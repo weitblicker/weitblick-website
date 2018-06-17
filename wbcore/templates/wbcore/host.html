@@ -1,0 +1,10 @@
+{% extends 'wbcore/base.html' %}
+
+{% if host %}
+    {% block content %}
+    <h1>{{ host.name }}</h1>
+    <img src="{{    host.logo.url }}"/>
+    {% endblock %}
+{% else %}
+    <p>No host available.</p>
+{% endif %}

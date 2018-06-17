@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Weitblick{% endblock %}</title>
+    {% load bootstrap4 %}
+    {% load static %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript jquery='full'%}
+    {% load sass_tags %}
+    <link href="{% sass_src 'css/wbcore.scss' %}" rel="stylesheet" type="text/css" />
+    <script src="{% static 'js/wbcore.js' %}"></script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-8">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'idea' %}">Idee</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'projects' %}">Projects</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'events' %}">Events</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="{% url 'join' %}">Join in</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="#">...</a>
+                    </li>
+
+                </ul>
+            </div>
+            <div class="col-4">
+                </a><div class="logo" style="height:100px; background: url({% if host %}{{ host.logo.url }}{% else %}{% get_media_prefix %}logo.png{% endif %}) no-repeat right; background-size: contain;"></div>
+            </div>
+        </div>
+        <div class="row">
+            <main class="col-12">
+                {% block breadcrumb %}
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        {% for crumb in breadcrumb %}
+                        {% if crumb.1 %}
+                            <li class="breadcrumb-item"><a href="{{crumb.1}}">{{crumb.0}}</a></li>
+                        {% else %}
+                            <li class="breadcrumb-item active" aria-current="page">{{crumb.0}}</li>
+                        {% endif %}
+                        {% endfor %}
+                    </ol>
+                </nav>
+                {% endblock %}
+
+                {# Display django.contrib.messages as Bootstrap alerts #}
+                {% bootstrap_messages %}
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+</body>
+</html>
