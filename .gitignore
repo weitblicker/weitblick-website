@@ -102,3 +102,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# user generated
+/weitblick/media/
+/weitblick/static/css
+
+# migrations
+/wbcore/migrations/*
+!__init__.py
