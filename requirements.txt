@@ -1,0 +1,5 @@
+Django==2.0.6
+django-bootstrap4==0.0.6
+django-countries==5.3.1
+django-redactoreditor==1.2.10
+django-sass-processor==0.7
