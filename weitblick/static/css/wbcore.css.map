@@ -1,9 +1,0 @@
-{
-	"version": 3,
-	"file": "../../home/spuetz/weitblick/weitblick-site/weitblick/wbcore/static/css/wbcore.css",
-	"sources": [
-		"../../home/spuetz/weitblick/weitblick-site/weitblick/wbcore/static/css/wbcore.scss"
-	],
-	"names": [],
-	"mappings": "AAEA,AAAA,IAAI,CAAC;EACD,UAAU,EAHC,OAAO,GAIrB"
-}
