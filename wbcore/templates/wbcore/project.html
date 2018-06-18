@@ -2,7 +2,7 @@
 {% block content %}
     {% if project %}
         <h1>{{ project.name }}</h1>
-        <p>{{ project.description }}</p>
+        <div>{{ project.description|safe }}</div>
     {% else %}
         <p>No project available.</p>
     {% endif %}

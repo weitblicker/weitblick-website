@@ -85,16 +85,16 @@ class Event(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    host = models.ManyToManyField(Host)
+    host = models.ManyToManyField(Host, blank=True, )
     image = models.ImageField(null=True, blank=True)
 
 
 class Post(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
-    host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True)
-    project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
-    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True, blank=True)
+    project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
 
 # Create your models here.
