@@ -44,12 +44,14 @@ def idea_view(request):
 def projects_view(request):
     template = loader.get_template('wbcore/projects.html')
     projects = Project.objects.all()
+    projects_countries_list = {"AF": 1,"IN": 2,"DZ": 5}
     context = {
         'main_nav': [('Idea', reverse('idea')),
                      ('Projects', None),
                      ('Events', reverse('events')),
                      ('Join in', reverse('join'))],
         'projects': projects,
+        'projects_countries_list': projects_countries_list,
         'breadcrumb': [('Home', reverse('home')), ('Projects', None)],
     }
     return HttpResponse(template.render(context, request))
@@ -109,12 +111,17 @@ def host_projects_view(request, host_slug):
 
 def events_view(request):
     events = Event.objects.all()
+    #some examples to get markers on the map
+    cities = {'HD':{
+            "name": 'Heidelberg', "latLng": [49.3987524,8.672433500000011]},
+          'Mu':{"name": 'Münster', "latLng": [51.9606649,7.626134699999966]}}
     template = loader.get_template('wbcore/events.html')
     context = {
         'main_nav': [('Idea', reverse('idea')),
                      ('Projects', reverse('projects')),
                      ('Events', None),
                      ('Join in', reverse('join'))],
+        'city_list': cities,
         'events': events,
         'breadcrumb': [('Home', reverse('home')), ('Events', None)],
     }
