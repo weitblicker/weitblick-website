@@ -2,6 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from django.urls import reverse
 from .models import Host, Project, Event, Post
+from num2words import num2words
 
 def home_view(request):
     projects = Project.objects.all()
@@ -10,11 +11,19 @@ def home_view(request):
     posts = Post.objects.all()
 
     template = loader.get_template('wbcore/home.html')
+
+    more_nav = [{'title': 'Gruppe A', 'links': [('Item A.1', '#'), ('Item A.2', '#')]},
+                {'title': 'Gruppe B', 'links': [('Item B.1', '#'), ('Item B.2', '#')]},
+                {'title': 'Gruppe B', 'links': [('Item B.1', '#'), ('Item B.2', '#')]},
+                {'title': 'Gruppe B', 'links': [('Item B.1', '#'), ('Item B.2', '#')]},
+                {'title': 'Gruppe B', 'links': [('Item B.1', '#'), ('Item B.2', '#')]},
+                {'title': 'Gruppe C', 'links': [('Item C.1', '#'), ('Item C.2', '#'), ('Item C.3', '#')]}]
     context = {
         'main_nav': [('Idea', reverse('idea')),
                      ('Projects', reverse('projects')),
                      ('Events', reverse('events')),
                      ('Join in', reverse('join'))],
+        'more_nav': (more_nav, num2words(len(more_nav))),
         'projects': projects,
         'hosts': hosts,
         'events': events,

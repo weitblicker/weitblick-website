@@ -5,3 +5,4 @@ django-redactoreditor==1.2.10
 django-sass-processor==0.7
 Pillow==5.1.0
 libsass==0.14.5
+num2words
