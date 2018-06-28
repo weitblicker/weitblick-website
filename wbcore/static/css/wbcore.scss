@@ -4,9 +4,17 @@ body {
 	background: $primaryColor;
 }
 
-#popup-menu{
+#main-menu{
 	background-color: #ffffff;
-	visibility: hidden;
+}
+
+#popup-menu-container{
+	background-color: #ffffff;
+}
+
+#popup-menu{
+	margin: 40px;
+	display: none;
 }
 
 .logo{

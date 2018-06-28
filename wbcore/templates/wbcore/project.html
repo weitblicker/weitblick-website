@@ -4,6 +4,7 @@
         <h1>{{ project.name }}</h1>
         <div>{{ project.description|safe }}</div>
     {% else %}
+    	{% include 'wbcore/project_cade.html' %}
         <p>No project available.</p>
     {% endif %}
 {% endblock %}

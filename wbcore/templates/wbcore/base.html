@@ -5,46 +5,12 @@
     {% include "wbcore/head.html" %}
 <body>
 
-    <!-- Following Menu -->
-    <div class="ui large top fixed hidden secondary menu" style="background-color: #ffffff; border-bottom: solid 1px;">
-        <div class="ui container">
-            {% for elem in main_nav %}
-            {% if elem.1 %}
-            <a class="item" href="{{ elem.1 }}">{{elem.0}}</a>
-            {% else %}
-            <a class="item active" href="#">{{elem.0}}</a>
-            {% endif %}
-            {% endfor %}
-
-            <div class="right menu">
-                <div class="item">
-                    <div class="ui icon input">
-                        <input placeholder="Search..." type="text">
-                        <i class="search link icon"></i>
-                    </div>
-                </div>
-                <div class="ui item logo">
-                    <div class="ui tiny image"><img class="" src="{% if host %}{{ host.logo.url }}{% else %}{% get_media_prefix %}logo.png{% endif %}"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'wbcore/main_nav.html' %}
 
     {% include 'wbcore/sidebar.html' %}
 
     <!-- Page Contents -->
     <div class="pusher">
-        <div class="ui inverted vertical masthead center aligned segment">
-            {% include 'wbcore/main_nav.html' %}
-
-            <div class="ui text container">
-                <h1 class="ui inverted header">
-                    Weitblick
-                </h1>
-                <h2>Bildungschancen weltweit.</h2>
-            </div>
-
-        </div>
 
         <div class="ui vertical stripe segment">
             <div class="ui middle aligned stackable grid container">

@@ -1,17 +1,15 @@
 {% load static %}
-<div class="ui container">
-    <div class="ui large secondary inverted pointing menu">
-        <a class="toc item">
-            <i class="sidebar icon"></i>
-        </a>
+<div id="main-menu" class="ui large top fixed secondary menu" style="display: block;">
+    <div class="ui container row">
         {% for elem in main_nav %}
-            {% if elem.1 %}
-                <a class="item" href="{{ elem.1 }}">{{elem.0}}</a>
-            {% else %}
-                <a class="item active" href="#">{{elem.0}}</a>
-            {% endif %}
+        {% if elem.1 %}
+        <a class="item" href="{{ elem.1 }}">{{elem.0}}</a>
+        {% else %}
+        <a class="item active" href="#">{{elem.0}}</a>
+        {% endif %}
         {% endfor %}
         <a id="popup-menu-btn" class="item">...</a>
+
         <div class="right menu">
             <div class="item">
                 <div class="ui icon input">
@@ -19,26 +17,25 @@
                     <i class="search link icon"></i>
                 </div>
             </div>
-            <div class="item logo-inverted">
-                <div class="ui small image logo-inverted"><img class="" src="{% if host %}{{ host.logo.url }}{% else %}{% get_media_prefix %}logo-inverse.png{% endif %}"></div>
+            <div class="ui item logo">
+                <div class="ui tiny image"><img class="" src="{% if host %}{{ host.logo.url }}{% else %}{% get_media_prefix %}logo.png{% endif %}"></div>
             </div>
         </div>
-
     </div>
-
-    <div id="popup-menu" class="ui fluid bottom left">
-        <div class="ui {{ more_nav.1 }} column relaxed equal height divided grid">
-            {% for column in more_nav.0 %}
-                <div class="column">
-                    <h4 class="ui header">{{ column.title}}</h4>
-                    <div class="ui link list">
-                        {% for link in column.links %}
-                            <a class="item">{{ link.0 }}</a>
-                        {% endfor %}
+    <div class="ui container row" id="popup-menu-container">
+        <div id="popup-menu" class="ui fluid bottom left">
+            <div class="ui {{ more_nav.1 }} column relaxed equal height divided grid">
+                {% for column in more_nav.0 %}
+                    <div class="column">
+                        <h4 class="ui header">{{ column.title}}</h4>
+                        <div class="ui link list">
+                            {% for link in column.links %}
+                                <a class="item">{{ link.0 }}</a>
+                            {% endfor %}
+                        </div>
                     </div>
-                </div>
-            {% endfor %}
-        </div>
+                {% endfor %}
+            </div>
+        </div>       
     </div>
-
 </div>

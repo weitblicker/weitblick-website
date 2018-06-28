@@ -4,6 +4,13 @@ from django.urls import reverse
 from .models import Host, Project, Event, Post
 from num2words import num2words
 
+more_nav = [{'title': 'Gruppe A', 'links': [('Item A.1', '#'), ('Item A.2', '#')]},
+            {'title': 'Gruppe B', 'links': [('Item B.1', '#'), ('Item B.2', '#')]},
+            {'title': 'Gruppe B', 'links': [('Item B.1', '#'), ('Item B.2', '#')]},
+            {'title': 'Gruppe B', 'links': [('Item B.1', '#'), ('Item B.2', '#')]},
+            {'title': 'Gruppe B', 'links': [('Item B.1', '#'), ('Item B.2', '#')]},
+            {'title': 'Gruppe C', 'links': [('Item C.1', '#'), ('Item C.2', '#'), ('Item C.3', '#')]}]
+
 def home_view(request):
     projects = Project.objects.all()
     hosts = Host.objects.all()
@@ -12,12 +19,6 @@ def home_view(request):
 
     template = loader.get_template('wbcore/home.html')
 
-    more_nav = [{'title': 'Gruppe A', 'links': [('Item A.1', '#'), ('Item A.2', '#')]},
-                {'title': 'Gruppe B', 'links': [('Item B.1', '#'), ('Item B.2', '#')]},
-                {'title': 'Gruppe B', 'links': [('Item B.1', '#'), ('Item B.2', '#')]},
-                {'title': 'Gruppe B', 'links': [('Item B.1', '#'), ('Item B.2', '#')]},
-                {'title': 'Gruppe B', 'links': [('Item B.1', '#'), ('Item B.2', '#')]},
-                {'title': 'Gruppe C', 'links': [('Item C.1', '#'), ('Item C.2', '#'), ('Item C.3', '#')]}]
     context = {
         'main_nav': [('Idea', reverse('idea')),
                      ('Projects', reverse('projects')),
@@ -43,6 +44,7 @@ def idea_view(request):
                      ('Projects', reverse('projects')),
                      ('Events', reverse('events')),
                      ('Join in', reverse('join'))],
+        'more_nav': (more_nav, num2words(len(more_nav))),
         'projects': projects,
         'hosts': hosts,
         'breadcrumb': [('Home', reverse('home')), ('Idea', None)],
@@ -59,6 +61,7 @@ def projects_view(request):
                      ('Projects', None),
                      ('Events', reverse('events')),
                      ('Join in', reverse('join'))],
+        'more_nav': (more_nav, num2words(len(more_nav))),
         'projects': projects,
         'projects_countries_list': projects_countries_list,
         'breadcrumb': [('Home', reverse('home')), ('Projects', None)],
@@ -73,6 +76,7 @@ def join_view(request):
                      ('Projects', reverse('projects')),
                      ('Events', reverse('events')),
                      ('Join in', None)],
+        'more_nav': (more_nav, num2words(len(more_nav))),
         'breadcrumb': [('Home', reverse('home')), ('Join in', None)],
     }
     return HttpResponse(template.render(context, request))
@@ -87,6 +91,7 @@ def project_view(request, project_slug):
                      ('Events', reverse('events')),
                      ('Join in', reverse('join'))],
         'project': project,
+        'more_nav': (more_nav, num2words(len(more_nav))),
         'breadcrumb': [('Home', reverse('home')), ('Projects', reverse('projects')), (project.name, None)],
     }
     return HttpResponse(template.render(context, request))
@@ -111,6 +116,7 @@ def host_projects_view(request, host_slug):
                      ('Projects', None),
                      ('Events', reverse('events')),
                      ('Join in', reverse('join'))],
+        'more_nav': (more_nav, num2words(len(more_nav))),
         'projects': projects,
         'host': host,
         'breadcrumb': [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Projects', None)],
@@ -130,6 +136,7 @@ def events_view(request):
                      ('Projects', reverse('projects')),
                      ('Events', None),
                      ('Join in', reverse('join'))],
+        'more_nav': (more_nav, num2words(len(more_nav))),
         'city_list': cities,
         'events': events,
         'breadcrumb': [('Home', reverse('home')), ('Events', None)],
@@ -146,6 +153,7 @@ def host_events_view(request, host_slug):
                      ('Projects', reverse('projects')),
                      ('Events', None),
                      ('Join in', reverse('join'))],
+        'more_nav': (more_nav, num2words(len(more_nav))),
         'events': events,
         'host': host,
         'breadcrumb': [('Home', reverse('home')), (host.name, reverse('host', host_slug)), ("Events", None)],
@@ -161,6 +169,7 @@ def event_view(request, event_slug):
                      ('Projects', reverse('projects')),
                      ('Events', None),
                      ('Join in', reverse('join'))],
+        'more_nav': (more_nav, num2words(len(more_nav))),
         'event': event,
         'breadcrumb': [('Home', reverse('home')), ("Events", reverse('events')), (event.name, None)],
     }

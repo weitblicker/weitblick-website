@@ -26,11 +26,13 @@
         on         : 'click', 
         hoverable  : true,
         inline     : false,
-        transition : 'fade',
+        transition : 'fade down',
+        position   : 'bottom center',
         delay: {
-          show: 300,
-          hide: 800
-        }
+          show: 0,
+          hide: 0
+        },
+        duration: 500,
       });
 
       $('#popup-menu-2-btn')
