@@ -1,0 +1,10 @@
+<!-- Sidebar Menu -->
+<div class="ui vertical inverted sidebar menu">
+    {% for elem in main_nav %}
+        {% if elem.1 %}
+            <a class="item" href="{{ elem.1 }}">{{elem.0}}</a>
+        {% else %}
+            <a class="item active" href="#">{{elem.0}}</a>
+        {% endif %}
+    {% endfor %}
+</div>
