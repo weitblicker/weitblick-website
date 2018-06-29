@@ -37,6 +37,7 @@ def save_host_logo(instance, filename):
 
 class Host(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    city = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50, unique=True)
     email = models.EmailField(max_length=100, unique=True)
     founding_date = models.DateField()
@@ -69,6 +70,12 @@ class Project(models.Model):
     description = models.TextField()
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
     partner = models.ForeignKey(Partner, on_delete=models.CASCADE, null=True, blank=True)
+
+
+    def host_name_list(self):
+        host_names = [host.name for host in self.hosts.all()]
+        return ", ".join(host_names)
+
 
     def __str__(self):
         return self.name

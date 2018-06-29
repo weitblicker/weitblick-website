@@ -5,7 +5,7 @@
 {% if projects %}
     <div class="ui four stackable cards">
     {% for project in projects %}
-        {% include 'wbcore/project_card.html' with title=project.name slug=project.slug %}
+        {% include 'wbcore/project_card.html' with title=project.name slug=project.slug hosts=project.hosts.all description=project.short_description|striptags country=project.location.country.name %}
     {% endfor %}
     </div>
 {% else %}

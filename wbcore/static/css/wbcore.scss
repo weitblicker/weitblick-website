@@ -6,15 +6,26 @@ body {
 
 #main-menu{
 	background-color: #ffffff;
+	padding-bottom: 15px;
+	border-bottom: solid 1px;
 }
 
 #popup-menu-container{
 	background-color: #ffffff;
 }
 
+.wb-icon{
+	width: 20px;
+	height: 20px;
+}
+
 #popup-menu{
 	margin: 40px;
 	display: none;
+}
+
+.content{
+	padding-top: 58px;
 }
 
 .logo{
