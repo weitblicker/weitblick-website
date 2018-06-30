@@ -3,6 +3,7 @@ from django.template import loader
 from django.urls import reverse
 from .models import Host, Project, Event, Post
 from num2words import num2words
+import csv
 
 more_nav = [{'title': 'Gruppe A', 'links': [('Item A.1', '#'), ('Item A.2', '#')]},
             {'title': 'Gruppe B', 'links': [('Item B.1', '#'), ('Item B.2', '#')]},
@@ -53,8 +54,15 @@ def idea_view(request):
 
 
 def projects_view(request):
-    template = loader.get_template('wbcore/projects.html')
-    projects = Project.objects.all()
+    host_slugs = request.GET.getlist("wb")
+    host_slugs = list(csv.reader(host_slugs))
+    host_slugs = list(set().union(*host_slugs))
+    host_slugs = [x.strip(' ') for x in host_slugs]
+    print(host_slugs)
+    if host_slugs:
+        projects = Project.objects.filter(hosts__slug__in=host_slugs).distinct()
+    else:
+        projects = Project.objects.all()
     projects_countries_list = {"AF": 1,"IN": 2,"DZ": 5}
     context = {
         'main_nav': [('Idea', reverse('idea')),
@@ -66,6 +74,7 @@ def projects_view(request):
         'projects_countries_list': projects_countries_list,
         'breadcrumb': [('Home', reverse('home')), ('Projects', None)],
     }
+    template = loader.get_template('wbcore/projects.html')
     return HttpResponse(template.render(context, request))
 
 
