@@ -36,9 +36,9 @@ def save_host_logo(instance, filename):
 
 
 class Host(models.Model):
+    slug = models.SlugField(primary_key=True, max_length=50, unique=True)
     name = models.CharField(max_length=100, unique=True)
     city = models.CharField(max_length=50)
-    slug = models.SlugField(max_length=50, unique=True)
     email = models.EmailField(max_length=100, unique=True)
     founding_date = models.DateField()
     address = models.OneToOneField(Address, on_delete=models.CASCADE)
@@ -71,11 +71,9 @@ class Project(models.Model):
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
     partner = models.ForeignKey(Partner, on_delete=models.CASCADE, null=True, blank=True)
 
-
     def host_name_list(self):
         host_names = [host.name for host in self.hosts.all()]
         return ", ".join(host_names)
-
 
     def __str__(self):
         return self.name
@@ -99,9 +97,36 @@ class Profile(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
-    host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True, blank=True)
+    image = models.ImageField(null=True, blank=True, upload_to="posts")
+    img_alt = models.CharField(max_length=300)
+    added = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+    published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    RANGE_CHOICES = (
+        ('preview', 'Preview'),
+        ('hidden', 'Hidden'),
+        ('global', 'Global'),
+        ('federal', 'Federal'),
+        ('city', 'City')
+    )
+    range = models.CharField(max_length=20, choices=RANGE_CHOICES, default='preview', null=True)
+    teaser = models.TextField()
+    host = models.ForeignKey(Host, to_field='slug', on_delete=models.SET_NULL, null=True, blank=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    author_str = models.CharField(max_length=200, null=True, blank=True)
 
+    def author_name(self):
+        name = self.author_str
+        if self.author:
+            name = self.author.first_name + " " + self.author.last_name
+        return name
 
+    class Meta:
+        get_latest_by = 'published'
+
+    def __str__(self):
+        city = ("(" + self.host.city + ")") if self.host else ''
+        return self.title + " " + city
 # Create your models here.
+

@@ -185,6 +185,39 @@ def event_view(request, event_slug):
     return HttpResponse(template.render(context, request))
 
 
+def posts_view(request):
+    template = loader.get_template('wbcore/posts.html')
+
+    posts = Post.objects.all().order_by('-published')[:30]
+    posts = reversed(posts)
+
+    context = {
+        'main_nav': [('Idea', reverse('idea')),
+                     ('Projects', reverse('projects')),
+                     ('Events', None),
+                     ('Join in', reverse('join'))],
+        'more_nav': (more_nav, num2words(len(more_nav))),
+        'posts': posts,
+        'breadcrumb': [('Home', reverse('home')), ("Posts", None)],
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def post_view(request, post_id):
+    template = loader.get_template('wbcore/post.html')
+    post = Post.objects.get(pk=post_id)
+    context = {
+        'main_nav': [('Idea', reverse('idea')),
+                     ('Projects', reverse('projects')),
+                     ('Events', reverse('events')),
+                     ('Join in', reverse('join'))],
+        'more_nav': (more_nav, num2words(len(more_nav))),
+        'post': post,
+        'breadcrumb': [('Home', reverse('home')), ("Posts", reverse('posts')), (post.title, None)],
+    }
+    return HttpResponse(template.render(context, request))
+
+
 def search_view(request):
     if request.method == "POST":
         search_text = request.POST['search_text']
