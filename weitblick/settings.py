@@ -38,10 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'django_countries',
     'bootstrap4',
     'sass_processor',
     'redactor',
+    'photologue',
+    'sortedm2m',
 ]
 
 MIDDLEWARE = [
