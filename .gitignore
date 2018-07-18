@@ -2,3 +2,8 @@ __pycache__
 migrations
 djangoenv
 .idea
+deploy.sh
+db.sqlite3
+weitblick/media/posts*
+update-server.sh
+wbcore/static/css/wbcore.css
