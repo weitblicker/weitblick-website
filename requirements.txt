@@ -7,3 +7,4 @@ Pillow==5.1.0
 libsass==0.14.5
 num2words
 django-photologue
+django-compressor
