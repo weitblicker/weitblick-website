@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '+k(vot$ur$u-anq(+u-35=ves6(luzr$q+uwv+5!gn$(mk05ms'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["new.weitblicker.org", "new.weitblick.ngo", "new.weitblick.ong"]
 
 
 # Application definition
@@ -38,13 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',
     'django_countries',
     'bootstrap4',
     'sass_processor',
     'redactor',
-    'photologue',
-    'sortedm2m',
 ]
 
 MIDDLEWARE = [
@@ -129,7 +126,8 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 ENV_PATH = os.path.abspath(os.path.dirname(__file__))
 MEDIA_ROOT = os.path.join(ENV_PATH, 'media/')
-STATIC_ROOT = os.path.join(ENV_PATH, 'static/')
+#STATIC_ROOT = os.path.join(ENV_PATH, 'static/')
+STATIC_ROOT = '/var/www/weitblick-new/static/'
 SASS_PROCESSOR_ROOT = STATIC_ROOT
 
 STATICFILES_FINDERS = [
