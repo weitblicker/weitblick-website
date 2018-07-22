@@ -42,17 +42,17 @@ for user in user_data['users']:
 news_list = []
 downloads = []
 
-citys = ['osnabrueck', 'berlin']
+#citys = ['osnabrueck', 'berlin']
 
 for article in data["news-list"]:
     article = article['news-article']
     dt = datetime.datetime.strptime(article['datetime'], "%Y-%m-%d %H:%M:%S").isoformat()
     host = article['wb-host'].lower()
     host = umlaute(host)
-    if host in citys:
-        print(host)
-    else:
-        host = None
+#    if host in citys:
+#        print(host)
+#    else:
+#        host = None
 
     user_id = article['Autor']
     user = users[user_id]['name']
