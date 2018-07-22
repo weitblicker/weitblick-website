@@ -14,7 +14,7 @@ outfile = sys.argv[3]
 
 
 def umlaute(value):
-    replacements = [(u'ä', u'ae'), (u'ü', u'ue'), (u'ö', u'oe')]
+    replacements = [(u'ä', u'ae'), (u'ü', u'ue'), (u'ö', u'oe'), (u'gesamtverein', u'bundesverband')]
     for (s, r) in replacements:
         value = value.replace(s, r)
     return value
