@@ -8,7 +8,6 @@ from localflavor.generic.models import BICField
 from localflavor.generic.countries.sepa import IBAN_SEPA_COUNTRIES
 
 
-
 class Address(models.Model):
     name = models.CharField(max_length=200)
     country = CountryField()
@@ -85,11 +84,13 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
+
 class CustomGallery(models.Model):
     gallery = models.OneToOneField(Gallery, related_name='extended',on_delete=models.CASCADE)
     project = models.ForeignKey(Project,on_delete=models.SET_NULL, null=True, blank =True)
     def __str__(self):
         return self.gallery.title
+
 
 class Event(models.Model):
     name = models.CharField(max_length=200)
@@ -149,10 +150,12 @@ class Post(models.Model):
     def __str__(self):
         city = ("(" + self.host.city + ")") if self.host else ''
         return self.title + " " + city
-    
+
+
 def save_document(instance, filename):
     return "documents/"+ instance.host +"/" + instance.title.lower().replace(' ', '_') + path.splittext(filename)[1].lower() 
-  
+
+
 class Document(models.Model):
     title = models.CharField(max_length=50)
     file = models.FileField(upload_to=save_document)
@@ -166,7 +169,8 @@ class Document(models.Model):
     def __str__(self):
         city = ("(" + self.host.city + ")") if self.host else ''
         return self.title + " " + city
-    
+
+
 class Team(models.Model):
     name = models.CharField(max_length=100)
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
@@ -175,23 +179,27 @@ class Team(models.Model):
     def __str__(self):
         city = ("(" + self.host.city + ")") if self.host else ''
         return self.title + " " + city
-    
+
+
 class Donation(models.Model):
     host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
     amount = models.DecimalField(max_digits=11, decimal_places=2)
     note = models.TextField()
-    
+
+
 class Milestone(models.Model):
     project = models.OneToOneField(Project, on_delete=models.CASCADE, null=True, blank=True)
-    
+
+
 class Milestep(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField()
     milestone = models.ForeignKey(Milestone, on_delete = models.CASCADE)
     date = models.DateField(null=True, blank=True)
     reached = models.BooleanField()
-    
+
+
 class BankAccount(models.Model):
     account_holder = models.CharField(max_length=100)
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE)

@@ -1,7 +1,8 @@
 from django.urls import path
 from django.conf.urls import include
-
-from . import views
+from wbcore import rest_views
+from wbcore import rest_url
+from wbcore import views
 
 
 main_patterns = [
@@ -14,8 +15,10 @@ main_patterns = [
     path('posts/', views.posts_view, name='posts'),
 ]
 
+
 urlpatterns = [
     path('', views.home_view, name='home'),
+    path('rest/', include(rest_url.rest_patterns)),
     path('idea/', views.idea_view, name='idea'),
 ]
 
