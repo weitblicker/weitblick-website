@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'photologue',
     'sortedm2m',
     'rest_framework'
+    'localflavor',
 ]
 
 MIDDLEWARE = [
@@ -132,6 +133,7 @@ ENV_PATH = os.path.abspath(os.path.dirname(__file__))
 MEDIA_ROOT = os.path.join(ENV_PATH, 'media/')
 STATIC_ROOT = os.path.join(ENV_PATH, 'static/')
 SASS_PROCESSOR_ROOT = STATIC_ROOT
+SITE_ID=1 #has fixed 'site not found' error when accessing admin page
 
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',

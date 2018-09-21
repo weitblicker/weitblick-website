@@ -1,6 +1,51 @@
 {% extends 'wbcore/base.html' %}
 {% load staticfiles %}
 {% block content %}
+<script src="{% static 'highmaps/highmaps.js'%}"></script>
+<div id="world-map" style="width: 900px; height: 400px"></div>
+<script>
+var data = [
+    ['de', 20],
+    ['us', 2],
+    ['in', 4],
+];
+
+$.getJSON("{% static 'highmaps/world-robinson-highres.geo.json'%}", function (geojson) {
+
+    // Initiate the chart
+    Highcharts.mapChart('world-map', {
+        chart: {
+            map: geojson
+        },
+
+        title: {
+            text: 'Weitblick Projekte'
+        },
+
+        mapNavigation: {
+            enabled: true,
+            buttonOptions: {
+                verticalAlign: 'bottom'
+            }
+        },
+
+        colorAxis: {
+            tickPixelInterval: 100
+        },
+
+        series: [{
+            data: data,
+            name: 'Projektanzahl',
+            states: {
+                hover: {
+                    color: '#FF9900'
+                }
+            },
+            
+        }]
+    });
+});
+</script>
 
 {% if projects %}
     <div class="ui four stackable cards">

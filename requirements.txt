@@ -5,6 +5,7 @@ django-redactoreditor==1.2.10
 django-sass-processor==0.7
 django-photologue
 django-compressor
+django-localflavor
 django-filter
 djangorestframework
 Pillow==5.1.0
