@@ -93,25 +93,35 @@ class CustomGallery(models.Model):
 
 class Event(models.Model):
     name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=50, unique=True, null=True)
     projects = models.ManyToManyField(Project, blank=True)
-    host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True, blank=True)
+    host = models.ManyToManyField(Host)
     description = models.TextField()
     start_date = models.DateTimeField()
     end_date = models.DateTimeField(null=True, blank=True)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     gallery = models.ForeignKey(Gallery, null=True, blank =True,on_delete=models.SET_NULL)
+    
+    def __str__(self):
+        return self.name
 
 
 class Profile(models.Model):
+    name = models.CharField(max_length=100) 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     host = models.ManyToManyField(Host, through='UserRelation')
     image = models.ImageField(null=True, blank=True)
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
     since = models.DateField(auto_now_add=True)
     STATUS_CHOICES = (
         ('activ', 'Active'),
         ('left', 'Left')
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    
+    def __str__(self):
+        return self.name
+    
 
 class UserRelation(models.Model):
     host = models.ForeignKey(Host, on_delete=models.CASCADE)
@@ -123,6 +133,9 @@ class UserRelation(models.Model):
     )
     member_type=models.CharField(max_length=20, choices=TYPE_CHOICES, default='pending')
     membership_fee = models.DecimalField(max_digits=5, decimal_places=2)
+    
+    def __str__(self):
+        return self.profile.name + ' in ' + self.host.name
 
 class Post(models.Model):
     title = models.CharField(max_length=200)
@@ -193,8 +206,14 @@ class Donation(models.Model):
     amount = models.DecimalField(max_digits=11, decimal_places=2)
     note = models.TextField(null=True, blank=True)
     
+    def __str__(self):    
+        project = ("(" + self.project.name + ")") if self.host else ''
+        return str(self.amount) + "€ für " + self.host.city + project
+    
 class Milestone(models.Model):
     project = models.OneToOneField(Project, on_delete=models.CASCADE, null=True, blank=True)
+    def __str__(self):  
+        return "Milestone für " + self.project.name
     
 class Milestep(models.Model):
     name = models.CharField(max_length=50)
@@ -202,12 +221,17 @@ class Milestep(models.Model):
     milestone = models.ForeignKey(Milestone, on_delete = models.CASCADE)
     date = models.DateField(null=True, blank=True)
     reached = models.BooleanField()
+    def __str__(self):
+        return self.name + ' (' + self.milestone.project.name + ')'
     
 class BankAccount(models.Model):
     account_holder = models.CharField(max_length=100)
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
     iban = IBANField(include_countries=IBAN_SEPA_COUNTRIES)
     bic = BICField()
+    
+    def __str__(self):
+        return 'Bankdaten von '+self.profile.name 
     
     
     
