@@ -25,7 +25,7 @@ SECRET_KEY = '+k(vot$ur$u-anq(+u-35=ves6(luzr$q+uwv+5!gn$(mk05ms'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost']
 
 
 # Application definition
