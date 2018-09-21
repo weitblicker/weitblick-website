@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'redactor',
     'photologue',
     'sortedm2m',
-    'rest_framework'
+    'rest_framework',
     'localflavor',
 ]
 

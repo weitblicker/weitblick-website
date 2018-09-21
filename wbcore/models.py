@@ -104,7 +104,7 @@ class Event(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    host = models.ManyToManyField(Host)
+    host = models.ManyToManyField(Host, through='UserRelation')
     image = models.ImageField(null=True, blank=True)
     since = models.DateField(auto_now_add=True)
     STATUS_CHOICES = (
@@ -113,6 +113,16 @@ class Profile(models.Model):
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
 
+class UserRelation(models.Model):
+    host = models.ForeignKey(Host, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    TYPE_CHOICES = (
+        ('user', 'User'),
+        ('member', 'Member'),
+        ('pending', 'Pending')
+    )
+    member_type=models.CharField(max_length=20, choices=TYPE_CHOICES, default='pending')
+    membership_fee = models.DecimalField(max_digits=5, decimal_places=2)
 
 class Post(models.Model):
     title = models.CharField(max_length=200)
@@ -197,7 +207,7 @@ class BankAccount(models.Model):
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
     iban = IBANField(include_countries=IBAN_SEPA_COUNTRIES)
     bic = BICField()
-    fee_per_month = models.DecimalField(max_digits=5, decimal_places=2)
+    
     
     
     
