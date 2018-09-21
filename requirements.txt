@@ -8,3 +8,4 @@ libsass==0.14.5
 num2words
 django-photologue
 django-compressor
+django-localflavor
