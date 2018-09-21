@@ -53,14 +53,14 @@ class Host(models.Model):
 
 
 def save_partner_logo(instance, filename):
-    return "partners/" + instance.name.lower().replace(' ', '_') + path.splittext(filename)[1].lower()
+    return "partners/" + instance.name.lower().replace(' ', '_') + splitext(filename)[1].lower()
 
 
 class Partner(models.Model):
     name = models.CharField(max_length=200, unique=True)
     description = models.TextField()
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, blank=True, null=True)
-    logo = models.ImageField(upload_to=save_partner_logo)
+    logo = models.ImageField(upload_to=save_partner_logo, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -94,25 +94,49 @@ class CustomGallery(models.Model):
 
 class Event(models.Model):
     name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=50, unique=True, null=True)
     projects = models.ManyToManyField(Project, blank=True)
-    host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True, blank=True)
+    host = models.ManyToManyField(Host)
     description = models.TextField()
     start_date = models.DateTimeField()
     end_date = models.DateTimeField(null=True, blank=True)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
-    gallery = models.ForeignKey(CustomGallery, null=True, blank =True,on_delete=models.SET_NULL)
+    gallery = models.ForeignKey(Gallery, null=True, blank =True,on_delete=models.SET_NULL)
+    
+    def __str__(self):
+        return self.name
 
 
 class Profile(models.Model):
+    name = models.CharField(max_length=100) 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    host = models.ManyToManyField(Host)
+    host = models.ManyToManyField(Host, through='UserRelation')
     image = models.ImageField(null=True, blank=True)
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
     since = models.DateField(auto_now_add=True)
     STATUS_CHOICES = (
         ('activ', 'Active'),
         ('left', 'Left')
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    
+    def __str__(self):
+        return self.name
+    
+
+class UserRelation(models.Model):
+    host = models.ForeignKey(Host, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    TYPE_CHOICES = (
+        ('user', 'User'),
+        ('member', 'Member'),
+        ('pending', 'Pending')
+    )
+    member_type=models.CharField(max_length=20, choices=TYPE_CHOICES, default='pending')
+    membership_fee = models.DecimalField(max_digits=5, decimal_places=2)
+    
+    def __str__(self):
+        return self.profile.name + ' in ' + self.host.name
 
 
 class Post(models.Model):
@@ -136,7 +160,7 @@ class Post(models.Model):
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     author_str = models.CharField(max_length=200, null=True, blank=True)
-    gallery = models.ForeignKey(CustomGallery, null=True, blank =True, on_delete=models.SET_NULL)
+    gallery = models.ForeignKey(Gallery, null=True, blank =True, on_delete=models.SET_NULL)
 
     def author_name(self):
         name = self.author_str
@@ -153,11 +177,12 @@ class Post(models.Model):
 
 
 def save_document(instance, filename):
-    return "documents/"+ instance.host +"/" + instance.title.lower().replace(' ', '_') + path.splittext(filename)[1].lower() 
+    return "documents/"+ instance.host.slug +"/" + instance.title.lower().replace(' ', '_') + splitext(filename)[1].lower()
 
 
 class Document(models.Model):
     title = models.CharField(max_length=50)
+    description = models.TextField(null=True, blank=True)
     file = models.FileField(upload_to=save_document)
     host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
@@ -178,19 +203,25 @@ class Team(models.Model):
     
     def __str__(self):
         city = ("(" + self.host.city + ")") if self.host else ''
-        return self.title + " " + city
-
+        return self.name + " " + city
+    
 
 class Donation(models.Model):
     host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
     amount = models.DecimalField(max_digits=11, decimal_places=2)
-    note = models.TextField()
-
+    note = models.TextField(null=True, blank=True)
+    
+    def __str__(self):    
+        project = ("(" + self.project.name + ")") if self.host else ''
+        return str(self.amount) + "€ für " + self.host.city + project
+    
 
 class Milestone(models.Model):
     project = models.OneToOneField(Project, on_delete=models.CASCADE, null=True, blank=True)
-
+    def __str__(self):  
+        return "Milestone für " + self.project.name
+    
 
 class Milestep(models.Model):
     name = models.CharField(max_length=50)
@@ -199,13 +230,19 @@ class Milestep(models.Model):
     date = models.DateField(null=True, blank=True)
     reached = models.BooleanField()
 
+    def __str__(self):
+        return self.name + ' (' + self.milestone.project.name + ')'
+    
 
 class BankAccount(models.Model):
     account_holder = models.CharField(max_length=100)
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
     iban = IBANField(include_countries=IBAN_SEPA_COUNTRIES)
     bic = BICField()
-    fee_per_month = models.DecimalField(max_digits=5, decimal_places=2)
+    
+    def __str__(self):
+        return 'Bankdaten von '+self.profile.name 
+    
     
     
     
