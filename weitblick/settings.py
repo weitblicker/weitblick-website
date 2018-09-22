@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/2.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
-
+from django.utils.translation import gettext_lazy as _
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['localhost']
 
 INSTALLED_APPS = [
     'wbcore.apps.WbcoreConfig',
+    'modeltranslation',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -46,12 +47,15 @@ INSTALLED_APPS = [
     'photologue',
     'sortedm2m',
     'rest_framework',
-    'localflavor',
+    'localflavor', 
 ]
+
+SUMMERNOTE_THEME = 'bs4'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -123,6 +127,14 @@ USE_L10N = True
 
 USE_TZ = True
 
+LANGUAGES = (
+    ('de', _('German')),
+    ('en', _('English')),
+    ('fr', _('French')),
+    ('es', _('Spanish')),
+)
+MODELTRANSLATION_LANGUAGES = ('de','en','fr')
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'de'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
@@ -132,6 +144,7 @@ MEDIA_URL = '/media/'
 ENV_PATH = os.path.abspath(os.path.dirname(__file__))
 MEDIA_ROOT = os.path.join(ENV_PATH, 'media/')
 STATIC_ROOT = os.path.join(ENV_PATH, 'static/')
+LOCALE_PATH = os.path.join(ENV_PATH, 'locale/')
 SASS_PROCESSOR_ROOT = STATIC_ROOT
 SITE_ID=1 #has fixed 'site not found' error when accessing admin page
 
@@ -148,3 +161,10 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
+
+FROALA_EDITOR_PLUGINS = ('align', 'char_counter', 'code_beautifier' ,'code_view', 'colors', 'draggable', 'emoticons',
+        'entities', 'file', 'font_family', 'font_size', 'fullscreen', 'inline_style',
+        'line_breaker', 'link', 'lists', 'paragraph_format', 'paragraph_style', 'quick_insert', 'quote', 'table',
+        'url')
+
+    
