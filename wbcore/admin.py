@@ -5,6 +5,8 @@ from django.db import models
 from redactor.widgets import AdminRedactorEditor
 from photologue.admin import GalleryAdmin as GalleryAdminDefault
 from photologue.models import Gallery
+from modeltranslation.admin import TabbedTranslationAdmin
+
 
 
 
@@ -12,6 +14,11 @@ class MyAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.TextField: {'widget': AdminRedactorEditor},
     }
+
+class MyTranslatedAdmin(TabbedTranslationAdmin, MyAdmin):
+    pass
+    
+
 class GalleryExtendedInline(admin.StackedInline):
     model = CustomGallery
     can_delete = False
@@ -26,7 +33,7 @@ admin.site.register(Address, MyAdmin)
 admin.site.register(Location, MyAdmin)
 admin.site.register(Host, MyAdmin)
 admin.site.register(Partner, MyAdmin)
-admin.site.register(Project, MyAdmin)
+admin.site.register(Project, MyTranslatedAdmin)
 admin.site.register(Event, MyAdmin)
 admin.site.register(Post, MyAdmin)
 admin.site.register(Profile, MyAdmin)

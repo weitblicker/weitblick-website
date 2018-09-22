@@ -21,10 +21,10 @@ class Address(models.Model):
 
 
 class Location(models.Model):
-    name = models.CharField(max_length=200, unique=True)
-    lng = models.DecimalField(max_digits=11, decimal_places=8)
-    lat = models.DecimalField(max_digits=11, decimal_places=8)
-    description = models.TextField(blank=True, null=True)
+    name = models.CharField(max_length=100, unique=True)
+    lng = models.DecimalField(max_digits=14, decimal_places=11)
+    lat = models.DecimalField(max_digits=14, decimal_places=11)
+    description = models.CharField(blank=True, null=True,max_length=300 )
     country = CountryField()
     postal_code = models.CharField(blank=True, null=True, max_length=20)
     city = models.CharField(blank=True, null=True, max_length=30)

@@ -1,7 +1,6 @@
 Django==2.1.1
 django-bootstrap4==0.0.6
 django-countries==5.3.1
-django-redactoreditor==1.2.10
 django-sass-processor==0.7
 django-photologue
 django-compressor
@@ -16,3 +15,4 @@ Pillow==5.1.0
 libsass==0.14.5
 num2words
 markdown
+django-modeltranslation==0.13b1
