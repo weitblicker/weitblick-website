@@ -5,10 +5,13 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
+from django.contrib.postgres.search import SearchVector
+from django.urls import reverse
+from haystack.query import SearchQuerySet
+from haystack.inputs import AutoQuery, Exact, Clean
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
-
+from itertools import groupby
 
 @api_view(['GET'])
 def host_list(request, format=None):
@@ -88,4 +91,52 @@ def post_detail(request, pk, format=None):
     if request.method == 'GET':
         serializer = PostSerializer(post)
         return Response(serializer.data)
+
+
+
+def remove_tags(text):
+    from tidylib import tidy_fragment
+
+    import re, html
+    text = html.unescape(text)
+    text, errors = tidy_fragment(text)
+    tag_re = re.compile(r'<[^>]+>')
+    return tag_re.sub('', text)
+
+
+@api_view(['GET', 'POST'])
+def search(request, query):
+
+    results = SearchQuerySet().filter(content__contains=query).highlight()
+
+    result_groups = {'results': {}}
+
+    for key, group in groupby(results, lambda x: x.model):
+        result_set = []
+        for result in group:
+            print("Highlighted", result.highlighted)
+            elem = {
+                'title': result.object.search_title(),
+                'description': remove_tags(result.highlighted[0]),
+                'url': result.object.search_url(),
+            }
+            result_set.append(elem);
+            print("Reverse: %s" % (elem['url']))
+            print("Found %s in %s." % (result.object, str(key)))
+        result_groups['results'][str(key.get_model_name())] = {
+            'name': str(key.get_model_name()),
+            'results': result_set,
+        }
+
+    #hosts = Host.objects.filter(slug__contains=query)
+
+    #for host in hosts:
+    #    hosts_result = {
+    #        'title': host.name,
+    #        'url': reverse('host', args=[host.slug]),
+    #    }
+    #    hosts_results.append(hosts_result)
+    print(result_groups)
+
+    return JsonResponse(result_groups)
 

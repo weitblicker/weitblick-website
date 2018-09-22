@@ -5,7 +5,7 @@ from rest_framework import serializers
 class PostSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Post
-        fields = ('title', 'text', 'image', 'added', 'updated', 'published', 'range', 'teaser', 'host')
+        fields = ('title', 'text', 'image', 'added', 'updated', 'published', 'range', 'teaser')
 
 
 class HostSerializer(serializers.HyperlinkedModelSerializer):

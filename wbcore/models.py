@@ -6,7 +6,7 @@ from os.path import splitext
 from localflavor.generic.models import IBANField
 from localflavor.generic.models import BICField
 from localflavor.generic.countries.sepa import IBAN_SEPA_COUNTRIES
-
+from django.urls import reverse
 
 class Address(models.Model):
     name = models.CharField(max_length=200)
@@ -47,6 +47,16 @@ class Host(models.Model):
     founding_date = models.DateField()
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True)
     logo = models.ImageField(upload_to=save_host_logo)
+
+    def search_title(self):
+        return self.name
+
+    def search_url(self):
+        return reverse('host', args=[self.slug])
+
+    @staticmethod
+    def get_model_name():
+        return "Union"
 
     def __str__(self):
         return self.name
@@ -161,6 +171,16 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     author_str = models.CharField(max_length=200, null=True, blank=True)
     gallery = models.ForeignKey(Gallery, null=True, blank =True, on_delete=models.SET_NULL)
+
+    def search_title(self):
+        return self.title
+
+    def search_url(self):
+        return reverse('post', args=[self.pk])
+
+    @staticmethod
+    def get_model_name():
+        return 'Post'
 
     def author_name(self):
         name = self.author_str

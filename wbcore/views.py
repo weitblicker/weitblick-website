@@ -321,7 +321,7 @@ def host_events_view(request, host_slug):
     return HttpResponse(template.render(context, request))
 
 
-def search_view(request):
+def search_view(request, query):
     if request.method == "POST":
         search_text = request.POST['search_text']
         search_type = request.POST['search_type']

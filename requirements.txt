@@ -7,6 +7,10 @@ django-photologue
 django-compressor
 django-localflavor
 django-filter
+elasticsearch>=2,<3
+django-haystack
+pytidylib
+psycopg2
 djangorestframework
 Pillow==5.1.0
 libsass==0.14.5

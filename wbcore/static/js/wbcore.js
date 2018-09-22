@@ -15,11 +15,10 @@
       ;
 
       // create sidebar and attach to menu open
-      $('.ui.sidebar')
+      /*$('.ui.sidebar')
         .sidebar('attach events', '.toc.item')
-      ;
+      ;*/
 
-    
       $('#popup-menu-btn')
       .popup({
         popup      : $('#popup-menu'),
@@ -32,7 +31,7 @@
           show: 0,
           hide: 0
         },
-        duration: 500,
+        duration: 500
       });
 
       $('#popup-menu-2-btn')
@@ -46,6 +45,14 @@
           show: 300,
           hide: 800
         }
+      });
+
+      $('.ui.search').search({
+          apiSettings: {
+              url: '/search/{query}'
+          },
+          type: 'category',
+          minCharacters: 3,
       });
 
 

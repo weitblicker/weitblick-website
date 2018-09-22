@@ -11,11 +11,12 @@
         <a id="popup-menu-btn" class="item">...</a>
 
         <div class="right menu">
-            <div class="item">
-                <div class="ui icon input">
-                    <input placeholder="Search..." type="text">
+            <div class="ui item fluid category search">
+                <div class="ui left icon input">
+                    <input class="prompt" placeholder="Search..." type="text">
                     <i class="search link icon"></i>
                 </div>
+                <div class="result eight wide column"></div>
             </div>
             <div class="ui item logo">
                 <div class="ui tiny image"><img class="" src="{% if host %}{{ host.logo.url }}{% else %}{% get_media_prefix %}logo.png{% endif %}"></div>
