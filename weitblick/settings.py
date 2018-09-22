@@ -31,7 +31,6 @@ ALLOWED_HOSTS = ['localhost']
 # Application definition
 
 INSTALLED_APPS = [
-    'wbcore.apps.WbcoreConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django_countries',
+    'haystack',
     'bootstrap4',
     'sass_processor',
     'redactor',
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'sortedm2m',
     'rest_framework',
     'localflavor',
+    'wbcore.apps.WbcoreConfig',
 ]
 
 MIDDLEWARE = [
@@ -85,10 +86,21 @@ WSGI_APPLICATION = 'weitblick.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'weitblick_website',
+        'USER': 'weitblick_website',
+        'PASSWORD': '42.zitronenkuchen',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
+
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#    }
+#}
 
 
 # Password validation
@@ -148,3 +160,12 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny'
     ]
 }
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'haystack',
+    },
+}
+
