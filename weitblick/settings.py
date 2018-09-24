@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'haystack',
     'bootstrap4',
     'sass_processor',
-    'redactor',
+    'tinymce',
     'photologue',
     'sortedm2m',
     'rest_framework',

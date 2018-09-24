@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('photologue/', include('photologue.urls', namespace='photologue')),
     path('', include('wbcore.urls')),
+    path('tinymce/', include('tinymce.urls')),
     
     
 ]

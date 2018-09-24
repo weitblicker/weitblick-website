@@ -13,7 +13,7 @@ class Address(models.Model):
     country = CountryField()
     postal_code = models.CharField(max_length=20)
     city = models.CharField(max_length=30)
-    state = models.CharField(max_length=30)
+    state = models.CharField(max_length=30, null=True, blank=True)
     street = models.CharField(max_length=30)
 
     def __str__(self):
@@ -122,8 +122,9 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     host = models.ManyToManyField(Host, through='UserRelation')
     image = models.ImageField(null=True, blank=True)
-    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
+    address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
     since = models.DateField(auto_now_add=True)
+    until = models.DateField(null=True, blank=True)
     STATUS_CHOICES = (
         ('activ', 'Active'),
         ('left', 'Left')
@@ -153,7 +154,7 @@ class Post(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
     image = models.ImageField(null=True, blank=True, upload_to="posts")
-    img_alt = models.CharField(max_length=300)
+    img_alt = models.CharField(max_length=300,null=True, blank=True)
     added = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -218,6 +219,7 @@ class Document(models.Model):
 
 class Team(models.Model):
     name = models.CharField(max_length=100)
+    description = models.TextField(null=True, blank=True)
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
     member = models.ManyToManyField(Profile)
     
