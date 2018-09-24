@@ -14,5 +14,5 @@ djangorestframework
 Pillow==5.1.0
 libsass==0.14.5
 num2words
-markdown
+markdown==2.6.11
 django-modeltranslation==0.13b1
