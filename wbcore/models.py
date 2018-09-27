@@ -8,6 +8,8 @@ from localflavor.generic.models import BICField
 from localflavor.generic.countries.sepa import IBAN_SEPA_COUNTRIES
 from django.urls import reverse
 
+
+
 class Address(models.Model):
     name = models.CharField(max_length=200)
     country = CountryField()
@@ -71,6 +73,7 @@ class Partner(models.Model):
     description = models.TextField()
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, blank=True, null=True)
     logo = models.ImageField(upload_to=save_partner_logo, null=True, blank=True)
+    
 
     def __str__(self):
         return self.name
@@ -235,7 +238,7 @@ class Donation(models.Model):
     note = models.TextField(null=True, blank=True)
     
     def __str__(self):    
-        project = ("(" + self.project.name + ")") if self.host else ''
+        project = ("(" + self.project.name + ")") if self.project else ''
         return str(self.amount) + "€ für " + self.host.city + project
     
 

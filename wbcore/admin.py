@@ -51,3 +51,4 @@ admin.site.register(Donation, MyAdmin)
 admin.site.register(Milestep, MyTranslatedAdmin)
 admin.site.register(BankAccount, MyAdmin)
 
+
