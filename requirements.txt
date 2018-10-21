@@ -1,4 +1,4 @@
-Django==2.1.1
+Django==2.1.2
 django-bootstrap4==0.0.6
 django-countries==5.3.1
 django-sass-processor==0.7
@@ -17,3 +17,4 @@ num2words
 markdown==2.6.11
 django-modeltranslation==0.13b1
 django-tinymce4-lite
+python-slugify

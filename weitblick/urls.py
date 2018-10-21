@@ -24,8 +24,6 @@ urlpatterns = [
     path('photologue/', include('photologue.urls', namespace='photologue')),
     path('', include('wbcore.urls')),
     path('tinymce/', include('tinymce.urls')),
-    
-    
 ]
 
 if settings.DEBUG is True:

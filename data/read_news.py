@@ -42,17 +42,16 @@ for user in user_data['users']:
 news_list = []
 downloads = []
 
-#citys = ['osnabrueck', 'berlin']
+skip_citys = ['tuebingen']
 
 for article in data["news-list"]:
     article = article['news-article']
     dt = datetime.datetime.strptime(article['datetime'], "%Y-%m-%d %H:%M:%S").isoformat()
     host = article['wb-host'].lower()
     host = umlaute(host)
-#    if host in citys:
-#        print(host)
-#    else:
-#        host = None
+    if host in skip_citys:
+        print(host)
+        continue
 
     user_id = article['Autor']
     user = users[user_id]['name']
@@ -69,15 +68,15 @@ for article in data["news-list"]:
     downloads.append(download)
 
     elem = {
-        'title': article['article-title'].rstrip(),
-        'text': article['article-text'].rstrip(),
+        'title_de': article['article-title'].rstrip(),
+        'text_de': article['article-text'].rstrip(),
         'image': "posts/"+download['name'],
-        'img_alt': article['teaserimage']['alt'],
+        'img_alt_de': article['teaserimage']['alt'],
         'added': dt,
         'updated': dt,
         'published': dt,
         'range': 'preview',
-        'teaser': article['conclusion'],
+        'teaser_de': article['conclusion'],
         'host': host,
         "project": None,
         "author": None,
