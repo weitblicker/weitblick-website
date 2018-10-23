@@ -9,7 +9,7 @@ django-filter
 elasticsearch>=2,<3
 django-haystack
 pytidylib
-psycopg2
+psycopg2-binary
 djangorestframework
 Pillow==5.1.0
 libsass==0.14.5

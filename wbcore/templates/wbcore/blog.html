@@ -1,0 +1,16 @@
+{% extends 'wbcore/base.html' %}
+{% load staticfiles %}
+{% block content %}
+
+{% if posts %}
+    <div class="ui three stackable cards">
+    {% for post in posts %}
+        {% include 'wbcore/blog_post_feed.html' with post=post host_slug=host.slug %}
+    {% endfor %}
+    </div>
+{% else %}
+    <p>No posts available.</p>
+{% endif %}
+{% endblock %}
+
+
