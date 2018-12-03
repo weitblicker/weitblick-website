@@ -153,7 +153,7 @@ class UserRelation(models.Model):
         return self.profile.name + ' in ' + self.host.name
 
 
-class Post(models.Model):
+class NewsPost(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
     image = models.ImageField(null=True, blank=True, upload_to="posts")
@@ -180,11 +180,11 @@ class Post(models.Model):
         return self.title
 
     def search_url(self):
-        return reverse('post', args=[self.pk])
+        return reverse('news-post', args=[self.pk])
 
     @staticmethod
     def get_model_name():
-        return 'Post'
+        return 'NewsPost'
 
     def author_name(self):
         name = self.author_str

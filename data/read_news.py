@@ -3,7 +3,7 @@
 import json
 import sys
 import datetime
-import urllib.request
+from urllib import request, error
 from slugify import slugify
 import os
 import re
@@ -11,6 +11,7 @@ import shutil
 
 img_pat = re.compile('<img [^>]*src="([^"]+)')
 link_pat = re.compile('href="([^"]+)')
+p_tag_pat = re.compile('(<p>.+?</p>)|(<img.+?src=".+?".*?>)')
 
 filename = sys.argv[1]
 usersfile = sys.argv[2]
@@ -175,7 +176,7 @@ for article in data["news-list"]:
     }
 
     post = {
-        "model": "wbcore.post",
+        "model": "wbcore.newspost",
         "pk": None,
         "fields": elem
     }
@@ -204,9 +205,11 @@ for i, image in enumerate(images):
         continue
 
     print('Download image ', i, 'from', len(images), ':', url, 'to images/'+name)
-    with urllib.request.urlopen(url) as response, open(filename, 'wb') as img_file:
-        shutil.copyfileobj(response, img_file)
-
+    try:
+        with request.urlopen(url) as response, open(filename, 'wb') as img_file:
+            shutil.copyfileobj(response, img_file)
+    except error.HTTPError:
+        print("Could not download the image ", url)
     #### todo download images
     #styles/presselogo_custom_user_normal_1x/public
 

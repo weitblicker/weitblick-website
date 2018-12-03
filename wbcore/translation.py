@@ -5,7 +5,7 @@ Necessary for the modeltranslation package
 """
 
 from modeltranslation.translator import register, TranslationOptions
-from .models import Project, Location, Address, Host, Partner, Event, Post, BlogPost, Document, Team, Milestep
+from .models import Project, Location, Address, Host, Partner, Event, NewsPost, BlogPost, Document, Team, Milestep
 
 @register(Project)
 class ProjectTranslationOptions(TranslationOptions):
@@ -32,12 +32,12 @@ class PartnerTranslationOptions(TranslationOptions):
 class EventTranslationOptions(TranslationOptions):
     fields = ('name','description',)
     
-@register(Post)
-class PostTranslationOptions(TranslationOptions):
+@register(NewsPost)
+class NewsPostTranslationOptions(TranslationOptions):
     fields = ('title','text', 'img_alt', 'teaser')
 
 @register(BlogPost)
-class PostTranslationOptions(TranslationOptions):
+class BlogPostTranslationOptions(TranslationOptions):
     fields = ('title', 'text', 'img_alt', 'teaser')
 
 @register(Document)

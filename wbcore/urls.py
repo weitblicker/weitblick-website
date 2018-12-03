@@ -10,10 +10,10 @@ main_patterns = [
     path('projects/<str:project_slug>/', views.project_view, name='project'),
     path('events/', views.events_view, name='events'),
     path('events/<str:event_slug>/', views.event_view, name='event'),
-    path('posts/<int:post_id>/', views.post_view, name='post'),
-    path('posts/', views.posts_view, name='posts'),
-    path('blog/', views.blog_view, name='blog'),
+    path('news/<int:post_id>/', views.news_post_view, name='news-post'),
+    path('news/', views.news_view, name='news'),
     path('blog/<int:post_id>/', views.blog_post_view, name='blog-post'),
+    path('blog/', views.blog_view, name='blog'),
 ]
 
 

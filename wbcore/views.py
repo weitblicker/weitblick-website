@@ -1,7 +1,7 @@
 from django.http import HttpResponse, JsonResponse, Http404
 from django.template import loader
 from django.urls import reverse
-from .models import Host, Project, Event, Post, BlogPost
+from .models import Host, Project, Event, NewsPost, BlogPost
 from num2words import num2words
 import csv
 
@@ -28,7 +28,7 @@ def home_view(request):
     projects = Project.objects.all()
     hosts = Host.objects.all()
     events = Event.objects.all()
-    posts = Post.objects.all()
+    posts = NewsPost.objects.all()
 
     template = loader.get_template('wbcore/home.html')
 
@@ -219,39 +219,6 @@ def event_view(request, host_slug=None, event_slug=None):
     return HttpResponse(template.render(context, request))
 
 
-def post_view(request, host_slug=None, post_id=None):
-    template = loader.get_template('wbcore/post.html')
-    try:
-        if host_slug:
-            post = Post.objects.get(pk=post_id, host__slug=host_slug)
-            host = Host.objects.get(slug=host_slug)
-            breadcrumb = [('Home', reverse('home')),
-                          (host.name, reverse('host', args=[host_slug])),
-                          ('Posts', reverse('posts', args=[host_slug])),
-                          (post.title, None)]
-        else:
-            post = Post.objects.get(pk=post_id)
-            host = None
-            breadcrumb = [('Home', reverse('home')), ("Posts", reverse('posts')), (post.title, None)]
-
-    except Post.DoesNotExist:
-        raise Http404("The post does not exists!")
-    except Host.DoesNotExist:
-        raise Http404()
-
-    context = {
-        'main_nav': [('Idea', reverse('idea')),
-                     ('Projects', reverse('projects')),
-                     ('Events', reverse('events')),
-                     ('Join in', reverse('join'))],
-        'more_nav': (more_nav, num2words(len(more_nav))),
-        'post': post,
-        'breadcrumb': breadcrumb,
-        'host': host,
-    }
-    return HttpResponse(template.render(context, request))
-
-
 def blog_view(request, host_slug=None):
     template = loader.get_template('wbcore/blog.html')
 
@@ -288,7 +255,7 @@ def blog_view(request, host_slug=None):
 
 
 def blog_post_view(request, host_slug=None, post_id=None):
-    template = loader.get_template('wbcore/post.html')
+    template = loader.get_template('wbcore/blog_post.html')
     try:
         if host_slug:
             post = BlogPost.objects.get(pk=post_id, host__slug=host_slug)
@@ -320,16 +287,16 @@ def blog_post_view(request, host_slug=None, post_id=None):
     return HttpResponse(template.render(context, request))
 
 
-def posts_view(request, host_slug=None):
-    template = loader.get_template('wbcore/posts.html')
+def news_view(request, host_slug=None):
+    template = loader.get_template('wbcore/news.html')
 
     host_slugs = get_host_slugs(request, host_slug)
     try:
         if host_slugs:
-            posts = Post.objects.filter(host__slug__in=host_slugs).distinct()
+            posts = NewsPost.objects.filter(host__slug__in=host_slugs).distinct()
             host = Host.objects.get(slug=host_slug) if host_slug else None
         else:
-            posts = Post.objects.all()
+            posts = NewsPost.objects.all()
             host = None
     except Host.DoesNotExist:
         raise Http404()
@@ -338,7 +305,7 @@ def posts_view(request, host_slug=None):
     posts = reversed(posts)
 
     if host:
-        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ("Posts", None)]
+        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ("News", None)]
     else:
         breadcrumb = [('Home', reverse('home')), ('Post', None)]
 
@@ -351,6 +318,39 @@ def posts_view(request, host_slug=None):
         'posts': posts,
         'host': host,
         'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def news_post_view(request, host_slug=None, post_id=None):
+    template = loader.get_template('wbcore/news_post.html')
+    try:
+        if host_slug:
+            post = NewsPost.objects.get(pk=post_id, host__slug=host_slug)
+            host = Host.objects.get(slug=host_slug)
+            breadcrumb = [('Home', reverse('home')),
+                          (host.name, reverse('host', args=[host_slug])),
+                          ('News', reverse('news', args=[host_slug])),
+                          (post.title, None)]
+        else:
+            post = NewsPost.objects.get(pk=post_id)
+            host = None
+            breadcrumb = [('Home', reverse('home')), ("News", reverse('news')), (post.title, None)]
+
+    except NewsPost.DoesNotExist:
+        raise Http404("The post does not exists!")
+    except Host.DoesNotExist:
+        raise Http404()
+
+    context = {
+        'main_nav': [('Idea', reverse('idea')),
+                     ('Projects', reverse('projects')),
+                     ('Events', reverse('events')),
+                     ('Join in', reverse('join'))],
+        'more_nav': (more_nav, num2words(len(more_nav))),
+        'post': post,
+        'breadcrumb': breadcrumb,
+        'host': host,
     }
     return HttpResponse(template.render(context, request))
 

@@ -1,5 +1,5 @@
-from wbcore.serializers import PostSerializer, HostSerializer, EventSerializer, ProjectSerializer
-from wbcore.models import Post, Host, Event, Project
+from wbcore.serializers import NewsPostSerializer, BlogPostSerializer, HostSerializer, EventSerializer, ProjectSerializer
+from wbcore.models import NewsPost, BlogPost, Host, Event, Project
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, JsonResponse
 from rest_framework import status
@@ -76,20 +76,20 @@ def project_detail(request, pk, format=None):
 @api_view(['GET'])
 def post_list(request, format=None):
     if request.method == 'GET':
-        posts = Post.objects.all()
-        serializer = PostSerializer(posts, many=True, context={'request': request})
+        posts = NewsPost.objects.all()
+        serializer = NewsPostSerializer(posts, many=True, context={'request': request})
         return Response(serializer.data)
 
 
 @api_view(['GET'])
 def post_detail(request, pk, format=None):
     try:
-        post = Post.objects.get(pk=pk)
-    except Post.DoesNotExist:
+        post = NewsPost.objects.get(pk=pk)
+    except NewsPost.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        serializer = PostSerializer(post)
+        serializer = NewsPostSerializer(post)
         return Response(serializer.data)
 
 
