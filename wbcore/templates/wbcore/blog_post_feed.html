@@ -1,0 +1,27 @@
+{% load static %}
+<a href="{% if host_slug %}{% url 'blog-post' host_slug=host_slug post_id=post.pk %}{% else %}{% url 'blog-post' post_id=post.pk %}{% endif %}"
+   class="ui raised link card">
+    <div class="image">
+        <img src="{% get_media_prefix %}{{ post.image }}" alt="{{ post.img_alt }}">
+    </div>
+    <div class="content">
+        <div class="header">{{ post.title }}</div>
+        <div class="meta">
+            <span class="category">{{ post.published }}</span>
+        </div>
+        <div class="description">
+            <p class="mini">{{ post.teaser }}</p>
+        </div>
+    </div>
+    <div class="extra content">
+        <span class="">
+            <img class="ui avatar image" src="{% get_media_prefix %}kristy.png"> {{ post.author_name }}
+        </span>
+    </div>
+    <div class="extra content">
+        <span class="ui">
+            <img class="ui avatar image" src="{% get_media_prefix %}icon.png">{{ post.host.name }}
+        </span>
+    </div>
+
+</a>

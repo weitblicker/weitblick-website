@@ -7,4 +7,6 @@ db.sqlite3
 weitblick/media/posts*
 update-server.sh
 wbcore/static/css/wbcore.css
+weitblick/static/css/wbcore.css
+weitblick/static/css/wbcore.css.map
 weitblick/media/photologue/photos/cache

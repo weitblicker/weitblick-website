@@ -1,0 +1,3 @@
+{{ object.title|safe|striptags }}
+{{ object.text|safe|striptags }}
+{{ object.teaser|safe|striptags }}

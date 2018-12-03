@@ -1,7 +1,7 @@
 from django.http import HttpResponse, JsonResponse, Http404
 from django.template import loader
 from django.urls import reverse
-from .models import Host, Project, Event, Post, Location
+from .models import Host, Project, Event, Post, Location, BlogPost
 from django.db.models import Count
 from num2words import num2words
 import csv
@@ -239,6 +239,74 @@ def post_view(request, host_slug=None, post_id=None):
 
     except Post.DoesNotExist:
         raise Http404("The post does not exists!")
+    except Host.DoesNotExist:
+        raise Http404()
+
+    context = {
+        'main_nav': [('Idea', reverse('idea')),
+                     ('Projects', reverse('projects')),
+                     ('Events', reverse('events')),
+                     ('Join in', reverse('join'))],
+        'more_nav': (more_nav, num2words(len(more_nav))),
+        'post': post,
+        'breadcrumb': breadcrumb,
+        'host': host,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def blog_view(request, host_slug=None):
+    template = loader.get_template('wbcore/blog.html')
+
+    host_slugs = get_host_slugs(request, host_slug)
+    try:
+        if host_slugs:
+            posts = BlogPost.objects.filter(host__slug__in=host_slugs).distinct()
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+        else:
+            posts = BlogPost.objects.all()
+            host = None
+    except Host.DoesNotExist:
+        raise Http404()
+
+    posts = posts.order_by('-published')
+    posts = reversed(posts)
+
+    if host:
+        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ("Blog", None)]
+    else:
+        breadcrumb = [('Home', reverse('home')), ('Blog', None)]
+
+    context = {
+        'main_nav': [('Idea', reverse('idea')),
+                     ('Projects', reverse('projects')),
+                     ('Events', None),
+                     ('Join in', reverse('join'))],
+        'more_nav': (more_nav, num2words(len(more_nav))),
+        'posts': posts,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def blog_post_view(request, host_slug=None, post_id=None):
+    template = loader.get_template('wbcore/post.html')
+    try:
+        if host_slug:
+            post = BlogPost.objects.get(pk=post_id, host__slug=host_slug)
+            host = Host.objects.get(slug=host_slug)
+            breadcrumb = [('Home', reverse('home')),
+                          (host.name, reverse('host', args=[host_slug])),
+                          ('Blog', reverse('blog', args=[host_slug])),
+                          (post.title, None)]
+        else:
+            post = BlogPost.objects.get(pk=post_id)
+            host = None
+            breadcrumb = [('Home', reverse('home')), ("Blog", reverse('blog')), (post.title, None)]
+
+    except BlogPost.DoesNotExist:
+        raise Http404("The blog post does not exists!")
     except Host.DoesNotExist:
         raise Http404()
 

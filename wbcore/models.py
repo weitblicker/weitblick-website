@@ -200,6 +200,53 @@ class Post(models.Model):
         return self.title + " " + city
 
 
+class BlogPost(models.Model):
+    title = models.CharField(max_length=200)
+    text = models.TextField()
+    image = models.ImageField(null=True, blank=True, upload_to="posts")
+    img_alt = models.CharField(max_length=300,null=True, blank=True)
+    added = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+    published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    RANGE_CHOICES = (
+        ('preview', 'Preview'),
+        ('hidden', 'Hidden'),
+        ('global', 'Global'),
+        ('federal', 'Federal'),
+        ('city', 'City')
+    )
+    range = models.CharField(max_length=20, choices=RANGE_CHOICES, default='preview', null=True)
+    teaser = models.TextField()
+    host = models.ForeignKey(Host, to_field='slug', on_delete=models.SET_NULL, null=True)
+    project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    author_str = models.CharField(max_length=200, null=True, blank=True)
+    gallery = models.ForeignKey(Gallery, null=True, blank =True, on_delete=models.SET_NULL)
+
+    def search_title(self):
+        return self.title
+
+    def search_url(self):
+        return reverse('blog-post', args=[self.pk])
+
+    @staticmethod
+    def get_model_name():
+        return 'BlogPost'
+
+    def author_name(self):
+        name = self.author_str
+        if self.author:
+            name = self.author.first_name + " " + self.author.last_name
+        return name
+
+    class Meta:
+        get_latest_by = 'published'
+
+    def __str__(self):
+        city = ("(" + self.host.city + ")") if self.host else ''
+        return self.title + " " + city
+
+
 def save_document(instance, filename):
     return "documents/"+ instance.host.slug +"/" + instance.title.lower().replace(' ', '_') + splitext(filename)[1].lower()
 

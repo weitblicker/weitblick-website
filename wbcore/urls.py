@@ -12,6 +12,8 @@ main_patterns = [
     path('events/<str:event_slug>/', views.event_view, name='event'),
     path('posts/<int:post_id>/', views.post_view, name='post'),
     path('posts/', views.posts_view, name='posts'),
+    path('blog/', views.blog_view, name='blog'),
+    path('blog/<int:post_id>/', views.blog_post_view, name='blog-post'),
 ]
 
 
