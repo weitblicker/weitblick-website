@@ -1,7 +1,8 @@
 from django.http import HttpResponse, JsonResponse, Http404
 from django.template import loader
 from django.urls import reverse
-from .models import Host, Project, Event, NewsPost, BlogPost
+from .models import Host, Project, Event, NewsPost, Location, BlogPost
+from django.db.models import Count
 from num2words import num2words
 import csv
 
@@ -82,7 +83,8 @@ def projects_view(request, host_slug=None):
         projects = Project.objects.all()
         breadcrumb = [('Home', reverse('home')), ('Projects', None)]
 
-
+    project_list = list(Location.objects.filter(project__in=projects).values(
+            'country').annotate(number=Count('country')))
     context = {
         'main_nav': [('Idea', reverse('idea')),
                      ('Projects', None),
@@ -90,6 +92,7 @@ def projects_view(request, host_slug=None):
                      ('Join in', reverse('join'))],
         'more_nav': (more_nav, num2words(len(more_nav))),
         'projects': projects,
+        'project_list': project_list,
         'breadcrumb': breadcrumb,
     }
     template = loader.get_template('wbcore/projects.html')
