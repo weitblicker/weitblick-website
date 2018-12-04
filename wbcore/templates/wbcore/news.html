@@ -3,7 +3,7 @@
 {% block content %}
 
 {% if posts %}
-    <div class="ui three stackable cards">
+    <div class="ui items">
     {% for post in posts %}
         {% include 'wbcore/post_feed.html' with post=post host_slug=host.slug %}
     {% endfor %}

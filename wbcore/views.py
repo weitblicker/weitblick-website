@@ -304,9 +304,8 @@ def news_view(request, host_slug=None):
     except Host.DoesNotExist:
         raise Http404()
 
-    posts = posts.order_by('-published')
-    posts = reversed(posts)
-
+    posts = posts.order_by('-published')[:20]
+    
     if host:
         breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ("News", None)]
     else:
