@@ -6,13 +6,14 @@ from django.db.models import Count
 from num2words import num2words
 import csv
 
-more_nav = [{'title': 'Gruppe A', 'links': [('Item A.1', '#'), ('Item A.2', '#')]},
-            {'title': 'Gruppe B', 'links': [('Item B.1', '#'), ('Item B.2', '#')]},
-            {'title': 'Gruppe B', 'links': [('Item B.1', '#'), ('Item B.2', '#')]},
-            {'title': 'Gruppe B', 'links': [('Item B.1', '#'), ('Item B.2', '#')]},
-            {'title': 'Gruppe B', 'links': [('Item B.1', '#'), ('Item B.2', '#')]},
-            {'title': 'Gruppe C', 'links': [('Item C.1', '#'), ('Item C.2', '#'), ('Item C.3', '#')]}]
 
+dot_nav_news = NewsPost.objects.all().order_by('-published')[:3]
+dot_nav_blog = BlogPost.objects.all().order_by('-published')[:3]
+dot_nav_events = Event.objects.all().order_by('-start_date')[:3]
+
+dot_nav = {'news': dot_nav_news,
+           'blog': dot_nav_blog,
+           'events': dot_nav_events}
 
 def get_host_slugs(request, host_slug):
     if host_slug:
@@ -38,7 +39,7 @@ def home_view(request):
                      ('Projects', reverse('projects')),
                      ('Events', reverse('events')),
                      ('Join in', reverse('join'))],
-        'more_nav': (more_nav, num2words(len(more_nav))),
+        'dot_nav': dot_nav,
         'projects': projects,
         'hosts': hosts,
         'events': events,
@@ -58,7 +59,7 @@ def idea_view(request):
                      ('Projects', reverse('projects')),
                      ('Events', reverse('events')),
                      ('Join in', reverse('join'))],
-        'more_nav': (more_nav, num2words(len(more_nav))),
+        'dot_nav': dot_nav,
         'projects': projects,
         'hosts': hosts,
         'breadcrumb': [('Home', reverse('home')), ('Idea', None)],
@@ -90,7 +91,7 @@ def projects_view(request, host_slug=None):
                      ('Projects', None),
                      ('Events', reverse('events')),
                      ('Join in', reverse('join'))],
-        'more_nav': (more_nav, num2words(len(more_nav))),
+        'dot_nav': dot_nav,
         'projects': projects,
         'project_list': project_list,
         'breadcrumb': breadcrumb,
@@ -106,7 +107,7 @@ def join_view(request, host_slug=None):
                      ('Projects', reverse('projects')),
                      ('Events', reverse('events')),
                      ('Join in', None)],
-        'more_nav': (more_nav, num2words(len(more_nav))),
+        'dot_nav': dot_nav,
         'breadcrumb': [('Home', reverse('home')), ('Join in', None)],
     }
     return HttpResponse(template.render(context, request))
@@ -139,7 +140,7 @@ def project_view(request, host_slug=None, project_slug=None):
                      ('Join in', reverse('join'))],
         'project': project,
         'host': host,
-        'more_nav': (more_nav, num2words(len(more_nav))),
+        'dot_nav': dot_nav,
         'breadcrumb': breadcrumb,
     }
     return HttpResponse(template.render(context, request))
@@ -181,7 +182,7 @@ def events_view(request, host_slug=None):
                      ('Projects', reverse('projects')),
                      ('Events', None),
                      ('Join in', reverse('join'))],
-        'more_nav': (more_nav, num2words(len(more_nav))),
+        'dot_nav': dot_nav,
         'events': events,
         'host': host,
         'breadcrumb': breadcrumb,
@@ -214,7 +215,7 @@ def event_view(request, host_slug=None, event_slug=None):
                      ('Projects', reverse('projects')),
                      ('Events', None),
                      ('Join in', reverse('join'))],
-        'more_nav': (more_nav, num2words(len(more_nav))),
+        'dot_nav': dot_nav,
         'event': event,
         'breadcrumb': breadcrumb,
         'host': host
@@ -248,7 +249,7 @@ def blog_view(request, host_slug=None):
                      ('Projects', reverse('projects')),
                      ('Events', None),
                      ('Join in', reverse('join'))],
-        'more_nav': (more_nav, num2words(len(more_nav))),
+        'dot_nav': dot_nav,
         'posts': posts,
         'host': host,
         'breadcrumb': breadcrumb,
@@ -281,7 +282,7 @@ def blog_post_view(request, host_slug=None, post_id=None):
                      ('Projects', reverse('projects')),
                      ('Events', reverse('events')),
                      ('Join in', reverse('join'))],
-        'more_nav': (more_nav, num2words(len(more_nav))),
+        'dot_nav': dot_nav,
         'post': post,
         'breadcrumb': breadcrumb,
         'host': host,
@@ -315,7 +316,7 @@ def news_view(request, host_slug=None):
                      ('Projects', reverse('projects')),
                      ('Events', None),
                      ('Join in', reverse('join'))],
-        'more_nav': (more_nav, num2words(len(more_nav))),
+        'dot_nav': dot_nav,
         'posts': posts,
         'host': host,
         'breadcrumb': breadcrumb,
@@ -348,7 +349,7 @@ def news_post_view(request, host_slug=None, post_id=None):
                      ('Projects', reverse('projects')),
                      ('Events', reverse('events')),
                      ('Join in', reverse('join'))],
-        'more_nav': (more_nav, num2words(len(more_nav))),
+        'dot_nav': dot_nav,
         'post': post,
         'breadcrumb': breadcrumb,
         'host': host,
@@ -365,7 +366,7 @@ def host_projects_view(request, host_slug):
                      ('Projects', None),
                      ('Events', reverse('events')),
                      ('Join in', reverse('join'))],
-        'more_nav': (more_nav, num2words(len(more_nav))),
+        'dot_nav': dot_nav,
         'projects': projects,
         'host': host,
         'breadcrumb': [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Projects', None)],
@@ -382,7 +383,7 @@ def host_events_view(request, host_slug):
                      ('Projects', reverse('projects')),
                      ('Events', None),
                      ('Join in', reverse('join'))],
-        'more_nav': (more_nav, num2words(len(more_nav))),
+        'dot_nav': dot_nav,
         'events': events,
         'host': host,
         'breadcrumb': [('Home', reverse('home')), (host.name, reverse('host', host_slug)), ("Events", None)],

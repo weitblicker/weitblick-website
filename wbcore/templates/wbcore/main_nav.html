@@ -25,19 +25,8 @@
     </div>
     <div class="ui container row" id="popup-menu-container">
         <div id="popup-menu" class="ui fluid bottom left">
-            <div class="ui {{ more_nav.1 }} column relaxed equal height divided grid">
-                {% for column in more_nav.0 %}
-                    <div class="column">
-                        <h4 class="ui header">{{ column.title}}</h4>
-                        <div class="ui link list">
-                            {% for link in column.links %}
-                                <a class="item">{{ link.0 }}</a>
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>       
+            {% include 'wbcore/dot_nav.html' %}
+        </div>      
     </div>
 
     <div class="ui container">
