@@ -4,7 +4,7 @@
 		<img src="{% get_media_prefix %}{{ image }}">
 	</a>
 	<div class="content">
-		<a href="{% url 'news-post' post_id=entry.pk %}" class="ui tiny header">{{ title }}</a>
+		<a href="{% url type post_id=id %}" class="ui tiny header">{{ title }}</a>
 		<div class="description">
 			<p>{{ desc }}</p>
 		</div>

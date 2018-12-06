@@ -1,12 +1,12 @@
 {% load static %}
-<div class="ui three column relaxed equal height divided grid">
-        <div class="ui column divided aligned top items">
+<div class="ui three column relaxed divided grid">
+        <div class="ui column divided items">
 	        <a class="ui item header" href="{% url 'news' %}">News</a>
             {% for entry in dot_nav.news %}
             	{% include 'wbcore/dot_nav_item.html' with type='news-post' id=entry.pk title=entry.title image=entry.image desc=entry.teaser|truncatewords:7 %}
             {% endfor %}
         </div>
-        <div class="ui column divided aligned top items">
+        <div class="ui column divided items">
             <a class="ui item header"href="{% url 'blog' %}" >Blog</a>
             {% for entry in dot_nav.blog %}
             	{% include 'wbcore/dot_nav_item.html' with type='blog-post' id=entry.pk title=entry.title image=entry.image desc=entry.text|truncatewords:7 %}
