@@ -1,44 +1,52 @@
 {% load static %}
-<div id="main-menu" class="ui large top fixed secondary menu" style="display: block;">
-    <div class="ui container row">
-        {% for elem in main_nav %}
-        {% if elem.1 %}
-        <a class="item" href="{{ elem.1 }}">{{elem.0}}</a>
-        {% else %}
-        <a class="item active" href="#">{{elem.0}}</a>
-        {% endif %}
-        {% endfor %}
-        <a id="popup-menu-btn" class="item">...</a>
-
-        <div class="right menu">
-            <div class="ui item fluid category search">
-                <div class="ui left icon input">
-                    <input class="prompt" placeholder="Search..." type="text">
-                    <i class="search link icon"></i>
+<div id="main-menu" class="ui container large top fixed">
+    <div class="ui grid">
+        <div class="twelve wide column">
+            <div class="ui row menu">
+                <div class="ui category search item">
+                    <div class="ui transparent icon input">
+                        <input class="prompt" type="text" placeholder="Search ...">
+                        <i class="search link icon"></i>
+                    </div>
+                    <div class="results"></div>
                 </div>
-                <div class="result eight wide column"></div>
-            </div>
-            <div class="ui item logo">
-                <div class="ui tiny image"><img class="" src="{% if host %}{{ host.logo.url }}{% else %}{% get_media_prefix %}logo.png{% endif %}"></div>
+            </div>        
+            <div class="ui row menu">
+                {% for elem in main_nav %}
+                {% if elem.1 %}
+                    <a class="item" href="{{ elem.1 }}">{{elem.0}}</a>
+                {% else %}
+                    <a class="item active" href="#">{{elem.0}}</a>
+                {% endif %}
+                {% endfor %}
+                <a class="item" href="{% url 'hosts' %}">Städte</a>
+                <a id="popup-menu-btn" class="item">...</a>
+            </div>                
+        </div>
+        <div class="four wide right aligned column">
+            <div class="right menu">
+                <div class="ui item logo">
+                    <div class="ui medium image"><img class="" src="{% if host %}{{ host.logo.url }}{% else %}{% get_media_prefix %}logo.png{% endif %}"></div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="ui container row" id="popup-menu-container">
-        <div id="popup-menu" class="ui fluid bottom left">
+        <div class="ui container" id="popup-menu-container">
+            <div id="popup-menu" class="ui fluid bottom left">
             {% include 'wbcore/dot_nav.html' %}
-        </div>      
+            </div>      
+        </div>
+        <div class="ui container">
+            <div class="ui small breadcrumb">
+                {% for crumb in breadcrumb %}
+                    {% if crumb.1 %}
+                        <a class="section" href="{{ crumb.1 }}">{{ crumb.0 }}</a>
+                        <i class="right chevron icon divider"></i>
+                    {% else %}
+                        <div class="active section">{{ crumb.0 }}</div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
     </div>
 
-    <div class="ui container">
-        <div class="ui small breadcrumb">
-            {% for crumb in breadcrumb %}
-                {% if crumb.1 %}
-                    <a class="section" href="{{ crumb.1 }}">{{ crumb.0 }}</a>
-                    <i class="right chevron icon divider"></i>
-                {% else %}
-                    <div class="active section">{{ crumb.0 }}</div>
-                {% endif %}
-            {% endfor %}
-        </div>
-    </div>
 </div>

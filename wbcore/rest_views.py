@@ -111,32 +111,25 @@ def search(request, query):
 
     result_groups = {'results': {}}
 
+    cnt = 0
     for key, group in groupby(results, lambda x: x.model):
         result_set = []
         for result in group:
-            print("Highlighted", result.highlighted)
             elem = {
                 'title': result.object.search_title(),
                 'description': remove_tags(result.highlighted[0]),
                 'url': result.object.search_url(),
+                'image': result.object.search_image(),
             }
             result_set.append(elem);
-            print("Reverse: %s" % (elem['url']))
-            print("Found %s in %s." % (result.object, str(key)))
+            if len(result_set) > 2:
+                break
+            cnt = cnt + 1
         result_groups['results'][str(key.get_model_name())] = {
             'name': str(key.get_model_name()),
             'results': result_set,
         }
-
-    #hosts = Host.objects.filter(slug__contains=query)
-
-    #for host in hosts:
-    #    hosts_result = {
-    #        'title': host.name,
-    #        'url': reverse('host', args=[host.slug]),
-    #    }
-    #    hosts_results.append(hosts_result)
-    print(result_groups)
+    print("Found %s results in %s categories." % (cnt, len(result_set)))
 
     return JsonResponse(result_groups)
 

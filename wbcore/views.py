@@ -146,6 +146,18 @@ def project_view(request, host_slug=None, project_slug=None):
     return HttpResponse(template.render(context, request))
 
 
+def hosts_view(request):
+    hosts = Host.objects.all()
+
+    template = loader.get_template('wbcore/hosts.html')
+    context = {
+        'hosts': hosts,
+        'breadcrumb': [('Home', reverse('home')), ("Unions", reverse('hosts'))],
+    }
+    return HttpResponse(template.render(context, request))
+
+
+
 def host_view(request, host_slug):
     try:
         host = Host.objects.get(slug=host_slug)
@@ -174,7 +186,7 @@ def events_view(request, host_slug=None):
     else:
         host = None
         events = Event.objects.all()
-        breadcrumb = [('Home', reverse('home')), ('Events', None)],
+        breadcrumb = [('Home', reverse('home')), ('Events', None)]
 
     template = loader.get_template('wbcore/events.html')
     context = {
@@ -392,12 +404,12 @@ def host_events_view(request, host_slug):
 
 
 def search_view(request, query):
-    if request.method == "POST":
-        search_text = request.POST['search_text']
-        search_type = request.POST['search_type']
-    else:
-        search_text = ''
-        search_text = ''
+  #  if request.method == "POST":
+       # search_text = request.POST['search_text']
+       # search_type = request.POST['search_type']
+    #else:
+       # search_text = ''
+       # search_text = ''
 
     return JsonResponse()
 

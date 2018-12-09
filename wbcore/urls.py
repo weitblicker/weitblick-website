@@ -22,6 +22,7 @@ urlpatterns = [
     path('rest/', include(rest_url.rest_patterns)),
     path('idea/', views.idea_view, name='idea'),
     path('search/<str:query>/', rest_views.search),
+    path('union/', views.hosts_view, name='hosts'),
     #path('search/', include('haystack.urls')),
 ]
 

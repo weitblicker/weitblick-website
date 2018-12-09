@@ -7,7 +7,7 @@ from localflavor.generic.models import IBANField
 from localflavor.generic.models import BICField
 from localflavor.generic.countries.sepa import IBAN_SEPA_COUNTRIES
 from django.urls import reverse
-
+from django.conf import settings
 
 
 class Address(models.Model):
@@ -55,6 +55,9 @@ class Host(models.Model):
 
     def search_url(self):
         return reverse('host', args=[self.slug])
+
+    def search_image(self):
+        return self.logo.url if self.logo else ""
 
     @staticmethod
     def get_model_name():
@@ -182,9 +185,12 @@ class NewsPost(models.Model):
     def search_url(self):
         return reverse('news-post', args=[self.pk])
 
+    def search_image(self):
+        return self.image.url if self.image else ""
+
     @staticmethod
     def get_model_name():
-        return 'NewsPost'
+        return 'News'
 
     def author_name(self):
         name = self.author_str
@@ -224,14 +230,17 @@ class BlogPost(models.Model):
     gallery = models.ForeignKey(Gallery, null=True, blank =True, on_delete=models.SET_NULL)
 
     def search_title(self):
-        return self.title
+        return self.title_de
 
     def search_url(self):
         return reverse('blog-post', args=[self.pk])
 
+    def search_image(self):
+        return self.image.url if self.image else ""
+
     @staticmethod
     def get_model_name():
-        return 'BlogPost'
+        return 'Blog'
 
     def author_name(self):
         name = self.author_str
