@@ -1,12 +1,12 @@
-from django.http import HttpResponse, JsonResponse, Http404
+import csv
+from collections import OrderedDict
+
+from django.db.models import Count
+from django.http import HttpResponse, Http404
 from django.template import loader
 from django.urls import reverse
-from .models import Host, Project, Event, NewsPost, Location, BlogPost
-from django.db.models import Count
-from num2words import num2words
-from collections import OrderedDict
-import csv
 
+from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost
 
 dot_nav_news = NewsPost.objects.all().order_by('-published')[:3]
 dot_nav_blog = BlogPost.objects.all().order_by('-published')[:3]
@@ -33,6 +33,7 @@ def get_main_nav(host=None, active=None):
         nav[active]['link'] = None
 
     return nav
+
 
 def get_host_slugs(request, host_slug):
     if host_slug:
