@@ -1,3 +1,5 @@
+$box-background: #ffffff;
+
 .puzzle-svg{
 	.title{
 		font-size: 40px;
@@ -28,9 +30,13 @@
 	fill: url(#puzzle-background);
 }
 
+#content-block {
+	background-color: $box-background;
+}
+
 #main-menu{
+	background-color: $box-background;
 	margin-top: 15px;
-	background-color: #ffffff;
 	padding-bottom: 15px;
 	border-bottom: solid 1px;
 }
