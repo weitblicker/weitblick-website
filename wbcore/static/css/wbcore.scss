@@ -4,6 +4,39 @@ body {
 	background: $primaryColor;
 }
 
+.puzzle-svg{
+	.title{
+		font-size: 50px;
+		font-family: Bree Serif;
+		fill: #ffffff;
+	}
+
+	.desc{
+		font-size: 40px;
+		font-family: Open Sans;
+		fill: #ffffff;
+	}
+
+	.ficon{
+		font-family: FontAwesome;
+		font-size: 40px;
+		fill: #ffffff;
+		content: "\f0c4";
+	}
+
+	width: 200px;
+	height: 200px;
+}
+
+#puzzle-svg2{
+	background-color: red;
+	display: inline-block;
+}
+
+.puzzle-path{
+	fill: url(#gelb);
+}
+
 #main-menu{
 	margin-top: 15px;
 	background-color: #ffffff;
