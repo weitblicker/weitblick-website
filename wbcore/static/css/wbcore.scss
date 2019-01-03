@@ -81,7 +81,6 @@ $box-background: #ffffff;
 .logo-inverted {
 	margin-bottom: 0 !important;
 	padding-bottom: 0 !important;
-
 }
 
 .hidden.menu {
@@ -167,4 +166,9 @@ $box-background: #ffffff;
 		margin-top: 0.5em;
 		font-size: 1.5em;
 	}
+}
+
+// custom override here. Did not work through input.variables nor search.variables
+.menu > .search {
+	border: 1px solid #D6D6D6;
 }

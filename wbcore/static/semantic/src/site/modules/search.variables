@@ -1,3 +1,5 @@
 /*******************************
          Site Overrides
 *******************************/
+//why does this not work?
+@border: 1px solid #D6D6D6;
