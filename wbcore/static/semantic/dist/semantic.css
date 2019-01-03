@@ -14156,7 +14156,7 @@ img.ui.bordered.image {
   font-family: Bree Serif, Open Sans, 'Helvetica Neue', Arial, Helvetica, sans-serif;
   padding: 0.67857143em 1em;
   background: #FFFFFF;
-  border: 1px solid rgba(34, 36, 38, 0.15);
+  border: 1px solid #D6D6D6;
   color: rgba(0, 0, 0, 0.87);
   border-radius: 0;
   -webkit-transition: border-color 0.1s ease, -webkit-box-shadow 0.1s ease;
@@ -23635,9 +23635,9 @@ ol.ui.horizontal.list li:before,
   font-family: Bree Serif, Open Sans, 'Helvetica Neue', Arial, Helvetica, sans-serif;
   background: #FFFFFF;
   font-weight: normal;
-  border: 1px solid rgba(34, 36, 38, 0.15);
-  -webkit-box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.15);
-  box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.15);
+  border: 0 none;
+  -webkit-box-shadow: 0;
+  box-shadow: 0;
   border-radius: 0;
   min-height: 2.85714286em;
 }
@@ -24158,8 +24158,8 @@ Floated Menu / Item
   -ms-flex-direction: column;
   flex-direction: column;
   background: #FFFFFF;
-  -webkit-box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.15);
-  box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.15);
+  -webkit-box-shadow: 0;
+  box-shadow: 0;
 }
 
 /*--- Item ---*/
@@ -25777,8 +25777,8 @@ Floated Menu / Item
   margin-top: 0em;
   top: 0px;
   margin-bottom: 1rem;
-  -webkit-box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.15), none;
-  box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.15), none;
+  -webkit-box-shadow: 0, none;
+  box-shadow: 0, none;
   border-radius: 0em 0em 0 0;
 }
 
