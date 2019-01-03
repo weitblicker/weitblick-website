@@ -4,3 +4,5 @@
 
 @defaultBorderRadius: 0;
 @pageBackground: #D9E2ED;
+@importGoogleFonts : true;
+@fontName : Bree Serif, Open Sans;
