@@ -11,7 +11,7 @@
                     <div class="results"></div>
                 </div>
             </div>        
-            <div class="ui row menu">
+            <div class="ui row menu" id="menu-nav">
                 {% for key, elem in main_nav.items %}
                 {% if elem.link %}
                     <a class="item" href="{{ elem.link }}">{{ elem.name }}</a>
