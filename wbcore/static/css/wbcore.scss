@@ -26,8 +26,8 @@ $box-background: #ffffff;
 		height: 300px;
 
 		float: left;
-
 	}
+
 	
 	.puzzle-svg.down{
 		margin-top:67.5px;
@@ -35,9 +35,20 @@ $box-background: #ffffff;
 
 	.puzzle-path{
 	}
-	
+
 	margin:auto;
-	padding-left:-33.75px
+	padding-left:-400
+}
+
+
+.icon{
+	.path{
+		fill:none;
+		stroke:#ffffff;
+		stroke-linecap:round;
+		stroke-linejoin:round;
+		stroke-width:1.92px;
+	}
 }
 
 
