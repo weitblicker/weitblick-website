@@ -1,16 +1,16 @@
 {% extends 'wbcore/base.html' %}
 
 {% block content %}
-	<div>
-		{% include 'wbcore/puzzle.svg' with id='1' title='Idee' description='Was ist Weitblick?' icon='idea.svg' link='#' background='gelb.png' type='up' %}
+	<div id=puzzles>
+		{% include 'wbcore/puzzle.svg' with id='puzzle-svg-1' title='Idee' description='Was ist Weitblick?' icon='idea.svg' link='idea' background='colorbg/yellow.svg' type='up' %}
 
-		{% include 'wbcore/puzzle.svg' with id='2' title='Projects' description='Wen unterstützen wir?' icon='idea.svg' link='#' background='blaugrau.svg' type='down' %}
+		{% include 'wbcore/puzzle.svg' with id='puzzle-svg-2' title='Projects' description='Wen unterstützen wir?' icon='idea.svg' link='projects' background='colorbg/blue.svg' type='down' %}
 
-		{% include 'wbcore/puzzle.svg' with id='3' title='Events' description='Was tun wir?' icon='idea.svg' link='#' background='gelb.png' type='up' %}
+		{% include 'wbcore/puzzle.svg' with id='puzzle-svg-3' title='Events' description='Was tun wir?' icon='idea.svg' link='events' background='colorbg/grey.svg' type='up' %}
 
-		{% include 'wbcore/puzzle.svg' with id='4' title='Mitmachen' description='Komm vorbei!' icon='idea.svg' link='#' background='gelb.png' type='down' %}
+		{% include 'wbcore/puzzle.svg' with id='puzzle-svg-4' title='Mitmachen' description='Komm vorbei!' icon='idea.svg' link='join' background='colorbg/green.svg' type='down' %}
 
-			</div>
+	</div>
 	
 
 {% endblock %}
