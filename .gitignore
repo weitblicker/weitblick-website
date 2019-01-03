@@ -10,3 +10,12 @@ wbcore/static/css/wbcore.css
 weitblick/static/css/wbcore.css
 weitblick/static/css/wbcore.css.map
 weitblick/media/photologue/photos/cache
+wbcore/static/semantic/node_modules/
+bower_components
+node_modules
+semantic/dist/components
+semantic/dist/themes/*
+!semantic/dist/*.js
+!semantic/dist/*.css
+!semantic/dist/themes/default/
+wbcore/static/semantic/dist/components/
