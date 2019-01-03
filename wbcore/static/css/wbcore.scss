@@ -1,7 +1,31 @@
-$primaryColor: #ffffff;
+.puzzle-svg{
+	.title{
+		font-size: 40px;
+		font-family: Bree Serif;
+		fill: #ffffff;
+	}
 
-body {
-	background: $primaryColor;
+	.desc{
+		font-size: 22px;
+		font-family: Open Sans;
+		fill: #ffffff;
+	}
+
+	.ficon{
+		font-family: FontAwesome;
+		font-size: 40px;
+		fill: #ffffff;
+		content: "\f0c4";
+	}
+
+	width: 250px;
+	height: 250px;
+
+	display: inline-block;
+}
+
+.puzzle-path{
+	fill: url(#puzzle-background);
 }
 
 #main-menu{
