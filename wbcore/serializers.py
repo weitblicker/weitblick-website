@@ -1,10 +1,16 @@
-from wbcore.models import Post, Host, Event, Project
+from wbcore.models import NewsPost, BlogPost, Host, Event, Project
 from rest_framework import serializers
 
 
-class PostSerializer(serializers.HyperlinkedModelSerializer):
+class BlogPostSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Post
+        model = BlogPost
+        fields = ('title', 'text', 'image', 'added', 'updated', 'published', 'range', 'teaser')
+
+
+class NewsPostSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = NewsPost
         fields = ('title', 'text', 'image', 'added', 'updated', 'published', 'range', 'teaser')
 
 

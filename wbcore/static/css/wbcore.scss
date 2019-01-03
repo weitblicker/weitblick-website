@@ -5,9 +5,14 @@ body {
 }
 
 #main-menu{
+	margin-top: 15px;
 	background-color: #ffffff;
 	padding-bottom: 15px;
 	border-bottom: solid 1px;
+}
+
+#menu-nav > .item {
+	text-transform: uppercase;
 }
 
 #popup-menu-container{
@@ -15,17 +20,16 @@ body {
 }
 
 .wb-icon{
-	width: 20px;
-	height: 20px;
+	width: 17px;
+	height: 17px;
+	display: inline-block;
+	margin: 0 6px 0 12px !important;
+	line-height: 17px;
 }
 
 #popup-menu{
 	margin: 40px;
 	display: none;
-}
-
-.content{
-	padding-top: 58px;
 }
 
 .logo{
@@ -37,13 +41,6 @@ body {
 	margin-bottom: 0 !important;
 	padding-bottom: 0 !important;
 
-}
-
-.search{
-	border-radius: 20px;
-	border-color: #ffffff;
-	box-shadow: none;
-	padding: 20px;
 }
 
 .hidden.menu {

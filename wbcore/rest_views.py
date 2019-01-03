@@ -1,5 +1,5 @@
-from wbcore.serializers import PostSerializer, HostSerializer, EventSerializer, ProjectSerializer
-from wbcore.models import Post, Host, Event, Project
+from wbcore.serializers import NewsPostSerializer, BlogPostSerializer, HostSerializer, EventSerializer, ProjectSerializer
+from wbcore.models import NewsPost, BlogPost, Host, Event, Project
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, JsonResponse
 from rest_framework import status
@@ -76,20 +76,20 @@ def project_detail(request, pk, format=None):
 @api_view(['GET'])
 def post_list(request, format=None):
     if request.method == 'GET':
-        posts = Post.objects.all()
-        serializer = PostSerializer(posts, many=True, context={'request': request})
+        posts = NewsPost.objects.all()
+        serializer = NewsPostSerializer(posts, many=True, context={'request': request})
         return Response(serializer.data)
 
 
 @api_view(['GET'])
 def post_detail(request, pk, format=None):
     try:
-        post = Post.objects.get(pk=pk)
-    except Post.DoesNotExist:
+        post = NewsPost.objects.get(pk=pk)
+    except NewsPost.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        serializer = PostSerializer(post)
+        serializer = NewsPostSerializer(post)
         return Response(serializer.data)
 
 
@@ -111,32 +111,25 @@ def search(request, query):
 
     result_groups = {'results': {}}
 
+    cnt = 0
     for key, group in groupby(results, lambda x: x.model):
         result_set = []
         for result in group:
-            print("Highlighted", result.highlighted)
             elem = {
                 'title': result.object.search_title(),
                 'description': remove_tags(result.highlighted[0]),
                 'url': result.object.search_url(),
+                'image': result.object.search_image(),
             }
             result_set.append(elem);
-            print("Reverse: %s" % (elem['url']))
-            print("Found %s in %s." % (result.object, str(key)))
+            if len(result_set) > 2:
+                break
+            cnt = cnt + 1
         result_groups['results'][str(key.get_model_name())] = {
             'name': str(key.get_model_name()),
             'results': result_set,
         }
-
-    #hosts = Host.objects.filter(slug__contains=query)
-
-    #for host in hosts:
-    #    hosts_result = {
-    #        'title': host.name,
-    #        'url': reverse('host', args=[host.slug]),
-    #    }
-    #    hosts_results.append(hosts_result)
-    print(result_groups)
+    print("Found %s results in %s categories." % (cnt, len(result_set)))
 
     return JsonResponse(result_groups)
 

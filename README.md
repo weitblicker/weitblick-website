@@ -4,9 +4,13 @@ The new Weitblick website is *Django*, and *Python* based. The search engine we 
 
 ## Installation
 
-Python 3 and Java are required! If not installed install Python and Java!
+### Required Software 
 
-### Python Environment 
+* [Python 3](https://www.python.org/)
+* [Java 11](https://jdk.java.net/11/)
+* [Tidy](http://binaries.html-tidy.org/)
+* [Elastic Search 2](https://www.elastic.co/de/downloads/past-releases/elasticsearch-2-4-2)  (see Elastic Search section below.)
+### Python Environment (Unix)
 
 * If you do not have `pip` installed install it using:
 `curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py`
@@ -30,10 +34,10 @@ and then hit: `curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py`
 
 ### Elastic Search
 
-Install Elastic Search 2. You can download it here: https://www.elastic.co/downloads/past-releases/elasticsearch-6-2-4 and unzip it.
+Install Elastic Search 2. You can download it here: https://www.elastic.co/de/downloads/past-releases/elasticsearch-2-4-2 and unzip it.
 
 * Run `bin/elasticsearch` on unix, or `bin\elasticsearch.bat` on windows.
-* Run Use the django module command to build the search index: `python manage.py rebuild_index` type `y` or add a `--noinput` to the rebuild command. 
+* Use the django module command to build the search index: `python manage.py rebuild_index` type `y` or add a `--noinput` to the rebuild command. 
 * This search index should be updated later when adding content, for example by using a cron job running: `python manage.py update_index`
 
 

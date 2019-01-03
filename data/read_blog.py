@@ -1,5 +1,6 @@
 #!/user/bin/python
 
+import re
 import json
 import sys
 import datetime
@@ -8,6 +9,8 @@ from slugify import slugify
 import os
 import getpass
 import pymysql
+from urllib import request, error
+import shutil
 import paramiko
 import pandas as pd
 from paramiko import SSHClient
@@ -17,6 +20,11 @@ from os.path import expanduser
 filename = sys.argv[1]
 pw = getpass.getpass()
 user = getpass.getuser()
+
+img_pat = re.compile(r'<img [^>]*src="([^"]+)')
+img_org = re.compile(r'(-\d+x\d+)')
+link_pat = re.compile(r'href="([^"]+)')
+p_tag_pat = re.compile(r'(<p>.+?</p>)|(<img.+?src=".+?".*?>)')
 
 
 home = expanduser('~')
@@ -80,35 +88,58 @@ def umlaute(value):
 
 
 post_list = []
-downloads = []
+images = []
 
 for index, article in df.iterrows():
-    dt = pd.to_datetime(article['date'], format="%Y-%m-%d %H:%M:%S.%f").tz_localize('UTC').strftime("%Y-%m-%d %H:%M:%S.%f")
-    print(dt)
+
+    dt_obj = pd.to_datetime(article['date'], format="%Y-%m-%d %H:%M:%S")
+    slug_date = dt_obj.strftime("%Y-%m-%d")
+    dt = dt_obj.tz_localize('UTC').strftime("%Y-%m-%d %H:%M:%S.%f")
+
     host = None
-    user = article['display_name']
+    user = article['user_login']
+    text = article['content']
+    title = article['title'],
+    title = title[0]
+    image = None
+    images_html = img_pat.findall(text)
+    #print(title, text)
+    slug = slug_date+'-'+slugify(umlaute(title.lower()))
+    teaser = article['excerpt']
 
-    #img = article['teaserimage']['src']
-    slug = slugify(article['title'].rstrip())
-    #img_ext = os.path.splitext(img)[1].lower()
+    i = 0
+    for small_image in images_html:
+        big_image = img_org.sub('', small_image).replace("www.", "").replace("blog.", "weitweg.")
+        img_ext = os.path.splitext(small_image)[1].lower()
+        if i == 0:
+            new_image_name = slug + img_ext
+        else:
+            new_image_name = slug+'-' + str(i) + img_ext
+        i = i + 1
+        new_image_html = '/media/blog/' + new_image_name
+        if image is None:
+            image = 'blog/' + new_image_name
 
-    #download = {
-    #    'url': img,
-    #    'name': slug + img_ext
-    #}
+        html_image = {
+            'url': big_image,
+            'url2': small_image,
+            'name': new_image_name
+        }
+        text = text.replace(small_image, new_image_html)
+        images.append(html_image)
 
-    #downloads.append(download)
+    print(image)
 
     elem = {
-        'title_de': article['title'].rstrip(),
-        'text_de': article['content'].rstrip(),
-        # 'image': "posts/"+download['name'],
-        # 'img_alt_de': article['teaserimage']['alt'],
+        'title_de': title,
+        'text_de': text,
+        'image': image,
+        #'img_alt_de': '',
         'added': dt,
         'updated': dt,
         'published': dt,
         'range': 'global',
-        'teaser_de': article['excerpt'],
+        'teaser_de': teaser,
         'host': None,
         "project": None,
         "author": None,
@@ -129,8 +160,28 @@ with open(filename, 'w') as outfile:
     json.dump(post_list, outfile)
 
 
-def download(url, dname):
-    urllib.request.urlretrieve(url, dname)
+for i, image in enumerate(images):
+    url = image['url']
+    name = image['name']
 
-#for dl in downloads:
-#    download(dl['url'], "images/" + dl['name'])
+    filename = 'blog_images' + '/' + name.strip()
+
+    if os.path.isfile(filename):
+        print(filename, 'already exists. skip.')
+        continue
+
+    print('Download image ', i, 'from', len(images), ':', url, 'to blog_images/'+name)
+    try:
+        with request.urlopen(url) as response, open(filename, 'wb') as img_file:
+            shutil.copyfileobj(response, img_file)
+    except error.HTTPError:
+        print("Could not download the image ", url)
+        #### todo download images
+        #styles/presselogo_custom_user_normal_1x/public
+    except error.URLError:
+        print("Could not download the image ", url)
+    except UnicodeEncodeError:
+        print("Could not read the image url.")
+    except ValueError:
+        print("Some value error.")
+

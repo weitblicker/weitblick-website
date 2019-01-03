@@ -7,7 +7,7 @@ from localflavor.generic.models import IBANField
 from localflavor.generic.models import BICField
 from localflavor.generic.countries.sepa import IBAN_SEPA_COUNTRIES
 from django.urls import reverse
-
+from django.conf import settings
 
 
 class Address(models.Model):
@@ -23,9 +23,9 @@ class Address(models.Model):
 
 
 class Location(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    lng = models.DecimalField(max_digits=14, decimal_places=11)
+    name = models.CharField(max_length=100, unique=True)  
     lat = models.DecimalField(max_digits=14, decimal_places=11)
+    lng = models.DecimalField(max_digits=14, decimal_places=11)
     description = models.CharField(blank=True, null=True,max_length=300 )
     country = CountryField()
     postal_code = models.CharField(blank=True, null=True, max_length=20)
@@ -55,6 +55,9 @@ class Host(models.Model):
 
     def search_url(self):
         return reverse('host', args=[self.slug])
+
+    def search_image(self):
+        return self.logo.url if self.logo else ""
 
     @staticmethod
     def get_model_name():
@@ -153,10 +156,10 @@ class UserRelation(models.Model):
         return self.profile.name + ' in ' + self.host.name
 
 
-class Post(models.Model):
+class NewsPost(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
-    image = models.ImageField(null=True, blank=True, upload_to="posts")
+    image = models.ImageField(null=True, blank=True, upload_to="news")
     img_alt = models.CharField(max_length=300,null=True, blank=True)
     added = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
@@ -180,11 +183,14 @@ class Post(models.Model):
         return self.title
 
     def search_url(self):
-        return reverse('post', args=[self.pk])
+        return reverse('news-post', args=[self.pk])
+
+    def search_image(self):
+        return self.image.url if self.image else ""
 
     @staticmethod
     def get_model_name():
-        return 'Post'
+        return 'News'
 
     def author_name(self):
         name = self.author_str
@@ -203,7 +209,7 @@ class Post(models.Model):
 class BlogPost(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
-    image = models.ImageField(null=True, blank=True, upload_to="posts")
+    image = models.ImageField(null=True, blank=True, upload_to="blog")
     img_alt = models.CharField(max_length=300,null=True, blank=True)
     added = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
@@ -224,14 +230,17 @@ class BlogPost(models.Model):
     gallery = models.ForeignKey(Gallery, null=True, blank =True, on_delete=models.SET_NULL)
 
     def search_title(self):
-        return self.title
+        return self.title_de
 
     def search_url(self):
         return reverse('blog-post', args=[self.pk])
 
+    def search_image(self):
+        return self.image.url if self.image else ""
+
     @staticmethod
     def get_model_name():
-        return 'BlogPost'
+        return 'Blog'
 
     def author_name(self):
         name = self.author_str
