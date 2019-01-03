@@ -6,13 +6,13 @@ body {
 
 .puzzle-svg{
 	.title{
-		font-size: 50px;
+		font-size: 40px;
 		font-family: Bree Serif;
 		fill: #ffffff;
 	}
 
 	.desc{
-		font-size: 40px;
+		font-size: 22px;
 		font-family: Open Sans;
 		fill: #ffffff;
 	}
@@ -24,17 +24,14 @@ body {
 		content: "\f0c4";
 	}
 
-	width: 200px;
-	height: 200px;
-}
+	width: 250px;
+	height: 250px;
 
-#puzzle-svg2{
-	background-color: red;
 	display: inline-block;
 }
 
 .puzzle-path{
-	fill: url(#gelb);
+	fill: url(#puzzle-background);
 }
 
 #main-menu{
