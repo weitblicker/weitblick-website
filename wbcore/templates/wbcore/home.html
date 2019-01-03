@@ -1,5 +1,12 @@
 {% extends 'wbcore/base.html' %}
 
 {% block content %}
-    <p>Startseite</p>
+	<div>
+		{% include 'wbcore/puzzle.svg' with title="Title" %}
+		{% include 'wbcore/puzzle.svg' with title="Title2" %}
+		{% include 'wbcore/puzzle.svg' with title="Title3" %}
+		{% include 'wbcore/puzzle.svg' with title="title4" %}
+	</div>
+	
+
 {% endblock %}

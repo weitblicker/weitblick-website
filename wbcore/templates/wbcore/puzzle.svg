@@ -1,0 +1,23 @@
+{% load static %}
+
+<svg class="puzzle-svg" id="puzzle-svg1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+	<defs>
+		<pattern id="blaugrau" patternUnits="userSpaceOnUse" width="800" height="800">
+			<image xlink:href="http://localhost:8000/media/blaugrau.svg" x="0" y="0" width="800" height="800" />
+		</pattern>
+		<pattern id="gelb" patternUnits="userSpaceOnUse" width="568" height="568">
+			<image xlink:href="http://localhost:8000/media/gelb.png" x="0" y="0" width="568" height="568" />
+		</pattern>
+	</defs>
+
+	<a href="/idea">
+		<path class="puzzle-path" d="M138.7,564.71a855.58,855.58,0,0,0,162,25.62h.7a26.61,26.61,0,0,0,18.49-45.76l-12.26-11.69a61,61,0,1,1,87,0L381.76,545a26.39,26.39,0,0,0,18.35,45.34h.5a831.94,831.94,0,0,0,163-25.65,857.67,857.67,0,0,0,25.64-162.06v-.69a26.63,26.63,0,0,0-45.77-18.5L531.82,395.7a61,61,0,1,1,0-87l12.11,12.8a26.38,26.38,0,0,0,45.35-18.33v-.51a834.12,834.12,0,0,0-25.67-163,833.56,833.56,0,0,1-163,25.65h-.51A26.38,26.38,0,0,1,381.73,120l12.81-12.12a61.07,61.07,0,1,0-87,0l12.27,11.68a26.61,26.61,0,0,1-18.5,45.76h-.69a840,840,0,0,1-162-25.6,832.63,832.63,0,0,1,25.67,163v.52A26.39,26.39,0,0,1,119,321.55l-12.13-12.8a61,61,0,1,0,0,87l11.68-12.26A26.62,26.62,0,0,1,164.33,402v.69A858.21,858.21,0,0,1,138.7,564.71Z" transform="translate(-3 -4)"/>
+		<text class="title" x="360" y="220" fill="#000000" text-anchor="middle" alignment-baseline="middle">
+		  {{ title }}
+		</text>
+		<text class="desc" x="360" y="270" fill="#000000" text-anchor="middle" alignment-baseline="middle">
+			Was ist Weitblick
+		</text>
+		<image x="300" y="310" width="90" height="90" xlink:href="http://localhost:8000/media/idea.svg" />
+	</a>
+</svg>
