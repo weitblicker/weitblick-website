@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/2.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
-
+from django.utils.translation import gettext_lazy as _
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -31,22 +31,32 @@ ALLOWED_HOSTS = ["new.weitblicker.org", "new.weitblick.ngo", "new.weitblick.ong"
 # Application definition
 
 INSTALLED_APPS = [
-    'wbcore.apps.WbcoreConfig',
+    'modeltranslation',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'django_countries',
+    'haystack',
     'bootstrap4',
     'sass_processor',
-    'redactor',
+    'tinymce',
+    'photologue',
+    'sortedm2m',
+    'rest_framework',
+    'localflavor',
+    'wbcore.apps.WbcoreConfig',
 ]
+
+SUMMERNOTE_THEME = 'bs4'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -78,6 +88,19 @@ WSGI_APPLICATION = 'weitblick.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'weitblick_website',
+        'USER': 'weitblick_website',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
+'''
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -108,7 +131,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'de-de'
 
 TIME_ZONE = 'UTC'
 
@@ -118,6 +141,14 @@ USE_L10N = True
 
 USE_TZ = True
 
+LANGUAGES = (
+    ('de', _('German')),
+    ('en', _('English')),
+    ('fr', _('French')),
+    ('es', _('Spanish')),
+)
+MODELTRANSLATION_LANGUAGES = ('de','en','fr')
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'de'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
@@ -125,13 +156,33 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 ENV_PATH = os.path.abspath(os.path.dirname(__file__))
-MEDIA_ROOT = os.path.join(ENV_PATH, 'media/')
+
 #STATIC_ROOT = os.path.join(ENV_PATH, 'static/')
 STATIC_ROOT = '/var/www/weitblick-new/static/'
-SASS_PROCESSOR_ROOT = STATIC_ROOT
+MEDIA_ROOT = os.path.join(ENV_PATH, 'media/')
+LOCALE_PATH = os.path.join(ENV_PATH, 'locale/')
+SASS_PROCESSOR_ROOT = os.path.join(ENV_PATH, 'static/')
+SITE_ID=1 #has fixed 'site not found' error when accessing admin page
 
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'sass_processor.finders.CssFinder',
 ]
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny'
+    ]
+}
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'haystack',
+    },
+}
+
