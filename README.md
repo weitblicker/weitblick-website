@@ -4,9 +4,13 @@ The new Weitblick website is *Django*, and *Python* based. The search engine we 
 
 ## Installation
 
-Python 3 and Java are required! If not installed install Python and Java!
+### Required Software 
 
-### Python Environment (Linux)
+* [Python 3](https://www.python.org/)
+* [Java 11](https://jdk.java.net/11/)
+* [Tidy](http://binaries.html-tidy.org/)
+* [Elastic Search 2](https://www.elastic.co/de/downloads/past-releases/elasticsearch-2-4-2)  (see Elastic Search section below.)
+### Python Environment (Unix)
 
 * If you do not have `pip` installed install it using:
 `curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py`
