@@ -4,6 +4,7 @@ from django.urls import reverse
 from .models import Host, Project, Event, NewsPost, Location, BlogPost
 from django.db.models import Count
 from num2words import num2words
+from collections import OrderedDict
 import csv
 
 
@@ -14,6 +15,24 @@ dot_nav_events = Event.objects.all().order_by('-start_date')[:3]
 dot_nav = {'news': dot_nav_news,
            'blog': dot_nav_blog,
            'events': dot_nav_events}
+
+
+def get_main_nav(host=None, active=None):
+
+    args = [host.slug] if host else []
+    nav = OrderedDict([
+            #('home', {'name': 'Home', 'link': reverse('home')}),
+            ('idea', {'name': 'Idea', 'link': reverse('idea')}),
+            ('projects', {'name': 'Projects', 'link': reverse('projects', args=args)}),
+            ('events', {'name': 'Events', 'link': reverse('events', args=args)}),
+            ('join', {'name': 'Join in', 'link': reverse('join', args=args)}),
+            ('hosts', {'name': 'Unions', 'link': reverse('hosts')}),
+    ])
+
+    if active in nav:
+        nav[active]['link'] = None
+
+    return nav
 
 def get_host_slugs(request, host_slug):
     if host_slug:
@@ -35,10 +54,7 @@ def home_view(request):
     template = loader.get_template('wbcore/home.html')
 
     context = {
-        'main_nav': [('Idea', reverse('idea')),
-                     ('Projects', reverse('projects')),
-                     ('Events', reverse('events')),
-                     ('Join in', reverse('join'))],
+        'main_nav': get_main_nav(),
         'dot_nav': dot_nav,
         'projects': projects,
         'hosts': hosts,
@@ -55,10 +71,7 @@ def idea_view(request):
 
     template = loader.get_template('wbcore/idea.html')
     context = {
-        'main_nav': [('Idea', None),
-                     ('Projects', reverse('projects')),
-                     ('Events', reverse('events')),
-                     ('Join in', reverse('join'))],
+        'main_nav': get_main_nav(active='idea'),
         'dot_nav': dot_nav,
         'projects': projects,
         'hosts': hosts,
@@ -87,10 +100,7 @@ def projects_view(request, host_slug=None):
     project_list = list(Location.objects.filter(project__in=projects).values(
             'country').annotate(number=Count('country')))
     context = {
-        'main_nav': [('Idea', reverse('idea')),
-                     ('Projects', None),
-                     ('Events', reverse('events')),
-                     ('Join in', reverse('join'))],
+        'main_nav': get_main_nav(host=host, active='projects'),
         'dot_nav': dot_nav,
         'projects': projects,
         'project_list': project_list,
@@ -103,10 +113,7 @@ def projects_view(request, host_slug=None):
 def join_view(request, host_slug=None):
     template = loader.get_template('wbcore/join.html')
     context = {
-        'main_nav': [('Idea', reverse('idea')),
-                     ('Projects', reverse('projects')),
-                     ('Events', reverse('events')),
-                     ('Join in', None)],
+        'main_nav': get_main_nav(active='join'),
         'dot_nav': dot_nav,
         'breadcrumb': [('Home', reverse('home')), ('Join in', None)],
     }
@@ -134,10 +141,7 @@ def project_view(request, host_slug=None, project_slug=None):
 
     template = loader.get_template('wbcore/project.html')
     context = {
-        'main_nav': [('Idea', reverse('idea')),
-                     ('Projects', None),
-                     ('Events', reverse('events')),
-                     ('Join in', reverse('join'))],
+        'main_nav': get_main_nav(host=host, active='projects'),
         'project': project,
         'host': host,
         'dot_nav': dot_nav,
@@ -152,6 +156,7 @@ def hosts_view(request):
     template = loader.get_template('wbcore/hosts.html')
     context = {
         'hosts': hosts,
+        'main_nav': get_main_nav(active='hosts'),
         'breadcrumb': [('Home', reverse('home')), ("Unions", reverse('hosts'))],
     }
     return HttpResponse(template.render(context, request))
@@ -168,6 +173,8 @@ def host_view(request, host_slug):
     context = {
         'host': host,
         'breadcrumb': [('Home', reverse('home')), (host.name, None)],
+        'main_nav': get_main_nav(host=host),
+        'dot_nav': dot_nav,
     }
     return HttpResponse(template.render(context, request))
 
@@ -190,10 +197,7 @@ def events_view(request, host_slug=None):
 
     template = loader.get_template('wbcore/events.html')
     context = {
-        'main_nav': [('Idea', reverse('idea')),
-                     ('Projects', reverse('projects')),
-                     ('Events', None),
-                     ('Join in', reverse('join'))],
+        'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': dot_nav,
         'events': events,
         'host': host,
@@ -223,10 +227,7 @@ def event_view(request, host_slug=None, event_slug=None):
 
     template = loader.get_template('wbcore/events.html')
     context = {
-        'main_nav': [('Idea', reverse('idea')),
-                     ('Projects', reverse('projects')),
-                     ('Events', None),
-                     ('Join in', reverse('join'))],
+        'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': dot_nav,
         'event': event,
         'breadcrumb': breadcrumb,
@@ -257,10 +258,7 @@ def blog_view(request, host_slug=None):
         breadcrumb = [('Home', reverse('home')), ('Blog', None)]
 
     context = {
-        'main_nav': [('Idea', reverse('idea')),
-                     ('Projects', reverse('projects')),
-                     ('Events', None),
-                     ('Join in', reverse('join'))],
+        'main_nav': get_main_nav(host=host, active='blog'),
         'dot_nav': dot_nav,
         'posts': posts,
         'host': host,
@@ -290,10 +288,7 @@ def blog_post_view(request, host_slug=None, post_id=None):
         raise Http404()
 
     context = {
-        'main_nav': [('Idea', reverse('idea')),
-                     ('Projects', reverse('projects')),
-                     ('Events', reverse('events')),
-                     ('Join in', reverse('join'))],
+        'main_nav': get_main_nav(host=host, active='blog'),
         'dot_nav': dot_nav,
         'post': post,
         'breadcrumb': breadcrumb,
@@ -324,10 +319,7 @@ def news_view(request, host_slug=None):
         breadcrumb = [('Home', reverse('home')), ('Post', None)]
 
     context = {
-        'main_nav': [('Idea', reverse('idea')),
-                     ('Projects', reverse('projects')),
-                     ('Events', None),
-                     ('Join in', reverse('join'))],
+        'main_nav': get_main_nav(host=host, active='news'),
         'dot_nav': dot_nav,
         'posts': posts,
         'host': host,
@@ -357,10 +349,7 @@ def news_post_view(request, host_slug=None, post_id=None):
         raise Http404()
 
     context = {
-        'main_nav': [('Idea', reverse('idea')),
-                     ('Projects', reverse('projects')),
-                     ('Events', reverse('events')),
-                     ('Join in', reverse('join'))],
+        'main_nav': get_main_nav(host=host, active='news'),
         'dot_nav': dot_nav,
         'post': post,
         'breadcrumb': breadcrumb,
@@ -374,10 +363,7 @@ def host_projects_view(request, host_slug):
     host = Host.objects.get(slug=host_slug)
     projects = Project.objects.filter(hosts__slug=host_slug)
     context = {
-        'main_nav': [('Idea', reverse('idea')),
-                     ('Projects', None),
-                     ('Events', reverse('events')),
-                     ('Join in', reverse('join'))],
+        'main_nav': get_main_nav(host=host, active='projects'),
         'dot_nav': dot_nav,
         'projects': projects,
         'host': host,
@@ -391,25 +377,10 @@ def host_events_view(request, host_slug):
     host = Host.objects.get(slug=host_slug)
     events = Event.objects.filter(hosts__slug=host_slug)
     context = {
-        'main_nav': [('Idea', reverse('idea')),
-                     ('Projects', reverse('projects')),
-                     ('Events', None),
-                     ('Join in', reverse('join'))],
+        'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': dot_nav,
         'events': events,
         'host': host,
         'breadcrumb': [('Home', reverse('home')), (host.name, reverse('host', host_slug)), ("Events", None)],
     }
     return HttpResponse(template.render(context, request))
-
-
-def search_view(request, query):
-  #  if request.method == "POST":
-       # search_text = request.POST['search_text']
-       # search_type = request.POST['search_type']
-    #else:
-       # search_text = ''
-       # search_text = ''
-
-    return JsonResponse()
-
