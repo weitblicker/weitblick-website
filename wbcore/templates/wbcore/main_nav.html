@@ -1,6 +1,6 @@
 {% load static %}
-<div id="main-menu" class="ui container large top fixed">
-    <div class="ui grid">
+<div id="main-menu" class="ui grid container large top fixed">
+{#    <div class="ui grid">#}
         <div class="twelve wide column">
             <div class="ui row menu">
                 <div class="ui category search item">
@@ -42,18 +42,6 @@
             {% include 'wbcore/dot_nav.html' %}
             </div>      
         </div>
-        <div class="ui container">
-            <div class="ui small breadcrumb">
-                {% for crumb in breadcrumb %}
-                    {% if crumb.1 %}
-                        <a class="section" href="{{ crumb.1 }}">{{ crumb.0 }}</a>
-                        <i class="right chevron icon divider"></i>
-                    {% else %}
-                        <div class="active section">{{ crumb.0 }}</div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-    </div>
+{#    </div>#}
 
 </div>

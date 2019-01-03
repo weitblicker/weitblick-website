@@ -13,11 +13,22 @@
     <div class="pusher content">
 
 
-
         <div class="ui vertical stripe segment">
-            <div class="ui middle aligned stackable grid container">
+            <div class="ui middle aligned stackable grid container" id="content-block">
+                <div class="ui small breadcrumb">
+                    {% for crumb in breadcrumb %}
+                        {% if crumb.1 %}
+                            <a class="section" href="{{ crumb.1 }}">{{ crumb.0 }}</a>
+                            <i class="right chevron icon divider"></i>
+                        {% else %}
+                            <div class="active section">{{ crumb.0 }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
                 {% block content %}{% endblock %}
             </div>
+            {% include 'wbcore/socialbuttons.html' %}
         </div>
 
         {% include 'wbcore/footer.html' %}

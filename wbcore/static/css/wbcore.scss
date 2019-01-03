@@ -1,3 +1,5 @@
+$box-background: #ffffff;
+
 #puzzles{
 	.puzzle-svg{
 		.title{
@@ -24,22 +26,28 @@
 		height: 300px;
 
 		float: left;
-	}
 
+	}
+	
 	.puzzle-svg.down{
 		margin-top:67.5px;
 	}
 
 	.puzzle-path{
 	}
+	
 	margin:auto;
-	padding-left:-28.25px
+	padding-left:-33.75px
 }
 
 
+#content-block {
+	background-color: $box-background;
+}
+
 #main-menu{
+	background-color: $box-background;
 	margin-top: 15px;
-	background-color: #ffffff;
 	padding-bottom: 15px;
 	border-bottom: solid 1px;
 }
