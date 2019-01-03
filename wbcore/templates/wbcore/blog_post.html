@@ -1,0 +1,10 @@
+{% extends 'wbcore/base.html' %}
+{% block content %}
+    {% if post %}
+        <h1>{{ post.title }}</h1>
+        <div>{{ post.teaser|safe }}</div>
+        <div>{{ post.text|safe }}</div>
+    {% else %}
+        <p>No post available.</p>
+    {% endif %}
+{% endblock %}

@@ -4,10 +4,48 @@ body {
 	background: $primaryColor;
 }
 
+.puzzle-svg{
+	.title{
+		font-size: 50px;
+		font-family: Bree Serif;
+		fill: #ffffff;
+	}
+
+	.desc{
+		font-size: 40px;
+		font-family: Open Sans;
+		fill: #ffffff;
+	}
+
+	.ficon{
+		font-family: FontAwesome;
+		font-size: 40px;
+		fill: #ffffff;
+		content: "\f0c4";
+	}
+
+	width: 200px;
+	height: 200px;
+}
+
+#puzzle-svg2{
+	background-color: red;
+	display: inline-block;
+}
+
+.puzzle-path{
+	fill: url(#gelb);
+}
+
 #main-menu{
+	margin-top: 15px;
 	background-color: #ffffff;
 	padding-bottom: 15px;
 	border-bottom: solid 1px;
+}
+
+#menu-nav > .item {
+	text-transform: uppercase;
 }
 
 #popup-menu-container{
@@ -15,17 +53,16 @@ body {
 }
 
 .wb-icon{
-	width: 20px;
-	height: 20px;
+	width: 17px;
+	height: 17px;
+	display: inline-block;
+	margin: 0 6px 0 12px !important;
+	line-height: 17px;
 }
 
 #popup-menu{
 	margin: 40px;
 	display: none;
-}
-
-.content{
-	padding-top: 58px;
 }
 
 .logo{
@@ -37,13 +74,6 @@ body {
 	margin-bottom: 0 !important;
 	padding-bottom: 0 !important;
 
-}
-
-.search{
-	border-radius: 20px;
-	border-color: #ffffff;
-	box-shadow: none;
-	padding: 20px;
 }
 
 .hidden.menu {

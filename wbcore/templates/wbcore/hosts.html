@@ -1,0 +1,14 @@
+{% extends 'wbcore/base.html' %}
+{% load staticfiles %}
+{% block content %}
+
+{% if hosts %}
+    <ul class="ui items">
+    {% for host in hosts %}
+    	<li class="item"><a href="{% url 'host' host.slug %}">{{ host.name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No posts available.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,31 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+django-bootstrap4 = "==0.0.6"
+django-countries = "==5.3.1"
+django-sass-processor = "==0.7"
+django-photologue = "*"
+django-localflavor = "*"
+django-filter = "*"
+elasticsearch = ">=2,<3"
+django-haystack = "*"
+pytidylib = "*"
+psycopg2-binary = "*"
+djangorestframework = "*"
+libsass = "==0.14.5"
+num2words = "*"
+django-modeltranslation = "==0.13b1"
+django-tinymce4-lite = "*"
+python-slugify = "*"
+Django = "==2.1.2"
+django_compressor = "*"
+Pillow = "==5.1.0"
+Markdown = "==2.6.11"
+
+[requires]
+python_version = "3.7"

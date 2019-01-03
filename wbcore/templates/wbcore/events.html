@@ -1,31 +1,5 @@
 {% extends 'wbcore/base.html' %}
 {% load staticfiles %}
 {% block content %}
-    <link rel="stylesheet" href="{% static 'jvectormap/jquery-jvectormap-2.0.3.css' %}" type="text/css" media="screen"/>
-    <script src="{% static 'jquery/jquery.min.js' %}"></script>
-    <script src="{% static 'jvectormap/jquery-jvectormap-2.0.3.min.js' %}"></script>
-    <script src="{% static 'jvectormap/jquery-jvectormap-de-mill.js' %}"></script>
-  <div id="world-map" style="width: 900px; height: 400px"></div>
-  <script>
-
-    $(function(){
-      $('#world-map').vectorMap({map: 'de_mill',
-          markersSelectable: true,
-          markers: {{city_list|safe}},
-          regionStyle: {
-              hover: {"fill-opacity": 1.0 }
-              },
-          markerStyle: {
-            initial: {
-              fill:'#FF9900'
-              }
-            },
-          onRegionTipShow: function(e, el, code){
-            el.html(el.html()+' blickt weit!');
-             }
-        });
-    });
-  </script>
-
     <p>Events</p>
 {% endblock %}

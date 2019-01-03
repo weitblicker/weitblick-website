@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Address, Location, Host, Partner, Project, Event, Post, BlogPost, Profile
+from .models import Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, Profile
 from .models import CustomGallery, UserRelation, Document, Team, Milestone, Donation, Milestep, BankAccount
 from django.db import models
 from photologue.admin import GalleryAdmin as GalleryAdminDefault
@@ -44,7 +44,7 @@ admin.site.register(Host, MyTranslatedAdmin)
 admin.site.register(Partner, MyTranslatedAdmin)
 admin.site.register(Project, MyTranslatedAdmin)
 admin.site.register(Event, MyTranslatedAdmin)
-admin.site.register(Post, MyTranslatedAdmin)
+admin.site.register(NewsPost, MyTranslatedAdmin)
 admin.site.register(Profile, MyAdmin)
 admin.site.register(UserRelation, MyAdmin)
 admin.site.register(Document, MyTranslatedAdmin)
