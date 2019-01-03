@@ -3,3 +3,4 @@
 *******************************/
 
 @defaultBorderRadius: 0;
+@pageBackground: #D9E2ED;
