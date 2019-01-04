@@ -26,31 +26,31 @@ $box-background: #ffffff;
 		height: 300px;
 
 		float: left;
-	}
-
 	
-	.puzzle-svg.down{
-		margin-top:67.5px;
+		&.down{
+			margin-top:67.5px;
+		}
 	}
-
+	
 	.puzzle-path{
+		fill: url(#puzzle-bg);
+		&:hover{
+			fill: url(#puzzle-bg-hover);
+		}
 	}
 
 	margin:auto;
-	padding-left:-400
-}
 
-
-.icon{
-	.path{
-		fill:none;
-		stroke:#ffffff;
-		stroke-linecap:round;
-		stroke-linejoin:round;
-		stroke-width:1.92px;
+	.icon{
+		.path{
+			fill:none;
+			stroke:#ffffff;
+			stroke-linecap:round;
+			stroke-linejoin:round;
+			stroke-width:1.92px;
+		}
 	}
 }
-
 
 #content-block {
 	background-color: $box-background;
