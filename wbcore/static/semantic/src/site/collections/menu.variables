@@ -5,3 +5,5 @@
 @border: 0 none;
 @boxShadow: 0;
 @borderRadius: 0;
+@fontName: 'Open Sans';
+@fontWeight: 700;

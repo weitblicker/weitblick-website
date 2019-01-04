@@ -23632,9 +23632,9 @@ ol.ui.horizontal.list li:before,
   display: -ms-flexbox;
   display: flex;
   margin: 1rem 0em;
-  font-family: Bree Serif, Open Sans, 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-family: 'Open Sans', 'Helvetica Neue', Arial, Helvetica, sans-serif;
   background: #FFFFFF;
-  font-weight: normal;
+  font-weight: 700;
   border: 0 none;
   -webkit-box-shadow: 0;
   box-shadow: 0;
