@@ -49,8 +49,9 @@ def get_host_slugs(request, host_slug):
 def home_view(request):
     projects = Project.objects.all()
     hosts = Host.objects.all()
-    events = Event.objects.all()
-    posts = NewsPost.objects.all()
+    events = Event.objects.all().order_by('-start_date')[:3]
+    posts = NewsPost.objects.all().order_by('-published')[:3]
+    blog = BlogPost.objects.all().order_by('-published')[:3]
 
     template = loader.get_template('wbcore/home.html')
 
