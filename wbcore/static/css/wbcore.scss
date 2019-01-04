@@ -1,4 +1,7 @@
 $box-background: #ffffff;
+$light-gray: #cfdbde; //or #D6D6D6 ??
+$middle-gray: #969696;
+$dark-gray: #2c2c2c;
 
 #puzzles{
 	.puzzle-svg{
@@ -43,6 +46,7 @@ $box-background: #ffffff;
 
 #content-block {
 	background-color: $box-background;
+	position: relative;
 }
 
 #main-menu{
@@ -144,6 +148,19 @@ $box-background: #ffffff;
 	display: none;
 }
 
+#social-buttons {
+	width: 50px;
+	position: absolute;
+	right: -50px;
+	padding: 0;
+	img {
+		background: $middle-gray;
+	}
+	img:hover {
+		background: rebeccapurple;
+	}
+}
+
 @media only screen and (max-width: 700px) {
 	.ui.fixed.menu {
 		display: none !important;
@@ -170,5 +187,5 @@ $box-background: #ffffff;
 
 // custom override here. Did not work through input.variables nor search.variables
 .menu > .search {
-	border: 1px solid #D6D6D6;
+	border: 1px solid $light-gray;
 }
