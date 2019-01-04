@@ -8,20 +8,58 @@ $dark-gray: #2c2c2c;
 		.title{
 			font-size: 40px;
 			font-family: Bree Serif;
-			fill: #ffffff;
+			fill: $middle-gray;
+			pointer-events: none;
 		}
 
 		.desc{
 			font-size: 22px;
 			font-family: Open Sans;
-			fill: #ffffff;
+			fill: $middle-gray;
+			pointer-events: none;
 		}
 
 		.ficon{
 			font-family: FontAwesome;
 			font-size: 40px;
-			fill: #ffffff;
+			fill: $middle-gray;
 			content: "\f0c4";
+		}
+
+		.puzzle-path{
+			fill: url(#puzzle-bg);
+		}
+
+		.icon{
+			.path{
+				fill:none;
+				stroke:$middle-gray;
+				stroke-linecap:round;
+				stroke-linejoin:round;
+				stroke-width:1.92px;
+			}
+		}
+
+		a:hover{
+			
+			.puzzle-path{
+				fill: url(#puzzle-bg-hover);
+			}
+
+			.title{
+				fill: #ffffff;
+			}
+
+			.desc{
+				fill: #ffffff;
+			}
+
+			.icon{
+				.path{
+					stroke:#ffffff;
+					stroke-width:2.3px;
+				}
+			}
 		}
 
 		margin-left:-67.5px;
@@ -29,31 +67,14 @@ $dark-gray: #2c2c2c;
 		height: 300px;
 
 		float: left;
-	}
-
 	
-	.puzzle-svg.down{
-		margin-top:67.5px;
+		&.down{
+			margin-top:67.5px;
+		}
 	}
-
-	.puzzle-path{
-	}
-
+	
 	margin:auto;
-	padding-left:-400
 }
-
-
-.icon{
-	.path{
-		fill:none;
-		stroke:#ffffff;
-		stroke-linecap:round;
-		stroke-linejoin:round;
-		stroke-width:1.92px;
-	}
-}
-
 
 #content-block {
 	background-color: $box-background;
