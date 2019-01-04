@@ -86,6 +86,9 @@ $dark-gray: #2c2c2c;
 #popup-menu{
 	margin: 40px;
 	display: none;
+	.ui.items {
+    	margin: 0;
+	}
 }
 
 .logo{
