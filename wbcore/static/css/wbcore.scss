@@ -4,7 +4,11 @@ $middle-gray: #969696;
 $dark-gray: #2c2c2c;
 
 #puzzles{
-	.puzzle-svg{
+	.puzzle-svg {
+		pointer-events: none;
+		.puzzle-link {
+			pointer-events: all;
+		}
 		.title{
 			font-size: 40px;
 			font-family: Bree Serif;
