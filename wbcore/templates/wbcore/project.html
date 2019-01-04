@@ -1,5 +1,5 @@
-{% extends 'wbcore/base.html' %}
-{% block content %}
+{% extends 'wbcore/single_content.html' %}
+{% block single-content %}
     {% if project %}
         <h1>{{ project.name }}</h1>
         <div>{{ project.description|safe }}</div>

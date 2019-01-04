@@ -1,7 +1,7 @@
-{% extends 'wbcore/base.html' %}
+{% extends 'wbcore/single_content.html' %}
 
 {% if host %}
-    {% block content %}
+    {% block single-content %}
     <h1>{{ host.name }}</h1>
     <img src="{{    host.logo.url }}"/>
     {% endblock %}
