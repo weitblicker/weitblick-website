@@ -21,7 +21,7 @@ def get_main_nav(host=None, active=None):
 
     args = [host.slug] if host else []
     nav = OrderedDict([
-            #('home', {'name': 'Home', 'link': reverse('home')}),
+            ('home', {'name': 'Home', 'link': reverse('home')}),
             ('idea', {'name': 'Idea', 'link': reverse('idea')}),
             ('projects', {'name': 'Projects', 'link': reverse('projects', args=args)}),
             ('events', {'name': 'Events', 'link': reverse('events', args=args)}),
