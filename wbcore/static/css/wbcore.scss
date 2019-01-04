@@ -32,6 +32,10 @@ $dark-gray: #2c2c2c;
 
 		.puzzle-path{
 			fill: url(#puzzle-bg);
+			stroke:#ffffff;
+			stroke-linecap:round;
+			stroke-linejoin:round;
+			stroke-width:2px;
 		}
 
 		.icon{
