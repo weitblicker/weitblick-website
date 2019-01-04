@@ -28,8 +28,10 @@
                 </div>
 
                 {% block content %}{% endblock %}
+
+                {% include 'wbcore/socialbuttons.html' %}
+
             </div>
-            {% include 'wbcore/socialbuttons.html' %}
         </div>
 
         {% include 'wbcore/footer.html' %}
