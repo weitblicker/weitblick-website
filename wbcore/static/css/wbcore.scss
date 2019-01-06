@@ -2,6 +2,8 @@ $box-background: #ffffff;
 $light-gray: #cfdbde; //or #D6D6D6 ??
 $middle-gray: #969696;
 $dark-gray: #2c2c2c;
+$backgroundColor: #d9e2ed;
+$orange: #eb800f;
 
 #puzzles{
 	.puzzle-svg {
@@ -202,8 +204,14 @@ $dark-gray: #2c2c2c;
 		background: $middle-gray;
 	}
 	img:hover {
-		background: rebeccapurple;
+		background: $orange;
 	}
+}
+
+.column.split-space {
+	background: $backgroundColor;
+    width: 20px !important;
+    padding: 0 !important;
 }
 
 @media only screen and (max-width: 700px) {

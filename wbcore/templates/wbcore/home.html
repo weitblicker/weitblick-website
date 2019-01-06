@@ -24,19 +24,23 @@
 
     <div class="ui vertical stripe segment">
     	<div class="ui grid container content-block">
-		  <div class="ten wide column divided items">
-	        <a class="ui item header" href="{% url 'news' %}">News</a>
-            {% for entry in posts %}
-            	{% include 'wbcore/dot_nav_item.html' with type='news-post' id=entry.pk title=entry.title image=entry.image desc=entry.teaser|truncatewords:7 %}
-            {% endfor %}
-		  </div>
-		  <div class="six wide column divided items">
-            <a class="ui item header"href="{% url 'events' %}" >Events</a>
-            {% for entry in events %}
-            	{% include 'wbcore/dot_nav_item.html' with type='event' id=entry.pk title=entry.title image=entry.image desc=entry.text|truncatewords:7 %}
-            {% endfor %}
-		  </div>
-		</div>
+            <div class="nine wide column divided items">
+                <a class="ui item header" href="{% url 'news' %}">News</a>
+                {% for entry in posts %}
+                    {% include 'wbcore/dot_nav_item.html' with type='news-post' id=entry.pk title=entry.title image=entry.image desc=entry.teaser|truncatewords:7 %}
+                {% endfor %}
+            </div>
+            <div class="column divided items split-space">
+            </div>
+            <div class="six wide column divided items">
+                <div class="column-content">
+                    <a class="ui item header"href="{% url 'events' %}" >Events</a>
+                    {% for entry in events %}
+                        {% include 'wbcore/dot_nav_item.html' with type='event' id=entry.pk title=entry.title image=entry.image desc=entry.text|truncatewords:7 %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
 
 
