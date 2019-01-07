@@ -6,6 +6,10 @@ $backgroundColor: #d9e2ed;
 $orange: #eb800f;
 
 #puzzles{
+
+	#puzzle-svg-1{
+		margin-left: 0;
+	}
 	.puzzle-svg {
 		pointer-events: none;
 		.puzzle-link {
@@ -37,7 +41,7 @@ $orange: #eb800f;
 			stroke:#ffffff;
 			stroke-linecap:round;
 			stroke-linejoin:round;
-			stroke-width:2px;
+			stroke-width:1%;
 		}
 
 		.icon{
@@ -49,6 +53,8 @@ $orange: #eb800f;
 				stroke-width:1.92px;
 			}
 		}
+
+
 
 		a:hover{
 			
@@ -71,21 +77,35 @@ $orange: #eb800f;
 				}
 			}
 		}
-
-		margin-left:-67.5px;
-		width: 300px;
-		height: 300px;
-
+		
 		float: left;
-	
-		&.down{
-			margin-top:67.5px;
+
+		@media(min-width:723px){
+			margin-left:-6.4%;
+			width: 28.5%;
+
+			&.down{
+				margin-top:6.4%;
+			}
+		}
+		@media(max-width:723px){
+			margin-left:-11.4%;
+			width: 50.5%;
+
+			&.down{
+				margin-top:11.4%;
+			}
+
+			&#puzzle-svg-4{
+				margin-top: -11.2%;
+			}
+			&#puzzle-svg-3{
+				margin-top: -22.3%;
+				margin-left: 0;
+			}
 		}
 	}
-	
 	margin:auto;
-	margin-top: 40px;
-	margin-bottom: 40px;
 }
 
 .content-block {
