@@ -350,7 +350,7 @@ def news_view(request, host_slug=None):
     if host:
         breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ("News", None)]
     else:
-        breadcrumb = [('Home', reverse('home')), ('Post', None)]
+        breadcrumb = [('Home', reverse('home')), ('News', None)]
 
     context = {
         'main_nav': get_main_nav(host=host, active='news'),

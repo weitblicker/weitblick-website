@@ -16,12 +16,14 @@ import pandas as pd
 from paramiko import SSHClient
 from sshtunnel import SSHTunnelForwarder
 from os.path import expanduser
+from urllib.parse import quote
 
 filename = sys.argv[1]
 pw = getpass.getpass()
 user = getpass.getuser()
 
 img_pat = re.compile(r'<img [^>]*src="([^"]+)')
+video_pat = re.compile(r'\[video.*?[mp4|src]="(.+?)".*?\](?:.*?\[/video\])?')
 img_org = re.compile(r'(-\d+x\d+)')
 link_pat = re.compile(r'href="([^"]+)')
 p_tag_pat = re.compile(r'(<p>.+?</p>)|(<img.+?src=".+?".*?>)')
@@ -64,8 +66,6 @@ with SSHTunnelForwarder(
     df = pd.read_sql_query(query, conn)
     conn.close()
 
-
-
 #
 # [{"model": "wbcore.blogpost", "pk": 1,
 #   "fields": {
@@ -103,6 +103,10 @@ for index, article in df.iterrows():
     title = title[0]
     image = None
     images_html = img_pat.findall(text)
+    #videos = video_pat.findall(text)
+    #if videos:
+    #    print(videos)
+
     #print(title, text)
     slug = slug_date+'-'+slugify(umlaute(title.lower()))
     teaser = article['excerpt']
@@ -128,7 +132,27 @@ for index, article in df.iterrows():
         text = text.replace(small_image, new_image_html)
         images.append(html_image)
 
-    print(image)
+    video_html = '<video width="400" controls><source src="{0}" type="video/mp4">Your browser does not support HTML5 video.</video>'
+
+    def new_video_html(match):
+        link = match.group(1)
+        print("Found video:", link)
+
+        video_ext = os.path.splitext(link)[1].lower()
+        new_video_name = slug + video_ext
+        new_video_link = '/media/blog/' + new_video_name
+
+        video_info = {
+            'url': link,
+            'url2': '',
+            'name': new_video_name     
+        }
+        images.append(video_info)
+        tmp = video_html.format(new_video_link)
+        print(tmp)
+        return tmp
+       
+    text = video_pat.sub(new_video_html, text)  
 
     elem = {
         'title_de': title,
@@ -156,32 +180,103 @@ for index, article in df.iterrows():
 
 post_list.sort(key=lambda x: x['fields']['published'], reverse=False)
 
+print("Write json file...")
 with open(filename, 'w') as outfile:
     json.dump(post_list, outfile)
 
 
+def alter_file_extension(url):
+    extensions = ['jpg', 'jpeg', 'JPG', 'JPEG', 'png', 'PNG', 'gif', 'GIF']
+
+    path_parts = url.split("/")
+    fullfilename = path_parts[-1]
+    path = "/".join(path_parts[0:-1])
+    filename = fullfilename.split(".")[0]
+
+    for ext in extensions:
+        new_url = path + "/" + filename + "." + ext
+        #print("Trying:", new_url)
+        try:
+            req = urllib.request.Request(new_url)
+            req.get_method = lambda: 'HEAD'
+            request.urlopen(new_url)
+            #print("Found alternative URL:", new_url)
+            return new_url
+        except UnicodeEncodeError:
+            try:
+                new_url = path + "/" + request.quote(filename) + "." + ext
+                req= urllib.request.Request(new_url)
+                req.get_method = lambda: 'HEAD'
+                request.urlopen(new_url)
+                #print("Found alternative URL:", new_url)
+                return new_url
+            except error.HTTPError:
+                continue
+        except error.HTTPError:
+            continue
+        except error.URLError:
+            return ""
+        except ValueError:
+            return ""
+
+    return ""
+
+print("Download media files...")
 for i, image in enumerate(images):
     url = image['url']
+    original_url = url
     name = image['name']
 
     filename = 'blog_images' + '/' + name.strip()
 
-    if os.path.isfile(filename):
-        print(filename, 'already exists. skip.')
-        continue
+    if ".mp4" in url:
+        print(url)
 
-    print('Download image ', i, 'from', len(images), ':', url, 'to blog_images/'+name)
+    print("Download:", filename)
+    if os.path.isfile(filename):
+        try:
+            site = request.urlopen(url)
+        except:
+            url = alter_file_extension(url)
+            if url != "":
+                site = request.urlopen(url)
+            else:
+                #print("Could not open URL:", url, "skipping it...")
+                continue
+        server_file_length = int(site.info()["Content-Length"])
+        f = open(filename, "rb")
+        disk_file_length = len(f.read())
+        f.close()
+
+        if server_file_length == disk_file_length:
+            print("File already exists:", filename, "skip.")
+            continue
+        else:
+            print("Found broken file. Server Content-Length:", server_file_length,
+             "Disk Content-Length:", disk_file_length, "Downloading it again...");
+
     try:
         with request.urlopen(url) as response, open(filename, 'wb') as img_file:
+            print('Download image ', i, 'from', len(images), ':', url, 'to blog_images/'+name)
             shutil.copyfileobj(response, img_file)
-    except error.HTTPError:
-        print("Could not download the image ", url)
-        #### todo download images
-        #styles/presselogo_custom_user_normal_1x/public
-    except error.URLError:
-        print("Could not download the image ", url)
-    except UnicodeEncodeError:
-        print("Could not read the image url.")
-    except ValueError:
-        print("Some value error.")
+    except:
+        url = alter_file_extension(url)
+        if url != "":
+            #print("Download from alternative URL:", url, "...")
+            try:
+                with request.urlopen(url) as response, open(filename, 'wb') as img_file:
+                    print('Download image ', i, 'from', len(images), ':', url, 'to blog_images/'+name)
+                    print("Download from alternative URL:", url, "...")
+                    shutil.copyfileobj(response, img_file)
+            except error.HTTPError:
+                print("HTTPError: Could not download the image ", url)
+            except error.URLError:
+                print("URLError: Could not download the image ", url)
+            except UnicodeEncodeError:
+                print("UnicodeEncodeError: Could not read the image url.")
+            except ValueError:
+                print("Some value error.")
+        else:
+            #print("File under the URL", original_url, "does not exist!")
+            continue;
 
