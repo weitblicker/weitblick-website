@@ -1,19 +1,9 @@
 <!-- Social-Buttons -->
 {% load static %}
-<div id="social-buttons">
-    <a href="{% url 'home' %}">
-        <img class="" src="{% get_media_prefix %}icons/Schloss.svg"></a>
+<div id="icon-links">
+    {% for key, elem in icon_links.items %}
+    <a href="{{ elem.link }}">
+        <i class="{{ elem.icon }} icon"></i>
     </a>
-    <a href="{% url 'home' %}">
-        <img class="" src="{% get_media_prefix %}icons/Facebook.svg"></a>
-    </a>
-    <a href="{% url 'home' %}">
-        <img class="" src="{% get_media_prefix %}icons/Twitter.svg"></a>
-    </a>
-    <a href="{% url 'home' %}">
-        <img class="" src="{% get_media_prefix %}icons/Instagram.svg"></a>
-    </a>
-    <a href="{% url 'home' %}">
-        <img class="" src="{% get_media_prefix %}icons/Youtube.svg"></a>
-    </a>
+    {% endfor %}
 </div>

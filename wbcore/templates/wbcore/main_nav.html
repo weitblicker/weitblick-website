@@ -1,42 +1,38 @@
 {% load static %}
-<div id="main-menu" class="ui grid container large top fixed">
-    <div class="twelve wide column">
-        <div class="ui row menu">
-            <div class="ui category search item">
-                <div class="ui transparent icon input">
+<div id="main-menu" class="ui mobile reversed stackable grid container">
+    <div class="ui twelve wide column">
+        <div class="ui stackable menu">
+            <div class="category search item">
+                <div class="ui large transparent icon input">
                     <input class="prompt" type="text" placeholder="Search ...">
                     <i class="search link icon"></i>
                 </div>
                 <div class="results"></div>
             </div>
         </div>
-        <div class="ui row menu" id="menu-nav">
-            {% for key, elem in main_nav.items %}
-                {% if elem.link %}
-                    <a class="item" href="{{ elem.link }}">{{ elem.name }}</a>
-                {% else %}
-                    <a class="item active" href="#">{{ elem.name }}</a>
-                {% endif %}
-            {% endfor %}
-            <a id="popup-menu-btn" class="item">...</a>
-        </div>
-    </div>
-    <div class="four wide right aligned column">
-        <div class="right menu">
-            <div class="ui item logo">
-                <div class="ui medium image">
-                    {% if host %}
-                        <a href="{% url 'host' host.slug %}"><img class="" src="{{ host.logo.url }}"></a>
+        <div class="ui grid">
+            <div class="ui row stackable menu" id="menu-nav">
+                {% for key, elem in main_nav.items %}
+                    {% if elem.link %}
+                        <a class="item" href="{{ elem.link }}">{{ elem.name }}</a>
                     {% else %}
-                        <a href="{% url 'home' %}"><img class="" src="{% get_media_prefix %}logo.png"></a>
+                        <a class="item active" href="#">{{ elem.name }}</a>
                     {% endif %}
-                </div>
-            </div>
+                {% endfor %}
+                <a id="popup-menu-btn" class="item">...</a>
+            </div>            
         </div>
     </div>
-    <div class="ui container" id="popup-menu-container">
-        <div id="popup-menu" class="ui fluid bottom left">
-        {% include 'wbcore/dot_nav.html' %}
+    <div class="four wide column">
+        <div class="right menu">
+            {% if host %}
+                <a id="logo" href="{% url 'host' host.slug %}" class="ui item" style="background-image: url({{ host.logo.url }});"></a>
+            {% else %}
+                <a id="logo" href="{% url 'home' %}" class="ui item" style="background-image: url({% get_media_prefix %}logo.png);"></a>
+            {% endif %}
         </div>
+    </div>
+    <div id="popup-menu" class="ui row">
+        {% include 'wbcore/dot_nav.html' %}
     </div>
 </div>

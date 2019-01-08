@@ -16,6 +16,37 @@ dot_nav = {'news': dot_nav_news,
            'blog': dot_nav_blog,
            'events': dot_nav_events}
 
+icon_links = OrderedDict([
+    ('login',
+        {'name': 'Login',
+         'link': '#',
+         'icon': 'unlock alternate'}),
+    ('facebook',
+        {'name': 'Facebook',
+         'link': 'https://www.facebook.com/weitblick/',
+         'icon': 'facebook f'}),
+    ('twitter',
+        {'name': 'Twitter',
+         'link': 'https://twitter.com/weitblick',
+         'icon': 'twitter'}),
+    ('instagram',
+        {'name': 'Instagram',
+         'link': 'https://www.instagram.com/weitblick_osnabrueck/',
+         'icon': 'instagram'}),
+    ('youtube',
+        {'name': 'YouTube',
+         'link': 'https://www.youtube.com/user/weitblickTV',
+         'icon': 'youtube'}),
+    ('soundcloud',
+        {'name': 'SoundCloud',
+         'link': 'https://soundcloud.com/weitblick',
+         'icon': 'soundcloud'}),
+    ('email',
+        {'name': 'E-Mail',
+         'link': 'mailto:info@weitblicker.org',
+         'icon': 'envelope outline'}),
+])
+
 
 def get_main_nav(host=None, active=None):
 
@@ -63,6 +94,7 @@ def home_view(request):
         'events': events,
         'posts': posts,
         'breadcrumb': [('Home', None)],
+        'icon_links': icon_links
     }
     return HttpResponse(template.render(context, request))
 

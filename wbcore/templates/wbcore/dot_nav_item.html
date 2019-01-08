@@ -1,12 +1,9 @@
 {% load static %}
 <div class="ui item">
-	<a href="{% url type post_id=id %}" class="ui top aligned tiny image">
+	<a href="{% url type post_id=id %}" class="ui top aligned mini image">
 		<img src="{% get_media_prefix %}{{ image }}">
 	</a>
 	<div class="content">
-		<a href="{% url type post_id=id %}" class="ui tiny header">{{ title }}</a>
-		<div class="description">
-			<p>{{ desc }}</p>
-		</div>
+		<a href="{% url type post_id=id %}">{{ title }}</a>
 	</div>
 </div>

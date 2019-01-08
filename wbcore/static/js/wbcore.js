@@ -19,32 +19,9 @@
         .sidebar('attach events', '.toc.item')
       ;*/
 
-      $('#popup-menu-btn')
-      .popup({
-        popup      : $('#popup-menu'),
-        on         : 'click', 
-        hoverable  : true,
-        inline     : false,
-        transition : 'fade down',
-        position   : 'bottom center',
-        delay: {
-          show: 0,
-          hide: 0
-        },
-        duration: 500
-      });
-
-      $('#popup-menu-2-btn')
-      .popup({
-        popup      : $('#popup-menu-2'),
-        on         : 'click', 
-        hoverable  : true,
-        inline     : false,
-        transition : 'fade',
-        delay: {
-          show: 300,
-          hide: 800
-        }
+      $('#popup-menu-btn').click(function(){
+       // $('#popup-menu.show').css('height', $('#popup-menu').first().height());
+        $('#popup-menu').fadeToggle();
       });
 
       $('.ui.search').search({
