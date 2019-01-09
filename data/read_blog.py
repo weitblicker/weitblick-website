@@ -23,7 +23,9 @@ pw = getpass.getpass()
 user = getpass.getuser()
 
 img_pat = re.compile(r'<img [^>]*src="([^"]+)')
+caption_img = re.compile(r'\[caption.*?caption="(.*?)".*?\].*?<img [^>]*src="([^"]+).*?\[/caption\]')
 video_pat = re.compile(r'\[video.*?[mp4|src]="(.+?)".*?\](?:.*?\[/video\])?')
+tag_pat = re.compile(r'\[.*?\](?:.*?\[.*?\])?')
 img_org = re.compile(r'(-\d+x\d+)')
 link_pat = re.compile(r'href="([^"]+)')
 p_tag_pat = re.compile(r'(<p>.+?</p>)|(<img.+?src=".+?".*?>)')
@@ -103,9 +105,11 @@ for index, article in df.iterrows():
     title = title[0]
     image = None
     images_html = img_pat.findall(text)
-    #videos = video_pat.findall(text)
-    #if videos:
-    #    print(videos)
+    
+    tags = caption_img.findall(text)
+    if tags:
+        for tag in tags:
+            print(tag)
 
     #print(title, text)
     slug = slug_date+'-'+slugify(umlaute(title.lower()))
