@@ -48,7 +48,7 @@ ssh_user = 'spuetz'
 ssh_port = 22
 ssh_pw = pw
 
-query = '''select p.ID, p.post_title as title, p.post_excerpt as excerpt, p.post_content as content, p.post_date as 'date', p.post_date_gmt as date_gmt, u.user_login, u.display_name, u.ID as user_id, u.user_email, t.name as country, GROUP_CONCAT(p2.Tag) as tags, p.guid as old_page from wp_posts p 
+query = '''select p.ID, p.post_title as title, p.post_excerpt as excerpt, p.post_content as content, p.post_date as 'date', p.post_date_gmt as date_gmt, u.user_login, u.display_name, u.ID as user_id, u.user_email, t.name as country, GROUP_CONCAT(p2.Tag) as tags, GROUP_CONCAT(DISTINCT CONCAT(p3.guid,',% ', p3.post_date_gmt,',% ', p3.post_content) SEPARATOR ';%') as gallery, p.guid as old_page from wp_posts p 
 left join wp_users u on p.post_author=u.ID 
 inner join wp_term_relationships r on r.object_id=p.ID
 inner join wp_term_taxonomy tax on r.term_taxonomy_id=tax.term_taxonomy_id
@@ -56,7 +56,8 @@ inner join wp_terms t on tax.term_id=t.term_id
 left join (select p2.ID, t2.name as Tag from wp_posts p2 inner join wp_term_relationships r2 on r2.object_id=p2.ID
 inner join wp_term_taxonomy tax2 on r2.term_taxonomy_id=tax2.term_taxonomy_id
 inner join wp_terms t2 on tax2.term_id=t2.term_id where tax2.taxonomy = 'post_tag' ) p2 on p2.ID=p.ID
-where p.post_type='post' and tax.taxonomy = 'category' and
+left join (select p3.post_date_gmt, p3.post_content, p3.post_parent, p3.post_type, p3.guid from wp_posts p3) p3 on p3.post_parent=p.ID 
+where p.post_type='post' and tax.taxonomy = 'category' and p3.post_type = 'attachment' and
 t.name!='unsere Projekte' and p.post_status = 'publish' group by p.ID'''
 
 
@@ -105,13 +106,21 @@ for index, article in df.iterrows():
     user = article['user_login']
     text = article['content']
     title = article['title'],
+    gallery = article['gallery'].split(';')
     title = title[0]
     teaser_image = None
     teaser_image_caption = ""
     tags = caption_img.findall(text)
-    if tags:
-        for tag in tags:
-            print(tag)
+
+    for entry in gallery:
+
+        l = entry.split(',%')
+        if len(l) is 3:
+            path, date, title = l
+            print(path, date, title)
+ #   if tags:
+ #       for tag in tags:
+ #           print(tag)
 
     #print(title, text)
     slug = slug_date+'-'+slugify(umlaute(title.lower()))
@@ -121,7 +130,7 @@ for index, article in df.iterrows():
 
     def new_video_html(match):
         link = match.group(1)
-        print("Found video:", link)
+        #print("Found video:", link)
 
         video_ext = os.path.splitext(link)[1].lower()
         new_video_name = slug + video_ext
@@ -134,7 +143,7 @@ for index, article in df.iterrows():
 
         images.append(video_info)
         tmp = video_html.format(new_video_link)
-        print(tmp)
+        #print(tmp)
         return tmp
 
     i = 0
@@ -146,7 +155,7 @@ for index, article in df.iterrows():
         image = gd['src']
         image = img_org.sub('', image).replace("www.", "").replace("blog.", "weitweg.")
 
-        print("Found image:", image)
+        #print("Found image:", image)
         if caption != "": print("With caption:", caption)
 
         global i
