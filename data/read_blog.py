@@ -18,13 +18,15 @@ from sshtunnel import SSHTunnelForwarder
 from os.path import expanduser
 from urllib.parse import quote
 
-filename = sys.argv[1]
+blog_filename = sys.argv[1]
+photos_filename = sys.argv[2]
+
 pw = getpass.getpass()
 user = getpass.getuser()
 
-img_pat = re.compile(r'<img [^>]*src="([^"]+)')
-caption_img = re.compile(r'\[caption.*?caption="(.*?)".*?\].*?<img [^>]*src="([^"]+).*?\[/caption\]')
-video_pat = re.compile(r'\[video.*?[mp4|src]="(.+?)".*?\](?:.*?\[/video\])?')
+img_pat = re.compile(r'<img [^>]*src="(?P<src>[^"]+)')
+caption_img = re.compile(r'\[caption.*?caption="(?P<caption>.*?)".*?\].*?<img [^>]*src="(?P<src>[^"]+).*?\[/caption\]')
+video_pat = re.compile(r'\[video.*?[mp4|src]="(?P<src>.+?)".*?\](?:.*?\[/video\])?')
 tag_pat = re.compile(r'\[.*?\](?:.*?\[.*?\])?')
 img_org = re.compile(r'(-\d+x\d+)')
 link_pat = re.compile(r'href="([^"]+)')
@@ -88,9 +90,10 @@ def umlaute(value):
         value = value.replace(s, r)
     return value
 
-
+photo_list = []
 post_list = []
 images = []
+
 
 for index, article in df.iterrows():
 
@@ -103,9 +106,8 @@ for index, article in df.iterrows():
     text = article['content']
     title = article['title'],
     title = title[0]
-    image = None
-    images_html = img_pat.findall(text)
-    
+    teaser_image = None
+    teaser_image_caption = ""
     tags = caption_img.findall(text)
     if tags:
         for tag in tags:
@@ -114,27 +116,6 @@ for index, article in df.iterrows():
     #print(title, text)
     slug = slug_date+'-'+slugify(umlaute(title.lower()))
     teaser = article['excerpt']
-
-    i = 0
-    for small_image in images_html:
-        big_image = img_org.sub('', small_image).replace("www.", "").replace("blog.", "weitweg.")
-        img_ext = os.path.splitext(small_image)[1].lower()
-        if i == 0:
-            new_image_name = slug + img_ext
-        else:
-            new_image_name = slug+'-' + str(i) + img_ext
-        i = i + 1
-        new_image_html = '/media/blog/' + new_image_name
-        if image is None:
-            image = 'blog/' + new_image_name
-
-        html_image = {
-            'url': big_image,
-            'url2': small_image,
-            'name': new_image_name
-        }
-        text = text.replace(small_image, new_image_html)
-        images.append(html_image)
 
     video_html = '<video width="400" controls><source src="{0}" type="video/mp4">Your browser does not support HTML5 video.</video>'
 
@@ -148,21 +129,86 @@ for index, article in df.iterrows():
 
         video_info = {
             'url': link,
-            'url2': '',
             'name': new_video_name     
         }
+
         images.append(video_info)
         tmp = video_html.format(new_video_link)
         print(tmp)
         return tmp
-       
+
+    i = 0
+
+    def sub_image_match(match):
+
+        gd = match.groupdict()
+        caption = gd['caption'] if 'caption' in gd else ""
+        image = gd['src']
+        image = img_org.sub('', image).replace("www.", "").replace("blog.", "weitweg.")
+
+        print("Found image:", image)
+        if caption != "": print("With caption:", caption)
+
+        global i
+        img_slug = slug if i is 0 else slug+'-' + str(i)
+        img_title = title if i is 0 else title + '-' + str(i)
+        i += 1
+
+        ext = os.path.splitext(image)[1].lower()
+        new_name = img_slug + ext
+        new_link = 'images/photos/' + new_name
+
+        global teaser_image, teaser_image_caption
+        if not teaser_image:
+            teaser_image = new_link
+            teaser_image_caption = caption
+
+        image_field = {
+            "image": new_link,
+            "date_taken": None,
+            "view_count": 0,
+            "crop_from": "center",
+            "effect": None,
+            "title": img_title,
+            "slug": img_slug,
+            "caption": caption,
+            "date_added": dt,
+            "is_public": True,
+            "sites": [1]
+        }
+
+        photo = {
+            "model": "photologue.photo",
+            "pk": None,
+            "fields": image_field,
+        }
+
+        photo_list.append(photo)
+
+        images.append({
+            'url': image,
+            'name': new_name     
+        })
+
+        return "" # remove from html and just add link to photologue object
+    
+    text = caption_img.sub(sub_image_match, text)
+
+    text = img_pat.sub(sub_image_match, text)
+
     text = video_pat.sub(new_video_html, text)  
+
+    tags = tag_pat.findall(text)
+
+    for tag in tags:
+        print(tag, title)
+
 
     elem = {
         'title_de': title,
         'text_de': text,
-        'image': image,
-        #'img_alt_de': '',
+        'image': teaser_image,
+        'img_alt_de': teaser_image_caption,
         'added': dt,
         'updated': dt,
         'published': dt,
@@ -184,9 +230,11 @@ for index, article in df.iterrows():
 
 post_list.sort(key=lambda x: x['fields']['published'], reverse=False)
 
-print("Write json file...")
-with open(filename, 'w') as outfile:
+print("Write json files...")
+with open(blog_filename, 'w') as outfile:
     json.dump(post_list, outfile)
+with open(photos_filename, 'w') as outfile:
+    json.dump(photo_list, outfile)
 
 
 def alter_file_extension(url):
