@@ -26,9 +26,13 @@
     <div class="four wide column">
         <div class="right menu">
             {% if host %}
-                <a id="logo" href="{% url 'host' host.slug %}" class="ui item" style="background-image: url({{ host.logo.url }});"></a>
+                <a id="logo" href="{% url 'host' host.slug %}">
+                    {% include 'wbcore/svgs/logo.svg' with text=host.name|cut:"Weitblick "|upper %}
+                </a>
             {% else %}
-                <a id="logo" href="{% url 'home' %}" class="ui item" style="background-image: url({% get_media_prefix %}logo.png);"></a>
+                <a id="logo" href="{% url 'home' %}" class="ui item">
+                    {% include 'wbcore/svgs/logo.svg' with text='Bildungschancen weltweit!' %}
+                </a>
             {% endif %}
         </div>
     </div>
