@@ -97,10 +97,10 @@ $orange: #eb800f;
 			}
 
 			&#puzzle-svg-4{
-				margin-top: -11.2%;
+				margin-top: -11.4%;
 			}
 			&#puzzle-svg-3{
-				margin-top: -22.3%;
+				margin-top: -22.8%;
 				margin-left: 0;
 			}
 		}
@@ -115,13 +115,15 @@ $orange: #eb800f;
 
 #main-menu{
 	background-color: $box-background;
-	margin-top: 15px;
-	padding-bottom: 15px;
+	margin-top: 0px;
+	padding-top: 15px;
 	border-bottom: solid 1px;
 }
 
 #menu-nav > .item {
 	text-transform: uppercase;
+	font-weight: bold;
+	font-size: 1.0em;
 }
 
 #popup-menu-container{
@@ -137,19 +139,32 @@ $orange: #eb800f;
 }
 
 #popup-menu{
-	margin: 40px;
-	display: none;
 	.ui.items {
     	margin: 0;
 	}
+	display: none;
 }
 
-.logo{
+
+
+
+#logo{
 	margin-top: 0 !important;
 	margin-bottom: 0 !important;
+	height: 100px;
+	width: 100%;
+	background-size: contain;
+	background-repeat: no-repeat;
+	display: block;
+	@media(min-width:723px){
+		background-position: right;	
+	}
+	@media(max-width:723px){
+		background-position: center;
+	}
 }
 
-.logo-inverted {
+#logo-inverted {
 	margin-bottom: 0 !important;
 	padding-bottom: 0 !important;
 }
@@ -215,15 +230,31 @@ $orange: #eb800f;
 	display: none;
 }
 
-#social-buttons {
+#icon-links {
+	.icon{
+		line-height: 1;
+		display: inline-block;
+		vertical-align: middle;
+		font-size: 2.3em;		
+		text-align: center;
+		color: #ffffff;
+		width: 50px;
+		margin-right: 0;
+	}
 	width: 50px;
 	position: absolute;
 	right: -50px;
 	padding: 0;
-	img {
+	a {
+		vertical-align: middle;
+		text-align: center;
+		width: 50px;
+		height: 50px;
+		display: flex;
+		align-items: center;
 		background: $middle-gray;
 	}
-	img:hover {
+	a:hover {
 		background: $orange;
 	}
 }
