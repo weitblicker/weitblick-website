@@ -93,6 +93,7 @@ def umlaute(value):
 
 photo_list = []
 post_list = []
+gallery_list = []
 images = []
 
 
