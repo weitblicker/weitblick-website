@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'wbcore.apps.WbcoreConfig',
 ]
 
+PHOTOLOGUE_DIR = 'images'
+
 SUMMERNOTE_THEME = 'bs4'
 
 MIDDLEWARE = [
@@ -66,17 +68,24 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'weitblick.urls'
 
+from photologue import PHOTOLOGUE_APP_DIR
+TEMPLATE_DIRS = [PHOTOLOGUE_APP_DIR]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
-        'APP_DIRS': True,
+        'APP_DIRS': False,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+            ],
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
             ],
         },
     },

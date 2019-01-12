@@ -1,3 +1,4 @@
+images/photos/* filter=lfs diff=lfs merge=lfs -text
 blog/** filter=lfs diff=lfs merge=lfs -text
 news/** filter=lfs diff=lfs merge=lfs -text
 hosts/** filter=lfs diff=lfs merge=lfs -text

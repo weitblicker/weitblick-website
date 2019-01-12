@@ -149,19 +149,11 @@ $orange: #eb800f;
 
 
 #logo{
+	margin: auto;
 	margin-top: 0 !important;
 	margin-bottom: 0 !important;
-	height: 100px;
-	width: 100%;
-	background-size: contain;
-	background-repeat: no-repeat;
-	display: block;
-	@media(min-width:723px){
-		background-position: right;	
-	}
-	@media(max-width:723px){
-		background-position: center;
-	}
+	display: inline-block;
+	width: auto;
 }
 
 #logo-inverted {
