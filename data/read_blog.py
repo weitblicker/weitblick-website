@@ -24,7 +24,7 @@ photos_filename = sys.argv[2]
 pw = getpass.getpass()
 user = getpass.getuser()
 
-img_pat = re.compile(r'<img [^>]*src="(?P<src>[^"]+)')
+img_pat = re.compile(r'<img [^>]*src="(?P<src>.+?)".+?>')
 caption_img = re.compile(r'\[caption.*?caption="(?P<caption>.*?)".*?\].*?<img [^>]*src="(?P<src>[^"]+).*?\[/caption\]')
 video_pat = re.compile(r'\[video.*?[mp4|src]="(?P<src>.+?)".*?\](?:.*?\[/video\])?')
 tag_pat = re.compile(r'\[.*?\](?:.*?\[.*?\])?')
@@ -91,10 +91,70 @@ def umlaute(value):
         value = value.replace(s, r)
     return value
 
-photo_list = []
+photo_list = {}
 post_list = []
 gallery_list = []
 images = []
+photo_pk = 0
+gallery_pk = 0
+photologue_list = []
+all_slugs = {}
+all_titles = {}
+all_galleries = {}
+
+def make_slug(name):
+    slug = slugify(umlaute(name.lower()))
+    slug = slug[:100]
+    if slug in all_slugs:
+        all_slugs[slug] += 1
+    else:
+        all_slugs[slug] = 1
+    
+    return slug + '-' + str(all_slugs[slug])
+
+
+def make_title(name):
+
+    if name in all_titles:
+        all_titles[name] += 1
+    else:
+        all_titles[name] = 1
+    
+    return name + '-' + str(all_titles[name])
+
+
+def make_gallery_title(name):
+
+    if name in all_galleries:
+        all_galleries[name] += 1
+    else:
+        all_galleries[name] = 1
+    
+    return name + '-' + str(all_galleries[name])
+
+
+def add_new_gallery(date, title, slug, desc, photos):
+
+    fields ={
+        "date_added": date,
+        "title": make_gallery_title(title),
+        "slug": slug,
+        "description": desc,
+        "is_public": True,
+        "photos": photos,
+        "sites": [1]
+    }
+
+    global gallery_pk
+    gallery_list.append({
+        "model": "photologue.gallery",
+        "pk": gallery_pk,
+        "fields": fields
+    })
+
+    gallery_pk += 1
+    return gallery_pk-1
+
 
 
 for index, article in df.iterrows():
@@ -106,19 +166,47 @@ for index, article in df.iterrows():
     host = None
     user = article['user_login']
     text = article['content']
-    title = article['title'],
-    gallery = article['gallery'].split(';')
-    title = title[0]
+    title = article['title']
+    gallery_raw = article['gallery']
+    gallery = []
+    if gallery_raw is not None:
+        gallery_raw = gallery_raw.split(';%')
+        for entry in gallery_raw:
+            try:
+                g_photo_url, g_photo_date, g_photo_title = entry.split(',%')
+                gallery.append({
+                    'url' : g_photo_url,
+                    'date': g_photo_date,
+                    'title': g_photo_title,
+                })
+            except:
+                g_photo_entry = entry.split(',%')
+                if len(g_photo_entry) > 0 and (g_photo_entry[0].endswith(".jpg") or g_photo_entry[0].endswith(".jpeg")):
+                    gallery.append({
+                        'url' : g_photo_entry[0],
+                        'date': dt,
+                        'title': "",
+                    })
+                else:
+                    print("Exception: Gallery string does not consists out of three values:", entry.split(',%'))              
+
+    if not isinstance(title, str):
+        title = title[0]
+    else:
+        article['title']
+
+    title = title.strip()
+
+    if not title:
+        print("############## TITLE is not set... continue with next blog entry...")
+        continue
+
     teaser_image = None
     teaser_image_caption = ""
     tags = caption_img.findall(text)
 
-    for entry in gallery:
-
-        l = entry.split(',%')
-        if len(l) is 3:
-            path, date, title = l
-            print(path, date, title)
+    photos=[]
+    
  #   if tags:
  #       for tag in tags:
  #           print(tag)
@@ -154,16 +242,37 @@ for index, article in df.iterrows():
         gd = match.groupdict()
         caption = gd['caption'] if 'caption' in gd else ""
         image = gd['src']
-        image = img_org.sub('', image).replace("www.", "").replace("blog.", "weitweg.")
+        image = img_org.sub('', image)
 
         #print("Found image:", image)
-        if caption != "": print("With caption:", caption)
+        #if caption != "": print("With caption:", caption)
 
-        global i
-        img_slug = slug if i is 0 else slug+'-' + str(i)
-        img_title = title if i is 0 else title + '-' + str(i)
-        i += 1
+        add_image(image, dt, caption)
+        return "" # remove from html and just add link to photologue object
 
+
+    def add_image(image, date, caption = "", special_title=None):
+
+        image = image.replace("www.", "").replace("blog.", "weitweg.")
+
+        img_slug = ""
+        img_title = ""
+
+        if special_title is not None:
+            special_title = special_title.strip()
+
+        if special_title:
+            img_slug = make_slug(slug_date + '-' + special_title)
+            img_title = make_title(special_title)
+        else:
+            img_slug = make_slug(slug_date + '-' + title)
+            img_title = make_title(title)
+
+
+        #print("slug:",img_slug, "title:", special_title)
+        #if img_title is "":
+        #    print("############## IMG TITLE is not set")
+            
         ext = os.path.splitext(image)[1].lower()
         new_name = img_slug + ext
         new_link = 'images/photos/' + new_name
@@ -172,6 +281,7 @@ for index, article in df.iterrows():
         if not teaser_image:
             teaser_image = new_link
             teaser_image_caption = caption
+
 
         image_field = {
             "image": new_link,
@@ -182,37 +292,48 @@ for index, article in df.iterrows():
             "title": img_title,
             "slug": img_slug,
             "caption": caption,
-            "date_added": dt,
+            "date_added": date.strip(),
             "is_public": True,
             "sites": [1]
         }
 
+        global photo_pk
         photo = {
             "model": "photologue.photo",
-            "pk": None,
+            "pk": photo_pk,
             "fields": image_field,
         }
 
-        photo_list.append(photo)
+        if image in photo_list:
+            photo = photo_list[image]
+        else:
+            photo_list[image] = photo
+            images.append({
+                'url': image,
+                'name': new_name     
+            })
+            photo_pk += 1
+        photos.append(photo['pk'])
 
-        images.append({
-            'url': image,
-            'name': new_name     
-        })
-
-        return "" # remove from html and just add link to photologue object
     
     text = caption_img.sub(sub_image_match, text)
 
     text = img_pat.sub(sub_image_match, text)
 
+    for entry in gallery:
+        # path date title
+        add_image(entry['url'], entry['date'], "", entry['title'])
+
     text = video_pat.sub(new_video_html, text)  
 
     tags = tag_pat.findall(text)
 
-    for tag in tags:
-        print(tag, title)
+    #for tag in tags:
+    #    print(tag, title)
 
+    current_gallery_pk = None
+    if len(photos) > 1:
+        current_gallery_pk = add_new_gallery(dt, title, slug, "", photos)
 
     elem = {
         'title_de': title,
@@ -228,6 +349,7 @@ for index, article in df.iterrows():
         "project": None,
         "author": None,
         "author_str": user,
+        "gallery": current_gallery_pk,
     }
 
     post = {
@@ -243,8 +365,13 @@ post_list.sort(key=lambda x: x['fields']['published'], reverse=False)
 print("Write json files...")
 with open(blog_filename, 'w') as outfile:
     json.dump(post_list, outfile)
+
+
+photologue_list.extend(photo_list.values())
+photologue_list.extend(gallery_list)
+
 with open(photos_filename, 'w') as outfile:
-    json.dump(photo_list, outfile)
+    json.dump(photologue_list, outfile)
 
 
 def alter_file_extension(url):

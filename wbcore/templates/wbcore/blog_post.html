@@ -1,9 +1,27 @@
 {% extends 'wbcore/single_content.html' %}
+{% load i18n %}
+
 {% block single-content %}
     {% if post %}
         <h1>{{ post.title }}</h1>
         <div>{{ post.teaser|safe }}</div>
         <div>{{ post.text|safe }}</div>
+
+        {% if post.gallery %}
+	        <div class="gallery">
+	        {% with gallery=post.gallery %}
+			    <h2 class="header">{{ gallery.title }}</h2>
+		        <p class="muted"><small>{% trans "Published" %} {{ gallery.date_added }}</small></p>        
+		        {% if gallery.description %}{{ gallery.description|safe }}{% endif %}
+			    {% for photo in gallery.public %}
+			        <a href="{{ photo.get_absolute_url }}">
+			             <img src="{{ photo.get_thumbnail_url }}" class="thumbnail" alt="{{ photo.title }}">
+			        </a>
+			    {% endfor %}
+	      	{% endwith %}
+      	{% endif %}
+
+        </div>
     {% else %}
         <p>No post available.</p>
     {% endif %}
