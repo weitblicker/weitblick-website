@@ -26,7 +26,6 @@
 		<text class="desc" x="200" y="150" fill="#000000" text-anchor="middle" alignment-baseline="middle">
 			{{ description }}
 		</text>
-		<image x="165" y="160" width="70" height="70" xlink:href="{% get_media_prefix %}{{ icon }}" />
 		{% include icon with x='165' y='160' %}
 		{% elif type == 'down' %}
 		<text class="title" x="200" y="200" fill="#000000" text-anchor="middle" alignment-baseline="middle">
