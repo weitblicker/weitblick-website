@@ -3,7 +3,7 @@
 {% if host %}
     {% block single-content %}
     <h1>{{ host.name }}</h1>
-    <img src="{{    host.logo.url }}"/>
+    {% include 'wbcore/logo.html' %}
     {% endblock %}
 {% else %}
     <p>No host available.</p>

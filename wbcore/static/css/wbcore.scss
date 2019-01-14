@@ -4,6 +4,8 @@ $middle-gray: #969696;
 $dark-gray: #2c2c2c;
 $backgroundColor: #d9e2ed;
 $orange: #eb800f;
+$logo-black: #04090e;
+$logo-orange: #f3971b;
 
 #puzzles{
 
@@ -145,15 +147,46 @@ $orange: #eb800f;
 	display: none;
 }
 
-
-
-
 #logo{
-	margin: auto;
 	margin-top: 0 !important;
 	margin-bottom: 0 !important;
+	margin: auto;
 	display: inline-block;
-	width: auto;
+	width: 100%;
+	svg{
+		display: block;
+		margin: auto;
+		width: 100%;
+		max-width: 260.75px;
+	}
+	.logo-text{
+        font-size: 23.4px;
+        fill: #959595;
+        font-family: 'Open Sans Condensed';
+        font-weight: bold;
+        letter-spacing: 0.05em;
+	}
+
+	&.host{
+		.logo-text{
+	        font-size: 28px;
+		}
+	}
+
+	.logo-weitblick {
+		fill: $logo-black;
+	}
+
+	.logo-puzzle {
+		fill: $logo-orange;
+	}
+
+	.claim{
+
+	}
+	.city{
+
+	}
 }
 
 #logo-inverted {

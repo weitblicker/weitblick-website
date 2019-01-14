@@ -37,10 +37,6 @@ class Location(models.Model):
         return self.name + " (" + self.country.name + ")"
 
 
-def save_host_logo(instance, filename):
-    return "hosts/" + instance.slug.lower() + splitext(filename)[1].lower()
-
-
 class Host(models.Model):
     slug = models.SlugField(primary_key=True, max_length=50, unique=True)
     name = models.CharField(max_length=100, unique=True)
@@ -48,7 +44,6 @@ class Host(models.Model):
     email = models.EmailField(max_length=100, unique=True)
     founding_date = models.DateField()
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True)
-    logo = models.ImageField(upload_to=save_host_logo)
 
     def search_title(self):
         return self.name
