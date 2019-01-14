@@ -53,7 +53,7 @@ def get_main_nav(host=None, active=None):
     args = [host.slug] if host else []
     nav = OrderedDict([
             ('home', {'name': 'Home', 'link': reverse('home')}),
-            ('idea', {'name': 'Idea', 'link': reverse('idea')}),
+            ('idea', {'name': 'Idea', 'link': reverse('idea', args=args)}),
             ('projects', {'name': 'Projects', 'link': reverse('projects', args=args)}),
             ('events', {'name': 'Events', 'link': reverse('events', args=args)}),
             ('join', {'name': 'Join in', 'link': reverse('join', args=args)}),
@@ -99,17 +99,29 @@ def home_view(request):
     return HttpResponse(template.render(context, request))
 
 
-def idea_view(request):
-    projects = Project.objects.all()
-    hosts = Project.objects.all()
+def idea_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
 
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Idea', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Idea', None)]
+
+
+    projects = Project.objects.all()
+        
     template = loader.get_template('wbcore/idea.html')
     context = {
         'main_nav': get_main_nav(active='idea'),
         'dot_nav': dot_nav,
         'projects': projects,
-        'hosts': hosts,
-        'breadcrumb': [('Home', reverse('home')), ('Idea', None)],
+        'host': host,
+        'breadcrumb': breadcrumb,
     }
     return HttpResponse(template.render(context, request))
 
@@ -139,6 +151,7 @@ def projects_view(request, host_slug=None):
         'projects': projects,
         'project_list': project_list,
         'breadcrumb': breadcrumb,
+        'host': host,
     }
     template = loader.get_template('wbcore/projects.html')
     return HttpResponse(template.render(context, request))
@@ -191,7 +204,7 @@ def hosts_view(request):
     context = {
         'hosts': hosts,
         'main_nav': get_main_nav(active='hosts'),
-        'breadcrumb': [('Home', reverse('home')), ("Unions", reverse('hosts'))],
+        'breadcrumb': [('Home', reverse('home')), ("Unions", None)],
     }
     return HttpResponse(template.render(context, request))
 

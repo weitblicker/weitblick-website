@@ -14,13 +14,13 @@ main_patterns = [
     path('news/', views.news_view, name='news'),
     path('blog/<int:post_id>/', views.blog_post_view, name='blog-post'),
     path('blog/', views.blog_view, name='blog'),
+    path('idea/', views.idea_view, name='idea'),
 ]
 
 
 urlpatterns = [
     path('', views.home_view, name='home'),
     path('rest/', include(rest_url.rest_patterns)),
-    path('idea/', views.idea_view, name='idea'),
     path('search/<str:query>/', rest_views.search),
     path('union/', views.hosts_view, name='hosts'),
     #path('search/', include('haystack.urls')),
