@@ -1,4 +1,4 @@
-Django==2.1.2
+Django==2.1.5
 django-bootstrap4==0.0.6
 django-countries==5.3.1
 django-sass-processor==0.7
