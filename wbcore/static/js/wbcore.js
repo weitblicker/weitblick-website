@@ -21,7 +21,7 @@
 
       $('#popup-menu-btn').click(function(){
        // $('#popup-menu.show').css('height', $('#popup-menu').first().height());
-        $('#popup-menu').fadeToggle();
+        $('#popup-menu').slideToggle();
       });
 
       $('.ui.search').search({

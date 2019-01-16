@@ -1,8 +1,8 @@
 {% load static %}
 <div class="ui item">
 	{% if image %}
-	<a href="{% url type post_id=id %}" class="ui top aligned mini image">
-		<img src="{% get_media_prefix %}{{ image }}">
+	<a href="{% url type post_id=id %}" class="ui top aligned image">
+		<img src="{{ photo.get_thumbnail_url }}" class="thumbnail" alt="{{ photo.title }}">
 	</a>
 	{% endif %}
 	<div class="content">
