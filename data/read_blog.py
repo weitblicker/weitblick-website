@@ -202,7 +202,6 @@ for index, article in df.iterrows():
         continue
 
     teaser_image = None
-    teaser_image_caption = ""
     tags = caption_img.findall(text)
 
     photos=[]
@@ -277,12 +276,6 @@ for index, article in df.iterrows():
         new_name = img_slug + ext
         new_link = 'images/photos/' + new_name
 
-        global teaser_image, teaser_image_caption
-        if not teaser_image:
-            teaser_image = new_link
-            teaser_image_caption = caption
-
-
         image_field = {
             "image": new_link,
             "date_taken": None,
@@ -313,6 +306,12 @@ for index, article in df.iterrows():
                 'name': new_name     
             })
             photo_pk += 1
+
+        global teaser_image
+        if not teaser_image:
+            teaser_image = photo['pk']
+
+
         photos.append(photo['pk'])
 
     
@@ -339,7 +338,6 @@ for index, article in df.iterrows():
         'title_de': title,
         'text_de': text,
         'image': teaser_image,
-        'img_alt_de': teaser_image_caption,
         'added': dt,
         'updated': dt,
         'published': dt,
