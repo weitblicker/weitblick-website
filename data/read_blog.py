@@ -3,7 +3,6 @@
 import re
 import json
 import sys
-import datetime
 import urllib.request
 from slugify import slugify
 import os
@@ -11,12 +10,10 @@ import getpass
 import pymysql
 from urllib import request, error
 import shutil
-import paramiko
 import pandas as pd
-from paramiko import SSHClient
 from sshtunnel import SSHTunnelForwarder
 from os.path import expanduser
-from urllib.parse import quote
+import time
 
 blog_filename = sys.argv[1]
 photos_filename = sys.argv[2]
@@ -202,7 +199,6 @@ for index, article in df.iterrows():
         continue
 
     teaser_image = None
-    teaser_image_caption = ""
     tags = caption_img.findall(text)
 
     photos=[]
@@ -277,11 +273,6 @@ for index, article in df.iterrows():
         new_name = img_slug + ext
         new_link = 'images/photos/' + new_name
 
-        global teaser_image, teaser_image_caption
-        if not teaser_image:
-            teaser_image = new_link
-            teaser_image_caption = caption
-
 
         image_field = {
             "image": new_link,
@@ -315,7 +306,11 @@ for index, article in df.iterrows():
             photo_pk += 1
         photos.append(photo['pk'])
 
-    
+        global teaser_image
+        if not teaser_image:
+            teaser_image = photo['pk']
+
+
     text = caption_img.sub(sub_image_match, text)
 
     text = img_pat.sub(sub_image_match, text)
@@ -339,7 +334,6 @@ for index, article in df.iterrows():
         'title_de': title,
         'text_de': text,
         'image': teaser_image,
-        'img_alt_de': teaser_image_caption,
         'added': dt,
         'updated': dt,
         'published': dt,
@@ -364,7 +358,7 @@ post_list.sort(key=lambda x: x['fields']['published'], reverse=False)
 
 print("Write json files...")
 with open(blog_filename, 'w') as outfile:
-    json.dump(post_list, outfile)
+    json.dump(post_list, outfile, )
 
 
 photologue_list.extend(photo_list.values())
@@ -373,6 +367,10 @@ photologue_list.extend(gallery_list)
 with open(photos_filename, 'w') as outfile:
     json.dump(photologue_list, outfile)
 
+print("Next gallery pk:", gallery_pk)
+print("Next photo pk:", photo_pk)
+
+time.sleep(5)
 
 def alter_file_extension(url):
     extensions = ['jpg', 'jpeg', 'JPG', 'JPEG', 'png', 'PNG', 'gif', 'GIF']
