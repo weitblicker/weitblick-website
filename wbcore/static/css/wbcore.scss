@@ -119,17 +119,12 @@ $logo-orange: #f3971b;
 	background-color: $box-background;
 	margin-top: 0px;
 	padding-top: 15px;
-	border-bottom: solid 1px;
 }
 
 #menu-nav > .item {
 	text-transform: uppercase;
 	font-weight: bold;
 	font-size: 1.0em;
-}
-
-#popup-menu-container{
-	background-color: #ffffff;
 }
 
 .wb-icon{
@@ -145,6 +140,30 @@ $logo-orange: #f3971b;
     	margin: 0;
 	}
 	display: none;
+	background-image: url('/media/colorbg/yellow.svg');
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	a{
+		color: #ffffff;
+		font-family: 'Open Sans';
+		&.image{
+			width: 65px;
+		}
+	}
+	.header{
+		color: #ffffff;
+		text-transform: uppercase;
+		font-family: 'Open Sans Condensed';
+		font-weight: bold;
+		font-size: 1.4em;
+		border-bottom-width: 1px;
+		border-bottom-style: solid;
+		padding-bottom: 4px;
+	}
+	.image + .content{
+		padding-left: 1em;
+	}
 }
 
 #logo{

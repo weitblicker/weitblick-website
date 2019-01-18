@@ -3,7 +3,7 @@
 <div class="item">
     {% if post.image %}
     <a class="image" href="{% if host_slug %}{% url 'blog-post' host_slug=host_slug post_id=post.pk %}{% else %}{% url 'blog-post' post_id=post.pk %}{% endif %}">
-        <img src="{% get_media_prefix %}{{ post.image }}" alt="{{ post.img_alt }}">
+        <img src="{{ post.image.get_thumbnail_url }}" class="thumbnail" alt="{{ post.image.title }}">
     </a>
     {% endif %}
     <div class="content">

@@ -273,7 +273,6 @@ for index, article in df.iterrows():
         new_name = img_slug + ext
         new_link = 'images/photos/' + new_name
 
-
         image_field = {
             "image": new_link,
             "date_taken": None,
@@ -304,6 +303,7 @@ for index, article in df.iterrows():
                 'name': new_name     
             })
             photo_pk += 1
+
         photos.append(photo['pk'])
 
         global teaser_image
