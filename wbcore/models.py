@@ -154,8 +154,7 @@ class UserRelation(models.Model):
 class NewsPost(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
-    image = models.ImageField(null=True, blank=True, upload_to="news")
-    img_alt = models.CharField(max_length=300,null=True, blank=True)
+    image = models.ForeignKey(Photo, null=True, blank =True, on_delete=models.SET_NULL)
     added = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)

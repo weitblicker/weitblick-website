@@ -358,14 +358,14 @@ post_list.sort(key=lambda x: x['fields']['published'], reverse=False)
 
 print("Write json files...")
 with open(blog_filename, 'w') as outfile:
-    json.dump(post_list, outfile, )
+    json.dump(post_list, outfile, indent=4, sort_keys=True)
 
 
 photologue_list.extend(photo_list.values())
 photologue_list.extend(gallery_list)
 
 with open(photos_filename, 'w') as outfile:
-    json.dump(photologue_list, outfile)
+    json.dump(photologue_list, outfile, indent=4, sort_keys=True )
 
 print("Next gallery pk:", gallery_pk)
 print("Next photo pk:", photo_pk)

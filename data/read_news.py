@@ -49,6 +49,7 @@ photologue_list = []
 all_slugs = {}
 all_titles = {}
 all_galleries = {}
+news_default = None
 
 with open(raw_news_filename) as f:
     data = json.load(f)
@@ -214,9 +215,13 @@ for article in data["news-list"]:
             img_slug = make_slug(slug_date + '-' + title)
             img_title = make_title(title)
 
+        global news_default
         if "neues-default" in image:
-            img_title = 'neues-default'
-
+            img_title = 'news-default'
+            img_slug = 'news-default'
+            if not news_default:
+                news_default = image
+                print("News default image:", news_default)
 
         #print("slug:",img_slug, "title:", special_title)
         #if img_title is "":
@@ -247,8 +252,9 @@ for article in data["news-list"]:
             "pk": photo_pk,
             "fields": image_field,
         }
-
-        if image in photo_list:
+        if img_title is 'news-default' and news_default and news_default in photo_list:
+            photo = photo_list[news_default]
+        elif image in photo_list:
             photo = photo_list[image]
         else:
             photo_list[image] = photo

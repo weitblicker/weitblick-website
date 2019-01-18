@@ -1,12 +1,16 @@
 {% load static %}
 
 <div class="item">
+
+    {% if post.image %}
     <a class="image" href="{% if host_slug %}{% url 'news-post' host_slug=host_slug post_id=post.pk %}{% else %}{% url 'news-post' post_id=post.pk %}{% endif %}">
-        <img src="{% get_media_prefix %}{{ post.image }}" alt="{{ post.img_alt }}">
+        <img src="{{ post.image.get_listsize_url }}" alt="{{ post.image.title }}">
     </a>
+    {% endif %}
+
     <div class="content">
         <div class="meta">
-            <span class="category">{{ post.published|date:"D, j. M Y"}}</span><a href="{% if post.host.slug %}{% url 'host' host_slug=post.host.slug %}{% endif %}"><img class="wb-icon" src="{% get_media_prefix %}icon.png">{{ post.host.city }}</a>
+            <span class="category">{{ post.published|date:"D, j. M Y"}}</span><a href="{% if post.host.slug %}{% url 'host' host_slug=post.host.slug %}{% endif %}"><img class="wb-icon" src="{% get_media_prefix %}icon.png">{{ post.host.name|cut:"Weitblick " }}</a>
         </div>
         <a class="header" href="{% if host_slug %}{% url 'news-post' host_slug=host_slug post_id=post.pk %}{% else %}{% url 'news-post' post_id=post.pk %}{% endif %}">{{ post.title }}</a>
 

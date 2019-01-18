@@ -34,7 +34,7 @@ class EventTranslationOptions(TranslationOptions):
     
 @register(NewsPost)
 class NewsPostTranslationOptions(TranslationOptions):
-    fields = ('title','text', 'img_alt', 'teaser')
+    fields = ('title','text', 'teaser')
 
 @register(BlogPost)
 class BlogPostTranslationOptions(TranslationOptions):

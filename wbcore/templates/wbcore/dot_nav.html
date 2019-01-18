@@ -3,7 +3,7 @@
         <div class="ui four wide column items">
 	        <a class="ui item header" href="{% url 'news' %}">News</a>
             {% for entry in dot_nav.news %}
-            	{% include 'wbcore/dot_nav_item.html' with type='news-post' id=entry.pk title=entry.title image=entry.image %}
+            	{% include 'wbcore/dot_nav_item.html' with photo=entry.image type='news-post' id=entry.pk title=entry.title image=entry.image %}
             {% endfor %}
         </div>
         <div class="ui four wide column items">
