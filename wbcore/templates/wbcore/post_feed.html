@@ -10,9 +10,10 @@
 
     <div class="content">
         <div class="meta">
-            <span class="category">{{ post.published|date:"D, j. M Y"}}</span><a href="{% if post.host.slug %}{% url 'host' host_slug=post.host.slug %}{% endif %}"><span class="wb-icon">{% include 'wbcore/svgs/puzzle-icon.svg' %}</span>{{ post.host.name|cut:"Weitblick " }}</a>
+            <span class="date">{{ post.published|date:"D, j. M Y"}}</span>
+            {% if post.host.slug %} | <a href="{% url 'host' host_slug=post.host.slug %}" class="wb-link"><span class="wb-icon">{% include 'wbcore/svgs/puzzle-icon.svg' %}</span><span class="wb-name">{{ post.host.name|cut:"Weitblick " }}</span></a>{% endif %}
         </div>
-        <a class="header" href="{% if host_slug %}{% url 'news-post' host_slug=host_slug post_id=post.pk %}{% else %}{% url 'news-post' post_id=post.pk %}{% endif %}">{{ post.title }}</a>
+        <a class="ui medium header" href="{% if host_slug %}{% url 'news-post' host_slug=host_slug post_id=post.pk %}{% else %}{% url 'news-post' post_id=post.pk %}{% endif %}">{{ post.title }}</a>
 
         <div class="description">
             <p>{{ post.teaser }}</p>

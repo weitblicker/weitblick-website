@@ -22,16 +22,20 @@
     </div>
 
     <div class="ui vertical stripe segment">
-    	<div class="ui grid container content-block">
-            <div class="nine wide column divided items">
+    	<div class="ui stackable grid container content-block">
+            <div class="ten wide column divided items">
                 <a class="ui item header" href="{% url 'news' %}">News</a>
-                {% for entry in posts %}
-                    {% include 'wbcore/dot_nav_item.html' with type='news-post' id=entry.pk title=entry.title image=entry.image desc=entry.teaser|truncatewords:7 %}
-                {% endfor %}
+                {% if posts %}
+                    <div class="ui unstackable items">
+                    {% for post in posts %}
+                        {% include 'wbcore/post_feed.html' with post=post host_slug=host.slug %}
+                    {% endfor %}
+                    </div>
+                {% endif %}
             </div>
             <div class="column divided items split-space">
             </div>
-            <div class="six wide column divided items">
+            <div class="five wide column divided items">
                 <div class="column-content">
                     <a class="ui item header"href="{% url 'events' %}" >Events</a>
                     {% for entry in events %}

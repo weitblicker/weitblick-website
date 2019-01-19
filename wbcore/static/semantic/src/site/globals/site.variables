@@ -5,4 +5,9 @@
 @defaultBorderRadius: 0;
 @pageBackground: #D9E2ED;
 @importGoogleFonts : true;
-@fontName : Bree Serif, Open Sans;
+@fontName : 'Open Sans';
+@headerFont : 'Open Sans';
+@pageFont : 'Open Sans';
+@googleFontFamily  : 'Bree+Serif|Open+Sans|Open+Sans+Condensed:700';
+@emSize: 12px;
+@fontSize : 12px;

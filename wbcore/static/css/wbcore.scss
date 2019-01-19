@@ -127,17 +127,42 @@ $logo-orange: #f3971b;
 	font-size: 1.0em;
 }
 
-.wb-icon{
-	width: 17px;
-	height: 17px;
-	display: inline-block;
-	margin: 0 6px 0 12px !important;
-	line-height: 17px;
+.meta{
+	color: $orange;
+	.date{
+		font-family: Open Sans;
+		font-weight: bold;
+		color: $orange;
+	}
+	.wb-link{
+
+		.wb-icon{
+			width: 14px;
+			display: inline-block;
+			margin: 0 4px 0 0 !important;
+			vertical-align: middle;
+
+		}
+		.wb-name{
+			font-family: Open Sans Condensed;
+			font-weight: bold;
+			text-transform: uppercase;
+			display: inline-block;
+			vertical-align: middle;
+		}	
+	}
 }
+
 
 #popup-menu{
 	.ui.items {
     	margin: 0;
+
+	}
+	.item{
+		.content{
+			min-height: 65px;
+		}
 	}
 	display: none;
 	background-image: url('/media/colorbg/yellow.svg');

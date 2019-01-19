@@ -1,5 +1,5 @@
 {
-  "base": "wbcore\\static\\semantic\\",
+  "base": "/wbcore/static/semantic/",
   "paths": {
     "source": {
       "config": "src/theme.config",

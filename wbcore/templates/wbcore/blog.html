@@ -3,7 +3,7 @@
 {% block single-content %}
 
 {% if posts %}
-    <div class="ui items">
+    <div class="ui unstackable items">
     {% for post in posts %}
         {% include 'wbcore/blog_post_feed.html' with post=post host_slug=host.slug %}
     {% endfor %}
