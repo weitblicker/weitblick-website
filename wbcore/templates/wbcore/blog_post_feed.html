@@ -8,7 +8,7 @@
     {% endif %}
     <div class="content">
         <div class="meta">
-            <span class="category">{{ post.published|date:"D, j. M Y"}}</span>{% if post.host %}<a href="{% if post.host.slug %}{% url 'host' host_slug=post.host.slug %}{% endif %}"><img class="wb-icon" src="{% get_media_prefix %}icon.png">{{ post.host.city }}</a>{% endif %}
+            <span class="category">{{ post.published|date:"D, j. M Y"}}</span>{% if post.host %}<a href="{% if post.host.slug %}{% url 'host' host_slug=post.host.slug %}{% endif %}"><span class="wb-icon">{% include 'wbcore/svgs/puzzle-icon.svg' %}</span>{{ post.host.city }}</a>{% endif %}
         </div>
         <a class="header" href="{% if host_slug %}{% url 'blog-post' host_slug=host_slug post_id=post.pk %}{% else %}{% url 'blog-post' post_id=post.pk %}{% endif %}">{{ post.title }}</a>
 
