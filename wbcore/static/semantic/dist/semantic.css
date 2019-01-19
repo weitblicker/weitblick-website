@@ -30273,7 +30273,7 @@ a.ui.card:hover,
 @media only screen and (max-width: 767px) {
   .ui.unstackable.items > .item > .image,
   .ui.unstackable.items > .item > .image > img {
-    width: 125px !important;
+    width: 75px !important;
   }
 }
 

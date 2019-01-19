@@ -26,7 +26,7 @@
             <div class="ten wide column divided items">
                 <a class="ui item header" href="{% url 'news' %}">News</a>
                 {% if posts %}
-                    <div class="ui unstackable items">
+                    <div class="ui divided unstackable items">
                     {% for post in posts %}
                         {% include 'wbcore/post_feed.html' with post=post host_slug=host.slug %}
                     {% endfor %}
