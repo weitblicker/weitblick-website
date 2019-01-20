@@ -180,7 +180,7 @@ class NewsPost(models.Model):
         return reverse('news-post', args=[self.pk])
 
     def search_image(self):
-        return self.image.get_thumbnail_url() if self.image else ""
+        return self.image.get_search_mini_url() if self.image else ""
 
     @staticmethod
     def get_model_name():
@@ -229,7 +229,7 @@ class BlogPost(models.Model):
         return reverse('blog-post', args=[self.pk])
 
     def search_image(self):
-        return self.image.get_thumbnail_url() if self.image else ""
+        return self.image.get_search_mini_url() if self.image else ""
 
     @staticmethod
     def get_model_name():
