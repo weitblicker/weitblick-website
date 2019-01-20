@@ -52,7 +52,7 @@ class Host(models.Model):
         return reverse('host', args=[self.slug])
 
     def search_image(self):
-        return self.logo.url if self.logo else ""
+        return ""
 
     @staticmethod
     def get_model_name():
@@ -180,7 +180,7 @@ class NewsPost(models.Model):
         return reverse('news-post', args=[self.pk])
 
     def search_image(self):
-        return self.image.url if self.image else ""
+        return self.image.get_thumbnail_url() if self.image else ""
 
     @staticmethod
     def get_model_name():
@@ -229,7 +229,7 @@ class BlogPost(models.Model):
         return reverse('blog-post', args=[self.pk])
 
     def search_image(self):
-        return self.image.url if self.image else ""
+        return self.image.get_thumbnail_url() if self.image else ""
 
     @staticmethod
     def get_model_name():
