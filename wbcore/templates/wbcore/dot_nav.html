@@ -1,18 +1,18 @@
 {% load static %}
-<div class="ui four column grid">
-        <div class="ui four wide column items">
+<div class="ui four column stackable grid">
+        <div class="ui four wide column unstackable items">
 	        <a class="ui item header" href="{% url 'news' %}">News</a>
             {% for entry in dot_nav.news %}
             	{% include 'wbcore/dot_nav_item.html' with photo=entry.image type='news-post' id=entry.pk title=entry.title image=entry.image %}
             {% endfor %}
         </div>
-        <div class="ui four wide column items">
+        <div class="ui four wide column unstackable items">
             <a class="ui item header"href="{% url 'blog' %}" >Blog</a>
             {% for entry in dot_nav.blog %}
             	{% include 'wbcore/dot_nav_item.html' with photo=entry.image type='blog-post' id=entry.pk title=entry.title image=entry.image desc=entry.text|truncatewords:7 %}
             {% endfor %}
         </div>
-        <div class="ui four wide column items">
+        <div class="ui four wide column unstackable items">
             <a href="{% url 'events' %}"><h4 class="ui header">Events</h4></a>
             <div class="ui link list">
                 {% for entry in dot_nav.events %}
