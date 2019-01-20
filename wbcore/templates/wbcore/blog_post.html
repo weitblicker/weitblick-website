@@ -1,28 +1,35 @@
 {% extends 'wbcore/single_content.html' %}
 {% load i18n %}
+{% load static %}
 
-{% block single-content %}
-    {% if post %}
-        <h1>{{ post.title }}</h1>
-        <div>{{ post.teaser|safe }}</div>
-        <div>{{ post.text|safe }}</div>
+{% block content %}
 
-        {% if post.gallery %}
-	        <div class="gallery">
-	        {% with gallery=post.gallery %}
-			    <h2 class="header">{{ gallery.title }}</h2>
-		        <p class="muted"><small>{% trans "Published" %} {{ gallery.date_added }}</small></p>        
-		        {% if gallery.description %}{{ gallery.description|safe }}{% endif %}
-			    {% for photo in gallery.public %}
-			        <a href="{{ photo.get_absolute_url }}">
-			             <img src="{{ photo.get_thumbnail_url }}" class="thumbnail" alt="{{ photo.title }}">
-			        </a>
-			    {% endfor %}
-	      	{% endwith %}
-      	{% endif %}
+	{% if post %}
+    <div class="ui vertical stripe segment">
+    	<div class="ui stackable grid container content-block">
+            <div class="ten wide column divided items">
+                <a class="ui item header" href="{% url 'news' %}">News</a>
+		        <h1 class="ui item header">{{ post.title }}</h1>
+		        <div class="author">
+            		<img class="ui avatar image" src="{% get_media_prefix %}kristy.png">
+            		<span>{{ post.author_name }}</span>
+                </div>
+		        <div>{{ post.teaser|safe }}</div>
+		        <div>{{ post.text|safe }}</div>
+            </div>
+            <div class="six wide column divided items">
 
+                <div class="column-content">
+                {% if post.gallery %}
+                	{% include 'wbcore/gallery.html' with gallery=post.gallery %}
+      			{% endif %}
+                </div>
+
+            </div>
         </div>
+    </div>
     {% else %}
         <p>No post available.</p>
     {% endif %}
+
 {% endblock %}

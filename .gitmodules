@@ -1,0 +1,3 @@
+[submodule "wbcore/static/PhotoSwipe"]
+	path = wbcore/static/PhotoSwipe
+	url = https://github.com/dimsemenov/PhotoSwipe.git
