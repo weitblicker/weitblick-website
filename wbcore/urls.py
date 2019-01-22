@@ -1,8 +1,7 @@
 from django.urls import path
 from django.conf.urls import include
-from wbcore import rest_views
-from wbcore import rest_url
-from wbcore import views
+from wbcore import views, rest_views, ajax_views
+from wbcore import rest_urls, ajax_urls
 
 main_patterns = [
     path('join/', views.join_view, name='join'),
@@ -20,8 +19,8 @@ main_patterns = [
 
 urlpatterns = [
     path('', views.home_view, name='home'),
-    path('rest/', include(rest_url.rest_patterns)),
-    path('search/<str:query>/', rest_views.search),
+    path('rest/', include(rest_urls.rest_patterns)),
+    path('ajax/', include(ajax_urls.ajax_patterns)),
     path('union/', views.hosts_view, name='hosts'),
     #path('search/', include('haystack.urls')),
 ]

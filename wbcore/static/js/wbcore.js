@@ -26,15 +26,34 @@
 
       $('.ui.search').search({
           apiSettings: {
-              url: '/search/{query}'
+              url: '/ajax/search/{query}'
           },
           type: 'category',
           minCharacters: 3,
       });
 
+      var news_filter = "";
+
       $('#news-filter.ui.dropdown')
         .dropdown({
-          allowAdditions: true
+          allowAdditions: true,
+          onChange: function(value, text, choice){
+            console.log(value, text);
+            $.ajax({
+              url: '/ajax/filter-news/',
+              data: {
+                'union': value,
+              },
+              dataType: 'html',
+              success: function (data) {
+                $('#news-list').html(data)
+                console.log(data)
+              },
+              error: function(error){
+                console.log(error)
+              }
+            });
+          },
       });
 
     });

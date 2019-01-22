@@ -14,14 +14,8 @@
 
 	<div class="ui stackable grid container content-block">
         <div class="ten wide column divided items">
-        	<div class="ui basic segment">
-            {% if posts %}
-                <div class="ui divided unstackable items">
-                {% for post in posts %}
-                    {% include 'wbcore/post_feed.html' with post=post host_slug=host.slug %}
-                {% endfor %}
-                </div>
-            {% endif %}
+        	<div id="news-list" class="ui basic segment">
+            	{% include 'wbcore/news_list.html' %}
             </div>
         </div>
 
@@ -35,7 +29,7 @@
 						<div class="ui segment">
 							<h3>Filter</h3>	
 
-							<div id="news-filter" class="ui fluid multiple search selection dropdown">
+							<div id="news-filter" class="ui multiple search selection dropdown">
 								<input name="tags" type="hidden">
 								<i class="dropdown icon"></i>
 								<div class="default text">Union</div>
@@ -44,10 +38,9 @@
 										<div class="item" data-value="{{ host.slug }}">{{ host.name }}</div>
 									{% endfor %}
 								</div>
-							</div>								
+							</div>
 						</div>
 	                </div>
-
                 </div>
             </div>
         </div>
