@@ -359,6 +359,7 @@ def news_view(request, host_slug=None):
         raise Http404()
 
     posts = posts.order_by('-published')[:20]
+    hosts = Host.objects.all()
 
     if host:
         breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ("News", None)]
@@ -370,6 +371,7 @@ def news_view(request, host_slug=None):
         'dot_nav': dot_nav,
         'posts': posts,
         'host': host,
+        'hosts': hosts,
         'breadcrumb': breadcrumb,
     }
     return HttpResponse(template.render(context, request))

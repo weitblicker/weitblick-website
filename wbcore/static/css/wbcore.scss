@@ -153,6 +153,16 @@ $logo-orange: #f3971b;
 	}
 }
 
+@media only screen and (max-width: 768px) {
+	.content{
+		.description{
+			display: none !important;
+		}
+		.extra{
+			display: none !important;
+		}
+	}
+}
 
 #popup-menu{
 	.ui.items {

@@ -1,3 +1,20 @@
 /*******************************
          Site Overrides
 *******************************/
+h1.ui.header, h1{
+	font-family: Bree Serif;
+}
+
+h3.ui.header, h3{
+	font-family: Open Sans Condensed;
+	text-transform: uppercase;
+	font-weight: bold;
+}
+
+@media only screen and (max-width: @mobileBreakpoint) {
+	.content{
+		.description{
+			display: none;
+		}
+	}
+}

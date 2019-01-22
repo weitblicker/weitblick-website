@@ -588,13 +588,13 @@ h5 {
   font-family: 'Open Sans';
   line-height: 1.28571429em;
   margin: calc(2rem -  0.14285714em ) 0em 1rem;
-  font-weight: bold;
+  font-weight: normal;
   padding: 0em;
 }
 
 h1 {
   min-height: 1rem;
-  font-size: 2rem;
+  font-size: 3rem;
 }
 
 h2 {
@@ -748,6 +748,24 @@ body .ui.inverted::-webkit-scrollbar-thumb:hover {
 /*******************************
          Site Overrides
 *******************************/
+
+h1.ui.header,
+h1 {
+  font-family: Bree Serif;
+}
+
+h3.ui.header,
+h3 {
+  font-family: Open Sans Condensed;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+@media only screen and (max-width: 320px) {
+  .content .description {
+    display: none;
+  }
+}
 /*!
  * # Semantic UI 2.4.2 - Button
  * http://github.com/semantic-org/semantic-ui/
@@ -6835,7 +6853,7 @@ i.flag.zimbabwe:before {
   margin: calc(2rem -  0.14285714em ) 0em 1rem;
   padding: 0em 0em;
   font-family: 'Open Sans';
-  font-weight: bold;
+  font-weight: normal;
   line-height: 1.28571429em;
   text-transform: none;
   color: rgba(0, 0, 0, 0.87);
@@ -6951,7 +6969,7 @@ i.flag.zimbabwe:before {
 ---------------*/
 
 h1.ui.header {
-  font-size: 2rem;
+  font-size: 3rem;
 }
 
 h2.ui.header {
@@ -6998,7 +7016,7 @@ h5.ui.header .sub.header {
 
 .ui.huge.header {
   min-height: 1em;
-  font-size: 2em;
+  font-size: 3em;
 }
 
 .ui.large.header {

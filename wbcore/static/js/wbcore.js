@@ -32,6 +32,10 @@
           minCharacters: 3,
       });
 
+      $('#news-filter.ui.dropdown')
+        .dropdown({
+          allowAdditions: true
+      });
 
     });
 
