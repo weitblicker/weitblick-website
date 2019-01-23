@@ -23,22 +23,29 @@
             <div class="column-content">
                 <div class="ui basic segment">
                 	<div class="ui divided unstackable items">
-						<div class="ui segment">
-							<h3>Archiv</h3>						
+						<h3>Archive</h3>
+						<div class="ui form segment">
+							2019<br>2018<br>archive functionality under construction...
 						</div>
-						<div class="ui segment">
-							<h3>Filter</h3>	
-
-							<div id="news-filter" class="ui multiple search selection dropdown">
-								<input name="tags" type="hidden">
-								<i class="dropdown icon"></i>
-								<div class="default text">Union</div>
-								<div class="menu">
-									{% for host in hosts %}
-										<div class="item" data-value="{{ host.slug }}">{{ host.name }}</div>
-									{% endfor %}
+						<h3>Filter</h3>	
+						<div class="ui form segment">
+								<div class="field">
+									<label>Hosts</label>
+									<div id="news-filter-hosts" class="ui multiple search selection dropdown">
+										<input name="tags" type="hidden">
+										<i class="dropdown icon"></i>
+										<div class="default text">Union</div>
+										<div class="menu">
+											{% for host in hosts %}
+												<div class="item" data-value="{{ host.slug }}">{{ host.name }}</div>
+											{% endfor %}
+										</div>
+									</div>
 								</div>
-							</div>
+								<div class="field">
+									<label>Search</label>
+									<input id="news-filter-search" type="text" placeholder="Search in News">
+								</div>
 						</div>
 	                </div>
                 </div>

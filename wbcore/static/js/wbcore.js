@@ -32,29 +32,42 @@
           minCharacters: 3,
       });
 
-      var news_filter = "";
+      var news_filter_union = "";
+      var news_filter_search = "";
 
-      $('#news-filter.ui.dropdown')
+      var filter_news = function(union, search){
+        $.ajax({
+          url: '/ajax/filter-news/',
+          data: {
+            'union': union,
+            'contains': search,
+          },
+          dataType: 'html',
+          success: function (data) {
+            $('#news-list').children().fadeOut('fast');
+            $('#news-list').html(data)
+            $('#news-list').children().fadeIn('fast');
+          },
+          error: function(error){
+            console.log(error)
+          }
+        }); 
+      }
+
+      $('#news-filter-hosts')
         .dropdown({
           allowAdditions: true,
           onChange: function(value, text, choice){
-            console.log(value, text);
-            $.ajax({
-              url: '/ajax/filter-news/',
-              data: {
-                'union': value,
-              },
-              dataType: 'html',
-              success: function (data) {
-                $('#news-list').html(data)
-                console.log(data)
-              },
-              error: function(error){
-                console.log(error)
-              }
-            });
+            news_filter_union = value;
+            console.log("Search",news_filter_union, news_filter_search);
+            filter_news(news_filter_union, news_filter_search);
           },
       });
 
+      $('#news-filter-search').on("change paste keyup", function() {
+        news_filter_search = $(this).val();
+        console.log("Search",news_filter_union, news_filter_search);
+        filter_news(news_filter_union, news_filter_search);
+      });
     });
 

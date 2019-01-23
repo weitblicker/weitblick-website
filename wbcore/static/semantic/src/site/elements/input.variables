@@ -2,4 +2,5 @@
     User Variable Overrides
 *******************************/
 //why does this not work?
+@defaultBorderRadius: 0;
 @border: 1px solid #D6D6D6;
