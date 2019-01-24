@@ -23,29 +23,53 @@
             <div class="column-content">
                 <div class="ui basic segment">
                 	<div class="ui divided unstackable items">
-						<h3>Archive</h3>
+						<h3>Filter Archive</h3>
 						<div class="ui form segment">
-							2019<br>2018<br>archive functionality under construction...
-						</div>
-						<h3>Filter</h3>	
-						<div class="ui form segment">
-								<div class="field">
-									<label>Hosts</label>
-									<div id="news-filter-hosts" class="ui multiple search selection dropdown">
-										<input name="tags" type="hidden">
-										<i class="dropdown icon"></i>
-										<div class="default text">Union</div>
-										<div class="menu">
-											{% for host in hosts %}
-												<div class="item" data-value="{{ host.slug }}">{{ host.name }}</div>
-											{% endfor %}
-										</div>
-									</div>
-								</div>
-								<div class="field">
-									<label>Search</label>
-									<input id="news-filter-search" type="text" placeholder="Search in News">
-								</div>
+                            <div class="two fields">
+
+                                <div class="field">
+                                    <label>Archive</label>
+                                    <div id="news-filter-archive" class="ui fluid basic dropdown button">
+                                        <span class="text">year or month</span>
+                                        <i class="dropdown icon"></i>
+                                        <div class="menu">
+                                            {% for year, months in years.items %}
+                                            <div class="item" data-value="{{ year|date:'Y' }}">
+                                                <i class="dropdown icon"></i>
+                                                <span class="text">{{ year|date:'Y' }}</span>
+                                                <div class="menu">
+                                                    {% for month in months %}
+                                                    <div class="item" data-value="{{ month|date:'Y-m' }}">{{ month|date:'F Y' }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label>Clear Filter</label>
+                                    <div id="news-filter-clear" class="ui fluid teal button">Clear</div>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Hosts</label>
+                                <div id="news-filter-hosts" class="ui multiple search selection dropdown">
+                                    <input name="tags" type="hidden">
+                                    <i class="dropdown icon"></i>
+                                    <div class="default text">Union</div>
+                                    <div class="menu">
+                                        {% for host in hosts %}
+                                            <div class="item" data-value="{{ host.slug }}">{{ host.name|cut:"Weitblick " }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Search</label>
+                                <input id="news-filter-search" type="text" placeholder="Search in News">
+                            </div>
 						</div>
 	                </div>
                 </div>

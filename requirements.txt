@@ -18,3 +18,4 @@ markdown==2.6.11
 django-modeltranslation==0.13b1
 django-tinymce4-lite
 python-slugify
+python-dateutil

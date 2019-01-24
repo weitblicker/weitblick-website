@@ -1,12 +1,12 @@
 import csv
-from collections import OrderedDict
 
 from django.db.models import Count
 from django.http import HttpResponse, Http404
 from django.template import loader
 from django.urls import reverse
-
+from datetime import timedelta, date
 from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost
+from collections import OrderedDict
 
 dot_nav_news = NewsPost.objects.all().order_by('-published')[:3]
 dot_nav_blog = BlogPost.objects.all().order_by('-published')[:3]
@@ -344,6 +344,25 @@ def blog_post_view(request, host_slug=None, post_id=None):
     return HttpResponse(template.render(context, request))
 
 
+def range_year_month(start_date, end_date):
+    years = OrderedDict()
+    d = date(year=start_date.year, month=start_date.month, day=1)
+    end_date = date(year=end_date.year, month=end_date.month, day=1)
+    print("End date:", end_date)
+    months = []
+    while d <= end_date:
+        months.append(date(year=d.year, month=d.month, day=1))
+        if d.month < 12:
+            d = d.replace(month=d.month+1)
+        else:
+            years[d] = months
+            d = d.replace(year=d.year+1, month=1, day=1)
+            months = []
+    if months:
+        years[date(year=d.year, month=1, day=1)] = months
+    return years
+
+
 def news_view(request, host_slug=None):
     template = loader.get_template('wbcore/news.html')
 
@@ -361,11 +380,20 @@ def news_view(request, host_slug=None):
     posts = posts.order_by('-published')[:20]
     hosts = Host.objects.all()
 
+    end_date = NewsPost.objects.latest('published').published
+    start_date = NewsPost.objects.earliest('published').published
+
+    print("Latest news:", end_date)
+    print("Earliest news:", start_date)
+
     if host:
         breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ("News", None)]
     else:
         breadcrumb = [('Home', reverse('home')), ('News', None)]
 
+    year_months = range_year_month(start_date, end_date)
+    for year, months in year_months.items():
+        print(year, months)
     context = {
         'main_nav': get_main_nav(host=host, active='news'),
         'dot_nav': dot_nav,
@@ -373,6 +401,7 @@ def news_view(request, host_slug=None):
         'host': host,
         'hosts': hosts,
         'breadcrumb': breadcrumb,
+        'years': year_months,
     }
     return HttpResponse(template.render(context, request))
 

@@ -26,6 +26,8 @@ Django = "==2.1.5"
 django_compressor = "*"
 Pillow = "==5.1.0"
 Markdown = "==2.6.11"
+dateutil = "*"
+python-dateutil = "*"
 
 [requires]
 python_version = "3.7"

@@ -196,8 +196,8 @@ class NewsPost(models.Model):
         get_latest_by = 'published'
 
     def __str__(self):
-        city = ("(" + self.host.city + ")") if self.host else ''
-        return self.title + " " + city
+        city = (" (" + self.host.name + ")") if self.host else ''
+        return self.title + city
 
 
 class BlogPost(models.Model):
