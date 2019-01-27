@@ -1,11 +1,18 @@
+from wbcore.serializers import NewsPostSerializer, BlogPostSerializer, HostSerializer, EventSerializer, ProjectSerializer
 from wbcore.models import NewsPost, BlogPost, Host, Event, Project
+from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
+from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.contrib.postgres.search import SearchVector
+from django.urls import reverse
 from haystack.query import SearchQuerySet
+from haystack.inputs import AutoQuery, Exact, Clean
+from rest_framework.parsers import JSONParser
+from rest_framework.renderers import JSONRenderer
 from itertools import groupby
-from datetime import datetime, date
-from dateutil.relativedelta import relativedelta
 import csv
 
 
@@ -24,7 +31,12 @@ def search(request, query):
 
     results = SearchQuerySet().filter(content__contains=query).highlight()
 
-    result_groups = {'results': {}}
+    result_groups = {'results': {},
+        "action": {
+            "url": '/search/'+query,
+            "text": "View all results"
+        }
+    }
 
     cnt = 0
     for key, group in groupby(results, lambda x: x.model):
@@ -39,7 +51,7 @@ def search(request, query):
             result_set.append(elem);
             if len(result_set) > 2:
                 break
-            cnt = cnt + 1
+            cnt += 1
         result_groups['results'][str(key.get_model_name())] = {
             'name': str(key.get_model_name()),
             'results': result_set,
@@ -53,25 +65,13 @@ def search(request, query):
 def filter_news(request):
 
     template = loader.get_template('wbcore/news_list.html')
-    contains = request.GET.get("search")
-    archive = request.GET.get("archive")
     host_slugs = request.GET.getlist("union")
+    contains = request.GET.get("contains")
     host_slugs = list(csv.reader(host_slugs))
     host_slugs = list(set().union(*host_slugs))
     host_slugs = [x.strip(' ') for x in host_slugs]
 
     host_slug = None
-    start_date = None
-    if archive:
-        try:
-            start_date = datetime.strptime(archive, '%Y-%m')
-            end_date = start_date + relativedelta(months=1)
-        except ValueError:
-            try:
-                start_date = datetime.strptime(archive, '%Y')
-                end_date = start_date + relativedelta(years=1)
-            except ValueError:
-                print("Archive string does not match a year or year and month", "Ignoring the archive string.")
 
     try:
         #posts = NewsPost.objects.filter(host__slug__in=host_slugs).distinct()
@@ -82,13 +82,7 @@ def filter_news(request):
         if host_slugs:
             results = results.filter_or(host_slug__in=host_slugs)
 
-        if contains:
-            print("Contains:", contains)
-            results = results.filter_and(content__contains=contains)
-
-        if start_date:
-            results = results.filter_and(published__gt=start_date)
-            results = results.filter_and(published__lt=end_date)
+        results = results.filter_and(content__contains=contains)
         results = results.models(NewsPost).order_by('-published')[:20]
 
         print("Length:", len(results))

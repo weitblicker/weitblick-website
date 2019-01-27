@@ -58,6 +58,36 @@ $(document)
             });
         };
 
+        $('#search').find('.dropdown').dropdown(
+            {
+                onChange: function (value, text, choice) {
+                    console.log(value);
+                }
+            }
+        );
+        $('#search').search(
+            {
+                type: 'category',
+                selector:{
+                  results: '.results',
+                },
+                searchOnFocus: true,
+                transition: 'fade-in',
+                apiSettings: {
+                    url: '/ajax/search/{query}',
+                    onResponse: function(results) {
+                        console.log(results);
+                    }
+                },
+                onSearchQuery: function (query) {
+                    console.log(query);
+                }
+            }
+        );
+
+
+
+
         $('#news-filter-clear').on('click', function() {
             $('#news-filter-archive').dropdown('clear');
             news_filter_archive = "";

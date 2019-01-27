@@ -462,3 +462,14 @@ def host_events_view(request, host_slug):
         'breadcrumb': [('Home', reverse('home')), (host.name, reverse('host', host_slug)), ("Events", None)],
     }
     return HttpResponse(template.render(context, request))
+
+
+def search_view(request, query=None):
+    template = loader.get_template('wbcore/search.html')
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'breadcrumb': [('Home', reverse('home')), ("Search", None)],
+    }
+    return HttpResponse(template.render(context), request)
+

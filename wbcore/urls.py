@@ -22,6 +22,8 @@ urlpatterns = [
     path('rest/', include(rest_urls.rest_patterns)),
     path('ajax/', include(ajax_urls.ajax_patterns)),
     path('union/', views.hosts_view, name='hosts'),
+    path('search/', views.search_view, name='search'),
+    path('search/<str:query>/', views.search_view, name='search'),
     #path('search/', include('haystack.urls')),
 ]
 

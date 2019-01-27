@@ -1,0 +1,50 @@
+{% extends 'wbcore/single_content.html' %}
+
+{% block content %}
+    <div class="ui vertical stripe segment">
+        <div class="ui middle centered aligned stackable grid container content-block">
+
+            {% include 'wbcore/breadcrumb.html' %}
+
+            <div id="search" class="row">
+                <div class="six wide column">
+                    <div class="ui center aligned basic segment">
+                        <div class="ui icon header">
+                            <i class="search icon"></i>
+                            Find Content
+                        </div>
+                        <div class="field">
+                            <div class="ui large left labeled input">
+                                <div class="ui dropdown label">
+                                    <div class="text">All Kategories</div>
+                                    <i class="dropdown icon"></i>
+                                    <div class="menu">
+                                        <div class="item">Projects</div>
+                                        <div class="item">Events</div>
+                                        <div class="item">Blog</div>
+                                        <div class="item">News</div>
+                                        <div class="item">Documents</div>
+                                        <div class="item">Partners</div>
+                                        <div class="item">Unions</div>
+                                    </div>
+                                </div>
+                                <input class="prompt" type="text" placeholder="Find...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ten wide column">
+                    <div class="ui segment">
+                        <div class="results">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% include 'wbcore/socialbuttons.html' %}
+
+        </div>
+    </div>
+
+{% endblock %}
