@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django_countries',
     'haystack',
-    'bootstrap4',
     'sass_processor',
     'tinymce',
     'photologue',

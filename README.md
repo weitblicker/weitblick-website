@@ -10,6 +10,7 @@ The new Weitblick website is *Django*, and *Python* based. The search engine we 
 * [Java 11](https://jdk.java.net/11/)
 * [Tidy](http://binaries.html-tidy.org/)
 * [Elastic Search 2](https://www.elastic.co/de/downloads/past-releases/elasticsearch-2-4-2)  (see Elastic Search section below.)
+* [Git Large File Storage](https://git-lfs.github.com/)
 ### Python Environment (Unix)
 
 * If you do not have `pip` installed install it using:
@@ -31,6 +32,11 @@ and then hit: `curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py`
 * `python manage.py loaddata data/hosts.json`
 * `python manage.py loaddata data/news.json`
 * `python manage.py loaddata data/blog.json`
+* `python manage.py loaddata data/photos-all.json`
+
+### Create a SuperUser for Admin Interface
+
+* `python3 manage.py createsuperuser`
 
 ### Elastic Search
 
