@@ -87,6 +87,7 @@ class Project(models.Model):
     partner = models.ForeignKey(Partner, on_delete=models.SET_NULL, null=True, blank=True)
     donation_goal = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
     donation_current = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    gallery = models.ForeignKey(Gallery, blank=True, null=True, on_delete=models.SET_NULL)
 
     def host_name_list(self):
         host_names = [host.name for host in self.hosts.all()]
@@ -94,13 +95,6 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class CustomGallery(models.Model):
-    gallery = models.OneToOneField(Gallery, related_name='extended',on_delete=models.CASCADE)
-    project = models.ForeignKey(Project,on_delete=models.SET_NULL, null=True, blank =True)
-    def __str__(self):
-        return self.gallery.title
 
 
 class Event(models.Model):

@@ -1,12 +1,9 @@
 from django.contrib import admin
 from .models import Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, Profile
-from .models import CustomGallery, UserRelation, Document, Team, Milestone, Donation, Milestep, BankAccount
+from .models import UserRelation, Document, Team, Milestone, Donation, Milestep, BankAccount
 from django.db import models
-from photologue.admin import GalleryAdmin as GalleryAdminDefault
-from photologue.models import Gallery
 from modeltranslation.admin import TabbedTranslationAdmin
 from tinymce import TinyMCE
-
 
 
 class MyAdmin(admin.ModelAdmin):
@@ -26,18 +23,6 @@ class MyTranslatedAdmin(MyAdmin,TabbedTranslationAdmin):
     pass
     
 
-class GalleryExtendedInline(admin.StackedInline):
-    model = CustomGallery
-    can_delete = False
-
-
-class GalleryAdmin(GalleryAdminDefault):
-    """Define our new one-to-one model as an inline of Photologue's Gallery model."""
-    inlines = [GalleryExtendedInline, ]
-
-
-admin.site.unregister(Gallery)
-admin.site.register(Gallery, GalleryAdmin)
 admin.site.register(Address, MyTranslatedAdmin)
 admin.site.register(Location, MyTranslatedAdmin)
 admin.site.register(Host, MyTranslatedAdmin)
