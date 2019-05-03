@@ -1,7 +1,6 @@
 Django==2.1.5
-django-bootstrap4==0.0.6
-django-countries==5.3.1
-django-sass-processor==0.7
+django-countries
+django-sass-processor
 django-photologue
 django-compressor
 django-localflavor
@@ -12,10 +11,9 @@ pytidylib
 psycopg2-binary
 djangorestframework
 Pillow
-libsass==0.14.5
+libsass
 num2words
-markdown==2.6.11
-django-modeltranslation==0.13b1
+markdown
+django-modeltranslation
 django-tinymce4-lite
 python-slugify
-python-dateutil
