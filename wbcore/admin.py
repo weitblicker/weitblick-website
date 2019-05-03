@@ -6,12 +6,13 @@ from photologue.admin import GalleryAdmin as GalleryAdminDefault
 from photologue.models import Gallery
 from modeltranslation.admin import TabbedTranslationAdmin
 from tinymce import TinyMCE
-
+from django_google_maps import widgets as map_widgets
+from django_google_maps import fields as map_fields
 
 
 class MyAdmin(admin.ModelAdmin):
     '''
-    Implements a wysiwyg editor. 
+    Implements a wysiwyg editor.
     '''
     formfield_overrides = {
         models.TextField: {'widget': TinyMCE(mce_attrs={'height': 200})},
@@ -22,9 +23,9 @@ class MyTranslatedAdmin(MyAdmin,TabbedTranslationAdmin):
     '''
     Creates Tabs to handle languages.
     '''
-    
+
     pass
-    
+
 
 class GalleryExtendedInline(admin.StackedInline):
     model = CustomGallery
@@ -35,11 +36,15 @@ class GalleryAdmin(GalleryAdminDefault):
     """Define our new one-to-one model as an inline of Photologue's Gallery model."""
     inlines = [GalleryExtendedInline, ]
 
+class LocationAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget},
+    }
 
 admin.site.unregister(Gallery)
 admin.site.register(Gallery, GalleryAdmin)
 admin.site.register(Address, MyTranslatedAdmin)
-admin.site.register(Location, MyTranslatedAdmin)
+admin.site.register(Location, LocationAdmin)
 admin.site.register(Host, MyTranslatedAdmin)
 admin.site.register(Partner, MyTranslatedAdmin)
 admin.site.register(Project, MyTranslatedAdmin)
@@ -54,5 +59,3 @@ admin.site.register(Donation, MyAdmin)
 admin.site.register(Milestep, MyTranslatedAdmin)
 admin.site.register(BankAccount, MyAdmin)
 admin.site.register(BlogPost, MyTranslatedAdmin)
-
-

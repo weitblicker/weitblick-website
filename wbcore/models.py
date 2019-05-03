@@ -8,6 +8,7 @@ from localflavor.generic.models import BICField
 from localflavor.generic.countries.sepa import IBAN_SEPA_COUNTRIES
 from django.urls import reverse
 from django.conf import settings
+from django_google_maps import fields as map_fields
 
 
 class Address(models.Model):
@@ -32,6 +33,8 @@ class Location(models.Model):
     city = models.CharField(blank=True, null=True, max_length=30)
     state = models.CharField(blank=True, null=True, max_length=30)
     street = models.CharField(blank=True, null=True, max_length=30)
+    address = map_fields.AddressField(max_length=200, null=True)
+    geolocation = map_fields.GeoLocationField(max_length=100, null=True)
 
     def __str__(self):
         return self.name + " (" + self.country.name + ")"

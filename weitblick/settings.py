@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'localflavor',
     'wbcore.apps.WbcoreConfig',
+    'django_google_maps',
 ]
 
 PHOTOLOGUE_DIR = 'images'
@@ -192,4 +193,4 @@ HAYSTACK_CONNECTIONS = {
         'INDEX_NAME': 'haystack',
     },
 }
-
+GOOGLE_MAPS_API_KEY = 'AIzaSyCtEff9Z-Kl_nRc5GU28LvwzXFlz-6ltHc'
