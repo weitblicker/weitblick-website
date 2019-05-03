@@ -16,6 +16,8 @@ class MyAdmin(admin.ModelAdmin):
     '''
     formfield_overrides = {
         models.TextField: {'widget': TinyMCE(mce_attrs={'height': 200})},
+        map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget},
+
     }
 
 
@@ -36,15 +38,11 @@ class GalleryAdmin(GalleryAdminDefault):
     """Define our new one-to-one model as an inline of Photologue's Gallery model."""
     inlines = [GalleryExtendedInline, ]
 
-class LocationAdmin(admin.ModelAdmin):
-    formfield_overrides = {
-        map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget},
-    }
 
 admin.site.unregister(Gallery)
 admin.site.register(Gallery, GalleryAdmin)
 admin.site.register(Address, MyTranslatedAdmin)
-admin.site.register(Location, LocationAdmin)
+admin.site.register(Location, MyTranslatedAdmin)
 admin.site.register(Host, MyTranslatedAdmin)
 admin.site.register(Partner, MyTranslatedAdmin)
 admin.site.register(Project, MyTranslatedAdmin)
