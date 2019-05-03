@@ -258,8 +258,16 @@ class Document(models.Model):
     description = models.TextField(null=True, blank=True)
     file = models.FileField(upload_to=save_document)
     host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True)
-    project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    TYPE_CHOICES = (
+        ('financial_report', 'Finanical Report'),
+        ('annual_report', 'Annual Report'),
+        ('Statue', 'Statue'),
+        ('membership_declaration', 'Membership Declaration'),
+        ('other', 'Other')
+    )
+    document_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='financial_report', null=True)
+    valid_from = models.DateField(null=True, blank=True)
 
     class Meta:
         get_latest_by = 'published'
