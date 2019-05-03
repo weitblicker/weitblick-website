@@ -87,6 +87,9 @@ class Project(models.Model):
     partner = models.ForeignKey(Partner, on_delete=models.SET_NULL, null=True, blank=True)
     donation_goal = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
     donation_current = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    completed = models.BooleanField(default=False)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
 
     def host_name_list(self):
         host_names = [host.name for host in self.hosts.all()]
