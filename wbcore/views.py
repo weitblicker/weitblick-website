@@ -19,7 +19,7 @@ dot_nav = {'news': dot_nav_news,
 icon_links = OrderedDict([
     ('login',
         {'name': 'Login',
-         'link': '#',
+         'link': 'https://new.weitblicker.org/admin',
          'icon': 'unlock alternate'}),
     ('facebook',
         {'name': 'Facebook',
@@ -114,7 +114,7 @@ def idea_view(request, host_slug=None):
 
 
     projects = Project.objects.all()
-        
+
     template = loader.get_template('wbcore/idea.html')
     context = {
         'main_nav': get_main_nav(active='idea'),
@@ -472,4 +472,3 @@ def search_view(request, query=None):
         'breadcrumb': [('Home', reverse('home')), ("Search", None)],
     }
     return HttpResponse(template.render(context), request)
-

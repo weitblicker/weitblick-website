@@ -11,7 +11,7 @@ django-haystack
 pytidylib
 psycopg2-binary
 djangorestframework
-Pillow==5.1.0
+Pillow
 libsass==0.14.5
 num2words
 markdown==2.6.11
