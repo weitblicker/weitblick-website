@@ -5,6 +5,7 @@ django-photologue
 django-compressor
 django-localflavor
 django-filter
+django-google-maps
 elasticsearch>=2,<3
 django-haystack
 pytidylib
