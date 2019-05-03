@@ -35,10 +35,10 @@ class Location(models.Model):
     geolocation = map_fields.GeoLocationField(max_length=100, null=True)
 
     def lat(self):
-        return self.geolocation.to_python().lat
+        return self.geolocation.lat
 
     def lng(self):
-        return self.geolocation.to_python().lon
+        return self.geolocation.lon
 
     def __str__(self):
         return self.name + " (" + self.country.name + ")"
