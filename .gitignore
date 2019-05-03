@@ -10,6 +10,7 @@ wbcore/static/css/wbcore.css
 weitblick/static/css/wbcore.css
 weitblick/static/css/wbcore.css.map
 weitblick/media/photologue/photos/cache
+weitblick/media/images/photos/cache
 wbcore/static/semantic/node_modules/
 bower_components
 node_modules
