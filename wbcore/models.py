@@ -25,8 +25,6 @@ class Address(models.Model):
 
 class Location(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    lat = models.DecimalField(max_digits=14, decimal_places=11)
-    lng = models.DecimalField(max_digits=14, decimal_places=11)
     description = models.CharField(blank=True, null=True,max_length=300 )
     country = CountryField()
     postal_code = models.CharField(blank=True, null=True, max_length=20)
@@ -35,6 +33,12 @@ class Location(models.Model):
     street = models.CharField(blank=True, null=True, max_length=30)
     address = map_fields.AddressField(max_length=200, null=True)
     geolocation = map_fields.GeoLocationField(max_length=100, null=True)
+
+    def lat(self):
+        return self.geolocation.to_python().lat
+
+    def lng(self):
+        return self.geolocation.to_python().lon
 
     def __str__(self):
         return self.name + " (" + self.country.name + ")"
@@ -101,6 +105,9 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
+
+    def teaser_image(self):
+        return self.gallery.photos.first()
 
 
 class Event(models.Model):
