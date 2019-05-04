@@ -728,7 +728,7 @@ def contact_view(request, host_slug=None):
             #msg['To'] = host.email
             msg['reply-to'] = form.cleaned_data['email']
             msg['Subject'] = form.cleaned_data['subject']
-            msg.set_content('Name: ' + form.cleaned_data['name'] + "\n" + 'E-Mail: ' + form.cleaned_data['email'] + "\n\n" + "Nachricht: " form.cleaned_data['message'])
+            msg.set_content('Name: ' + form.cleaned_data['name'] + "\n" + 'E-Mail: ' + form.cleaned_data['email'] + "\n\n" + "Nachricht: " + form.cleaned_data['message'])
             try:
                 # TODO: optimize, ssl from the start (smtplib.SMTP_SSL) and/or django internal (django.core.mail.send_mail)
                 with smtplib.SMTP('smtp.office365.com', 587) as smtp:
