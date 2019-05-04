@@ -3,10 +3,12 @@ from django.conf.urls import include
 from django.contrib.sitemaps.views import sitemap
 from .sitemaps import NewsPostSitemap
 from .sitemaps import ProjectSitemap
+from .sitemaps import BlogPostSitemap
+from .sitemaps import EventSitemap
 from wbcore import views, rest_views, ajax_views
 from wbcore import rest_urls, ajax_urls
 
-sitemaps = {'news': NewsPostSitemap, 'project': ProjectSitemap}
+sitemaps = {'news': NewsPostSitemap, 'project': ProjectSitemap, 'blogpost': BlogPostSitemap, 'event': EventSitemap}
 
 main_patterns = [
     path('join/', views.join_view, name='join'),
