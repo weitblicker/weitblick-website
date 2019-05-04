@@ -1,27 +1,28 @@
 {% load static %}
 <div class="ui fluid card">
-    <a class="image" href="{% url 'project' slug %}">
-        <img class="wb-icon" src="{{ image.get_listsize_url }}" alt="{{ image.title }}" />
+  <div class="content">
+    <a class="ui fluid image" href="{% url 'project' slug %}">
+      <div class="ui orange ribbon label">{{ country }}</div>
+      {% if image %}<img src="{{ image.get_cardsize_url }}" alt="{{ image.title }}" style="margin-bottom: 15px"/>
+      {% else %}
+        <div class="image" style="margin-bottom:15px;">{% include 'wbcore/svgs/placeholder.svg' with text="Projekt"%}</div>
+      {% endif %}
     </a>
-    <div class="content">
-        <a class="header" href="{% url 'project' slug %}">{{ title }}</a>
-        <div class="meta">
-            <span class="date">{{ country }}</span>
-        </div>
-        <div class="description">
-            {{ description|truncatewords:30 }}
-        </div>
+    <a class="header" href="{% url 'project' slug %}">{{ title }}</a>
+    <div class="description">
+        {{ description|safe|truncatewords:30 }}
     </div>
-    <div class="extra content">
-        {% for host in hosts %}
-          <div class="meta">
-              {% if host.slug %}
-                <a href="{% url 'host' host_slug=host.slug %}" class="wb-link">
-                  <span class="wb-icon">{% include 'wbcore/svgs/puzzle-icon.svg' %}</span>
-                  <span class="wb-name">{{ host.name|cut:"Weitblick " }}</span>
-                </a>
-              {% endif %}
-          </div>
-        {% endfor %}
-    </div>
+  </div>
+  <div class="extra content">
+    {% for host in hosts %}
+      <div class="meta">
+        {% if host.slug %}
+          <a href="{% url 'host' host_slug=host.slug %}" class="wb-link">
+            <span class="wb-icon">{% include 'wbcore/svgs/puzzle-icon.svg' %}</span>
+            <span class="wb-name">{{ host.name|cut:"Weitblick " }}</span>
+          </a>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
 </div>
