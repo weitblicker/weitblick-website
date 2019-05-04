@@ -723,9 +723,9 @@ def contact_view(request, host_slug=None):
             # sent info via email
             msg = EmailMessage()
             msg['From'] = EMAIL_ADDRESS
-            msg['To'] = 'benedikt.hemmer@weitblicker.org'
+            msg['To'] = 'admin@weitblicker.org'
             host = Host.objects.get(name=form.cleaned_data['host'])
-            # msg['To'] = host.email
+            #msg['To'] = host.email
             msg['reply-to'] = form.cleaned_data['email']
             msg['Subject'] = form.cleaned_data['subject']
             msg.set_content('Name: ' + form.cleaned_data['name'] + "\n" + 'E-Mail: ' + form.cleaned_data['email'] + "\n\n" + "Nachricht: " form.cleaned_data['message'])

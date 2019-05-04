@@ -42,8 +42,5 @@ admin.site.register(Donation, MyAdmin)
 admin.site.register(Milestep, MyTranslatedAdmin)
 admin.site.register(BankAccount, MyAdmin)
 admin.site.register(BlogPost, MyTranslatedAdmin)
-<<<<<<< HEAD
 admin.site.register(TeamUserRelation, MyAdmin)
-=======
 admin.site.register(ContactMessage, MyAdmin)
->>>>>>> forms
