@@ -1,18 +1,98 @@
 {% extends 'wbcore/single_content.html' %}
 {% load staticfiles %}
 {% block single-content %}
+<div class="ui one column stackable grid container content-block">
+  {% include 'wbcore/project_map.html' %}
+</div>
 
-    {% include 'wbcore/project_map.html' %}
+<div class="ui stackable grid container content-block">
 
-    {% if projects %}
-        <div class="ui four stackable cards">
-            {% for project in projects %}
-                {% include 'wbcore/project_card.html' with title=project.name image=project.teaser_image slug=project.slug hosts=project.hosts.all description=project.short_description|striptags country=project.location.country.name %}
-            {% endfor %}
+    <div class="ten wide column divided items">
+      {% if projects %}
+        <div class="ui three stackable cards">
+          {% for project in projects %}
+            {% include 'wbcore/project_card.html' with title=project.name image=project.teaser_image slug=project.slug hosts=project.hosts.all description=project.short_description|striptags country=project.location.country.name %}
+          {% endfor %}
         </div>
-    {% else %}
+      {% else %}
         <p>No projects available!</p>
-    {% endif %}
+      {% endif %}
+  </div>
+
+  <div class="six wide column divided items">
+    <div class="column-content">
+      <div class="ui basic segment">
+        <div class="ui divided unstackable items">
+          <h3>Filter Projects</h3>
+          <div class="ui form segment">
+            <div class="ui two unstackable fields">
+
+              <div class="field">
+                <label>Completed</label>
+                <div id="project-filter-completed" class="ui fluid basic dropdown button">
+                  <span class="text">Visibility</span>
+                  <i class="dropdown icon"></i>
+                  <div class="menu">
+                    {% for year, months in years.items %}
+                      <div class="item" data-value="{{ year|date:'Y' }}">
+                        <i class="dropdown icon"></i>
+                        <span class="text">{{ year|date:'Y' }}</span>
+                        <div class="menu">
+                          {% for month in months %}
+                            <div class="item" data-value="{{ month|date:'Y-m' }}">{{ month|date:'F Y' }}</div>
+                          {% endfor %}
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Clear Filter</label>
+                <div id="project-filter-clear" class="ui fluid orange button">Clear</div>
+              </div>
+
+            </div>
+
+              <div class="field">
+                <label>Hosts</label>
+                <div id="project-filter-hosts" class="ui multiple search selection dropdown">
+                  <input name="tags" type="hidden">
+                  <i class="dropdown icon"></i>
+                  <div class="default text">Union</div>
+                  <div class="menu">
+                    {% for host in hosts %}
+                      <div class="item" data-value="{{ host.slug }}">{{ host.name|cut:"Weitblick " }}</div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Country</label>
+                <div id="project-filter-countries" class="ui multiple search selection dropdown">
+                  <input name="tags" type="hidden">
+                  <i class="dropdown icon"></i>
+                  <div class="default text">Union</div>
+                  <div class="menu">
+                    {% for host in hosts %}
+                      <div class="item" data-value="{{ host.slug }}">{{ host.name|cut:"Weitblick " }}</div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Search</label>
+                <input id="project-filter-search" type="text" placeholder="Search in Projects">
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
-
-
