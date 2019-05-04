@@ -726,7 +726,7 @@ def contact_view(request, host_slug=None):
         else:
             message.error(request, 'Form not valid')
     else:
-        if host:  # in Host.objects.all().values_list('slug', flat=True):
+        if host:
             form = ContactForm(initial={'host': host_slug})
         else:
             form = ContactForm()
@@ -746,4 +746,3 @@ def contact_view(request, host_slug=None):
     }
 
     return HttpResponse(template.render(context, request))
-    #return render(request, 'wbcore/contact.html', {'contact_form': form})
