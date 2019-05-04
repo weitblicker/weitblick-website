@@ -3,14 +3,12 @@
 {% block content %}
 
     <div class="ui vertical stripe segment">
-        <div class="ui middle aligned stackable grid container content-block">
-
-            {% include 'wbcore/breadcrumb.html' %}
-
-            {% block single-content %}{% endblock %}
-
-            {% include 'wbcore/socialbuttons.html' %}
-
+      <div class="ui middle aligned stackable grid container content-block">
+        <div class="ui vertical stripe segment">
+          {% include 'wbcore/breadcrumb.html' %}
+          {% block single-content %}{% endblock %}
+        </div>
+        {% include 'wbcore/socialbuttons.html' %}
         </div>
     </div>
 
