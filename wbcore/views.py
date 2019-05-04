@@ -99,6 +99,231 @@ def home_view(request):
     return HttpResponse(template.render(context, request))
 
 
+def reports_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Reports', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Reports', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Reports', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/reports.html')
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def charter_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Charter', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Charter', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Charter', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/charter.html')
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def transparency_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Transparency', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Transparency', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Transparency', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/transparency.html')
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def contact_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Contact', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Contact', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/contact.html')
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def facts_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Facts', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Facts', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Facts', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/facts.html')
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def history_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('History', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('History', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('History', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/history.html')
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def privacy_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Privacy', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Privacy', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Privacy', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/privacy.html')
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def team_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Team', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Team', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/team.html')
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def about_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('About', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('About', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/about.html')
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+
 def idea_view(request, host_slug=None):
     host_slugs = get_host_slugs(request, host_slug)
 
@@ -111,7 +336,6 @@ def idea_view(request, host_slug=None):
     else:
         host = None
         breadcrumb = [('Home', reverse('home')), ('Idea', None)]
-
 
     projects = Project.objects.all()
 
@@ -204,6 +428,7 @@ def hosts_view(request):
     context = {
         'hosts': hosts,
         'main_nav': get_main_nav(active='hosts'),
+        'dot_nav': dot_nav,
         'breadcrumb': [('Home', reverse('home')), ("Unions", None)],
     }
     return HttpResponse(template.render(context, request))
