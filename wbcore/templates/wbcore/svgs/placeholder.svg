@@ -4,17 +4,17 @@
 	 viewBox="0 0 963.8 680.3" style="enable-background:new 0 0 963.8 680.3;" xml:space="preserve">
 <style type="text/css">
 	.Arched_x0020_Green{fill:url(#SVGID_1_);stroke:#FFFFFF;stroke-width:0.25;stroke-miterlimit:1;}
-	.st0{clip-path:url(#SVGID_4_);fill:url(#SVGID_5_);}
-	.st1{opacity:0.75;}
-	.st2{opacity:0.5;fill:url(#SVGID_6_);}
-	.st3{opacity:0.5;fill:url(#SVGID_7_);}
-	.st4{clip-path:url(#SVGID_9_);}
-	.st5{clip-path:url(#SVGID_11_);fill:#F29400;}
-	.st6{clip-path:url(#SVGID_11_);fill:#FFFFFF;}
-	.st7{fill:none;}
-	.st8{fill:#FFFFFF;}
-	.st9{font-family:'BreeSerif-Regular';}
-	.st10{font-size:119px;}
+	.fick0{clip-path:url(#SVGID_4_);fill:url(#SVGID_5_);}
+	.fick1{opacity:0.75;}
+	.fick2{opacity:0.5;fill:url(#SVGID_6_);}
+	.fick3{opacity:0.5;fill:url(#SVGID_7_);}
+	.fick4{clip-path:url(#SVGID_9_);}
+	.fick5{clip-path:url(#SVGID_11_);fill:#F29400;}
+	.fick6{clip-path:url(#SVGID_11_);fill:#FFFFFF;}
+	.fick7{fill:none;}
+	.fick8{fill:#FFFFFF;}
+	.fick9{font-family:'BreeSerif-Regular';}
+	.fick10{font-size:119px;}
 </style>
 <linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="196.639" y1="735.1643" x2="197.3461" y2="734.4572">
 	<stop  offset="0" style="stop-color:#259E2E"/>
@@ -24,7 +24,7 @@
 	<defs>
 		<rect id="SVGID_2_" width="963.8" height="680.3"/>
 	</defs>
-	
+
 		<radialGradient id="SVGID_3_" cx="478.2877" cy="322.9785" r="504.5428" gradientTransform="matrix(0.9551 0 0 0.6742 25.069 122.4122)" gradientUnits="userSpaceOnUse">
 		<stop  offset="5.050500e-03" style="stop-color:#53AFDE"/>
 		<stop  offset="1" style="stop-color:#306BAE"/>
@@ -33,26 +33,26 @@
 	<clipPath id="SVGID_4_">
 		<use xlink:href="#SVGID_2_"  style="overflow:visible;"/>
 	</clipPath>
-	
+
 		<radialGradient id="SVGID_5_" cx="478.2877" cy="295.2507" r="504.5428" gradientTransform="matrix(0.9551 0 0 1.0057 25.069 -124.0417)" gradientUnits="userSpaceOnUse">
 		<stop  offset="5.050500e-03" style="stop-color:#53AFDE"/>
 		<stop  offset="1" style="stop-color:#306BAE"/>
 	</radialGradient>
-	<rect y="-334.5" class="st0" width="963.8" height="1014.8"/>
+	<rect y="-334.5" class="fick0" width="963.8" height="1014.8"/>
 </g>
-<g class="st1">
-	
+<g class="fick1">
+
 		<radialGradient id="SVGID_6_" cx="1188.1425" cy="517.426" r="488.9714" gradientTransform="matrix(-1.2174 -3.100000e-03 3.100000e-03 -1.2174 1508.6183 743.488)" gradientUnits="userSpaceOnUse">
 		<stop  offset="5.050500e-03" style="stop-color:#53AFDE"/>
 		<stop  offset="1" style="stop-color:#306BAE"/>
 	</radialGradient>
-	<circle class="st2" cx="63.8" cy="109.9" r="595.3"/>
-	
+	<circle class="fick2" cx="63.8" cy="109.9" r="595.3"/>
+
 		<radialGradient id="SVGID_7_" cx="677.8011" cy="604.1703" r="488.9887" gradientTransform="matrix(-1.1411 0.4241 -0.4241 -1.1411 1603.2418 226.3704)" gradientUnits="userSpaceOnUse">
 		<stop  offset="5.050500e-03" style="stop-color:#53AFDE"/>
 		<stop  offset="1" style="stop-color:#306BAE"/>
 	</radialGradient>
-	<circle class="st3" cx="573.6" cy="-175.6" r="595.3"/>
+	<circle class="fick3" cx="573.6" cy="-175.6" r="595.3"/>
 </g>
 <g>
 	<g>
@@ -62,16 +62,16 @@
 		<clipPath id="SVGID_9_">
 			<use xlink:href="#SVGID_8_"  style="overflow:visible;"/>
 		</clipPath>
-		<g class="st4">
+		<g class="fick4">
 			<defs>
 				<rect id="SVGID_10_" x="685.7" y="340.2" width="78.3" height="78.3"/>
 			</defs>
 			<clipPath id="SVGID_11_">
 				<use xlink:href="#SVGID_10_"  style="overflow:visible;"/>
 			</clipPath>
-			<path class="st5" d="M763.8,379.2c0,21.6-17.5,39.1-39.1,39.1c-21.6,0-39.1-17.5-39.1-39.1c0-21.6,17.5-39.1,39.1-39.1
+			<path class="fick5" d="M763.8,379.2c0,21.6-17.5,39.1-39.1,39.1c-21.6,0-39.1-17.5-39.1-39.1c0-21.6,17.5-39.1,39.1-39.1
 				C746.3,340.2,763.8,357.6,763.8,379.2"/>
-			<path class="st6" d="M720.6,403.5c4.1-1.1,8.4-2.8,12.4-4.8l0,0c1-0.6,1.4-1.9,0.8-2.9c-0.3-0.5-0.8-0.9-1.3-1l-1.3-0.3
+			<path class="fick6" d="M720.6,403.5c4.1-1.1,8.4-2.8,12.4-4.8l0,0c1-0.6,1.4-1.9,0.8-2.9c-0.3-0.5-0.8-0.9-1.3-1l-1.3-0.3
 				c-1.2-0.3-2.3-1.1-3-2.3c-1.4-2.4-0.6-5.4,1.8-6.7c2.4-1.4,5.4-0.6,6.7,1.8c0.7,1.2,0.8,2.5,0.5,3.7l-0.4,1.4
 				c-0.2,0.5-0.1,1.1,0.2,1.7c0.6,1,1.9,1.4,2.9,0.8l0,0c3.8-2.5,7.3-5.3,10.4-8.4c-1.1-4.1-2.8-8.4-4.8-12.4l0,0
 				c-0.6-1-1.9-1.4-2.9-0.8c-0.5,0.3-0.9,0.8-1,1.3l-0.3,1.3c-0.3,1.2-1.1,2.3-2.3,3c-2.4,1.4-5.4,0.6-6.7-1.8
@@ -82,7 +82,7 @@
 				c-0.5,0.3-1.1,0.4-1.7,0.2l-1.4-0.4c-1.2-0.3-2.5-0.2-3.7,0.5c-2.4,1.4-3.2,4.4-1.8,6.7c1.4,2.4,4.4,3.2,6.7,1.8
 				c1.2-0.7,2-1.8,2.3-3l0.3-1.3c0.1-0.5,0.5-1,1-1.3c1-0.6,2.3-0.2,2.9,0.8l0,0C717.9,395.2,719.5,399.4,720.6,403.5"/>
 		</g>
-		<g class="st4">
+		<g class="fick4">
 			<defs>
 				<rect id="SVGID_12_" x="685.7" y="340.2" width="78.3" height="78.3"/>
 			</defs>
@@ -92,6 +92,6 @@
 		</g>
 	</g>
 </g>
-<rect y="397.5" class="st7" width="963.8" height="169.6"/>
-<text x="480" y="482.3929" text-anchor="middle" class="st8 st9 st10">Projekt</text>
+<rect y="397.5" class="fick7" width="963.8" height="169.6"/>
+<text x="480" y="482.3929" text-anchor="middle" class="fick8 fick9 fick10">{{text}}</text>
 </svg>
