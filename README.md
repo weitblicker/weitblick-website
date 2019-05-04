@@ -30,6 +30,7 @@ and then hit: `curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py`
 
 * `python manage.py loaddata data/address.json`
 * `python manage.py loaddata data/hosts.json`
+* `python manage.py loaddata data/photos-all.json`
 * `python manage.py loaddata data/news.json`
 * `python manage.py loaddata data/blog.json`
 * `python manage.py loaddata data/photos-all.json`
