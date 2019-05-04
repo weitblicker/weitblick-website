@@ -269,7 +269,7 @@ class Document(models.Model):
     TYPE_CHOICES = (
         ('financial_report', 'Finanical Report'),
         ('annual_report', 'Annual Report'),
-        ('Statue', 'Statue'),
+        ('charter', 'Charter'),
         ('membership_declaration', 'Membership Declaration'),
         ('other', 'Other')
     )
