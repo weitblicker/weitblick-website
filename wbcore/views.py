@@ -184,31 +184,6 @@ def transparency_view(request, host_slug=None):
     return HttpResponse(template.render(context, request))
 
 
-def contact_view(request, host_slug=None):
-    host_slugs = get_host_slugs(request, host_slug)
-
-    if host_slugs:
-        try:
-            host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Contact', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
-        except:
-            raise Http404()
-    else:
-        host = None
-        breadcrumb = [('Home', reverse('home')), ('Contact', None)]
-
-    projects = Project.objects.all()
-
-    template = loader.get_template('wbcore/contact.html')
-    context = {
-        'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
-        'host': host,
-        'breadcrumb': breadcrumb,
-    }
-    return HttpResponse(template.render(context, request))
-
-
 def facts_view(request, host_slug=None):
     host_slugs = get_host_slugs(request, host_slug)
 
@@ -715,6 +690,11 @@ def search_view(request, query=None):
 
 
 def contact_view(request, host_slug=None):
+    try:
+        host = Host.objects.get(slug=host_slug) if host_slug else None
+    except Host.DoesNotExist:
+        raise Http404()
+
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
@@ -746,9 +726,24 @@ def contact_view(request, host_slug=None):
         else:
             message.error(request, 'Form not valid')
     else:
-        if host_slug in Host.objects.all().values_list('slug', flat=True):
-            print(host_slug)
+        if host:  # in Host.objects.all().values_list('slug', flat=True):
             form = ContactForm(initial={'host': host_slug})
         else:
             form = ContactForm()
-    return render(request, 'wbcore/contact.html', {'contact_form': form})
+
+    if host:
+        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
+    else:
+        breadcrumb = [('Home', reverse('home')), ('Contact', None)]
+
+    template = loader.get_template('wbcore/contact.html')
+    context = {
+        'contact_form': form,
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+
+    return HttpResponse(template.render(context, request))
+    #return render(request, 'wbcore/contact.html', {'contact_form': form})
