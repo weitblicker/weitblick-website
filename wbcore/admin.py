@@ -13,7 +13,7 @@ class MyAdmin(admin.ModelAdmin):
     '''
     formfield_overrides = {
         models.TextField: {'widget': TinyMCE(mce_attrs={'height': 200})},
-        map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget},
+        map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget(attrs={'data-map-type': 'roadmap'})},
 
     }
 
