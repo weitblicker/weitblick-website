@@ -14,14 +14,14 @@
     </div>
     <div class="extra content">
         {% for host in hosts %}
-            <a href="{% url 'host' host.slug  %}">
-                {% if host.slug %}
-                    <a href="{% url 'host' host_slug=host.slug %}" class="wb-link">
-                        <span class="wb-icon">{% include 'wbcore/svgs/puzzle-icon.svg' %}</span>
-                        <span class="wb-name">{{ host.name|cut:"Weitblick " }}</span>
-                    </a>
-                {% endif %}
-            </a>
+          <div class="meta">
+              {% if host.slug %}
+                <a href="{% url 'host' host_slug=host.slug %}" class="wb-link">
+                  <span class="wb-icon">{% include 'wbcore/svgs/puzzle-icon.svg' %}</span>
+                  <span class="wb-name">{{ host.name|cut:"Weitblick " }}</span>
+                </a>
+              {% endif %}
+          </div>
         {% endfor %}
     </div>
 </div>
