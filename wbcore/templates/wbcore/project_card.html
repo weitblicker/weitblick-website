@@ -2,7 +2,7 @@
 <div class="ui fluid card">
   <div class="content">
     <a class="ui fluid image" href="{% url 'project' slug %}">
-      <div class="ui orange ribbon label">{{ country }}</div>
+      <div class="ui ribbon label">{{ country }}</div>
       {% if image %}<img src="{{ image.get_cardsize_url }}" alt="{{ image.title }}" style="margin-bottom: 15px"/>
       {% else %}
         <div class="image" style="margin-bottom:15px;">{% include 'wbcore/svgs/placeholder.svg' with text="Projekt"%}</div>
