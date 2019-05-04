@@ -127,7 +127,7 @@ $logo-orange: #f3971b;
 	font-size: 1.0em;
 }
 
-.meta{
+.meta, .extra{
 	color: $orange;
 	.date{
 		font-family: Open Sans;
@@ -149,7 +149,7 @@ $logo-orange: #f3971b;
 			text-transform: uppercase;
 			display: inline-block;
 			vertical-align: middle;
-		}	
+		}
 	}
 }
 
