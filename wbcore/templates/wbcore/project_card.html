@@ -1,23 +1,27 @@
 {% load static %}
 <div class="ui fluid card">
-  <a class="image" href="{% url 'project' slug %}">
-    <img src="/media/mikko.jpg">
-  </a>
-  <div class="content">
-    <a class="header" href="{% url 'project' slug %}">{{ title }}</a>
-    <div class="meta">
-      <span class="date">{{ country }}</span>
-    </div>
-    <div class="description">
-      {{ description|truncatewords:30 }}
-    </div>
-  </div>
-  <div class="extra content">
-    {% for host in hosts %}
-    <a href="{% url 'host' host.slug  %}">
-        <img class="wb-icon" src="{% get_media_prefix %}icon.png">
-        {{ host.city }}
+    <a class="image" href="{% url 'project' slug %}">
+        <img class="wb-icon" src="{{ image.get_listsize_url }}" alt="{{ image.title }}" />
     </a>
-    {% endfor %}
-  </div>
+    <div class="content">
+        <a class="header" href="{% url 'project' slug %}">{{ title }}</a>
+        <div class="meta">
+            <span class="date">{{ country }}</span>
+        </div>
+        <div class="description">
+            {{ description|truncatewords:30 }}
+        </div>
+    </div>
+    <div class="extra content">
+        {% for host in hosts %}
+          <div class="meta">
+              {% if host.slug %}
+                <a href="{% url 'host' host_slug=host.slug %}" class="wb-link">
+                  <span class="wb-icon">{% include 'wbcore/svgs/puzzle-icon.svg' %}</span>
+                  <span class="wb-name">{{ host.name|cut:"Weitblick " }}</span>
+                </a>
+              {% endif %}
+          </div>
+        {% endfor %}
+    </div>
 </div>
