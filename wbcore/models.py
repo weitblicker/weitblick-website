@@ -344,3 +344,17 @@ class BankAccount(models.Model):
 
     def __str__(self):
         return 'Bankdaten von '+self.profile.name
+
+class ContactMessage(models.Model):
+    REASON_CHOICES = (
+        ('spende', 'Spende'),
+        ('austritt', 'Austritt'),
+        ('other', 'Sonstiges')
+    )
+    host = models.ForeignKey(Host, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100, blank=True)
+    email = models.EmailField(max_length=100)
+    reason = models.CharField(max_length=20, choices=REASON_CHOICES)
+    subject = models.CharField(max_length=100)
+    message = models.TextField()
+    submission_date = models.DateTimeField(auto_now_add=True)

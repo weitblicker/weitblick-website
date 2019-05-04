@@ -1,4 +1,9 @@
 {% extends 'wbcore/single_content.html' %}
+
 {% block single-content %}
-    <p>Contact</p>
+  <form action="{% url 'contact' %}" method="post">
+    {% csrf_token %}
+    {{ contact_form }}
+    <input type="submit" value="Contact Message">
+  </form>
 {% endblock %}

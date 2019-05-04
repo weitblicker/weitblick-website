@@ -11,12 +11,7 @@ django-sass-processor = "*"
 django-photologue = "*"
 django-localflavor = "*"
 django-filter = "*"
-<<<<<<< HEAD
-django-google-maps = "*"
 elasticsearch = ">=2,<3"
-=======
-elasticsearch = "<3,>=2"
->>>>>>> forms
 django-haystack = "*"
 pytidylib = "*"
 psycopg2-binary = "*"
@@ -30,7 +25,6 @@ Django = "==2.1.5"
 django_compressor = "*"
 Pillow = "*"
 Markdown = "*"
-django-google-maps = "*"
 
 [requires]
 python_version = "3.6"
