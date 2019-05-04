@@ -605,20 +605,25 @@ def news_view(request, host_slug=None):
     posts = posts.order_by('-published')[:20]
     hosts = Host.objects.all()
 
-    end_date = NewsPost.objects.latest('published').published
-    start_date = NewsPost.objects.earliest('published').published
+    if NewsPost.objects.count():
+        latest = NewsPost.objects.latest('published')
+        earliest = NewsPost.objects.earliest('published')
+        start_date = earliest.published
+        end_date = latest.published
+        print("Latest news:", end_date)
+        print("Earliest news:", start_date)
 
-    print("Latest news:", end_date)
-    print("Earliest news:", start_date)
+        year_months = range_year_month(start_date, end_date)
+        for year, months in year_months.items():
+            print(year, months)
+    else:
+        year_months = None
 
     if host:
         breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ("News", None)]
     else:
         breadcrumb = [('Home', reverse('home')), ('News', None)]
 
-    year_months = range_year_month(start_date, end_date)
-    for year, months in year_months.items():
-        print(year, months)
     context = {
         'main_nav': get_main_nav(host=host, active='news'),
         'dot_nav': dot_nav,
