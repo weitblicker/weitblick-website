@@ -107,7 +107,10 @@ class Project(models.Model):
         return self.name
 
     def teaser_image(self):
-        return self.gallery.photos.first()
+        if self.gallery:
+            return self.gallery.photos.first()
+        else:
+            return None
 
 
 class Event(models.Model):
