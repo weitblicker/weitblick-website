@@ -286,17 +286,27 @@ class Document(models.Model):
         city = ("(" + self.host.city + ")") if self.host else ''
         return self.title + " " + city
 
+def save_team_image(instance, filename):
+    return "teams/"+ instance.host.slug +"/" + instance.title.lower().replace(' ', '_') + splitext(filename)[1].lower()
 
 class Team(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
-    member = models.ManyToManyField(Profile)
+    member = models.ManyToManyField(Profile, through='TeamUserRelation')
+    image = models.ImageField(upload_to=save_team_image, null=True, blank=True)
 
     def __str__(self):
         city = ("(" + self.host.city + ")") if self.host else ''
         return self.name + " " + city
 
+class TeamUserRelation(models.Model):
+    user = models.ForeignKey(Profile, on_delete= models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    text = models.TextField()
+
+    def __str__(self):
+        return self.user.name + ' in ' + self.team.name
 
 class Donation(models.Model):
     host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True)

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, Profile
-from .models import UserRelation, Document, Team, Milestone, Donation, Milestep, BankAccount
+from .models import UserRelation, Document, Team, Milestone, Donation, Milestep, BankAccount, TeamUserRelation
 from django.db import models
 from modeltranslation.admin import TabbedTranslationAdmin
 from tinymce import TinyMCE
@@ -42,3 +42,4 @@ admin.site.register(Donation, MyAdmin)
 admin.site.register(Milestep, MyTranslatedAdmin)
 admin.site.register(BankAccount, MyAdmin)
 admin.site.register(BlogPost, MyTranslatedAdmin)
+admin.site.register(TeamUserRelation, MyAdmin)
