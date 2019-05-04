@@ -1,6 +1,7 @@
 from django.contrib.sitemaps import Sitemap
 from .models import NewsPost
 from .models import Project
+from django.urls import reverse
 from datetime import datetime
 
 
@@ -18,7 +19,7 @@ class NewsPostSitemap(Sitemap):
         return datetime.now()
 
     def location(self, obj):
-        return 'hello'
+        return '/hi'
 
 
 class ProjectSitemap(Sitemap):
@@ -35,5 +36,6 @@ class ProjectSitemap(Sitemap):
         return datetime.now()
 
     def location(self, obj):
-        return 'hi'
+        #print(obj.slug)
+        return reverse('project', args=[obj.slug])
 
