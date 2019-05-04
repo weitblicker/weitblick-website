@@ -1,23 +1,36 @@
 {% load static %}
-<div class="ui four column stackable grid">
-        <div class="ui four wide column unstackable items">
-	        <a class="ui item header" href="{% url 'news' %}">News</a>
-            {% for entry in dot_nav.news %}
-            	{% include 'wbcore/dot_nav_item.html' with photo=entry.image type='news-post' id=entry.pk title=entry.title image=entry.image %}
+<div class="ui five column stackable grid">
+    <div class="ui two wide column unstackable items">
+        <a class="ui item header" href="{% url 'about' %}">About</a>
+        <div class="ui item"><a href="{% url 'idea' %}">Idea</a></div>
+        <div class="ui item"><a href="{% url 'history' %}">History</a></div>
+        <div class="ui item"><a href="{% url 'team' %}">Team</a></div>
+        <div class="ui item"><a href="{% url 'contact' %}">Contact</a></div>
+    </div>
+    <div class="ui four wide column unstackable items">
+        <a class="ui item header" href="{% url 'news' %}">News</a>
+        {% for entry in dot_nav.news %}
+            {% include 'wbcore/dot_nav_item.html' with photo=entry.image type='news-post' id=entry.pk title=entry.title image=entry.image %}
+        {% endfor %}
+    </div>
+    <div class="ui four wide column unstackable items">
+        <a class="ui item header"href="{% url 'blog' %}" >Blog</a>
+        {% for entry in dot_nav.blog %}
+            {% include 'wbcore/dot_nav_item.html' with photo=entry.image type='blog-post' id=entry.pk title=entry.title image=entry.image desc=entry.text|truncatewords:7 %}
+        {% endfor %}
+    </div>
+    <div class="ui three wide column unstackable items">
+        <a class="ui item header" href="{% url 'facts' %}">Facts</a>
+        <div class="ui item"><a href="{% url 'transparency' %}">Transparency</a></div>
+        <div class="ui item"><a href="{% url 'charter' %}">Charter</a></div>
+        <div class="ui item"><a href="{% url 'reports' %}">Reports</a></div>
+    </div>
+    <div class="ui two wide column unstackable items">
+        <a href="{% url 'events' %}"><h4 class="ui header">Events</h4></a>
+        <div class="ui link list">
+            {% for entry in dot_nav.events %}
+                <a class="item">{{ entry.title }}</a>
             {% endfor %}
         </div>
-        <div class="ui four wide column unstackable items">
-            <a class="ui item header"href="{% url 'blog' %}" >Blog</a>
-            {% for entry in dot_nav.blog %}
-            	{% include 'wbcore/dot_nav_item.html' with photo=entry.image type='blog-post' id=entry.pk title=entry.title image=entry.image desc=entry.text|truncatewords:7 %}
-            {% endfor %}
-        </div>
-        <div class="ui four wide column unstackable items">
-            <a href="{% url 'events' %}"><h4 class="ui header">Events</h4></a>
-            <div class="ui link list">
-                {% for entry in dot_nav.events %}
-                    <a class="item">{{ entry.title }}</a>
-                {% endfor %}
-            </div>
-        </div>
+    </div>
 </div>
