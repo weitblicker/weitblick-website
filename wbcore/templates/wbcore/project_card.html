@@ -10,7 +10,7 @@
     </a>
     <a class="header" href="{% url 'project' slug %}">{{ title }}</a>
     <div class="description">
-        {{ description|truncatewords:30 }}
+        {{ description|safe|truncatewords:30 }}
     </div>
   </div>
   <div class="extra content">
