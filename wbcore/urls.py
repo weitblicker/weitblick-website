@@ -14,6 +14,7 @@ main_patterns = [
     path('blog/<int:post_id>/', views.blog_post_view, name='blog-post'),
     path('blog/', views.blog_view, name='blog'),
     path('idea/', views.idea_view, name='idea'),
+    path('contact/', views.contact_view, name='contact'),
 ]
 
 
@@ -31,4 +32,3 @@ urlpatterns = urlpatterns + main_patterns
 
 urlpatterns.append(path('<str:host_slug>/', include(main_patterns)))
 urlpatterns.append(path('<str:host_slug>/', views.host_view, name='host'))
-

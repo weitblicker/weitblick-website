@@ -1,12 +1,22 @@
 import csv
+import os
+import smtplib
 
 from django.db.models import Count
 from django.http import HttpResponse, Http404
+from django.shortcuts import render, redirect
 from django.template import loader
 from django.urls import reverse
+from django.contrib import messages
+from django.core.mail import send_mail, BadHeaderError
 from datetime import timedelta, date
 from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost
 from collections import OrderedDict
+from .forms import ContactForm
+from email.message import EmailMessage
+
+EMAIL_ADDRESS = os.environ.get('TEST_EMAIL_USER')
+EMAIL_PASSWORT = os.environ.get('TEST_EMAIL_PW')
 
 dot_nav_news = NewsPost.objects.all().order_by('-published')[:3]
 dot_nav_blog = BlogPost.objects.all().order_by('-published')[:3]
@@ -472,3 +482,43 @@ def search_view(request, query=None):
         'breadcrumb': [('Home', reverse('home')), ("Search", None)],
     }
     return HttpResponse(template.render(context), request)
+
+
+def contact_view(request, host_slug=None):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+
+            # sent info via email
+            msg = EmailMessage()
+            msg['From'] = EMAIL_ADDRESS
+            msg['To'] = 'benedikt.hemmer@weitblicker.org'
+            host = Host.objects.get(name=form.cleaned_data['host'])
+            # msg['To'] = host.email
+            msg['reply-to'] = form.cleaned_data['email']
+            msg['Subject'] = form.cleaned_data['subject']
+            msg.set_content('Name: ' + form.cleaned_data['name'] + "\n" + 'E-Mail: ' + form.cleaned_data['email'] + "\n\n" + "Nachricht: " form.cleaned_data['message'])
+            try:
+                # TODO: optimize, ssl from the start (smtplib.SMTP_SSL) and/or django internal (django.core.mail.send_mail)
+                with smtplib.SMTP('smtp.office365.com', 587) as smtp:
+                    smtp.ehlo()
+                    smtp.starttls()
+                    smtp.ehlo()
+                    smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORT)
+                    smtp.send_message(msg)
+            except BadHeaderError:
+                print("error raised")
+                return HttpResponse('Invalid header found.')
+            # TODO: inform user on sucess
+            messages.success(request, 'Message successfully sent. Thank you!')  # nowhere shown yet
+            return redirect('home')
+        else:
+            message.error(request, 'Form not valid')
+    else:
+        if host_slug in Host.objects.all().values_list('slug', flat=True):
+            print(host_slug)
+            form = ContactForm(initial={'host': host_slug})
+        else:
+            form = ContactForm()
+    return render(request, 'wbcore/contact.html', {'contact_form': form})
