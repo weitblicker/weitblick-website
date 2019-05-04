@@ -2,6 +2,11 @@
 <html>
 <head>
     {% load static %}
+    
+    <!-- Cookie privacy notice -->
+    {% load cookielaw_tags%}
+    {% cookielaw_banner %}
+    
     {% include "wbcore/head.html" %}
 <body>
 

@@ -1,0 +1,44 @@
+{% load i18n %}
+
+<div id="CookielawBanner">
+    <div class="ui grid container">
+        <div class="ui two column grid">
+            <div class="three wide column">
+                <h2>{% trans "COOKIE_INFO_HEADER" %}</h2>
+                <a class="btn btn-primary pull-right" href="javascript:Cookielaw.createCookielawCookie();">{% trans "COOKIE_INFO_OK" %}</a>
+            </div>
+            <div class="twelve wide column">
+                {% trans "COOKIE_INFO_PARA" %}
+            </div>
+        </div>
+            
+
+            
+            
+
+    </div>
+</div>
+
+
+<!-- {% load i18n static %}
+<script src="{% static 'cookielaw/js/cookielaw.js' %}"></script>
+<div id="CookielawBanner">
+<div class="cookie-content">
+    <div class="cookie-text">
+        {% trans '' %}
+    </div>
+    <div class="cookie-buttons">
+         <a class="btn-blue" href='https://www.wikipedia.org'>{% trans "What are the cookies?" %}</a>
+         <a class="btn-orange" href="javascript:Cookielaw.createCookielawCookie();">{% trans "Ok, understood" %}</a>
+    </div>
+    <div class="close-cookies"></div>
+</div>
+</div>
+
+<script type="application/javascript">
+$(document).ready(function () {
+   $('.close-cookies').click(function () {
+       $(this).parent().hide();
+   });
+});
+</script> -->

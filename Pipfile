@@ -25,6 +25,8 @@ Django = "==2.1.5"
 django_compressor = "*"
 Pillow = "*"
 Markdown = "*"
+django-google-maps = "*"
+django-cookie-law = "*"
 
 [requires]
 python_version = "3.6"

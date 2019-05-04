@@ -1,0 +1,84 @@
+#CookielawBanner {
+    width: 100%;
+    z-index: 999999;
+    background-color: #1a1b1c;
+    color: white; 
+  }
+  
+  #CookielawBanner.fixedtop {
+    position: fixed;
+    left: 0;
+    top: 0;
+  }
+  
+  #CookielawBanner.fixedbottom {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+  }
+  
+  #CookielawBanner .container {
+    width: 100%;
+    padding-bottom: 1.5rem;
+  }
+  
+  #CookielawBanner .container::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+  
+  #CookielawBanner .cookieInfo {
+    padding: 0 1em;
+  }
+  
+  #CookielawBanner .cookieInfo h5 {
+    margin: 0.8rem 0;
+  
+  }
+  
+  #CookielawBanner .cookieInfo p {
+    margin-top: 0;
+    width: 100%;
+  }
+  
+  #CookielawBanner a.btn {
+    text-transform: uppercase;
+    text-decoration: none;
+    background-color: #969696;
+    border-radius: .25rem;
+    color: white;
+    padding: .5rem 1rem;
+    border: 2px solid #969696;
+    transition: .9s ease-out;
+  }
+  
+  #CookielawBanner .cookieBtn {
+    display: block;
+    text-align: center;
+  }
+  
+  #CookielawBanner a.btn:hover {
+    transition: .5s ease-out;
+    background-color: white;
+    border-color: #969696;
+    color: #969696;
+  }
+  
+  @media only screen and (min-width: 780px) {
+    #CookielawBanner .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+  
+    #CookielawBanner .cookieInfo p {
+      width: 80%;
+      display: inline-block;
+    }
+  
+    #CookielawBanner .cookieBtn {
+      display: inline-block;
+      vertical-align: top;
+      margin: 1em;
+    }
+  }

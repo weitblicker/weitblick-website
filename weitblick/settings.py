@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'localflavor',
     'wbcore.apps.WbcoreConfig',
     'django_google_maps',
+    'cookielaw',
 ]
 
 PHOTOLOGUE_DIR = 'images'

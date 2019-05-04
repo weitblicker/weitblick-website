@@ -1,4 +1,5 @@
 Django==2.1.5
+django-cookie-law
 django-countries
 django-sass-processor
 django-photologue

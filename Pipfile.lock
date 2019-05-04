@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "6219329e1b8d712e0069bfce1493db629a708c993c3fcc374d6b83a383ed9c5a"
+            "sha256": "03beccd998c136c43f394a322f8e56a10d243d740881db9471558b0039e0138e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -31,6 +31,13 @@
             ],
             "version": "==1.0.3"
         },
+        "django-classy-tags": {
+            "hashes": [
+                "sha256:792f9161d0e22d55b4fab6fc297bab8ab072ffaa3075b227613a6d8473624db8",
+                "sha256:f6d12f5a4df3e387795a0d9ef2836af389cae9a1fbebda035dac043d4722b1f7"
+            ],
+            "version": "==0.8.0"
+        },
         "django-compressor": {
             "hashes": [
                 "sha256:7732676cfb9d58498dfb522b036f75f3f253f72ea1345ac036434fdc418c2e57",
@@ -38,6 +45,13 @@
             ],
             "index": "pypi",
             "version": "==2.2"
+        },
+        "django-cookie-law": {
+            "hashes": [
+                "sha256:cb8500c5db6285e31fd2ce224eadcda9834e79fe39031fc79e69371fe4f9ad7b"
+            ],
+            "index": "pypi",
+            "version": "==2.0.1"
         },
         "django-countries": {
             "hashes": [
@@ -54,6 +68,13 @@
             ],
             "index": "pypi",
             "version": "==2.1.0"
+        },
+        "django-google-maps": {
+            "hashes": [
+                "sha256:e1190f0a3644564bed9b1ea9d704cb4fa87c33dd2546ff531534832f73966b0f"
+            ],
+            "index": "pypi",
+            "version": "==0.11.0"
         },
         "django-haystack": {
             "hashes": [
@@ -244,6 +265,13 @@
             ],
             "index": "pypi",
             "version": "==2.8.2"
+        },
+        "pytest-runner": {
+            "hashes": [
+                "sha256:00ad6cd754ce55b01b868a6d00b77161e4d2006b3918bde882376a0a884d0df4",
+                "sha256:e946c7dbdc8c0c2ffa44e7b45450f68e7f08cb133983134fa63a1d1486c2b36b"
+            ],
+            "version": "==4.4"
         },
         "python-slugify": {
             "hashes": [

@@ -20,3 +20,4 @@ semantic/dist/themes/*
 !semantic/dist/*.css
 !semantic/dist/themes/default/
 wbcore/static/semantic/dist/components/
+.vscode
