@@ -50,6 +50,7 @@ class Host(models.Model):
     city = models.CharField(max_length=50)
     email = models.EmailField(max_length=100, unique=True)
     founding_date = models.DateField()
+    updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True)
 
     def search_title(self):
@@ -98,6 +99,9 @@ class Project(models.Model):
     completed = models.BooleanField(default=False)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
+    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5)
+    updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+    published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     def host_name_list(self):
         host_names = [host.name for host in self.hosts.all()]
@@ -121,6 +125,9 @@ class Event(models.Model):
     description = models.TextField()
     start_date = models.DateTimeField()
     end_date = models.DateTimeField(null=True, blank=True)
+    updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+    published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     gallery = models.ForeignKey(Gallery, null=True, blank =True,on_delete=models.SET_NULL)
 
@@ -168,6 +175,7 @@ class NewsPost(models.Model):
     added = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5)
     RANGE_CHOICES = (
         ('preview', 'Preview'),
         ('hidden', 'Hidden'),
@@ -217,6 +225,7 @@ class BlogPost(models.Model):
     added = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5)
     RANGE_CHOICES = (
         ('preview', 'Preview'),
         ('hidden', 'Hidden'),
@@ -295,6 +304,8 @@ class Team(models.Model):
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
     member = models.ManyToManyField(Profile, through='TeamUserRelation')
     image = models.ImageField(upload_to=save_team_image, null=True, blank=True)
+    updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+    published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     def __str__(self):
         city = ("(" + self.host.city + ")") if self.host else ''
