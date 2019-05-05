@@ -1,18 +1,56 @@
 {% extends 'wbcore/single_content.html' %}
 
 {% block single-content %}
-  <div class="ui form"
+
+<div class="ui one column stackable grid container content-block">
+  <form class="ui form" action="{% url 'contact' %}" method="post">
+    {% csrf_token %}
+    {% if success %}
+      <div class="ui positive message">
+        <div class="header">Your message has been delivered. Thank you.</div>
+      </div>
+    {% endif %}
+
+    {% for field in contact_form %}
+      {% for error in field.errors %}
+        <div class="ui negative message">
+          <div class="header">{{ error|escape }}</div>
+        </div>
+      {% endfor %}
+    {% endfor %}
+
     <div class="fields">
-      <form action="{% url 'contact' %}" method="post">
-        {% csrf_token %}
-        {% for field in contact_form %}
-          <div class="field">
-            <label>{{ field.label }}</label>
-            {{ field }}
-          </div>
-        {% endfor %}
-        <input class="ui submit button orange" type="submit" value="Abschicken">
-      </form>
+      <div class="required eight wide field">
+        {{ contact_form.host.label_tag }} {{ contact_form.host }}
+      </div>
+      <div class="required eight wide field">
+        {{ contact_form.reason.label_tag }} {{ contact_form.reason }}
+      </div>
     </div>
-  </div>
+    <div class="fields">
+      <div class="eight wide field">
+        {{ contact_form.name.label_tag }} {{ contact_form.name }}
+      </div>
+      <div class="eight wide required field">
+        {{ contact_form.email.label_tag }} {{ contact_form.email }}
+      </div>
+    </div>
+    <div class="fields">
+      <div class="sixteen wide required field">
+        {{ contact_form.subject.label_tag }} {{ contact_form.subject }}
+      </div>
+    </div>
+    <div class="fields">
+      <div class="sixteen wide required field">
+        {{ contact_form.message.label_tag }} {{ contact_form.message }}
+      </div>
+    </div>
+    <div class="fields">
+      <div class="sixteen wide field">
+        <input class="ui submit button orange" type="submit" value="Abschicken">
+      </div>
+    </div>
+  </form>
+</div>
+
 {% endblock %}

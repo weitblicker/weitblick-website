@@ -1,7 +1,23 @@
 from django.urls import path
 from django.conf.urls import include
+from django.contrib.sitemaps.views import sitemap
+from .sitemaps import NewsPostSitemap, ProjectSitemap, BlogPostSitemap, EventSitemap, TeamSitemap, HostSitemap
+from .sitemaps import AboutSitemap, HistorySitemap, ContactSitemap, JoinSitemap
 from wbcore import views, rest_views, ajax_views
 from wbcore import rest_urls, ajax_urls
+
+sitemaps = {
+    'news': NewsPostSitemap,
+    'project': ProjectSitemap,
+    'blogpost': BlogPostSitemap,
+    'event': EventSitemap,
+    'team': TeamSitemap,
+    'host': HostSitemap,
+    'about': AboutSitemap,
+    'history': HistorySitemap,
+    'contact': ContactSitemap,
+    'join': JoinSitemap,
+}
 
 main_patterns = [
     path('join/', views.join_view, name='join'),
@@ -22,8 +38,10 @@ main_patterns = [
     path('charter/', views.charter_view, name='charter'),
     path('reports/', views.reports_view, name='reports'),
     path('facts/', views.facts_view, name='facts'),
+    path('impressum/', views.impressum_view, name='impressum'),
+    path('sitemap/', views.sitemap_view, name='sitemap'),
+    path('donations/', views.donations_view, name='donations'),
 ]
-
 
 urlpatterns = [
     path('', views.home_view, name='home'),
@@ -32,8 +50,10 @@ urlpatterns = [
     path('ajax/', include(ajax_urls.ajax_patterns)),
     path('union/', views.hosts_view, name='hosts'),
     path('search/', views.search_view, name='search'),
+    path('sitemap/', views.sitemap_view, name='sitemap'),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('search/<str:query>/', views.search_view, name='search'),
-    #path('search/', include('haystack.urls')),
+    # path('search/', include('haystack.urls')),
 ]
 
 urlpatterns = urlpatterns + main_patterns

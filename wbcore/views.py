@@ -698,11 +698,100 @@ def search_view(request, query=None):
     return HttpResponse(template.render(context), request)
 
 
+def sitemap_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Sitemap', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Sitemap', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/sitemap.html')
+    context = {
+        'main_nav': get_main_nav(active='sitemap'),
+        'dot_nav': dot_nav,
+        'projects': projects,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+def donations_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Donations', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Donations', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/donations.html')
+    context = {
+        'main_nav': get_main_nav(active='donations'),
+        'dot_nav': dot_nav,
+        'projects': projects,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+def impressum_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Impressum', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Impressum', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/impressum.html')
+    context = {
+        'main_nav': get_main_nav(active='impressum'),
+        'dot_nav': dot_nav,
+        'projects': projects,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
 def contact_view(request, host_slug=None):
     try:
         host = Host.objects.get(slug=host_slug) if host_slug else None
     except Host.DoesNotExist:
         raise Http404()
+
+    if host:
+        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
+    else:
+        breadcrumb = [('Home', reverse('home')), ('Contact', None)]
+
+    template = loader.get_template('wbcore/contact.html')
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'host': host,
+        'breadcrumb': breadcrumb,
+        'success': False,
+    }
 
     if request.method == 'POST':
         form = ContactForm(request.POST)
@@ -713,6 +802,7 @@ def contact_view(request, host_slug=None):
             msg = EmailMessage()
             msg['From'] = EMAIL_ADDRESS
             msg['To'] = 'admin@weitblicker.org'
+            #msg['To'] = 'admin@weitblicker.org'
             host = Host.objects.get(name=form.cleaned_data['host'])
             #msg['To'] = host.email
             msg['reply-to'] = form.cleaned_data['email']
@@ -726,32 +816,33 @@ def contact_view(request, host_slug=None):
                     smtp.ehlo()
                     smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORT)
                     smtp.send_message(msg)
+                context['success'] = True
+                form = ContactForm()
             except BadHeaderError:
                 print("error raised")
                 return HttpResponse('Invalid header found.')
-            # TODO: inform user on sucess
-            messages.success(request, 'Message successfully sent. Thank you!')  # nowhere shown yet
-            return redirect('home')
+                context['success'] = False
+            return HttpResponse(template.render(context, request))
         else:
-            message.error(request, 'Form not valid')
+            context['success'] = False
     else:
         if host:
             form = ContactForm(initial={'host': host_slug})
         else:
             form = ContactForm()
 
-    if host:
-        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
-    else:
-        breadcrumb = [('Home', reverse('home')), ('Contact', None)]
-
-    template = loader.get_template('wbcore/contact.html')
-    context = {
-        'contact_form': form,
-        'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
-        'host': host,
-        'breadcrumb': breadcrumb,
-    }
+    context['contact_form'] = form
 
     return HttpResponse(template.render(context, request))
+
+
+def sitemap_view(request):
+    template = loader.get_template('wbcore/sitemap.html')
+    hosts = Host.objects.all()
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'hosts': hosts,
+        'breadcrumb': [('Home', reverse('home')), ("Sitemap", None)],
+    }
+    return HttpResponse(template.render(context), request)
