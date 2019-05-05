@@ -99,6 +99,7 @@ class Project(models.Model):
     completed = models.BooleanField(default=False)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
+    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
@@ -126,6 +127,7 @@ class Event(models.Model):
     end_date = models.DateTimeField(null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     gallery = models.ForeignKey(Gallery, null=True, blank =True,on_delete=models.SET_NULL)
 
@@ -173,6 +175,7 @@ class NewsPost(models.Model):
     added = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5)
     RANGE_CHOICES = (
         ('preview', 'Preview'),
         ('hidden', 'Hidden'),
@@ -222,6 +225,7 @@ class BlogPost(models.Model):
     added = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5)
     RANGE_CHOICES = (
         ('preview', 'Preview'),
         ('hidden', 'Hidden'),
