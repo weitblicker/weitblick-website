@@ -1,4 +1,5 @@
 # see https://docs.djangoproject.com/en/2.2/ref/contrib/sitemaps/#django.contrib.sitemaps.views.sitemap
+# see https://www.sitemaps.org/protocol.html
 
 from django.contrib.sitemaps import Sitemap
 from .models import NewsPost
@@ -8,6 +9,7 @@ from .models import Event
 from .models import Team
 from .models import Host
 from django.urls import reverse
+from django.utils.dateparse import parse_date
 from datetime import datetime
 
 
@@ -39,7 +41,12 @@ class ProjectSitemap(Sitemap):
         return Project.objects.filter()
 
     def lastmod(self, obj):
-        return datetime.now()
+        if obj.updated:
+            return obj.datetime
+        elif obj.published:
+            return obj.published
+        else:
+            return parse_date('2008-01-01')
 
     def location(self, obj):
         return reverse('project', args=[obj.slug])
@@ -111,4 +118,3 @@ class HostSitemap(Sitemap):
 
     def location(self, obj):
         return reverse('host', args=[obj.slug])
-
