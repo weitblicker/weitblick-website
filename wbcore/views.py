@@ -702,3 +702,78 @@ def search_view(request, query=None):
         'breadcrumb': [('Home', reverse('home')), ("Search", None)],
     }
     return HttpResponse(template.render(context), request)
+
+def sitemap_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Sitemap', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Sitemap', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/sitemap.html')
+    context = {
+        'main_nav': get_main_nav(active='sitemap'),
+        'dot_nav': dot_nav,
+        'projects': projects,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+def donations_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Donations', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Donations', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/donations.html')
+    context = {
+        'main_nav': get_main_nav(active='donations'),
+        'dot_nav': dot_nav,
+        'projects': projects,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+def impressum_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Impressum', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Impressum', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/impressum.html')
+    context = {
+        'main_nav': get_main_nav(active='impressum'),
+        'dot_nav': dot_nav,
+        'projects': projects,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))

@@ -4,43 +4,30 @@
             <div class="three wide column">
                 <h4 class="ui inverted header">About</h4>
                 <div class="ui inverted link list">
-                    <a href="#" class="item">Home</a>
-                    <a href="#" class="item">Sitemap</a>
-                    <a href="#" class="item">Impressum</a>
+                    <a href="{% url 'sitemap' %}" class="item">Sitemap</a>
+                    <a href="{% url 'transparency' %}" class="item">Transparency</a>
+                    <a href="{% url 'donations' %}" class="item">Spenden</a>
+                    <a href="{% url 'impressum' %}" class="item">Impressum</a>
+                    <a href="{% url 'privacy' %}" class="item">Datenschutz</a>
                 </div>
             </div>
             <div class="three wide column">
-                <h4 class="ui inverted header">---</h4>
+                <h4 class="ui inverted header">Services</h4>
                 <div class="ui inverted link list">
-                    <a href="#" class="item">History</a>
-                    <a href="#" class="item">Teams</a>
-                    <a href="#" class="item">Events</a>
-                </div>
-            </div>
-            <div class="three wide column">
-                <h4 class="ui inverted header">---</h4>
-                <div class="ui inverted link list">
-                    <a href="#" class="item">Transparency</a>
-                    <a href="#" class="item">Reports</a>
-                    <a href="#" class="item">Contact us</a>
+                    <a href="{% url 'join' %}" class="item">Mitglied werden</a>
+                    <a href="{% url 'hosts' %}" class="item">Städte Übersicht</a>
+                    <a href="{% url 'events' %}" class="item">Termine</a>
+                    {% if host %}
+                    <a href="{% url 'contact' host.slug %}" class="item">Contact Us</a>
+                    {% else %}
+                    <a href="{% url 'contact' %}" class="item">Contact Us</a>
+                    {% endif %}
                 </div>
             </div>
             <div class="seven wide column">
-                <h4 class="ui inverted header">Follow Us</h4>
+                <h4 class="ui inverted header">Footer Header</h4>
                 <p>Extra space for a call to action inside the footer that could help re-engage users.</p>
             </div>
-        </div>
-        <div class="ui inverted section divider"></div>
-        <div class="ui center horizontal inverted small divided link list">
-            <a class="item" href="#">
-                "Privacy policy"
-            </a>
-            <a class="item" href="#">
-                "Cookie policy"
-            </a>
-            <a class="item" href="#">
-                "Privacy policy"
-            </a>    
         </div>
     </div>
 </div>

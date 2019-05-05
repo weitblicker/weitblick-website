@@ -22,6 +22,9 @@ main_patterns = [
     path('charter/', views.charter_view, name='charter'),
     path('reports/', views.reports_view, name='reports'),
     path('facts/', views.facts_view, name='facts'),
+    path('impressum/', views.impressum_view, name='impressum'),
+    path('sitemap/', views.sitemap_view, name='sitemap'),
+    path('donations/', views.donations_view, name='donations'),
 ]
 
 
