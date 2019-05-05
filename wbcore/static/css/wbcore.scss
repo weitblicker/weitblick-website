@@ -125,6 +125,19 @@ $logo-orange: #f3971b;
 	text-transform: uppercase;
 	font-weight: bold;
 	font-size: 1.0em;
+
+	.icon{
+		.path{
+			fill:none;
+			stroke:$dark-gray;
+			stroke-linecap:round;
+			stroke-linejoin:round;
+			stroke-width:5px;
+		}
+		width: 20px;
+		height: 20px;
+	}
+
 }
 
 .meta, .extra{

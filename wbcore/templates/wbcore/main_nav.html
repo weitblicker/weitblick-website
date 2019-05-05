@@ -11,16 +11,65 @@
             </div>
         </div>
         <div class="ui grid">
-            <div class="ui row stackable menu" id="menu-nav">
+            <!-- computer only menu -->
+            <div class="ui computer only row compact menu" id="menu-nav">
                 {% for key, elem in main_nav.items %}
                     {% if elem.link %}
-                        <a class="item" href="{{ elem.link }}">{{ elem.name }}</a>
+                        <a class="item" href="{{ elem.link }}">
+                            <i class="icon">{% include elem.icon %}</i>
+                            {{ elem.name }}</a>
                     {% else %}
-                        <a class="item active" href="#">{{ elem.name }}</a>
+                        <a class="item active" href="#">
+                            <i class="icon">{% include elem.icon %}</i>
+                            {{ elem.name }}
+                        </a>
                     {% endif %}
                 {% endfor %}
-                <a id="popup-menu-btn" class="item">
+                <a class="popup-menu-btn item">
                   <i class="fitted large chevron down icon"></i>
+                </a>
+            </div>
+
+            <!-- tablet menu only -->
+            <div class="ui tablet only row fluid seven item labeled icon menu" id="menu-nav">
+                {% for key, elem in main_nav.items %}
+                    {% if elem.link %}
+                        <a class="item" href="{{ elem.link }}">
+                            <i class="icon">{% include elem.icon %}</i>
+                            {{ elem.name }}
+                        </a>
+                    {% else %}
+                        <a class="item active" href="#">
+                            <i class="icon">{% include elem.icon %}</i>
+                            {{ elem.name }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+                <a class="popup-menu-btn item">
+                    <i class="fitted large chevron down icon"></i>
+                    More
+                </a>
+            </div>
+
+            <!-- mobile menu only -->
+            <div class="ui mobile only row fluid three item labeled icon menu" id="menu-nav">
+                {% for key, elem in main_nav.items %}
+                    {% if elem.mobile %}
+                        {% if elem.link %}
+                            <a class="item" href="{{ elem.link }}">
+                                <i class="icon">{% include elem.icon %}</i>
+                                {{ elem.name }}
+                            </a>
+                        {% else %}
+                            <a class="item active" href="#">
+                                <i class="icon">{% include elem.icon %}</i>
+                                {{ elem.name }}</a>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+                <a class="popup-menu-btn item">
+                    <i class="fitted large chevron down icon"></i>
+                    More
                 </a>
             </div>
         </div>
