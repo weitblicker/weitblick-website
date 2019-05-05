@@ -31,6 +31,15 @@
 <div class="ui one column stackable grid container content-block">
   <form class="ui form" action="{% url 'contact' %}" method="post">
     {% csrf_token %}
+    <!-- <i class="close icon"></i> -->
+    {% for field in contact_form %}
+      {% for error in field.errors %}
+        <div class="ui negative message">
+          <div class="header">{{ error|escape }}</div>
+        </div>
+      {% endfor %}
+    {% endfor %}
+
     <div class="fields">
       <div class="required eight wide field">
         {{ contact_form.host.label_tag }} {{ contact_form.host }}
