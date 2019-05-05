@@ -99,6 +99,10 @@ class Project(models.Model):
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
 
+    @staticmethod
+    def get_model_name():
+        return 'Project'
+
     def host_name_list(self):
         host_names = [host.name for host in self.hosts.all()]
         return ", ".join(host_names)

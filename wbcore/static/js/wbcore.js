@@ -58,6 +58,35 @@ $(document)
             });
         };
 
+        let project_filter_union = "";
+        let project_filter_search = "";
+        let project_filter_country = "";
+        let project_filter_visibility = "";
+
+        let filter_projects = function(union, search, country, visibility){
+            console.log("Filter union:", union, "search: ", search, "country:", country, "visibility:", visibility);
+            data = {};
+            if(union) data['union'] = union;
+            if(search) data['search'] = search;
+            if(country) data['country'] = country;
+            if(visibility) data['visibility'] = visibility;
+            $.ajax({
+                url: '/ajax/filter-projects/',
+                data: data,
+                dataType: 'html',
+                success: function (data) {
+                    console.log("success...", data)
+                    let projects_list = $('#projects-list');
+                    projects_list.children().fadeOut('fast');
+                    projects_list.html(data);
+                    projects_list.children().fadeIn('fast');
+                },
+                error: function(error){
+                    console.log(error)
+                }
+            });
+        };
+
         $('#search').find('.dropdown').dropdown(
             {
                 onChange: function (value, text, choice) {
@@ -65,6 +94,7 @@ $(document)
                 }
             }
         );
+
         $('#search').search(
             {
                 type: 'category',
@@ -84,9 +114,6 @@ $(document)
                 }
             }
         );
-
-
-
 
         $('#news-filter-clear').on('click', function() {
             $('#news-filter-archive').dropdown('clear');
@@ -119,6 +146,48 @@ $(document)
         $('#news-filter-search').on("change paste keyup", function() {
             news_filter_search = $(this).val();
             filter_news(news_filter_union, news_filter_search, news_filter_archive);
+        });
+
+        $('#project-filter-clear').on('click', function() {
+            $('#project-filter-countries').dropdown('clear');
+            project_filter_country = "";
+            $('#project-filter-hosts').dropdown('clear');
+            project_filter_union = "";
+            $('#news-filter-search').val('');
+            project_filter_search = "";
+            filter_projects(project_filter_union, project_filter_search, project_filter_country, project_filter_visibility);
+        });
+
+        $('#project-filter-hosts')
+            .dropdown({
+                onChange: function(value, text, choice){
+                    project_filter_union = value;
+                    filter_projects(project_filter_union,
+                        project_filter_search,
+                        project_filter_country,
+                        project_filter_visibility);
+                },
+            });
+
+        $('#project-filter-countries')
+            .dropdown({
+                onChange: function(value, text, choice){
+                    project_filter_country = value;
+                    filter_projects(project_filter_union,
+                        project_filter_search,
+                        project_filter_country,
+                        project_filter_visibility);
+                },
+            });
+
+        $('#project-filter-search').on("change paste keyup", function() {
+            project_filter_search = $(this).val();
+
+            console.log(project_filter_search)
+            filter_projects(project_filter_union,
+                project_filter_search,
+                project_filter_country,
+                project_filter_visibility);
         });
     });
 

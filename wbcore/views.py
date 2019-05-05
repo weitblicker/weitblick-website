@@ -352,8 +352,14 @@ def projects_view(request, host_slug=None):
         projects = Project.objects.all()
         breadcrumb = [('Home', reverse('home')), ('Projects', None)]
     posts = BlogPost.objects.filter(project__in=projects)
+
+    countries = set([project.location.country for project in projects])
+
     project_list = list(Location.objects.filter(project__in=projects).values(
             'country').annotate(number=Count('country')))
+
+    hosts = Host.objects.all()
+
     context = {
         'main_nav': get_main_nav(host=host, active='projects'),
         'dot_nav': dot_nav,
@@ -361,7 +367,9 @@ def projects_view(request, host_slug=None):
         'project_list': project_list,
         'breadcrumb': breadcrumb,
         'host': host,
+        'hosts': hosts,
         'posts': posts,
+        'countries': countries,
     }
     template = loader.get_template('wbcore/projects.html')
     return HttpResponse(template.render(context, request))
