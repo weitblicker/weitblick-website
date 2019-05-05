@@ -5,6 +5,8 @@ from .models import NewsPost
 from .models import Project
 from .models import BlogPost
 from .models import Event
+from .models import Team
+from .models import Host
 from django.urls import reverse
 from datetime import datetime
 
@@ -91,5 +93,22 @@ class TeamSitemap(Sitemap):
         return datetime.now()
 
     def location(self, obj):
-        return reverse('Team', args=[obj.host_slug])
+        return reverse('team', args=[obj.host_slug])
+
+
+class HostSitemap(Sitemap):
+    def changefreq(self, obj):
+        return "never"
+
+    def priority(self, obj):
+        return 0.5
+
+    def items(self):
+        return Host.objects.filter()
+
+    def lastmod(self, obj):
+        return datetime.now()
+
+    def location(self, obj):
+        return reverse('host', args=[obj.slug])
 
