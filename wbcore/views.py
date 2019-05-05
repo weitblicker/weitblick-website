@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError
 from datetime import timedelta, date
-from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost
+from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost, Team
 from collections import OrderedDict
 from .forms import ContactForm
 from email.message import EmailMessage
@@ -751,10 +751,15 @@ def contact_view(request, host_slug=None):
 def sitemap_view(request):
     template = loader.get_template('wbcore/sitemap.html')
     hosts = Host.objects.all()
+    teams = Team.objects.all()
+    fixed = ['about', 'history', 'contact', 'join']
+
     context = {
         'main_nav': get_main_nav(),
         'dot_nav': dot_nav,
         'hosts': hosts,
+        'teams': teams,
+        'fixed': fixed,
         'breadcrumb': [('Home', reverse('home')), ("Sitemap", None)],
     }
     return HttpResponse(template.render(context), request)

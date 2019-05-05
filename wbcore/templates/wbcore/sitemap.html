@@ -1,4 +1,39 @@
 {% extends 'wbcore/single_content.html' %}
 {% block single-content %}
-    <p>Sitemap</p>
+<p>Sitemap</p>
+<div>
+    <p><a href="{% url 'news' %}">News</a></p>
+    <p><a href="{% url 'events' %}">Events</a></p>
+    <p><a href="{% url 'projects' %}">Projects</a></p>
+    <p><a href="{% url 'blog' %}">Blog</a></p>
+
+    {% if hosts %}
+        <p><a href="{% url 'hosts' %}">Hosts</a></p>
+        {% for host in hosts %}
+        <div>
+            <a href="{% url 'host' host.slug %}">{{ host.name }}</a>
+        </div>
+            {% for fixed_value in fixed %}
+            <div>
+                <a href="{% url fixed_value host.slug %}">{{ fixed_value }}</a>
+            </div>
+            {% endfor %}
+            <!--
+                {% if teams %}
+                    <p><a href="{% url 'team' host.slug %}">Teams</a></p>
+                    {% for team in teams %}
+                    <div>
+                        <a href="{% url team.slug host.slug %}">{{ team.name }}</a>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            -->
+
+            {% endfor %}
+    {% endif %}
+</div>
 {% endblock %}
+
+teams = Team.objects.all()
+
+fixed = ['about', 'history', 'contact', 'join']
