@@ -1,12 +1,22 @@
 import csv
+import os
+import smtplib
 
 from django.db.models import Count
 from django.http import HttpResponse, Http404
+from django.shortcuts import render, redirect
 from django.template import loader
 from django.urls import reverse
+from django.contrib import messages
+from django.core.mail import send_mail, BadHeaderError
 from datetime import timedelta, date
 from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost
 from collections import OrderedDict
+from .forms import ContactForm
+from email.message import EmailMessage
+
+EMAIL_ADDRESS = os.environ.get('TEST_EMAIL_USER')
+EMAIL_PASSWORT = os.environ.get('TEST_EMAIL_PW')
 
 dot_nav_news = NewsPost.objects.all().order_by('-published')[:3]
 dot_nav_blog = BlogPost.objects.all().order_by('-published')[:3]
@@ -165,31 +175,6 @@ def transparency_view(request, host_slug=None):
     projects = Project.objects.all()
 
     template = loader.get_template('wbcore/transparency.html')
-    context = {
-        'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
-        'host': host,
-        'breadcrumb': breadcrumb,
-    }
-    return HttpResponse(template.render(context, request))
-
-
-def contact_view(request, host_slug=None):
-    host_slugs = get_host_slugs(request, host_slug)
-
-    if host_slugs:
-        try:
-            host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Contact', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
-        except:
-            raise Http404()
-    else:
-        host = None
-        breadcrumb = [('Home', reverse('home')), ('Contact', None)]
-
-    projects = Project.objects.all()
-
-    template = loader.get_template('wbcore/contact.html')
     context = {
         'main_nav': get_main_nav(),
         'dot_nav': dot_nav,
@@ -366,7 +351,7 @@ def projects_view(request, host_slug=None):
         host = None
         projects = Project.objects.all()
         breadcrumb = [('Home', reverse('home')), ('Projects', None)]
-
+    posts = BlogPost.objects.filter(project__in=projects)
     project_list = list(Location.objects.filter(project__in=projects).values(
             'country').annotate(number=Count('country')))
     context = {
@@ -376,6 +361,7 @@ def projects_view(request, host_slug=None):
         'project_list': project_list,
         'breadcrumb': breadcrumb,
         'host': host,
+        'posts': posts,
     }
     template = loader.get_template('wbcore/projects.html')
     return HttpResponse(template.render(context, request))
@@ -703,6 +689,7 @@ def search_view(request, query=None):
     }
     return HttpResponse(template.render(context), request)
 
+
 def sitemap_view(request, host_slug=None):
     host_slugs = get_host_slugs(request, host_slug)
 
@@ -773,6 +760,63 @@ def impressum_view(request, host_slug=None):
         'main_nav': get_main_nav(active='impressum'),
         'dot_nav': dot_nav,
         'projects': projects,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+def contact_view(request, host_slug=None):
+    try:
+        host = Host.objects.get(slug=host_slug) if host_slug else None
+    except Host.DoesNotExist:
+        raise Http404()
+
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+
+            # sent info via email
+            msg = EmailMessage()
+            msg['From'] = EMAIL_ADDRESS
+            msg['To'] = 'admin@weitblicker.org'
+            host = Host.objects.get(name=form.cleaned_data['host'])
+            #msg['To'] = host.email
+            msg['reply-to'] = form.cleaned_data['email']
+            msg['Subject'] = form.cleaned_data['subject']
+            msg.set_content('Name: ' + form.cleaned_data['name'] + "\n" + 'E-Mail: ' + form.cleaned_data['email'] + "\n\n" + "Nachricht: " + form.cleaned_data['message'])
+            try:
+                # TODO: optimize, ssl from the start (smtplib.SMTP_SSL) and/or django internal (django.core.mail.send_mail)
+                with smtplib.SMTP('smtp.office365.com', 587) as smtp:
+                    smtp.ehlo()
+                    smtp.starttls()
+                    smtp.ehlo()
+                    smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORT)
+                    smtp.send_message(msg)
+            except BadHeaderError:
+                print("error raised")
+                return HttpResponse('Invalid header found.')
+            # TODO: inform user on sucess
+            messages.success(request, 'Message successfully sent. Thank you!')  # nowhere shown yet
+            return redirect('home')
+        else:
+            message.error(request, 'Form not valid')
+    else:
+        if host:
+            form = ContactForm(initial={'host': host_slug})
+        else:
+            form = ContactForm()
+
+    if host:
+        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
+    else:
+        breadcrumb = [('Home', reverse('home')), ('Contact', None)]
+
+    template = loader.get_template('wbcore/contact.html')
+    context = {
+        'contact_form': form,
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
         'host': host,
         'breadcrumb': breadcrumb,
     }
