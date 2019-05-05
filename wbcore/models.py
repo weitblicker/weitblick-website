@@ -300,7 +300,7 @@ class Document(models.Model):
         return self.title + " " + city
 
 def save_team_image(instance, filename):
-    return "teams/"+ instance.host.slug +"/" + instance.title.lower().replace(' ', '_') + splitext(filename)[1].lower()
+    return "teams/"+ instance.host.slug +"/" + instance.name.lower().replace(' ', '_') + splitext(filename)[1].lower()
 
 class Team(models.Model):
     name = models.CharField(max_length=100)
