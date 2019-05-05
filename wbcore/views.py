@@ -267,7 +267,7 @@ def teams_view(request, host_slug=None):
         raise Http404()
     if host:
         try:
-            breadcrumb = [('Team', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', None)]
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', None)]
         except:
             raise Http404()
     else:

@@ -1,6 +1,7 @@
 from django.db import models
 from django_countries.fields import CountryField
 from django.contrib.auth.models import User
+from django.utils.text import slugify
 from photologue.models import Gallery, Photo
 from os.path import splitext
 from localflavor.generic.models import IBANField
@@ -304,12 +305,26 @@ def save_team_image(instance, filename):
 
 class Team(models.Model):
     name = models.CharField(max_length=100)
+    slug = models.SlugField(primary_key=True, max_length=50, unique=True)
     description = models.CharField(max_length=255, null=True, blank=True)
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
     member = models.ManyToManyField(Profile, through='TeamUserRelation')
     image = models.ImageField(upload_to=save_team_image, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+
+    def search_title(self):
+        return self.name
+
+    def search_url(self):
+        return reverse('team', args=[self.slug])
+
+    def search_image(self):
+        return ""
+
+    @staticmethod
+    def get_model_name():
+        return "Team"
 
     # TODO add host_slug
     def __str__(self):

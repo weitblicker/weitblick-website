@@ -1,23 +1,31 @@
-  <div class="card">
-    <div class="image">
-      <img src="{{ project.image.get_cardsize_url }}">
+{% load static %}
+
+<a class="ui raised link card" href="https://new.weitblicker.org">
+  <div class="image">
+    {% if team.image %}
+      <img class="ui fluid image" src="{{ team.image.get_cardsize_url }}">
+    {% else %}
+      <div class="image">{% include 'wbcore/svgs/placeholder.svg' with text="Team"%}</div>
+    {% endif %}
+  </div>
+  <div class="content">
+    <div class="header">
+      {{ team.name }}
     </div>
-    <div class="content">
-      <div class="header">{{ team.name }}</div>
-      <div class="meta">
-        <span class="date">Coworker</span>
-      </div>
-      <div class="description">
-        {{ team.description | truncatewords:30 }} 
-      </div>
-    </div>
-    <div class="extra content">
-      <span class="right floated">
-        {{ team.host }}
-      </span>
-      <span>
-        <i class="user icon"></i>
-        {{ team.member.count }}
-      </span>
+    <div class="description">
+      {{ team.description | truncatewords:30 }}
     </div>
   </div>
+  <div class="extra content">
+    <span>
+      <i class="user icon"></i>
+      {{ team.member.count }}
+    </span>
+    <div class="right floated author">
+      <div class="wb-link">
+        <span class="wb-icon">{% include 'wbcore/svgs/puzzle-icon.svg' %}</span>
+        <span class="wb-name">{{ team.host.name|cut:"Weitblick " }}</span>
+      </div>
+    </div>
+  </div>
+</a>
