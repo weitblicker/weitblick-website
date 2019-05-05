@@ -62,6 +62,45 @@ def search(request, query):
 
 
 @api_view(['GET', 'POST'])
+def filter_projects(request):
+
+    template = loader.get_template('wbcore/projects_list.html')
+    host_slugs = request.GET.getlist("union")
+    contains = request.GET.get("contains")
+    host_slugs = list(csv.reader(host_slugs))
+    host_slugs = list(set().union(*host_slugs))
+    host_slugs = [x.strip(' ') for x in host_slugs]
+
+    host_slug = None
+
+    try:
+        #posts = NewsPost.objects.filter(host__slug__in=host_slugs).distinct()
+        host = Project.objects.get(slug=host_slug) if host_slug else None
+        print("Host Slugs", host_slugs)
+
+        results = SearchQuerySet()
+        if host_slugs:
+            results = results.filter_or(host_slug__in=host_slugs)
+
+        results = results.filter_and(content__contains=contains)
+        results = results.models(NewsPost).order_by('-published')[:20]
+
+        print("Length:", len(results))
+        posts = [result.object for result in results]
+
+    except Host.DoesNotExist:
+        raise Http404()
+
+    context = {
+        'posts': posts,
+        'host': host,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+
+
+@api_view(['GET', 'POST'])
 def filter_news(request):
 
     template = loader.get_template('wbcore/news_list.html')
