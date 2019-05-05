@@ -88,7 +88,8 @@ class TeamSitemap(Sitemap):
         return obj.updated
 
     def location(self, obj):
-        return reverse('team', args=[obj.host_slug])
+        # TODO update team link, when format known
+        return reverse('team', args=[obj.host])
 
 
 class HostSitemap(Sitemap):
