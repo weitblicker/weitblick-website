@@ -24,6 +24,9 @@ and then hit: `curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py`
 * Enter the virtual environment: `pipenv shell`
 * Next we run the django server with out application: `python manage.py runserver`. This still will cause some problems, since we have to migrate the database, load data and also to install elastic search.
 
+> The next sections (Database migration and Load Weitblick data) can be achived running the script `initalize.sh`
+
+
 ### Database Migration
 
 * `python manage.py makemigrations wbcore`
