@@ -121,6 +121,10 @@ $logo-orange: #f3971b;
 	padding-top: 15px;
 }
 
+#mobile-menu .menu{
+	background: transparent;
+}
+
 #menu-nav > .item {
 	text-transform: uppercase;
 	font-weight: bold;
@@ -193,7 +197,7 @@ $logo-orange: #f3971b;
 	background-position: center;
 	background-repeat: no-repeat;
 	a{
-		color: #ffffff;
+		color: $dark-gray;
 		font-family: 'Open Sans';
 		&.image{
 			width: 65px;
