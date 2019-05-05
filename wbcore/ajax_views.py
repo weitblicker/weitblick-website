@@ -13,6 +13,8 @@ from haystack.inputs import AutoQuery, Exact, Clean
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from itertools import groupby
+from datetime import datetime
+from datetime import date
 import csv
 
 
@@ -105,11 +107,33 @@ def filter_news(request):
 
     template = loader.get_template('wbcore/news_list.html')
     host_slugs = request.GET.getlist("union")
-    contains = request.GET.get("contains")
+    contains = request.GET.get("search")
     host_slugs = list(csv.reader(host_slugs))
     host_slugs = list(set().union(*host_slugs))
     host_slugs = [x.strip(' ') for x in host_slugs]
 
+    archive = request.GET.get("archive")
+
+    start = None
+    end = None
+
+    if archive:
+        try:
+            start = datetime.strptime(archive, '%Y-%m').date()
+            if start.month is 12:
+                end = date(start.year+1, 1, 1)
+            else:
+                end = date(start.year, start.month+1, 1)
+        except ValueError:
+            try:
+                start = datetime.strptime(archive, '%Y').date()
+                end = date(start.year+1, 1, 1)
+            except ValueError:
+                start = None
+                end = None
+
+    print("Date", start, end)
+    print("Contains:", contains)
     host_slug = None
 
     try:
@@ -120,8 +144,12 @@ def filter_news(request):
         results = SearchQuerySet()
         if host_slugs:
             results = results.filter_or(host_slug__in=host_slugs)
+        if contains:
+            results = results.filter_and(content__contains=contains)
+        if start:
+            results = results.filter_and(published__lte=end)
+            results = results.filter_and(published__gte=start)
 
-        results = results.filter_and(content__contains=contains)
         results = results.models(NewsPost).order_by('-published')[:20]
 
         print("Length:", len(results))
