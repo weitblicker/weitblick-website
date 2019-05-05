@@ -814,7 +814,7 @@ def contact_view(request, host_slug=None):
                 print("error raised")
                 return HttpResponse('Invalid header found.')
                 context['success'] = False
-            HttpResponse(template.render(context, request))
+            return HttpResponse(template.render(context, request))
         else:
             context['success'] = False
     else:
