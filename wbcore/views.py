@@ -695,6 +695,20 @@ def contact_view(request, host_slug=None):
     except Host.DoesNotExist:
         raise Http404()
 
+    if host:
+        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
+    else:
+        breadcrumb = [('Home', reverse('home')), ('Contact', None)]
+
+    template = loader.get_template('wbcore/contact.html')
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'host': host,
+        'breadcrumb': breadcrumb,
+        'success': False,
+    }
+
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
@@ -703,7 +717,7 @@ def contact_view(request, host_slug=None):
             # sent info via email
             msg = EmailMessage()
             msg['From'] = EMAIL_ADDRESS
-            msg['To'] = 'benedikt.hemmer@weitblicker.org'
+            msg['To'] = 'admin@weitblicker.org'
             #msg['To'] = 'admin@weitblicker.org'
             host = Host.objects.get(name=form.cleaned_data['host'])
             #msg['To'] = host.email
@@ -718,32 +732,21 @@ def contact_view(request, host_slug=None):
                     smtp.ehlo()
                     smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORT)
                     smtp.send_message(msg)
+                context['success'] = True
+                form = ContactForm()
             except BadHeaderError:
                 print("error raised")
                 return HttpResponse('Invalid header found.')
-            # TODO: inform user on sucess
-            messages.success(request, 'Message successfully sent. Thank you!')  # nowhere shown yet
-            return redirect('home')
+                context['success'] = False
+            HttpResponse(template.render(context, request))
         else:
-            messages.error(request, 'Form not valid')
+            context['success'] = False
     else:
         if host:
             form = ContactForm(initial={'host': host_slug})
         else:
             form = ContactForm()
 
-    if host:
-        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
-    else:
-        breadcrumb = [('Home', reverse('home')), ('Contact', None)]
-
-    template = loader.get_template('wbcore/contact.html')
-    context = {
-        'contact_form': form,
-        'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
-        'host': host,
-        'breadcrumb': breadcrumb,
-    }
+    context['contact_form'] = form
 
     return HttpResponse(template.render(context, request))

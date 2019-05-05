@@ -31,7 +31,12 @@
 <div class="ui one column stackable grid container content-block">
   <form class="ui form" action="{% url 'contact' %}" method="post">
     {% csrf_token %}
-    <!-- <i class="close icon"></i> -->
+    {% if success %}
+      <div class="ui positive message">
+        <div class="header">Your message has been delivered. Thank you.</div>
+      </div>
+    {% endif %}
+
     {% for field in contact_form %}
       {% for error in field.errors %}
         <div class="ui negative message">
@@ -66,14 +71,6 @@
         {{ contact_form.message.label_tag }} {{ contact_form.message }}
       </div>
     </div>
-    <!-- loop over all fields
-    {% for field in contact_form %}
-      <div class="field">
-        {{ field.errors }}
-        {{ field.label_tag }} {{ field }}
-      </div>
-    {% endfor %} -->
-    <button type="button" class="ui submit button" name="button">Submit</button>
     <div class="fields">
       <div class="sixteen wide field">
         <input class="ui submit button orange" type="submit" value="Abschicken">
