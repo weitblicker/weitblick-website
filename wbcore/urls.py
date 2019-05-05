@@ -7,6 +7,10 @@ from .sitemaps import BlogPostSitemap
 from .sitemaps import EventSitemap
 from .sitemaps import TeamSitemap
 from .sitemaps import HostSitemap
+from .sitemaps import AboutSitemap
+from .sitemaps import HistorySitemap
+from .sitemaps import ContactSitemap
+from .sitemaps import JoinSitemap
 from wbcore import views, rest_views, ajax_views
 from wbcore import rest_urls, ajax_urls
 
@@ -17,6 +21,10 @@ sitemaps = {
     'event': EventSitemap,
     'team': TeamSitemap,
     'host': HostSitemap,
+    'about': AboutSitemap,
+    'history': HistorySitemap,
+    'contact': ContactSitemap,
+    'join': JoinSitemap,
 }
 
 main_patterns = [

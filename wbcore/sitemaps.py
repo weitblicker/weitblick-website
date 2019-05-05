@@ -111,3 +111,71 @@ class HostSitemap(Sitemap):
 
     def location(self, obj):
         return reverse('host', args=[obj.slug])
+
+
+class AboutSitemap(Sitemap):
+    def changefreq(self, obj):
+        return "yearly"
+
+    def priority(self, obj):
+        return 0.50
+
+    def items(self):
+        return Host.objects.filter()
+
+    def lastmod(self, obj):
+        return obj.updated
+
+    def location(self, obj):
+        return reverse('about', args=[obj.slug])
+
+
+class HistorySitemap(Sitemap):
+    def changefreq(self, obj):
+        return "yearly"
+
+    def priority(self, obj):
+        return 0.50
+
+    def items(self):
+        return Host.objects.filter()
+
+    def lastmod(self, obj):
+        return obj.updated
+
+    def location(self, obj):
+        return reverse('history', args=[obj.slug])
+
+
+class ContactSitemap(Sitemap):
+    def changefreq(self, obj):
+        return "yearly"
+
+    def priority(self, obj):
+        return 0.50
+
+    def items(self):
+        return Host.objects.filter()
+
+    def lastmod(self, obj):
+        return obj.updated
+
+    def location(self, obj):
+        return reverse('contact', args=[obj.slug])
+
+
+class JoinSitemap(Sitemap):
+    def changefreq(self, obj):
+        return "yearly"
+
+    def priority(self, obj):
+        return 0.50
+
+    def items(self):
+        return Host.objects.filter()
+
+    def lastmod(self, obj):
+        return obj.updated
+
+    def location(self, obj):
+        return reverse('join', args=[obj.slug])
