@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError
 from datetime import timedelta, date
-from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost
+from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost, Team
 from collections import OrderedDict
 from .forms import ContactForm
 from email.message import EmailMessage
@@ -257,13 +257,16 @@ def privacy_view(request, host_slug=None):
     }
     return HttpResponse(template.render(context, request))
 
-
-def team_view(request, host_slug=None):
-    host_slugs = get_host_slugs(request, host_slug)
-
-    if host_slugs:
+def teams_view(request, host_slug=None):
+    try:
+        if not host_slug:
+            host = Host.objects.get(slug='bundesverband')
+        else:
+            host = Host.objects.get(slug=host_slug)
+    except Host.DoesNotExist:
+        raise Http404()
+    if host:
         try:
-            host = Host.objects.get(slug=host_slug) if host_slug else None
             breadcrumb = [('Team', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', None)]
         except:
             raise Http404()
@@ -271,7 +274,34 @@ def team_view(request, host_slug=None):
         host = None
         breadcrumb = [('Home', reverse('home')), ('Team', None)]
 
-    projects = Project.objects.all()
+    teams = Team.objects.filter(host=host)
+
+    template = loader.get_template('wbcore/teams.html')
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'host': host,
+        'breadcrumb': breadcrumb,
+        'teams': teams
+    }
+    return HttpResponse(template.render(context, request))
+
+def team_view(request, host_slug=None):
+    try:
+        host = Host.objects.get(slug=host_slug) if host_slug else None
+    except Host.DoesNotExist:
+        raise Http404()
+
+    if host:
+        try:
+            breadcrumb = [('Team', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Team', None)]
+
+    team = None
 
     template = loader.get_template('wbcore/team.html')
     context = {
@@ -279,6 +309,7 @@ def team_view(request, host_slug=None):
         'dot_nav': dot_nav,
         'host': host,
         'breadcrumb': breadcrumb,
+        'team': team
     }
     return HttpResponse(template.render(context, request))
 
