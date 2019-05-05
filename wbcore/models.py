@@ -307,6 +307,7 @@ class Team(models.Model):
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
+    # TODO add host_slug
     def __str__(self):
         city = ("(" + self.host.city + ")") if self.host else ''
         return self.name + " " + city

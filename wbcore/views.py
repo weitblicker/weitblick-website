@@ -747,3 +747,15 @@ def contact_view(request, host_slug=None):
     }
 
     return HttpResponse(template.render(context, request))
+
+
+def sitemap_view(request):
+    template = loader.get_template('wbcore/sitemap.html')
+    hosts = Host.objects.all()
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'hosts': hosts,
+        'breadcrumb': [('Home', reverse('home')), ("Sitemap", None)],
+    }
+    return HttpResponse(template.render(context), request)
