@@ -59,7 +59,6 @@ icon_links = OrderedDict([
 
 
 def get_main_nav(host=None, active=None):
-
     args = [host.slug] if host else []
     nav = OrderedDict([
             ('home', {'name': 'Home', 'link': reverse('home')}),
@@ -311,7 +310,6 @@ def about_view(request, host_slug=None):
 
 def idea_view(request, host_slug=None):
     host_slugs = get_host_slugs(request, host_slug)
-
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
@@ -326,7 +324,7 @@ def idea_view(request, host_slug=None):
 
     template = loader.get_template('wbcore/idea.html')
     context = {
-        'main_nav': get_main_nav(active='idea'),
+        'main_nav': get_main_nav(active='idea', host=host),
         'dot_nav': dot_nav,
         'projects': projects,
         'host': host,
@@ -368,10 +366,15 @@ def projects_view(request, host_slug=None):
 
 
 def join_view(request, host_slug=None):
+    try:
+        host = Host.objects.get(slug=host_slug) if host_slug else None
+    except Host.DoesNotExist:
+        raise Http404()
     template = loader.get_template('wbcore/join.html')
     context = {
         'main_nav': get_main_nav(active='join'),
         'dot_nav': dot_nav,
+        'host': host,
         'breadcrumb': [('Home', reverse('home')), ('Join in', None)],
     }
     return HttpResponse(template.render(context, request))
@@ -423,7 +426,7 @@ def hosts_view(request):
 
 def host_view(request, host_slug):
     try:
-        host = Host.objects.get(slug=host_slug)
+        host = Host.objects.get(slug=host_slug) if host_slug else None
     except Host.DoesNotExist:
         raise Http404()
 
@@ -559,7 +562,6 @@ def range_year_month(start_date, end_date):
     years = OrderedDict()
     d = date(year=start_date.year, month=start_date.month, day=1)
     end_date = date(year=end_date.year, month=end_date.month, day=1)
-    print("End date:", end_date)
     months = []
     while d <= end_date:
         months.append(date(year=d.year, month=d.month, day=1))
@@ -596,12 +598,8 @@ def news_view(request, host_slug=None):
         earliest = NewsPost.objects.earliest('published')
         start_date = earliest.published
         end_date = latest.published
-        print("Latest news:", end_date)
-        print("Earliest news:", start_date)
 
         year_months = range_year_month(start_date, end_date)
-        for year, months in year_months.items():
-            print(year, months)
     else:
         year_months = None
 
@@ -715,24 +713,24 @@ def sitemap_view(request, host_slug=None):
     }
     return HttpResponse(template.render(context, request))
 
-def donations_view(request, host_slug=None):
+def donate_view(request, host_slug=None):
     host_slugs = get_host_slugs(request, host_slug)
 
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Donations', None)]
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('donate', None)]
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('Donations', None)]
+        breadcrumb = [('Home', reverse('home')), ('donate', None)]
 
     projects = Project.objects.all()
 
-    template = loader.get_template('wbcore/donations.html')
+    template = loader.get_template('wbcore/donate.html')
     context = {
-        'main_nav': get_main_nav(active='donations'),
+        'main_nav': get_main_nav(active='donate'),
         'dot_nav': dot_nav,
         'projects': projects,
         'host': host,
@@ -811,7 +809,6 @@ def contact_view(request, host_slug=None):
                 context['success'] = True
                 form = ContactForm()
             except BadHeaderError:
-                print("error raised")
                 return HttpResponse('Invalid header found.')
                 context['success'] = False
             return HttpResponse(template.render(context, request))

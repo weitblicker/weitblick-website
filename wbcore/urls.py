@@ -38,14 +38,13 @@ main_patterns = [
     path('charter/', views.charter_view, name='charter'),
     path('reports/', views.reports_view, name='reports'),
     path('facts/', views.facts_view, name='facts'),
+    path('donate/', views.donate_view, name='donate'),
+    path('privacy/', views.privacy_view, name="privacy"),
     path('impressum/', views.impressum_view, name='impressum'),
-    path('sitemap/', views.sitemap_view, name='sitemap'),
-    path('donations/', views.donations_view, name='donations'),
 ]
 
 urlpatterns = [
     path('', views.home_view, name='home'),
-    path('privacy/', views.privacy_view, name="privacy"),
     path('rest/', include(rest_urls.rest_patterns)),
     path('ajax/', include(ajax_urls.ajax_patterns)),
     path('union/', views.hosts_view, name='hosts'),
