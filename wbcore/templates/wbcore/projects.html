@@ -7,7 +7,7 @@
 
 <div class="ui stackable grid container content-block">
 
-  <div class="ten wide column divided items">
+  <div id="projects-list" class="ten wide column divided items">
     {% include 'wbcore/projects_list.html'%}
   </div>
 
@@ -68,10 +68,10 @@
                 <div id="project-filter-countries" class="ui multiple search selection dropdown">
                   <input name="tags" type="hidden">
                   <i class="dropdown icon"></i>
-                  <div class="default text">Union</div>
+                  <div class="default text">Country</div>
                   <div class="menu">
-                    {% for host in hosts %}
-                      <div class="item" data-value="{{ host.slug }}">{{ host.name|cut:"Weitblick " }}</div>
+                    {% for country in countries %}
+                      <div class="item" data-value="{{ country.code }}">{{ country.name }}</div>
                     {% endfor %}
                   </div>
                 </div>

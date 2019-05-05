@@ -103,6 +103,10 @@ class Project(models.Model):
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
+    @staticmethod
+    def get_model_name():
+        return 'Project'
+
     def host_name_list(self):
         host_names = [host.name for host in self.hosts.all()]
         return ", ".join(host_names)
