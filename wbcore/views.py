@@ -703,7 +703,8 @@ def contact_view(request, host_slug=None):
             # sent info via email
             msg = EmailMessage()
             msg['From'] = EMAIL_ADDRESS
-            msg['To'] = 'admin@weitblicker.org'
+            msg['To'] = 'benedikt.hemmer@weitblicker.org'
+            #msg['To'] = 'admin@weitblicker.org'
             host = Host.objects.get(name=form.cleaned_data['host'])
             #msg['To'] = host.email
             msg['reply-to'] = form.cleaned_data['email']
@@ -724,7 +725,7 @@ def contact_view(request, host_slug=None):
             messages.success(request, 'Message successfully sent. Thank you!')  # nowhere shown yet
             return redirect('home')
         else:
-            message.error(request, 'Form not valid')
+            messages.error(request, 'Form not valid')
     else:
         if host:
             form = ContactForm(initial={'host': host_slug})
