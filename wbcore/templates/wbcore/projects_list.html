@@ -1,5 +1,5 @@
 {% if projects %}
-  <div class="ui two stackable cards">
+  <div class="ui two fluid unstackable cards">
     {% for project in projects %}
       {% include 'wbcore/project_card.html' with title=project.name image=project.teaser_image slug=project.slug hosts=project.hosts.all description=project.short_description|striptags country=project.location.country.name %}
     {% endfor %}
