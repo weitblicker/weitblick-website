@@ -5,10 +5,17 @@ from .sitemaps import NewsPostSitemap
 from .sitemaps import ProjectSitemap
 from .sitemaps import BlogPostSitemap
 from .sitemaps import EventSitemap
+from .sitemaps import TeamSitemap
 from wbcore import views, rest_views, ajax_views
 from wbcore import rest_urls, ajax_urls
 
-sitemaps = {'news': NewsPostSitemap, 'project': ProjectSitemap, 'blogpost': BlogPostSitemap, 'event': EventSitemap}
+sitemaps = {
+    'news': NewsPostSitemap,
+    'project': ProjectSitemap,
+    'blogpost': BlogPostSitemap,
+    'event': EventSitemap,
+    'team': TeamSitemap
+}
 
 main_patterns = [
     path('join/', views.join_view, name='join'),

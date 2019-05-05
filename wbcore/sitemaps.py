@@ -20,7 +20,7 @@ class NewsPostSitemap(Sitemap):
         return NewsPost.objects.filter()
 
     def lastmod(self, obj):
-        return datetime.now()
+        return obj.updated
 
     def location(self, obj):
         return reverse('news-post', args=[obj.pk])
@@ -54,7 +54,7 @@ class BlogPostSitemap(Sitemap):
         return BlogPost.objects.filter()
 
     def lastmod(self, obj):
-        return datetime.now()
+        return obj.updated
 
     def location(self, obj):
         return reverse('blog-post', args=[obj.pk])
@@ -75,4 +75,21 @@ class EventSitemap(Sitemap):
 
     def location(self, obj):
         return reverse('event', args=[obj.event_slug])
+
+
+class TeamSitemap(Sitemap):
+    def changefreq(self, obj):
+        return "never"
+
+    def priority(self, obj):
+        return 0.5
+
+    def items(self):
+        return Team.objects.filter()
+
+    def lastmod(self, obj):
+        return datetime.now()
+
+    def location(self, obj):
+        return reverse('Team', args=[obj.host_slug])
 
