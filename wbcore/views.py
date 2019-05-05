@@ -376,7 +376,7 @@ def projects_view(request, host_slug=None):
         host = None
         projects = Project.objects.all()
         breadcrumb = [('Home', reverse('home')), ('Projects', None)]
-
+    posts = BlogPost.objects.filter(project__in=projects)
     project_list = list(Location.objects.filter(project__in=projects).values(
             'country').annotate(number=Count('country')))
     context = {
@@ -386,6 +386,7 @@ def projects_view(request, host_slug=None):
         'project_list': project_list,
         'breadcrumb': breadcrumb,
         'host': host,
+        'posts': posts,
     }
     template = loader.get_template('wbcore/projects.html')
     return HttpResponse(template.render(context, request))
