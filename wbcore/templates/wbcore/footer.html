@@ -5,7 +5,11 @@
                 <h4 class="ui inverted header">About</h4>
                 <div class="ui inverted link list">
                     <a href="#" class="item">Sitemap</a>
-                    <a href="#" class="item">Contact Us</a>
+                    {% if host %}
+                      <a href="{% url 'contact' host.slug %}" class="item">Contact Us</a>
+                    {% else %}
+                      <a href="{% url 'contact' %}" class="item">Contact Us</a>
+                    {% endif %}
                     <a href="#" class="item">Impressum</a>
                     <a href="#" class="item">Some Link</a>
                 </div>
@@ -26,4 +30,3 @@
         </div>
     </div>
 </div>
-

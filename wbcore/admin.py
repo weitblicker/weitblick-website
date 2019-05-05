@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, Profile
+from .models import Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, Profile, ContactMessage
 from .models import UserRelation, Document, Team, Milestone, Donation, Milestep, BankAccount, TeamUserRelation
 from django.db import models
 from modeltranslation.admin import TabbedTranslationAdmin
@@ -43,3 +43,4 @@ admin.site.register(Milestep, MyTranslatedAdmin)
 admin.site.register(BankAccount, MyAdmin)
 admin.site.register(BlogPost, MyTranslatedAdmin)
 admin.site.register(TeamUserRelation, MyAdmin)
+admin.site.register(ContactMessage, MyAdmin)
