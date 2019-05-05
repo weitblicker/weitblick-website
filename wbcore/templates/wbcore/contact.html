@@ -2,32 +2,6 @@
 
 {% block single-content %}
 
-<script>
-  $('.ui.form')
-    .form({
-      name: {
-        identifier  : 'name',
-        rules: [
-          {
-            type   : 'empty',
-            prompt : 'Please enter your name'
-          }
-        ]
-      },
-      email: {
-        identifier : 'mail',
-        rules: [
-          {
-            type   : 'email',
-            prompt : 'Pleas enter a valid e-mail address'
-          }
-        ]
-      }
-    })
-  ;
-
-</script>
-
 <div class="ui one column stackable grid container content-block">
   <form class="ui form" action="{% url 'contact' %}" method="post">
     {% csrf_token %}
