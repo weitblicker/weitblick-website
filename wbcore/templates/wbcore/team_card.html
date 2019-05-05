@@ -1,11 +1,11 @@
 {% load static %}
 
-<a class="ui raised link card" href="https://new.weitblicker.org">
+<a class="ui raised link card" href="{{team.slug}}">
   <div class="image">
-    {% if team.image %}
-      <img class="ui fluid image" src="{{ team.image.get_cardsize_url }}">
-    {% else %}
+    {% if not team.image %}
       <div class="image">{% include 'wbcore/svgs/placeholder.svg' with text="Team"%}</div>
+    {% else %}
+      <img class="ui fluid image" src="{{ team.image.get_cardsize_url }}">
     {% endif %}
   </div>
   <div class="content">
