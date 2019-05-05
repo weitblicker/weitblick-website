@@ -2,12 +2,7 @@
 # see https://www.sitemaps.org/protocol.html
 
 from django.contrib.sitemaps import Sitemap
-from .models import NewsPost
-from .models import Project
-from .models import BlogPost
-from .models import Event
-from .models import Team
-from .models import Host
+from .models import NewsPost, Project, BlogPost, Event, Team, Host
 from django.urls import reverse
 
 

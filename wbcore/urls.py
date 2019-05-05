@@ -1,16 +1,8 @@
 from django.urls import path
 from django.conf.urls import include
 from django.contrib.sitemaps.views import sitemap
-from .sitemaps import NewsPostSitemap
-from .sitemaps import ProjectSitemap
-from .sitemaps import BlogPostSitemap
-from .sitemaps import EventSitemap
-from .sitemaps import TeamSitemap
-from .sitemaps import HostSitemap
-from .sitemaps import AboutSitemap
-from .sitemaps import HistorySitemap
-from .sitemaps import ContactSitemap
-from .sitemaps import JoinSitemap
+from .sitemaps import NewsPostSitemap, ProjectSitemap, BlogPostSitemap, EventSitemap, TeamSitemap, HostSitemap
+from .sitemaps import AboutSitemap, HistorySitemap, ContactSitemap, JoinSitemap
 from wbcore import views, rest_views, ajax_views
 from wbcore import rest_urls, ajax_urls
 
