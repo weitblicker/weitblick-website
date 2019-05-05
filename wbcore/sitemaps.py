@@ -9,16 +9,14 @@ from .models import Event
 from .models import Team
 from .models import Host
 from django.urls import reverse
-from django.utils.dateparse import parse_date
-from datetime import datetime
 
 
 class NewsPostSitemap(Sitemap):
     def changefreq(self, obj):
-        return "never"
+        return "weekly"
 
     def priority(self, obj):
-        return 0.5
+        return obj.priority
 
     def items(self):
         return NewsPost.objects.filter()
@@ -32,21 +30,16 @@ class NewsPostSitemap(Sitemap):
 
 class ProjectSitemap(Sitemap):
     def changefreq(self, obj):
-        return "never"
+        return "monthly"
 
     def priority(self, obj):
-        return 0.5
+        return obj.priority
 
     def items(self):
         return Project.objects.filter()
 
     def lastmod(self, obj):
-        if obj.updated:
-            return obj.datetime
-        elif obj.published:
-            return obj.published
-        else:
-            return parse_date('2008-01-01')
+        return obj.updated
 
     def location(self, obj):
         return reverse('project', args=[obj.slug])
@@ -54,10 +47,10 @@ class ProjectSitemap(Sitemap):
 
 class BlogPostSitemap(Sitemap):
     def changefreq(self, obj):
-        return "never"
+        return "weekly"
 
     def priority(self, obj):
-        return 0.5
+        return obj.priority
 
     def items(self):
         return BlogPost.objects.filter()
@@ -71,16 +64,16 @@ class BlogPostSitemap(Sitemap):
 
 class EventSitemap(Sitemap):
     def changefreq(self, obj):
-        return "never"
+        return "weekly"
 
     def priority(self, obj):
-        return 0.5
+        return obj.priority
 
     def items(self):
         return Event.objects.filter()
 
     def lastmod(self, obj):
-        return datetime.now()
+        return obj.updated
 
     def location(self, obj):
         return reverse('event', args=[obj.event_slug])
@@ -88,16 +81,16 @@ class EventSitemap(Sitemap):
 
 class TeamSitemap(Sitemap):
     def changefreq(self, obj):
-        return "never"
+        return "yearly"
 
     def priority(self, obj):
-        return 0.5
+        return 0.50
 
     def items(self):
         return Team.objects.filter()
 
     def lastmod(self, obj):
-        return datetime.now()
+        return obj.updated
 
     def location(self, obj):
         return reverse('team', args=[obj.host_slug])
@@ -105,16 +98,16 @@ class TeamSitemap(Sitemap):
 
 class HostSitemap(Sitemap):
     def changefreq(self, obj):
-        return "never"
+        return "yearly"
 
     def priority(self, obj):
-        return 0.5
+        return 0.50
 
     def items(self):
         return Host.objects.filter()
 
     def lastmod(self, obj):
-        return datetime.now()
+        return obj.updated
 
     def location(self, obj):
         return reverse('host', args=[obj.slug])
