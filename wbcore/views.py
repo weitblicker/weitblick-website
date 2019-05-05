@@ -752,14 +752,15 @@ def sitemap_view(request):
     template = loader.get_template('wbcore/sitemap.html')
     hosts = Host.objects.all()
     teams = Team.objects.all()
-    fixed = ['about', 'history', 'contact', 'join']
+    # TODO fixed values should idealy be key-value pairs containing name and link reference
+    fixed_values = ['about', 'history', 'contact', 'join']
 
     context = {
         'main_nav': get_main_nav(),
         'dot_nav': dot_nav,
         'hosts': hosts,
         'teams': teams,
-        'fixed': fixed,
+        'fixed_values': fixed_values,
         'breadcrumb': [('Home', reverse('home')), ("Sitemap", None)],
     }
     return HttpResponse(template.render(context), request)

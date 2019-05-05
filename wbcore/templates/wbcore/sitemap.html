@@ -8,32 +8,29 @@
     <p><a href="{% url 'blog' %}">Blog</a></p>
 
     {% if hosts %}
-        <p><a href="{% url 'hosts' %}">Hosts</a></p>
-        {% for host in hosts %}
-        <div>
-            <a href="{% url 'host' host.slug %}">{{ host.name }}</a>
-        </div>
-            {% for fixed_value in fixed %}
-            <div>
-                <a href="{% url fixed_value host.slug %}">{{ fixed_value }}</a>
-            </div>
-            {% endfor %}
-            <!--
-                {% if teams %}
-                    <p><a href="{% url 'team' host.slug %}">Teams</a></p>
-                    {% for team in teams %}
-                    <div>
-                        <a href="{% url team.slug host.slug %}">{{ team.name }}</a>
-                    </div>
-                    {% endfor %}
-                {% endif %}
-            -->
+    <p><a href="{% url 'hosts' %}">Hosts</a></p>
+    {% for host in hosts %}
+    <div>
+        <a href="{% url 'host' host.slug %}">{{ host.name }}</a>
 
-            {% endfor %}
+        {% for fixed_value in fixed_values %}
+        <div>
+            <a href="{% url fixed_value host.slug %}">{{ fixed_value }}</a>
+        </div>
+        {% comment %}
+        This does not work, most likely due to team/teams not having a correct view
+        {% if teams %}
+        <p><a href="{% url 'team' host.slug %}">Teams</a></p>
+        {% for team in teams %}
+        <div>
+            <a href="{% url team.slug host.slug %}">{{ team.name }}</a>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endcomment %}
+        {% endfor %}
+    </div>
+    {% endfor %}
     {% endif %}
 </div>
 {% endblock %}
-
-teams = Team.objects.all()
-
-fixed = ['about', 'history', 'contact', 'join']
