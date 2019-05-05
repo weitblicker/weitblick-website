@@ -304,7 +304,7 @@ def save_team_image(instance, filename):
 
 class Team(models.Model):
     name = models.CharField(max_length=100)
-    description = models.TextField(null=True, blank=True)
+    description = models.CharField(max_length=255, null=True, blank=True)
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
     member = models.ManyToManyField(Profile, through='TeamUserRelation')
     image = models.ImageField(upload_to=save_team_image, null=True, blank=True)
