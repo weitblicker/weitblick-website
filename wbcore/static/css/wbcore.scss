@@ -59,7 +59,7 @@ $logo-orange: #f3971b;
 
 
 		a:hover{
-			
+
 			.puzzle-path{
 				fill: url(#puzzle-bg-hover);
 			}
@@ -79,7 +79,7 @@ $logo-orange: #f3971b;
 				}
 			}
 		}
-		
+
 		float: left;
 
 		@media(min-width:723px){
@@ -121,10 +121,27 @@ $logo-orange: #f3971b;
 	padding-top: 15px;
 }
 
+#mobile-menu .menu{
+	background: transparent;
+}
+
 #menu-nav > .item {
 	text-transform: uppercase;
 	font-weight: bold;
 	font-size: 1.0em;
+
+	.icon{
+		.path{
+			fill:none;
+			stroke:$dark-gray;
+			stroke-linecap:round;
+			stroke-linejoin:round;
+			stroke-width:5px;
+		}
+		width: 20px;
+		height: 20px;
+	}
+
 }
 
 .meta, .extra{
@@ -139,7 +156,7 @@ $logo-orange: #f3971b;
 		.wb-icon{
 			width: 14px;
 			display: inline-block;
-			margin: 0 4px 0 0 !important;
+			margin: 4px 4px 0 0 !important;
 			vertical-align: middle;
 
 		}
@@ -180,7 +197,7 @@ $logo-orange: #f3971b;
 	background-position: center;
 	background-repeat: no-repeat;
 	a{
-		color: #ffffff;
+		color: $dark-gray;
 		font-family: 'Open Sans';
 		&.image{
 			width: 65px;
@@ -314,7 +331,7 @@ $logo-orange: #f3971b;
 		line-height: 1;
 		display: inline-block;
 		vertical-align: middle;
-		font-size: 2.3em;		
+		font-size: 2.3em;
 		text-align: center;
 		color: #ffffff;
 		width: 50px;

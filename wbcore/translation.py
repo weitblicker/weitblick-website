@@ -5,7 +5,11 @@ Necessary for the modeltranslation package
 """
 
 from modeltranslation.translator import register, TranslationOptions
-from .models import Project, Location, Address, Host, Partner, Event, NewsPost, BlogPost, Document, Team, Milestep
+from .models import Project, Location, Address, Host, Partner, Event, NewsPost, BlogPost, Document, Team, Milestep, Content
+
+@register(Content)
+class ContentTranslationOptions(TranslationOptions):
+    fields = ('text',)
 
 @register(Project)
 class ProjectTranslationOptions(TranslationOptions):

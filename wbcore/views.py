@@ -62,12 +62,48 @@ icon_links = OrderedDict([
 def get_main_nav(host=None, active=None):
     args = [host.slug] if host else []
     nav = OrderedDict([
-            ('home', {'name': 'Home', 'link': reverse('home')}),
-            ('idea', {'name': 'Idea', 'link': reverse('idea', args=args)}),
-            ('projects', {'name': 'Projects', 'link': reverse('projects', args=args)}),
-            ('events', {'name': 'Events', 'link': reverse('events', args=args)}),
-            ('join', {'name': 'Join in', 'link': reverse('join', args=args)}),
-            ('hosts', {'name': 'Unions', 'link': reverse('hosts')}),
+            ('home',
+                {
+                    'name': 'Home',
+                    'link': reverse('home'),
+                    'icon': 'wbcore/svgs/home.svg',
+                    'mobile': False,
+                }),
+            ('idea',
+                {
+                    'name': 'Idee',
+                    'link': reverse('idea', args=args),
+                    'icon': 'wbcore/svgs/idea.svg',
+                    'mobile': True,
+                }),
+            ('projects',
+                {
+                    'name': 'Projekte',
+                    'link': reverse('projects', args=args),
+                    'icon': 'wbcore/svgs/leaf.svg',
+                    'mobile': True,
+                }),
+            ('events',
+                {
+                    'name': 'Events',
+                    'link': reverse('events', args=args),
+                    'icon': 'wbcore/svgs/hand.svg',
+                    'mobile': True,
+                }),
+            ('join',
+                {
+                    'name': 'Mitmachen',
+                    'link': reverse('join', args=args),
+                    'icon': 'wbcore/svgs/people.svg',
+                    'mobile': True,
+                }),
+            ('hosts',
+                {
+                    'name': 'Vereine',
+                    'link': reverse('hosts'),
+                    'icon': 'wbcore/svgs/unions.svg',
+                    'mobile': True,
+                }),
     ])
 
     if active in nav:
@@ -258,6 +294,7 @@ def privacy_view(request, host_slug=None):
     }
     return HttpResponse(template.render(context, request))
 
+
 def teams_view(request, host_slug=None):
     try:
         if not host_slug:
@@ -287,6 +324,7 @@ def teams_view(request, host_slug=None):
     }
     return HttpResponse(template.render(context, request))
 
+
 def team_view(request, host_slug=None, team_slug=None):
     try:
         host = Host.objects.get(slug=host_slug) if host_slug else None
@@ -294,7 +332,7 @@ def team_view(request, host_slug=None, team_slug=None):
         raise Http404()
 
     try:
-        team = Team.objects.get(slug=team_slug)
+        team = Team.objects.get(slug=team_slug, host=host)
     except Team.DoesNotExist:
         raise Http404()
 

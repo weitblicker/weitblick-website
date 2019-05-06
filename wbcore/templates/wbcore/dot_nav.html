@@ -1,5 +1,35 @@
 {% load static %}
-<div class="ui five column stackable grid">
+
+<div id="mobile-menu" class="ui grid mobile only">
+    <div class="five wide column">
+        <div class="ui fluid vertical menu">
+            <a class="item" href="{% url 'news' %}">News</a>
+            <a class="item" href="{% url 'blog' %}" >Blog</a>
+        </div>
+    </div>
+    <div class="five wide column">
+        <div class="ui fluid vertical menu">
+            <a class="item" href="{% url 'about' %}">About</a>
+            <div class="ui vertical fluid menu">
+                <a class="item" href="{% url 'history' %}">History</a>
+                <a class="item" href="{% url 'teams' %}">Team</a>
+                <a class="item" href="{% url 'contact' %}">Contact</a>
+            </div>
+        </div>
+    </div>
+    <div class="five wide column">
+        <div class="ui fluid vertical menu">
+            <a class="item" href="{% url 'facts' %}">Facts</a>
+            <div class="ui vertical fluid menu">
+                <a class="item" href="{% url 'transparency' %}">Transparency</a>
+                <a class="item" href="{% url 'charter' %}">Charter</a>
+                <a class="item" href="{% url 'reports' %}">Reports</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ui five column stackable grid tablet only computer only">
     <div class="ui two wide column unstackable items">
         <a class="ui item header" href="{% url 'about' %}">About</a>
         <div class="ui item"><a href="{% url 'idea' %}">Idea</a></div>

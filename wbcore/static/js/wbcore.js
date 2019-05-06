@@ -19,7 +19,7 @@ $(document)
           .sidebar('attach events', '.toc.item')
         ;*/
 
-        $('#popup-menu-btn').click(function(){
+        $('.popup-menu-btn').click(function(){
             // $('#popup-menu.show').css('height', $('#popup-menu').first().height());
             $('#popup-menu').slideToggle();
         });

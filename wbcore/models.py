@@ -1,5 +1,6 @@
 from django.db import models
 from django_countries.fields import CountryField
+from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 from photologue.models import Gallery, Photo
@@ -69,6 +70,39 @@ class Host(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Content(models.Model):
+    TYPE_CHOICES = (
+        ('welcome', 'Welcome'),
+        ('about', 'About'),
+        ('history', 'History'),
+        ('teams', 'Teams'),
+        ('contact', 'Contact'),
+        ('transparency', 'Transparency'),
+        ('charter', 'Charter'),
+        ('reports', 'Reports'),
+        ('donate', 'Donate'),
+        ('join', 'Join'),
+    )
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, null=True)
+    host = models.ForeignKey(Host, on_delete=models.CASCADE, null=False)
+    text = models.TextField()
+
+    def validate_unique(self, *args, **kwargs):
+        super(Content, self).validate_unique(*args, **kwargs)
+
+        if Content.objects.filter(host=self.host, type=self.type).exists():
+            raise ValidationError(
+                {
+                    NON_FIELD_ERRORS: [
+                        'The content for ' + dict(self.TYPE_CHOICES)[self.type] + ' already exist!',
+                        ],
+                }
+            )
+
+    def __str__(self):
+        return dict(self.TYPE_CHOICES)[self.type] + " (" + self.host.name + ")"
 
 
 def save_partner_logo(instance, filename):
@@ -307,7 +341,7 @@ def save_team_image(instance, filename):
 
 class Team(models.Model):
     name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=50, null=True)
+    slug = models.SlugField(max_length=50, null=False, blank=False)
     description = models.CharField(max_length=255, null=True, blank=True)
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
     members = models.ManyToManyField(Profile, through='TeamUserRelation')
@@ -328,11 +362,21 @@ class Team(models.Model):
     def get_model_name():
         return "Team"
 
-    # TODO add host_slug
     def __str__(self):
-        city = ("(" + self.host.city + ")") if self.host else ''
-        return self.name + " " + city
-    
+        return self.name + " (" + self.host.name + ")"
+
+    def validate_unique(self, *args, **kwargs):
+        super(Team, self).validate_unique(*args, **kwargs)
+
+        if Team.objects.filter(host=self.host, slug=self.slug).exists():
+            raise ValidationError(
+                {
+                    NON_FIELD_ERRORS: [
+                        'The \"slug\" ' + self.slug + ' already exist!',
+                    ],
+                }
+            )
+
 
 class TeamUserRelation(models.Model):
     user = models.ForeignKey(Profile, on_delete= models.CASCADE)
@@ -341,6 +385,7 @@ class TeamUserRelation(models.Model):
 
     def __str__(self):
         return self.user.name + ' in ' + self.team.name
+
 
 class Donation(models.Model):
     host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True)
