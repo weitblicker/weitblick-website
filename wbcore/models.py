@@ -300,12 +300,14 @@ class Document(models.Model):
         city = ("(" + self.host.city + ")") if self.host else ''
         return self.title + " " + city
 
+
 def save_team_image(instance, filename):
     return "teams/"+ instance.host.slug +"/" + instance.name.lower().replace(' ', '_') + splitext(filename)[1].lower()
 
+
 class Team(models.Model):
     name = models.CharField(max_length=100)
-    slug = models.SlugField(primary_key=True, max_length=50, unique=True, default='')
+    slug = models.SlugField(max_length=50, null=True)
     description = models.CharField(max_length=255, null=True, blank=True)
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
     members = models.ManyToManyField(Profile, through='TeamUserRelation')
@@ -330,6 +332,7 @@ class Team(models.Model):
     def __str__(self):
         city = ("(" + self.host.city + ")") if self.host else ''
         return self.name + " " + city
+    
 
 class TeamUserRelation(models.Model):
     user = models.ForeignKey(Profile, on_delete= models.CASCADE)
