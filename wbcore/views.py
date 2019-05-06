@@ -286,7 +286,7 @@ def teams_view(request, host_slug=None):
     }
     return HttpResponse(template.render(context, request))
 
-def team_view(request, host_slug=None):
+def team_view(request, host_slug=None, team_slug=None):
     try:
         host = Host.objects.get(slug=host_slug) if host_slug else None
     except Host.DoesNotExist:

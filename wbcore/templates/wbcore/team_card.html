@@ -1,6 +1,6 @@
 {% load static %}
 
-<a class="ui raised link card" href="{{team.slug}}">
+<a class="ui raised link card" href="{% url 'team' team.slug %}">
   <div class="image">
     {% if not team.image %}
       <div class="image">{% include 'wbcore/svgs/placeholder.svg' with text="Team"%}</div>
