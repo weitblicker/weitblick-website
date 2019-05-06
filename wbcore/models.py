@@ -305,10 +305,10 @@ def save_team_image(instance, filename):
 
 class Team(models.Model):
     name = models.CharField(max_length=100)
-    slug = models.SlugField(primary_key=True, max_length=50, unique=True)
+    slug = models.SlugField(primary_key=True, max_length=50, unique=True, default='')
     description = models.CharField(max_length=255, null=True, blank=True)
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
-    member = models.ManyToManyField(Profile, through='TeamUserRelation')
+    members = models.ManyToManyField(Profile, through='TeamUserRelation')
     image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)

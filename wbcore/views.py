@@ -1,6 +1,7 @@
 import csv
 import os
 import smtplib
+import pdb
 
 from django.db.models import Count
 from django.http import HttpResponse, Http404
@@ -10,7 +11,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError
 from datetime import timedelta, date
-from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost, Team
+from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation
 from collections import OrderedDict
 from .forms import ContactForm
 from email.message import EmailMessage
@@ -292,16 +293,28 @@ def team_view(request, host_slug=None, team_slug=None):
     except Host.DoesNotExist:
         raise Http404()
 
+    try:
+        team = Team.objects.get(slug=team_slug)
+    except Team.DoesNotExist:
+        raise Http404()
+
+    if not team:
+        raise Http404()
+
     if host:
         try:
-            breadcrumb = [('Team', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', None)]
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', reverse('teams')), (team.name, None)]
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('Team', None)]
+        breadcrumb = [('Home', reverse('home')), ('Team', reverse('teams')), (team.name, None)]
 
-    team = None
+    # get relationship between team and user (= description of user)
+    for member in team.members.all():
+        # TODO: should work, did with tobias but here member has profile type, not relation type
+        #print("\n", member.text, "\n")
+        pass
 
     template = loader.get_template('wbcore/team.html')
     context = {
@@ -309,7 +322,7 @@ def team_view(request, host_slug=None, team_slug=None):
         'dot_nav': dot_nav,
         'host': host,
         'breadcrumb': breadcrumb,
-        'team': team
+        'team': team,
     }
     return HttpResponse(template.render(context, request))
 

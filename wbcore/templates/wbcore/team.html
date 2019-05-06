@@ -1,4 +1,39 @@
 {% extends 'wbcore/single_content.html' %}
-{% block single-content %}
-    <p>Team</p>
+{% load staticfiles %}
+{% block content %}
+
+<div class="ui vertical stripe segment">
+  <div class="ui one column stackable grid container content-block">
+    <div class="column">
+      <div class="ui basic segment">
+        <h1 class="ui header">{{ team.name }}</h1>
+        {% if not team.image %}
+          <div class="image">{% include 'wbcore/svgs/placeholder.svg' with text="Team"%}</div>
+        {% else %}
+          <img class="ui fluid image" src="{{ team.image.get_header_url }}">
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="ui stackable grid container content-block">
+    <div class="ten wide column divided items">
+      <div id="news-list" class="ui basic segment">
+        {% for member in team.members.all %}
+          <!-- TODO: include relation text member.text (?) -->
+          {% include 'wbcore/team_member.html' with member=member relation='asdfasdfaasdf'%}
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="six wide column divided items">
+      <div class="column-content">
+        <div class="ui basic segment">
+          <p>{{ team.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
