@@ -68,38 +68,47 @@ def filter_projects(request):
 
     template = loader.get_template('wbcore/projects_list.html')
     host_slugs = request.GET.getlist("union")
-    contains = request.GET.get("contains")
+    contains = request.GET.get("search")
+    country_codes = request.GET.getlist("country")
+    visibility = request.GET.get("visibility")
+
     host_slugs = list(csv.reader(host_slugs))
     host_slugs = list(set().union(*host_slugs))
     host_slugs = [x.strip(' ') for x in host_slugs]
+
+    country_codes = list(csv.reader(country_codes))
+    country_codes = list(set().union(*country_codes))
+    country_codes = [x.strip(' ') for x in country_codes]
 
     host_slug = None
 
     try:
         #posts = NewsPost.objects.filter(host__slug__in=host_slugs).distinct()
-        host = Project.objects.get(slug=host_slug) if host_slug else None
-        print("Host Slugs", host_slugs)
+        host = Host.objects.get(slug=host_slug) if host_slug else None
 
         results = SearchQuerySet()
         if host_slugs:
-            results = results.filter_or(host_slug__in=host_slugs)
+            results = results.filter_or(hosts_slug__in=host_slugs)
+        if visibility == 'completed':
+            results = results.filter_and(completed=True)
+        if visibility == 'current':
+            results = results.exclude(completed=True)
+        if country_codes:
+            results = results.filter_and(country_code__in=country_codes)
+        if contains:
+            results = results.filter_and(text__contains=contains)
 
-        results = results.filter_and(content__contains=contains)
-        results = results.models(NewsPost).order_by('-published')[:20]
-
-        print("Length:", len(results))
-        posts = [result.object for result in results]
+        results = results.models(Project).all()
+        projects = [result.object for result in results]
 
     except Host.DoesNotExist:
         raise Http404()
 
     context = {
-        'posts': posts,
+        'projects': projects,
         'host': host,
     }
     return HttpResponse(template.render(context, request))
-
-
 
 
 @api_view(['GET', 'POST'])

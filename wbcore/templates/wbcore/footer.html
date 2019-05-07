@@ -1,28 +1,48 @@
 <div class="ui inverted vertical footer segment">
     <div class="ui container">
         <div class="ui stackable inverted divided equal height stackable grid">
-            <div class="three wide column">
-                <h4 class="ui inverted header">About</h4>
-                <div class="ui inverted link list">
-                    <a href="/sitemap/" class="item">Sitemap</a>
-                    {% if host %}
-                      <a href="{% url 'contact' host.slug %}" class="item">Contact Us</a>
-                    {% else %}
-                      <a href="{% url 'contact' %}" class="item">Contact Us</a>
-                    {% endif %}
-                    <a href="#" class="item">Impressum</a>
-                    <a href="#" class="item">Some Link</a>
-                </div>
-            </div>
-            <div class="three wide column">
-                <h4 class="ui inverted header">Services</h4>
-                <div class="ui inverted link list">
-                    <a href="#" class="item">Mitglied werden.</a>
-                    <a href="#" class="item">Städte Übersicht</a>
-                    <a href="#" class="item">Spenden</a>
-                    <a href="#" class="item">Termine</a>
-                </div>
-            </div>
+            {% if host %}
+              <div class="three wide column">
+                  <h4 class="ui inverted header">About</h4>
+                  <div class="ui inverted link list">
+                      <a href="{% url 'sitemap' %}" class="item">Sitemap</a>
+                      <a href="{% url 'transparency' host.slug %}" class="item">Transparenz</a>
+                      <a href="{% url 'donate' host.slug %}" class="item">Spenden</a>
+                      <a href="{% url 'impressum' host.slug %}" class="item">Impressum</a>
+                      <a href="{% url 'privacy' host.slug %}" class="item">Datenschutz</a>
+                  </div>
+              </div>
+              <div class="three wide column">
+                  <h4 class="ui inverted header">Services</h4>
+                  <div class="ui inverted link list">
+                      <a href="{% url 'join' host.slug %}" class="item">Mitglied werden</a>
+                      <a href="{% url 'hosts' %}" class="item">Städte</a>
+                      <a href="{% url 'events' host.slug %}" class="item">Termine</a>
+                      <a href="{% url 'contact' host.slug %}" class="item">Kontakt</a>
+                  </div>
+              </div>
+            {% else %}
+              <div class="three wide column">
+                  <h4 class="ui inverted header">About</h4>
+                  <div class="ui inverted link list">
+                      <a href="{% url 'sitemap' %}" class="item">Sitemap</a>
+                      <a href="{% url 'transparency' %}" class="item">Transparenz</a>
+                      <a href="{% url 'donate' %}" class="item">Spenden</a>
+                      <a href="{% url 'impressum' %}" class="item">Impressum</a>
+                      <a href="{% url 'privacy' %}" class="item">Datenschutz</a>
+                  </div>
+              </div>
+              <div class="three wide column">
+                  <h4 class="ui inverted header">Services</h4>
+                  <div class="ui inverted link list">
+                      <a href="{% url 'join' %}" class="item">Mitglied werden</a>
+                      <a href="{% url 'hosts' %}" class="item">Städte</a>
+                      <a href="{% url 'events' %}" class="item">Termine</a>
+                      <a href="{% url 'contact' %}" class="item">Kontakt</a>
+                  </div>
+              </div>
+            {% endif %}
+
             <div class="seven wide column">
                 <h4 class="ui inverted header">Footer Header</h4>
                 <p>Extra space for a call to action inside the footer that could help re-engage users.</p>

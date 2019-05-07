@@ -1,0 +1,7 @@
+{% extends 'wbcore/single_content.html' %}
+{% block single-content %}
+    <h1>Team</h1>
+    {% for team in teams %}
+        <h2> {{ team.name }} </h2>
+    {% endfor %}
+{% endblock %}

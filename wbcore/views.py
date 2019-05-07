@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError
 from datetime import timedelta, date
-from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost
+from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost, Team
 from collections import OrderedDict
 from .forms import ContactForm
 from email.message import EmailMessage
@@ -59,15 +59,50 @@ icon_links = OrderedDict([
 
 
 def get_main_nav(host=None, active=None):
-
     args = [host.slug] if host else []
     nav = OrderedDict([
-            ('home', {'name': 'Home', 'link': reverse('home')}),
-            ('idea', {'name': 'Idea', 'link': reverse('idea', args=args)}),
-            ('projects', {'name': 'Projects', 'link': reverse('projects', args=args)}),
-            ('events', {'name': 'Events', 'link': reverse('events', args=args)}),
-            ('join', {'name': 'Join in', 'link': reverse('join', args=args)}),
-            ('hosts', {'name': 'Unions', 'link': reverse('hosts')}),
+            ('home',
+                {
+                    'name': 'Home',
+                    'link': reverse('home'),
+                    'icon': 'wbcore/svgs/home.svg',
+                    'mobile': False,
+                }),
+            ('idea',
+                {
+                    'name': 'Idee',
+                    'link': reverse('idea', args=args),
+                    'icon': 'wbcore/svgs/idea.svg',
+                    'mobile': True,
+                }),
+            ('projects',
+                {
+                    'name': 'Projekte',
+                    'link': reverse('projects', args=args),
+                    'icon': 'wbcore/svgs/leaf.svg',
+                    'mobile': True,
+                }),
+            ('events',
+                {
+                    'name': 'Events',
+                    'link': reverse('events', args=args),
+                    'icon': 'wbcore/svgs/hand.svg',
+                    'mobile': True,
+                }),
+            ('join',
+                {
+                    'name': 'Mitmachen',
+                    'link': reverse('join', args=args),
+                    'icon': 'wbcore/svgs/people.svg',
+                    'mobile': True,
+                }),
+            ('hosts',
+                {
+                    'name': 'Vereine',
+                    'link': reverse('hosts'),
+                    'icon': 'wbcore/svgs/unions.svg',
+                    'mobile': True,
+                }),
     ])
 
     if active in nav:
@@ -258,13 +293,16 @@ def privacy_view(request, host_slug=None):
     }
     return HttpResponse(template.render(context, request))
 
-
-def team_view(request, host_slug=None):
-    host_slugs = get_host_slugs(request, host_slug)
-
-    if host_slugs:
+def teams_view(request, host_slug=None):
+    try:
+        if not host_slug:
+            host = Host.objects.get(slug='bundesverband')
+        else:
+            host = Host.objects.get(slug=host_slug)
+    except Host.DoesNotExist:
+        raise Http404()
+    if host:
         try:
-            host = Host.objects.get(slug=host_slug) if host_slug else None
             breadcrumb = [('Team', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', None)]
         except:
             raise Http404()
@@ -272,7 +310,34 @@ def team_view(request, host_slug=None):
         host = None
         breadcrumb = [('Home', reverse('home')), ('Team', None)]
 
-    projects = Project.objects.all()
+    teams = Team.objects.filter(host=host)
+
+    template = loader.get_template('wbcore/teams.html')
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'host': host,
+        'breadcrumb': breadcrumb,
+        'teams': teams
+    }
+    return HttpResponse(template.render(context, request))
+
+def team_view(request, host_slug=None):
+    try:
+        host = Host.objects.get(slug=host_slug) if host_slug else None
+    except Host.DoesNotExist:
+        raise Http404()
+
+    if host:
+        try:
+            breadcrumb = [('Team', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Team', None)]
+
+    team = None
 
     template = loader.get_template('wbcore/team.html')
     context = {
@@ -280,6 +345,7 @@ def team_view(request, host_slug=None):
         'dot_nav': dot_nav,
         'host': host,
         'breadcrumb': breadcrumb,
+        'team': team
     }
     return HttpResponse(template.render(context, request))
 
@@ -311,7 +377,6 @@ def about_view(request, host_slug=None):
 
 def idea_view(request, host_slug=None):
     host_slugs = get_host_slugs(request, host_slug)
-
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
@@ -326,7 +391,7 @@ def idea_view(request, host_slug=None):
 
     template = loader.get_template('wbcore/idea.html')
     context = {
-        'main_nav': get_main_nav(active='idea'),
+        'main_nav': get_main_nav(active='idea', host=host),
         'dot_nav': dot_nav,
         'projects': projects,
         'host': host,
@@ -352,8 +417,14 @@ def projects_view(request, host_slug=None):
         projects = Project.objects.all()
         breadcrumb = [('Home', reverse('home')), ('Projects', None)]
     posts = BlogPost.objects.filter(project__in=projects)
+
+    countries = set([project.location.country for project in projects])
+
     project_list = list(Location.objects.filter(project__in=projects).values(
             'country').annotate(number=Count('country')))
+
+    hosts = Host.objects.all()
+
     context = {
         'main_nav': get_main_nav(host=host, active='projects'),
         'dot_nav': dot_nav,
@@ -361,17 +432,24 @@ def projects_view(request, host_slug=None):
         'project_list': project_list,
         'breadcrumb': breadcrumb,
         'host': host,
+        'hosts': hosts,
         'posts': posts,
+        'countries': countries,
     }
     template = loader.get_template('wbcore/projects.html')
     return HttpResponse(template.render(context, request))
 
 
 def join_view(request, host_slug=None):
+    try:
+        host = Host.objects.get(slug=host_slug) if host_slug else None
+    except Host.DoesNotExist:
+        raise Http404()
     template = loader.get_template('wbcore/join.html')
     context = {
         'main_nav': get_main_nav(active='join'),
         'dot_nav': dot_nav,
+        'host': host,
         'breadcrumb': [('Home', reverse('home')), ('Join in', None)],
     }
     return HttpResponse(template.render(context, request))
@@ -423,7 +501,7 @@ def hosts_view(request):
 
 def host_view(request, host_slug):
     try:
-        host = Host.objects.get(slug=host_slug)
+        host = Host.objects.get(slug=host_slug) if host_slug else None
     except Host.DoesNotExist:
         raise Http404()
 
@@ -559,7 +637,6 @@ def range_year_month(start_date, end_date):
     years = OrderedDict()
     d = date(year=start_date.year, month=start_date.month, day=1)
     end_date = date(year=end_date.year, month=end_date.month, day=1)
-    print("End date:", end_date)
     months = []
     while d <= end_date:
         months.append(date(year=d.year, month=d.month, day=1))
@@ -596,12 +673,8 @@ def news_view(request, host_slug=None):
         earliest = NewsPost.objects.earliest('published')
         start_date = earliest.published
         end_date = latest.published
-        print("Latest news:", end_date)
-        print("Earliest news:", start_date)
 
         year_months = range_year_month(start_date, end_date)
-        for year, months in year_months.items():
-            print(year, months)
     else:
         year_months = None
 
@@ -690,11 +763,100 @@ def search_view(request, query=None):
     return HttpResponse(template.render(context), request)
 
 
+def sitemap_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Sitemap', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Sitemap', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/sitemap.html')
+    context = {
+        'main_nav': get_main_nav(active='sitemap'),
+        'dot_nav': dot_nav,
+        'projects': projects,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+def donate_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('donate', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('donate', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/donate.html')
+    context = {
+        'main_nav': get_main_nav(active='donate'),
+        'dot_nav': dot_nav,
+        'projects': projects,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
+def impressum_view(request, host_slug=None):
+    host_slugs = get_host_slugs(request, host_slug)
+
+    if host_slugs:
+        try:
+            host = Host.objects.get(slug=host_slug) if host_slug else None
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Impressum', None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [('Home', reverse('home')), ('Impressum', None)]
+
+    projects = Project.objects.all()
+
+    template = loader.get_template('wbcore/impressum.html')
+    context = {
+        'main_nav': get_main_nav(active='impressum'),
+        'dot_nav': dot_nav,
+        'projects': projects,
+        'host': host,
+        'breadcrumb': breadcrumb,
+    }
+    return HttpResponse(template.render(context, request))
+
 def contact_view(request, host_slug=None):
     try:
         host = Host.objects.get(slug=host_slug) if host_slug else None
     except Host.DoesNotExist:
         raise Http404()
+
+    if host:
+        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
+    else:
+        breadcrumb = [('Home', reverse('home')), ('Contact', None)]
+
+    template = loader.get_template('wbcore/contact.html')
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': dot_nav,
+        'host': host,
+        'breadcrumb': breadcrumb,
+        'success': False,
+    }
 
     if request.method == 'POST':
         form = ContactForm(request.POST)
@@ -705,6 +867,7 @@ def contact_view(request, host_slug=None):
             msg = EmailMessage()
             msg['From'] = EMAIL_ADDRESS
             msg['To'] = 'admin@weitblicker.org'
+            #msg['To'] = 'admin@weitblicker.org'
             host = Host.objects.get(name=form.cleaned_data['host'])
             #msg['To'] = host.email
             msg['reply-to'] = form.cleaned_data['email']
@@ -718,33 +881,21 @@ def contact_view(request, host_slug=None):
                     smtp.ehlo()
                     smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORT)
                     smtp.send_message(msg)
+                context['success'] = True
+                form = ContactForm()
             except BadHeaderError:
-                print("error raised")
                 return HttpResponse('Invalid header found.')
-            # TODO: inform user on sucess
-            messages.success(request, 'Message successfully sent. Thank you!')  # nowhere shown yet
-            return redirect('home')
+                context['success'] = False
+            return HttpResponse(template.render(context, request))
         else:
-            message.error(request, 'Form not valid')
+            context['success'] = False
     else:
         if host:
             form = ContactForm(initial={'host': host_slug})
         else:
             form = ContactForm()
 
-    if host:
-        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
-    else:
-        breadcrumb = [('Home', reverse('home')), ('Contact', None)]
-
-    template = loader.get_template('wbcore/contact.html')
-    context = {
-        'contact_form': form,
-        'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
-        'host': host,
-        'breadcrumb': breadcrumb,
-    }
+    context['contact_form'] = form
 
     return HttpResponse(template.render(context, request))
 

@@ -32,17 +32,19 @@ main_patterns = [
     path('idea/', views.idea_view, name='idea'),
     path('about/', views.about_view, name='about'),
     path('history/', views.history_view, name='history'),
-    path('team/', views.team_view, name='team'),
+    path('team/', views.teams_view, name='team'),
     path('contact/', views.contact_view, name='contact'),
     path('transparency/', views.transparency_view, name='transparency'),
     path('charter/', views.charter_view, name='charter'),
     path('reports/', views.reports_view, name='reports'),
     path('facts/', views.facts_view, name='facts'),
+    path('donate/', views.donate_view, name='donate'),
+    path('privacy/', views.privacy_view, name="privacy"),
+    path('impressum/', views.impressum_view, name='impressum'),
 ]
 
 urlpatterns = [
     path('', views.home_view, name='home'),
-    path('privacy/', views.privacy_view, name="privacy"),
     path('rest/', include(rest_urls.rest_patterns)),
     path('ajax/', include(ajax_urls.ajax_patterns)),
     path('union/', views.hosts_view, name='hosts'),
