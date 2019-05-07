@@ -7,14 +7,20 @@ The new Weitblick website is *Django*, and *Python* based. The search engine we 
 ### Required Software & Tools 
 
 * [Python 3](https://www.python.org/)
-* [Java 11](https://jdk.java.net/11/)
+* [Java 8] (https://jdk.java.net/8/)
+   - If you have a newer version, e.g., 11 (https://jdk.java.net/11/) you need to follow the steps:
+     + Replace in the elsticsearch folder: `-XX:+CMSIncrementalPacing` with `-XX:+UseG1GC`
+     + Remove in the elsticsearch folder: `UseConcMarkSweepGC`
 * [Tidy](http://binaries.html-tidy.org/)
 * [Elastic Search 2](https://www.elastic.co/de/downloads/past-releases/elasticsearch-2-4-2)  (see Elastic Search section below.)
 * [Git Large File Storage](https://git-lfs.github.com/)
    - `git lfs install`
    - `git lfs fetch`
    - `git lfs pull`
-### Python Environment (Unix)
+   
+* Buildtools for Visual Studio 2019, only necessary for Windows installation.
+
+### Python Environment
 
 * If you do not have `pip` installed install it using:
 `curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py`
@@ -25,7 +31,6 @@ and then hit: `curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py`
 * Next we run the django server with out application: `python manage.py runserver`. This still will cause some problems, since we have to migrate the database, load data and also to install elastic search.
 
 > The next sections (Database migration and Load Weitblick data) can be achived running the script `initalize.sh`
-
 
 ### Database Migration
 
@@ -54,7 +59,4 @@ Install Elastic Search 2. You can download it here: https://www.elastic.co/de/do
 * Run `bin/elasticsearch` on unix, or `bin\elasticsearch.bat` on windows.
 * Use the django module command to build the search index: `python manage.py rebuild_index` type `y` or add a `--noinput` to the rebuild command. 
 * This search index should be updated later when adding content, for example by using a cron job running: `python manage.py update_index`
-
-
-
 
