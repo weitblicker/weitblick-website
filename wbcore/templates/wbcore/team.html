@@ -19,9 +19,9 @@
   <div class="ui stackable grid container content-block">
     <div class="ten wide column divided items">
       <div id="news-list" class="ui basic segment">
-        {% for member in team.members.all %}
+        {% for member_relation in members_relations %}
           <!-- TODO: include relation text member.text (?) -->
-          {% include 'wbcore/team_member.html' with member=member relation='asdfasdfaasdf'%}
+          {% include 'wbcore/team_member.html' with member=member_relation.0 relation=member_relation.1%}
         {% endfor %}
       </div>
     </div>

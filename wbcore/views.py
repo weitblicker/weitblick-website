@@ -348,11 +348,10 @@ def team_view(request, host_slug=None, team_slug=None):
         host = None
         breadcrumb = [('Home', reverse('home')), ('Team', reverse('teams')), (team.name, None)]
 
-    # get relationship between team and user (= description of user)
-    for member in team.members.all():
-        # TODO: should work, did with tobias but here member has profile type, not relation type
-        #print("\n", member.text, "\n")
-        pass
+    members = team.members.all()
+    relations = []
+    for member in members:
+        relations.append(TeamUserRelation.objects.get(user=member))
 
     template = loader.get_template('wbcore/team.html')
     context = {
@@ -361,6 +360,7 @@ def team_view(request, host_slug=None, team_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'team': team,
+        'members_relations': zip(members, relations),
     }
     return HttpResponse(template.render(context, request))
 
