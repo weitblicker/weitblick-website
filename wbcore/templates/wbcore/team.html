@@ -28,10 +28,11 @@
 
     <div class="eight wide column divided items">
       <div id="news-list" class="ui basic segment">
-        {% for member_relation in members_relations %}
-          <!-- TODO: include relation text member.text (?) -->
-          {% include 'wbcore/team_member.html' with member=member_relation.0 relation=member_relation.1%}
-        {% endfor %}
+        <div class="ui divided unstackable items">
+          {% for member_relation in members_relations %}
+            {% include 'wbcore/team_member.html' with member=member_relation.0 relation=member_relation.1%}
+          {% endfor %}
+        </div>
       </div>
     </div>
   </div>

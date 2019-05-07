@@ -178,7 +178,7 @@ class Profile(models.Model):
     name = models.CharField(max_length=100)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     host = models.ManyToManyField(Host, through='UserRelation')
-    image = models.ImageField(null=True, blank=True)
+    image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
     since = models.DateField(auto_now_add=True)
     until = models.DateField(null=True, blank=True)
