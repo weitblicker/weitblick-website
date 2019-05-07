@@ -7,7 +7,7 @@ The new Weitblick website is *Django*, and *Python* based. The search engine we 
 ### Required Software & Tools 
 
 * [Python 3](https://www.python.org/)
-* [Java 8] (https://jdk.java.net/8/)
+* [Java 8](https://jdk.java.net/8/)
    - If you have a newer version, e.g., 11 (https://jdk.java.net/11/) you need to follow the steps:
      + Replace in the elsticsearch folder: `-XX:+CMSIncrementalPacing` with `-XX:+UseG1GC`
      + Remove in the elsticsearch folder: `UseConcMarkSweepGC`
