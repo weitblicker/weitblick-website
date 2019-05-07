@@ -153,8 +153,10 @@ $(document)
             project_filter_country = "";
             $('#project-filter-hosts').dropdown('clear');
             project_filter_union = "";
-            $('#news-filter-search').val('');
+            $('#project-filter-search').val('');
             project_filter_search = "";
+            $('#project-filter-visibility').dropdown('clear');
+            project_filter_visibility = "";
             filter_projects(project_filter_union, project_filter_search, project_filter_country, project_filter_visibility);
         });
 
@@ -162,6 +164,17 @@ $(document)
             .dropdown({
                 onChange: function(value, text, choice){
                     project_filter_union = value;
+                    filter_projects(project_filter_union,
+                        project_filter_search,
+                        project_filter_country,
+                        project_filter_visibility);
+                },
+            });
+
+        $('#project-filter-visibility')
+            .dropdown({
+                onChange: function(value, text, choice){
+                    project_filter_visibility = value;
                     filter_projects(project_filter_union,
                         project_filter_search,
                         project_filter_country,

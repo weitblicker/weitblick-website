@@ -70,6 +70,7 @@ def filter_projects(request):
     host_slugs = request.GET.getlist("union")
     contains = request.GET.get("search")
     country_codes = request.GET.getlist("country")
+    visibility = request.GET.get("visibility")
 
     host_slugs = list(csv.reader(host_slugs))
     host_slugs = list(set().union(*host_slugs))
@@ -79,7 +80,6 @@ def filter_projects(request):
     country_codes = list(set().union(*country_codes))
     country_codes = [x.strip(' ') for x in country_codes]
 
-
     host_slug = None
 
     try:
@@ -88,35 +88,27 @@ def filter_projects(request):
 
         results = SearchQuerySet()
         if host_slugs:
-            print("Host Slugs", host_slugs)
             results = results.filter_or(hosts_slug__in=host_slugs)
-            print(results)
+        if visibility == 'completed':
+            results = results.filter_and(completed=True)
+        if visibility == 'current':
+            results = results.exclude(completed=True)
         if country_codes:
-            print("Country codes:", country_codes)
             results = results.filter_and(country_code__in=country_codes)
-
         if contains:
-            print("Contains:", contains)
             results = results.filter_and(text__contains=contains)
 
         results = results.models(Project).all()
-
-        print("Length:", len(results))
         projects = [result.object for result in results]
 
     except Host.DoesNotExist:
         raise Http404()
 
-    print(projects)
-
     context = {
         'projects': projects,
         'host': host,
     }
-    print("response")
     return HttpResponse(template.render(context, request))
-
-
 
 
 @api_view(['GET', 'POST'])
