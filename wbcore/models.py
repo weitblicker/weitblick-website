@@ -342,7 +342,7 @@ def save_team_image(instance, filename):
 class Team(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=50, null=False, blank=False)
-    description = models.CharField(max_length=255, null=True, blank=True)
+    description = models.TextField(blank=True, default="")
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
     members = models.ManyToManyField(Profile, through='TeamUserRelation')
     image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
@@ -368,7 +368,10 @@ class Team(models.Model):
     def validate_unique(self, *args, **kwargs):
         super(Team, self).validate_unique(*args, **kwargs)
 
-        if Team.objects.filter(host=self.host, slug=self.slug).exists():
+        same_host_and_slug = Team.objects.filter(host=self.host, slug=self.slug)
+
+        if same_host_and_slug.exists() and (self not in same_host_and_slug):  # second part is necessary to be able to edit a team. Otherwise saving after editing will raise slug already exists error
+            print(same_host_and_slug, "\n", self)
             raise ValidationError(
                 {
                     NON_FIELD_ERRORS: [
@@ -382,6 +385,7 @@ class TeamUserRelation(models.Model):
     user = models.ForeignKey(Profile, on_delete= models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     text = models.TextField()
+    priority = models.IntegerField(default=99)
 
     def __str__(self):
         return self.user.name + ' in ' + self.team.name

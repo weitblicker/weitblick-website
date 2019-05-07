@@ -353,6 +353,8 @@ def team_view(request, host_slug=None, team_slug=None):
     for member in members:
         relations.append(TeamUserRelation.objects.get(user=member))
 
+    members_relations = sorted(zip(members, relations), key=lambda tup: (tup[1].priority, tup[0].name.split(" ")[-1]))
+
     template = loader.get_template('wbcore/team.html')
     context = {
         'main_nav': get_main_nav(),
@@ -360,7 +362,7 @@ def team_view(request, host_slug=None, team_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'team': team,
-        'members_relations': zip(members, relations),
+        'members_relations': members_relations,
     }
     return HttpResponse(template.render(context, request))
 

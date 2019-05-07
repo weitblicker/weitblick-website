@@ -16,8 +16,17 @@
     </div>
   </div>
 
+
   <div class="ui stackable grid container content-block">
-    <div class="ten wide column divided items">
+    <div class="eight wide column divided items">
+      <div class="column-content">
+        <div class="ui basic segment">
+          <p>{{ team.description | safe }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="eight wide column divided items">
       <div id="news-list" class="ui basic segment">
         {% for member_relation in members_relations %}
           <!-- TODO: include relation text member.text (?) -->
@@ -25,15 +34,8 @@
         {% endfor %}
       </div>
     </div>
-
-    <div class="six wide column divided items">
-      <div class="column-content">
-        <div class="ui basic segment">
-          <p>{{ team.description }}</p>
-        </div>
-      </div>
-    </div>
   </div>
+
 </div>
 
 {% endblock %}
