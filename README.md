@@ -13,10 +13,11 @@ The new Weitblick website is *Django*, and *Python* based. The search engine we 
      + Remove in the elsticsearch folder: `UseConcMarkSweepGC`
 * [Tidy](http://binaries.html-tidy.org/)
 * [Elastic Search 2](https://www.elastic.co/de/downloads/past-releases/elasticsearch-2-4-2)  (see Elastic Search section below.)
-* [Git Large File Storage](https://git-lfs.github.com/)
+* [Git Large File Storage](https://git-lfs.github.com/) Used for images and all lager binary files for the website.
    - `git lfs install`
    - `git lfs fetch`
    - `git lfs pull`
+   
    
 * Buildtools for Visual Studio 2019, only necessary for Windows installation.
 
