@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'django_google_maps',
 ]
 
+AUTH_USER_MODEL = 'wbcore.MyUser'
+
 PHOTOLOGUE_DIR = 'images'
 
 SUMMERNOTE_THEME = 'bs4'

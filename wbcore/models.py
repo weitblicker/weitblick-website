@@ -4,12 +4,83 @@ from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.contrib.auth.models import User
 from photologue.models import Gallery, Photo
 from os.path import splitext
-from localflavor.generic.models import IBANField
-from localflavor.generic.models import BICField
+from localflavor.generic.models import IBANField, BICField
 from localflavor.generic.countries.sepa import IBAN_SEPA_COUNTRIES
 from django.urls import reverse
-from django.conf import settings
 from django_google_maps import fields as map_fields
+from django.contrib.auth.models import (
+    BaseUserManager, AbstractBaseUser
+)
+
+
+class MyUserManager(BaseUserManager):
+    def create_user(self, email, date_of_birth, password=None):
+        """
+        Creates and saves a User with the given email, date of
+        birth and password.
+        """
+        if not email:
+            raise ValueError('Users must have an email address')
+
+        user = self.model(
+            email=self.normalize_email(email),
+            date_of_birth=date_of_birth,
+        )
+
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, date_of_birth, password):
+        """
+        Creates and saves a superuser with the given email, date of
+        birth and password.
+        """
+        user = self.create_user(
+            email,
+            password=password,
+            date_of_birth=date_of_birth,
+        )
+        user.is_admin = True
+        user.save(using=self._db)
+        return user
+
+
+class MyUser(AbstractBaseUser):
+    email = models.EmailField(
+        verbose_name='email address',
+        max_length=255,
+        unique=True,
+    )
+    date_of_birth = models.DateField()
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+
+    objects = MyUserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['date_of_birth']
+
+    def __str__(self):
+        return self.email
+
+    def has_perm(self, perm, obj=None):
+        "Does the user have a specific permission?"
+        print("has perm:", perm, obj)
+        # Simplest possible answer: Yes, always
+        return True
+
+    def has_module_perms(self, app_label):
+        print("has module perms:", app_label)
+        "Does the user have permissions to view the app `app_label`?"
+        # Simplest possible answer: Yes, always
+        return True
+
+    @property
+    def is_staff(self):
+        "Is the user a member of staff?"
+        # Simplest possible answer: All admins are staff
+        return self.is_admin
 
 
 class Address(models.Model):
@@ -176,7 +247,7 @@ class Event(models.Model):
 
 class Profile(models.Model):
     name = models.CharField(max_length=100)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(MyUser, on_delete=models.CASCADE)
     host = models.ManyToManyField(Host, through='UserRelation')
     image = models.ImageField(null=True, blank=True)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
@@ -226,7 +297,7 @@ class NewsPost(models.Model):
     teaser = models.TextField()
     host = models.ForeignKey(Host, to_field='slug', on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
-    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    author = models.ForeignKey(MyUser, on_delete=models.SET_NULL, null=True, blank=True)
     author_str = models.CharField(max_length=200, null=True, blank=True)
     gallery = models.ForeignKey(Gallery, null=True, blank =True, on_delete=models.SET_NULL)
 
@@ -276,7 +347,7 @@ class BlogPost(models.Model):
     teaser = models.TextField()
     host = models.ForeignKey(Host, to_field='slug', on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
-    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    author = models.ForeignKey(MyUser, on_delete=models.SET_NULL, null=True, blank=True)
     author_str = models.CharField(max_length=200, null=True, blank=True)
     gallery = models.ForeignKey(Gallery, null=True, blank =True, on_delete=models.SET_NULL)
 
@@ -409,3 +480,5 @@ class ContactMessage(models.Model):
     subject = models.CharField(max_length=100)
     message = models.TextField()
     submission_date = models.DateTimeField(auto_now_add=True)
+
+
