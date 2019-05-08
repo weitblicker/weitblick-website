@@ -190,6 +190,13 @@ $logo-orange: #f3971b;
 		.content{
 			min-height: 65px;
 		}
+		font-size: 1.2em;
+		img{
+			border: solid;
+			border-width: 1px;
+			border-color: white;
+
+		}
 	}
 	display: none;
 	background-image: url('/media/colorbg/yellow.svg');
