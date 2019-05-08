@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.contrib.auth import get_permission_codename
 from django import forms
 
 from django.db import models
@@ -16,6 +17,14 @@ from .models import (
 )
 
 
+class MyTranslatedAdmin(TabbedTranslationAdmin):
+    '''
+    Creates Tabs to handle languages.
+    '''
+
+    pass
+
+
 class MyAdmin(admin.ModelAdmin):
     '''
     Implements a wysiwyg editor.
@@ -26,13 +35,80 @@ class MyAdmin(admin.ModelAdmin):
 
     }
 
+    def has_add_permission(self, request):
+        """
+        Return True if the given request has permission to add an object.
+        Can be overridden by the user in subclasses.
+        """
+        opts = self.opts
+        codename = get_permission_codename('add', opts)
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
 
-class MyTranslatedAdmin(MyAdmin, TabbedTranslationAdmin):
-    '''
-    Creates Tabs to handle languages.
-    '''
+    def has_change_permission(self, request, obj=None):
+        """
+        Return True if the given request has permission to change the given
+        Django model instance, the default implementation doesn't examine the
+        `obj` parameter.
 
-    pass
+        Can be overridden by the user in subclasses. In such case it should
+        return True if the given request has permission to change the `obj`
+        model instance. If `obj` is None, this should return True if the given
+        request has permission to change *any* object of the given type.
+        """
+        opts = self.opts
+        codename = get_permission_codename('change', opts)
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
+
+    def has_delete_permission(self, request, obj=None):
+        """
+        Return True if the given request has permission to change the given
+        Django model instance, the default implementation doesn't examine the
+        `obj` parameter.
+
+        Can be overridden by the user in subclasses. In such case it should
+        return True if the given request has permission to delete the `obj`
+        model instance. If `obj` is None, this should return True if the given
+        request has permission to delete *any* object of the given type.
+        """
+        opts = self.opts
+        codename = get_permission_codename('delete', opts)
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
+
+    def has_view_permission(self, request, obj=None):
+        """
+        Return True if the given request has permission to view the given
+        Django model instance. The default implementation doesn't examine the
+        `obj` parameter.
+
+        If overridden by the user in subclasses, it should return True if the
+        given request has permission to view the `obj` model instance. If `obj`
+        is None, it should return True if the request has permission to view
+        any object of the given type.
+        """
+
+        opts = self.opts
+        codename_view = get_permission_codename('view', opts)
+        codename_change = get_permission_codename('change', opts)
+        return (
+                request.user.has_perm('%s.%s' % (opts.app_label, codename_view), obj) or
+                request.user.has_perm('%s.%s' % (opts.app_label, codename_change), obj)
+        )
+
+    def has_view_or_change_permission(self, request, obj=None):
+        return self.has_view_permission(request, obj) or self.has_change_permission(request, obj)
+
+    def has_module_permission(self, request):
+        """
+        Return True if the given request has any permission in the given
+        app label.
+
+        Can be overridden by the user in subclasses. In such case it should
+        return True if the given request has permission to view the module on
+        the admin index page and access the module's index page. Overriding it
+        does not restrict access to the add, change or delete views. Use
+        `ModelAdmin.has_(add|change|delete)_permission` for that.
+        """
+        return request.user.has_module_perms(self.opts.app_label)
 
 
 class UserCreationForm(forms.ModelForm):
@@ -43,7 +119,7 @@ class UserCreationForm(forms.ModelForm):
 
     class Meta:
         model = MyUser
-        fields = ('email', 'date_of_birth')
+        fields = ('email', 'date_of_birth', 'hosts')
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -71,7 +147,7 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = MyUser
-        fields = ('email', 'password', 'date_of_birth', 'is_active', 'is_admin')
+        fields = ('email', 'password', 'date_of_birth', 'is_active', 'is_admin', 'hosts')
 
     def clean_password(self):
         # Regardless of what the user provides, return the initial value.
@@ -93,6 +169,7 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Personal info', {'fields': ('date_of_birth',)}),
+        ('Belongs to hosts', {'fields': ('hosts',)}),
         ('Permissions', {'fields': ('is_admin',)}),
     )
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
@@ -100,37 +177,36 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'date_of_birth', 'password1', 'password2')}
+            'fields': ('email', 'date_of_birth', 'hosts', 'password1', 'password2')}
         ),
     )
     search_fields = ('email',)
-    ordering = ('email',)
+    ordering = ('email', 'hosts')
     filter_horizontal = ()
 
 
-# Now register the new UserAdmin...
+# since we're not using Django's built-in permissions,
+# register our own user model and unregister the Group model from admin.
 admin.site.register(MyUser, UserAdmin)
-# ... and, since we're not using Django's built-in permissions,
-# unregister the Group model from admin.
 admin.site.unregister(Group)
 
 
-admin.site.register(Address, MyTranslatedAdmin)
-admin.site.register(Content, MyTranslatedAdmin)
-admin.site.register(Location, MyTranslatedAdmin)
-admin.site.register(Host, MyTranslatedAdmin)
-admin.site.register(Partner, MyTranslatedAdmin)
-admin.site.register(Project, MyTranslatedAdmin)
-admin.site.register(Event, MyTranslatedAdmin)
-admin.site.register(NewsPost, MyTranslatedAdmin)
+admin.site.register(Address, MyAdmin)
+admin.site.register(Content, MyAdmin)
+admin.site.register(Location, MyAdmin)
+admin.site.register(Host, MyAdmin)
+admin.site.register(Partner, MyAdmin)
+admin.site.register(Project, MyAdmin)
+admin.site.register(Event, MyAdmin)
+admin.site.register(NewsPost, MyAdmin)
 admin.site.register(Profile, MyAdmin)
 admin.site.register(UserRelation, MyAdmin)
-admin.site.register(Document, MyTranslatedAdmin)
-admin.site.register(Team, MyTranslatedAdmin)
+admin.site.register(Document, MyAdmin)
+admin.site.register(Team, MyAdmin)
 admin.site.register(Milestone, MyAdmin)
 admin.site.register(Donation, MyAdmin)
-admin.site.register(Milestep, MyTranslatedAdmin)
-admin.site.register(BlogPost, MyTranslatedAdmin)
+admin.site.register(Milestep, MyAdmin)
+admin.site.register(BlogPost, MyAdmin)
 admin.site.register(BankAccount, MyAdmin)
 admin.site.register(TeamUserRelation, MyAdmin)
 admin.site.register(ContactMessage, MyAdmin)
