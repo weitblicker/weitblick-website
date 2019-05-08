@@ -48,9 +48,9 @@ INSTALLED_APPS = [
     'sortedm2m',
     'rest_framework',
     'localflavor',
-    'wbcore.apps.WbcoreConfig',
     'django_google_maps',
-    'microsoft_auth'
+    'microsoft_auth',
+    'wbcore.apps.WbcoreConfig',
 ]
 
 AUTH_USER_MODEL = 'wbcore.MyUser'

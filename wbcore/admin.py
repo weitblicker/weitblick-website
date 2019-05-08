@@ -148,7 +148,7 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = MyUser
-        fields = ('email', 'password', 'date_of_birth', 'is_active', 'is_admin', 'hosts')
+        fields = ('email', 'password', 'date_of_birth', 'is_active', 'hosts', 'first_name', 'last_name')
         exclude = ('date_joined',)
 
     def clean_password(self):
@@ -166,13 +166,12 @@ class UserAdmin(BaseUserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ('email', 'date_of_birth', 'is_admin')
-    list_filter = ('is_admin',)
+    list_display = ('first_name', 'last_name', 'email', 'date_of_birth')
+    list_filter = ('hosts', 'role')
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('date_of_birth',)}),
-        ('Belongs to hosts', {'fields': ('hosts',)}),
-        ('Permissions', {'fields': ('is_admin',)}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'date_of_birth',)}),
+        ('Permissions', {'fields': ('hosts', 'role')}),
     )
 
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
@@ -191,6 +190,7 @@ class UserAdmin(BaseUserAdmin):
 
 # since we're not using Django's built-in permissions,
 # register our own user model and unregister the Group model from admin.
+admin.site.unregister(MyUser)
 admin.site.register(MyUser, UserAdmin)
 admin.site.unregister(Group)
 

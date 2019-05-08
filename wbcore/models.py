@@ -38,7 +38,7 @@ class Host(models.Model):
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True)
 
     def belongs_to_host(self, host):
-        return host.slug == self.slug
+        return host == self
 
     def search_title(self):
         return self.name
@@ -69,7 +69,6 @@ class MyUserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             date_of_birth=date_of_birth,
-            is_staff=True,
         )
 
         user.set_password(password)
@@ -85,7 +84,6 @@ class MyUserManager(BaseUserManager):
             email,
             password=password,
             date_of_birth=date_of_birth,
-            is_staff=True
         )
         user.is_admin = True
         user.save(using=self._db)
@@ -96,8 +94,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=60)
     first_name = models.CharField(max_length=60)
     last_name = models.CharField(max_length=60)
-    is_staff = models.BooleanField(default=True)
-    date_joined = models.DateField()
+    #date_joined = models.DateField()
     email = models.EmailField(
         verbose_name='email address',
         max_length=255,
@@ -105,8 +102,25 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     )
     date_of_birth = models.DateField(null=True)
     is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
+
+    @property
+    def is_staff(self):
+        return True;
+
+    @property
+    def is_super_admin(self):
+        return self.role == 'super_admin'
+
     hosts = models.ManyToManyField(Host)
+
+    ROLE_CHOICES = (
+        ('super_admin', 'Admin'),
+        ('host_admin', 'Host Admin'),
+        ('member', 'Member'),
+        ('banker', 'Banker'),
+        ('applicant', 'Applicant'),
+    )
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='applicant')
 
     objects = MyUserManager()
 
@@ -118,26 +132,27 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
-        print("has perm:", perm, obj)
+        if obj:
+            print("has perm:", perm, obj)
 
         # admins have all rights
-        if self.is_admin:
+        if self.is_super_admin:
             return True
 
-        for host in self.hosts.all():
-            if obj.belongs_to_host(host):
-                return True
+        if not obj:
+            return True
+
+        if perm.startswith("wbcore.view"):
+            return True
+
+        if self.role == 'host_admin':
+            for host in self.hosts.all():
+                if obj.belongs_to_host(host):
+                    return True
 
         return False
 
     def has_module_perms(self, app_label):
-        # admins have all rights
-        if self.is_admin:
-            return True
-
-        print("has module perms:", app_label)
-        "Does the user have permissions to view the app `app_label`?"
-        # Simplest possible answer: Yes, always
         return True
 
 
