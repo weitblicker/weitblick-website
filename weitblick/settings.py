@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'localflavor',
     'wbcore.apps.WbcoreConfig',
     'django_google_maps',
+    'microsoft_auth'
 ]
 
 AUTH_USER_MODEL = 'wbcore.MyUser'
@@ -85,6 +86,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'microsoft_auth.context_processors.microsoft',
             ],
             'loaders': [
                 'django.template.loaders.filesystem.Loader',
@@ -138,6 +140,16 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+AUTHENTICATION_BACKENDS = [
+    'microsoft_auth.backends.MicrosoftAuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend'
+]
+
+MICROSOFT_AUTH_CLIENT_ID = '461a1fd8-9c6d-42b1-a74f-5dcdb912d89d'
+MICROSOFT_AUTH_CLIENT_SECRET = '-Klk0zF]9EIxDG6@s7gMwM/v:ha.cB2]'
+MICROSOFT_AUTH_LOGIN_TYPE = 'ma'
 
 
 # Internationalization
@@ -196,3 +208,4 @@ HAYSTACK_CONNECTIONS = {
     },
 }
 GOOGLE_MAPS_API_KEY = 'AIzaSyCtEff9Z-Kl_nRc5GU28LvwzXFlz-6ltHc'
+

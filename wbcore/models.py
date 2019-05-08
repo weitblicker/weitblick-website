@@ -1,7 +1,7 @@
 from django.db import models
 from django_countries.fields import CountryField
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, PermissionsMixin
 from photologue.models import Gallery, Photo
 from os.path import splitext
 from localflavor.generic.models import IBANField, BICField
@@ -66,12 +66,10 @@ class MyUserManager(BaseUserManager):
         if not email:
             raise ValueError('Users must have an email address')
 
-        if not host:
-            raise ValueError('User must be assigned to a host')
-
         user = self.model(
             email=self.normalize_email(email),
             date_of_birth=date_of_birth,
+            is_staff=True,
         )
 
         user.set_password(password)
@@ -87,22 +85,28 @@ class MyUserManager(BaseUserManager):
             email,
             password=password,
             date_of_birth=date_of_birth,
+            is_staff=True
         )
         user.is_admin = True
         user.save(using=self._db)
         return user
 
 
-class MyUser(AbstractBaseUser):
+class MyUser(AbstractBaseUser, PermissionsMixin):
+    username = models.CharField(max_length=60)
+    first_name = models.CharField(max_length=60)
+    last_name = models.CharField(max_length=60)
+    is_staff = models.BooleanField(default=True)
+    date_joined = models.DateField()
     email = models.EmailField(
         verbose_name='email address',
         max_length=255,
         unique=True,
     )
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(null=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-    hosts = models.ManyToManyField(Host, null=True)
+    hosts = models.ManyToManyField(Host)
 
     objects = MyUserManager()
 
@@ -135,12 +139,6 @@ class MyUser(AbstractBaseUser):
         "Does the user have permissions to view the app `app_label`?"
         # Simplest possible answer: Yes, always
         return True
-
-    @property
-    def is_staff(self):
-        "Is the user a member of staff?"
-        # Simplest possible answer: All admins are staff
-        return self.is_admin
 
 
 

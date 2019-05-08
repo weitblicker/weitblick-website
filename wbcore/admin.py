@@ -120,6 +120,7 @@ class UserCreationForm(forms.ModelForm):
     class Meta:
         model = MyUser
         fields = ('email', 'date_of_birth', 'hosts')
+        exclude = ('date_joined',)
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -148,6 +149,7 @@ class UserChangeForm(forms.ModelForm):
     class Meta:
         model = MyUser
         fields = ('email', 'password', 'date_of_birth', 'is_active', 'is_admin', 'hosts')
+        exclude = ('date_joined',)
 
     def clean_password(self):
         # Regardless of what the user provides, return the initial value.
@@ -172,12 +174,14 @@ class UserAdmin(BaseUserAdmin):
         ('Belongs to hosts', {'fields': ('hosts',)}),
         ('Permissions', {'fields': ('is_admin',)}),
     )
+
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
     # overrides get_fieldsets to use this attribute when creating a user.
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'date_of_birth', 'hosts', 'password1', 'password2')}
+            'fields': ('email', 'date_of_birth', 'hosts', 'password1', 'password2'),
+            'exclude': ('date_joined',)},
         ),
     )
     search_fields = ('email',)
