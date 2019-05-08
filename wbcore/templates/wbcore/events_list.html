@@ -1,0 +1,7 @@
+{% if events %}
+    <div class="ui divided unstackable items">
+    {% for event in events %}
+        {% include 'wbcore/event_feed.html' with event=event host_slug=host.slug %}
+    {% endfor %}
+    </div>
+{% endif %}
