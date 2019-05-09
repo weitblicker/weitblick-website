@@ -12,7 +12,11 @@
 
     <div class="content">
         <div class="meta">
-            <span class="date">{{ event.published|date:"D, j. M Y"}}</span>
+            <span class="date">
+                {% if event.end_date %} {{ event.start_date|date:"D, j. M Y"}} &ensp; &mdash; &ensp; {{ event.end_date|date:"D, j. M Y"}}
+                {% else %} {{ event.start_date|date:"D, j. M Y"}}
+                {% endif %}
+            </span>
             {% if event.host.slug %} | <a href="{% url 'host' host_slug=event.host.slug %}" class="wb-link"><span class="wb-icon">{% include 'wbcore/svgs/puzzle-icon.svg' %}</span><span class="wb-name">{{ event.host.name|cut:"Weitblick " }}</span></a>{% endif %}
         </div>
         <a class="ui medium header" href="{% if host_slug %}{% url 'event' host_slug=host_slug event_slug=event.slug %}{% else %}{% url 'event' event_slug=event.slug %}{% endif %}">{{ event.name }}</a>
