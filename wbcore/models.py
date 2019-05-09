@@ -162,15 +162,39 @@ class Event(models.Model):
     projects = models.ManyToManyField(Project, blank=True)
     host = models.ManyToManyField(Host)
     description = models.TextField()
-    start_date = models.DateTimeField()
+    start_date = models.DateField()
     start_time = models.TimeField(null=True, blank=True)
-    end_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
     end_time = models.TimeField(null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
+    image = models.ForeignKey(Photo, null=True, blank =True, on_delete=models.SET_NULL)
     gallery = models.ForeignKey(Gallery, null=True, blank =True,on_delete=models.SET_NULL)
+
+    def search_title(self):
+        return self.name
+
+    def search_url(self):
+        return reverse('event', args=[self.slug])
+
+    def search_image(self):
+        # TODO: return first image of gallery instead, if no image is set
+        return self.image.get_search_mini_url() if self.image else ""
+
+    @staticmethod
+    def get_model_name():
+        return 'Events'
+
+    def author_name(self):
+        name = self.author_str
+        if self.author:
+            name = self.author.first_name + " " + self.author.last_name
+        return name
+
+    class Meta:
+        get_latest_by = 'published'
 
     def __str__(self):
         return self.name
@@ -212,7 +236,7 @@ class UserRelation(models.Model):
 class NewsPost(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
-    image = models.ForeignKey(Photo, null=True, blank =True, on_delete=models.SET_NULL)
+    image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     added = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
