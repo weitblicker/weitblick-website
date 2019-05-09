@@ -194,7 +194,7 @@ class Event(models.Model):
         return name
 
     class Meta:
-        get_latest_by = 'published'
+        get_latest_by = ['start_date', 'start_time']
 
     def __str__(self):
         return self.name
