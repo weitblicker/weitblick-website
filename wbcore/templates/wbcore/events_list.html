@@ -1,7 +1,7 @@
-{% if events %}
+{% if occurrences %}
     <div class="ui divided unstackable items">
-    {% for event in events %}
-        {% include 'wbcore/event_feed.html' with event=event hosts=event.host.all host_slug=host.slug %}
+    {% for occ in occurrences %}
+        {% include 'wbcore/event_feed.html' with occ=occ host_slug=host.slug %}
     {% endfor %}
     </div>
 {% endif %}

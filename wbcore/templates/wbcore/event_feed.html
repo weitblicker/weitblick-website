@@ -1,35 +1,36 @@
 {% load static %}
 
-<div class="item">
+<!-- occ = occurrence of an event, use occ.event. for attributes not in original Event class by django-scheduler -->
 
-  {% if event.image %}
-  <a class="image" href="{% if host_slug %}{% url 'event' host_slug=host_slug event_slug=event.slug %}{% else %}{% url 'event' event_slug=event.slug %}{% endif %}">
-      <img src="{{ event.image.get_listsize_url }}" alt="{{ event.image.title }}">
+<div class="item">
+  <a class="image" href="{% if host_slug %}{% url 'event' host_slug event_slug=occ.event.slug %}{% else %}{% url 'event' event_slug=occ.event.slug %}{% endif %}">
+      {% if occ.image %}
+      <img src="{{ occ.event.image.get_listsize_url }}" alt="{{ occ.event.image.title }}">
+      {% else %}
+          <div class="image" style="margin-bottom:15px;">{% include 'wbcore/svgs/placeholder.svg' with text="Event"%}</div>
+      {% endif %}
   </a>
-  {% else %}
-      <div class="image" style="margin-bottom:15px;">{% include 'wbcore/svgs/placeholder.svg' with text="Event"%}</div>
-  {% endif %}
 
   <div class="content">
     <div class="meta">
       <span class="date">
-        {% if event.start.day == event.end.day %}
-          {{ event.start|date:"D, j. M Y"}}  &ensp; {{ event.start|date:"H:i"}} - {{ event.end|date:"H:i"}}
+        {% if occ.start.day == occ.end.day %}
+          {{ occ.start|date:"D, j. M Y"}}  &ensp; {{ occ.start|date:"H:i"}} - {{ occ.end|date:"H:i"}}
         {% else %}
-          {{ event.start|date:"D, j. M Y"}} &ensp; &mdash; &ensp; {{ event.end|date:"D, j. M Y"}}
+          {{ occ.start|date:"D, j. M Y"}} &ensp; &mdash; &ensp; {{ occ.end|date:"D, j. M Y"}}
         {% endif %}
       </span>
-      {% if event.location %} | <span>{{ event.location.name }}</span>{% endif %}
+      {% if occ.event.location %} | <span>{{ occ.event.location.name }}</span>{% endif %}
     </div>
-    <a class="ui medium header" href="{% if host_slug %}{% url 'event' host_slug=host_slug event_slug=event.slug %}{% else %}{% url 'event' event_slug=event.slug %}{% endif %}">{{ event.title }}</a>
+    <a class="ui medium header" href="{% if host_slug %}{% url 'event' host_slug=host_slug event_slug=occ.event.slug %}{% else %}{% url 'event' event_slug=occ.event.slug %}{% endif %}">{{ occ.title }}</a>
 
     <div class="description">
-      {% if event.teaser %} <p>{{ event.teaser | safe }}</p>
-      {% else %} <p>{{ event.description | safe | truncatewords:45 }}</p>
+      {% if occ.event.teaser %} <p>{{ occ.event.teaser | safe }}</p>
+      {% else %} <p>{{ occ.description | safe | truncatewords:45 }}</p>
       {% endif %}
     </div>
     <div class="extra content">
-      {% for host in hosts %}
+      {% for host in occ.event.host.all %}
         <div class="meta">
           {% if host %}
             <a href="{% url 'host' host_slug=host.slug %}" class="wb-link">

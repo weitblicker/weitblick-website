@@ -37,12 +37,12 @@
             </div>
             <div class="five wide column divided items">
                 <div class="column-content">
-                  <a class="ui item header"href="{% url 'events' %}" >Events</a>
-                  {% if events %}
+                  <a class="ui item header"href="{% url 'events' %}">Events</a>
+                  {% if occurrences %}
                     <div class="ui divided unstackable items">
-                    {% for event in events %}
+                    {% for occ in occurrences %}
                       <!-- TODO: use different template, this is used for events page and to wide here -->
-                      {% include 'wbcore/event_feed.html' with event=event host_slug=host.slug %}
+                      {% include 'wbcore/event_feed.html' with occ=occ host_slug=host.slug %}
                     {% endfor %}
                     </div>
                   {% endif %}
