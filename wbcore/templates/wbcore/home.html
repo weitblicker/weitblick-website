@@ -37,10 +37,14 @@
             </div>
             <div class="five wide column divided items">
                 <div class="column-content">
-                    <a class="ui item header"href="{% url 'events' %}" >Events</a>
-                    {% for entry in events %}
-                        {% include 'wbcore/dot_nav_item.html' with type='event' id=entry.pk title=entry.title image=entry.image desc=entry.text|truncatewords:7 %}
+                  <a class="ui item header"href="{% url 'events' %}" >Events</a>
+                  {% if events %}
+                    <div class="ui divided unstackable items">
+                    {% for event in events %}
+                      {% include 'wbcore/event_feed.html' with event=event host_slug=host.slug %}
                     {% endfor %}
+                    </div>
+                  {% endif %}
                 </div>
             </div>
         </div>
