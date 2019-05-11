@@ -10,10 +10,12 @@ from django.urls import reverse
 from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError
 from datetime import timedelta, date
-from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost, Team
 from collections import OrderedDict
-from .forms import ContactForm
 from email.message import EmailMessage
+
+from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost, Team
+from wbcore.forms import ContactForm, JoinForm
+
 
 EMAIL_ADDRESS = os.environ.get('TEST_EMAIL_USER')
 EMAIL_PASSWORT = os.environ.get('TEST_EMAIL_PW')
@@ -322,6 +324,7 @@ def teams_view(request, host_slug=None):
     }
     return HttpResponse(template.render(context, request))
 
+
 def team_view(request, host_slug=None):
     try:
         host = Host.objects.get(slug=host_slug) if host_slug else None
@@ -445,13 +448,41 @@ def join_view(request, host_slug=None):
         host = Host.objects.get(slug=host_slug) if host_slug else None
     except Host.DoesNotExist:
         raise Http404()
+
     template = loader.get_template('wbcore/join.html')
+
+    try:
+        host = Host.objects.get(slug=host_slug) if host_slug else None
+    except Host.DoesNotExist:
+        raise Http404()
+
+    if host:
+        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
+    else:
+        breadcrumb = [('Home', reverse('home')), ('Contact', None)]
+
+    success = False
+
+    if request.method == 'POST':
+        form = JoinForm(request.POST)
+        if form.is_valid():
+            form.save()
+            success = True
+    else:
+        if host:
+            form = JoinForm(initial={'hosts': [host_slug]})
+        else:
+            form = JoinForm()
+
     context = {
         'main_nav': get_main_nav(active='join'),
         'dot_nav': dot_nav,
         'host': host,
         'breadcrumb': [('Home', reverse('home')), ('Join in', None)],
+        'join_form': form,
+        'success': success,
     }
+
     return HttpResponse(template.render(context, request))
 
 
@@ -837,6 +868,7 @@ def impressum_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
     }
     return HttpResponse(template.render(context, request))
+
 
 def contact_view(request, host_slug=None):
     try:
