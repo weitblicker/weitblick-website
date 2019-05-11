@@ -24,6 +24,7 @@ Django = "==2.1.5"
 django_compressor = "*"
 Markdown = "*"
 Pillow = "*"
+django-scheduler = "*"
 
 [dev-packages]
 
