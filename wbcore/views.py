@@ -25,8 +25,6 @@ dot_nav_news = NewsPost.objects.all().order_by('-published')[:3]
 dot_nav_blog = BlogPost.objects.all().order_by('-published')[:3]
 dot_nav_events = Event.objects.all().order_by('-start')[:3]
 
-print("\n\n", Event.objects.all().first(), "\n\n")
-
 
 dot_nav = {'news': dot_nav_news,
            'blog': dot_nav_blog,

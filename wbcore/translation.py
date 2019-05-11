@@ -5,7 +5,8 @@ Necessary for the modeltranslation package
 """
 
 from modeltranslation.translator import register, TranslationOptions
-from .models import Project, Location, Address, Host, Partner, Event, NewsPost, BlogPost, Document, Team, Milestep, Content
+from .models import Project, Location, Address, Host, Partner, NewsPost, BlogPost, Document, Team, Milestep, Content, Event
+from schedule.models.events import Event as ScheduleEvent
 
 @register(Content)
 class ContentTranslationOptions(TranslationOptions):
@@ -32,9 +33,13 @@ class HostTranslationOptions(TranslationOptions):
 class PartnerTranslationOptions(TranslationOptions):
     fields = ('name','description',)
 
+@register(ScheduleEvent)
+class ScheduleEventTranslationOptions(TranslationOptions):
+    fields = ()
+
 @register(Event)
-class EventTranslationOptions(TranslationOptions):
-    fields = ('title','description',)
+class EventTranslationOptions(ScheduleEventTranslationOptions):
+    fields = ('title', 'description',)
 
 @register(NewsPost)
 class NewsPostTranslationOptions(TranslationOptions):
