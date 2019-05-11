@@ -1,6 +1,7 @@
 import csv
 import os
 import smtplib
+import pdb
 
 from django.db.models import Count
 from django.http import HttpResponse, Http404
@@ -10,7 +11,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError
 from datetime import timedelta, date
-from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost, Team
+from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation
 from collections import OrderedDict
 from .forms import ContactForm
 from email.message import EmailMessage
@@ -298,6 +299,7 @@ def privacy_view(request, host_slug=None):
     }
     return HttpResponse(template.render(context, request))
 
+
 def teams_view(request, host_slug=None):
     try:
         if not host_slug:
@@ -308,7 +310,7 @@ def teams_view(request, host_slug=None):
         raise Http404()
     if host:
         try:
-            breadcrumb = [('Team', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', None)]
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', None)]
         except:
             raise Http404()
     else:
@@ -327,22 +329,36 @@ def teams_view(request, host_slug=None):
     }
     return HttpResponse(template.render(context, request))
 
-def team_view(request, host_slug=None):
+
+def team_view(request, host_slug=None, team_slug=None):
     try:
         host = Host.objects.get(slug=host_slug) if host_slug else None
     except Host.DoesNotExist:
         raise Http404()
 
+    try:
+        team = Team.objects.get(slug=team_slug, host=host)
+    except Team.DoesNotExist:
+        raise Http404()
+
+    if not team:
+        raise Http404()
+
     if host:
         try:
-            breadcrumb = [('Team', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', None)]
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', reverse('teams')), (team.name, None)]
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('Team', None)]
+        breadcrumb = [('Home', reverse('home')), ('Team', reverse('teams')), (team.name, None)]
 
-    team = None
+    members = team.members.all()
+    relations = []
+    for member in members:
+        relations.append(TeamUserRelation.objects.get(user=member))
+
+    members_relations = sorted(zip(members, relations), key=lambda tup: (tup[1].priority, tup[0].name.split(" ")[-1]))
 
     template = loader.get_template('wbcore/team.html')
     context = {
@@ -350,7 +366,8 @@ def team_view(request, host_slug=None):
         'dot_nav': dot_nav,
         'host': host,
         'breadcrumb': breadcrumb,
-        'team': team
+        'team': team,
+        'members_relations': members_relations,
     }
     return HttpResponse(template.render(context, request))
 

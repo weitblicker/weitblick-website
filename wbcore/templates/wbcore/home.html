@@ -36,14 +36,16 @@
             <div class="column divided items split-space">
             </div>
             <div class="five wide column divided items">
-              <a class="ui item header" href="{% url 'events' %}">Events</a>
-              {% if events %}
-                  <div class="ui divided unstackable items">
-                  {% for event in events %}
+                <div class="column-content">
+                  <a class="ui item header"href="{% url 'events' %}" >Events</a>
+                  {% if events %}
+                    <div class="ui divided unstackable items">
+                    {% for event in events %}
                       {% include 'wbcore/event_feed.html' with event=event host_slug=host.slug %}
-                  {% endfor %}
-                  </div>
-              {% endif %}
+                    {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
             </div>
         </div>
     </div>

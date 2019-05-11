@@ -2,6 +2,7 @@ from django.db import models
 from django_countries.fields import CountryField
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.contrib.auth.models import User
+from django.utils.text import slugify
 from photologue.models import Gallery, Photo
 from os.path import splitext
 from localflavor.generic.models import IBANField
@@ -54,6 +55,8 @@ class Host(models.Model):
     founding_date = models.DateField()
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True)
+    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
+    
 
     def search_title(self):
         return self.name
@@ -103,7 +106,6 @@ class Content(models.Model):
 
     def __str__(self):
         return dict(self.TYPE_CHOICES)[self.type] + " (" + self.host.name + ")"
-
 
 
 def save_partner_logo(instance, filename):
@@ -188,7 +190,7 @@ class Profile(models.Model):
     name = models.CharField(max_length=100)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     host = models.ManyToManyField(Host, through='UserRelation')
-    image = models.ImageField(null=True, blank=True)
+    image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
     since = models.DateField(auto_now_add=True)
     until = models.DateField(null=True, blank=True)
@@ -344,30 +346,62 @@ class Document(models.Model):
         city = ("(" + self.host.city + ")") if self.host else ''
         return self.title + " " + city
 
+
 def save_team_image(instance, filename):
     return "teams/"+ instance.host.slug +"/" + instance.name.lower().replace(' ', '_') + splitext(filename)[1].lower()
 
+
 class Team(models.Model):
     name = models.CharField(max_length=100)
-    description = models.TextField(null=True, blank=True)
+    slug = models.SlugField(max_length=50, null=False, blank=False)
+    description = models.TextField(blank=True, default="")
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
-    member = models.ManyToManyField(Profile, through='TeamUserRelation')
-    image = models.ImageField(upload_to=save_team_image, null=True, blank=True)
+    members = models.ManyToManyField(Profile, through='TeamUserRelation')
+    image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
-    # TODO add host_slug
+    def search_title(self):
+        return self.name
+
+    def search_url(self):
+        return reverse('team', args=[self.slug])
+
+    def search_image(self):
+        return ""
+
+    @staticmethod
+    def get_model_name():
+        return "Team"
+
     def __str__(self):
-        city = ("(" + self.host.city + ")") if self.host else ''
-        return self.name + " " + city
+        return self.name + " (" + self.host.name + ")"
+
+    def validate_unique(self, *args, **kwargs):
+        super(Team, self).validate_unique(*args, **kwargs)
+
+        same_host_and_slug = Team.objects.filter(host=self.host, slug=self.slug)
+
+        if same_host_and_slug.exists() and (self not in same_host_and_slug):  # second part is necessary to be able to edit a team. Otherwise saving after editing will raise slug already exists error
+            print(same_host_and_slug, "\n", self)
+            raise ValidationError(
+                {
+                    NON_FIELD_ERRORS: [
+                        'The \"slug\" ' + self.slug + ' already exist!',
+                    ],
+                }
+            )
+
 
 class TeamUserRelation(models.Model):
     user = models.ForeignKey(Profile, on_delete= models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     text = models.TextField()
+    priority = models.IntegerField(default=99)
 
     def __str__(self):
         return self.user.name + ' in ' + self.team.name
+
 
 class Donation(models.Model):
     host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True)
