@@ -41,6 +41,7 @@
                   {% if events %}
                     <div class="ui divided unstackable items">
                     {% for event in events %}
+                      <!-- TODO: use different template, this is used for events page and to wide here -->
                       {% include 'wbcore/event_feed.html' with event=event host_slug=host.slug %}
                     {% endfor %}
                     </div>

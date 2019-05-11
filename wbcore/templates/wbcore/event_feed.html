@@ -2,30 +2,43 @@
 
 <div class="item">
 
-    {% if event.image %}
-    <a class="image" href="{% if host_slug %}{% url 'event' host_slug=host_slug event_slug=event.slug %}{% else %}{% url 'event' event_slug=event.slug %}{% endif %}">
-        <img src="{{ event.image.get_listsize_url }}" alt="{{ event.image.title }}">
-    </a>
-    {% else %}
-        <div class="image" style="margin-bottom:15px;">{% include 'wbcore/svgs/placeholder.svg' with text="Event"%}</div>
-    {% endif %}
+  {% if event.image %}
+  <a class="image" href="{% if host_slug %}{% url 'event' host_slug=host_slug event_slug=event.slug %}{% else %}{% url 'event' event_slug=event.slug %}{% endif %}">
+      <img src="{{ event.image.get_listsize_url }}" alt="{{ event.image.title }}">
+  </a>
+  {% else %}
+      <div class="image" style="margin-bottom:15px;">{% include 'wbcore/svgs/placeholder.svg' with text="Event"%}</div>
+  {% endif %}
 
-    <div class="content">
-        <div class="meta">
-            <span class="date">
-                {{ event.start|date:"D, j. M Y"}} &ensp; &mdash; &ensp; {{ event.end|date:"D, j. M Y"}}
-            </span>
-            {% if event.host.slug %} | <a href="{% url 'host' host_slug=event.host.slug %}" class="wb-link"><span class="wb-icon">{% include 'wbcore/svgs/puzzle-icon.svg' %}</span><span class="wb-name">{{ event.host.name|cut:"Weitblick " }}</span></a>{% endif %}
-        </div>
-        <a class="ui medium header" href="{% if host_slug %}{% url 'event' host_slug=host_slug event_slug=event.slug %}{% else %}{% url 'event' event_slug=event.slug %}{% endif %}">{{ event.name }}</a>
-
-        <div class="description">
-            {% if event.teaser %} <p>{{ event.description | safe }}</p>
-            {% else %} <p>{{ event.description | safe | truncatewords:45 }}</p>
-            {% endif %}
-        </div>
-        <!-- <div class="extra">
-            <img class="ui avatar image" src="{% get_media_prefix %}kristy.png">{{ event.host | cut:'Weitblick ' }}
-        </div> -->
+  <div class="content">
+    <div class="meta">
+      <span class="date">
+        {% if event.start.day == event.end.day %}
+          {{ event.start|date:"D, j. M Y"}}  &ensp; {{ event.start|date:"H:i"}} - {{ event.end|date:"H:i"}}
+        {% else %}
+          {{ event.start|date:"D, j. M Y"}} &ensp; &mdash; &ensp; {{ event.end|date:"D, j. M Y"}}
+        {% endif %}
+      </span>
+      {% if event.location %} | <span>{{ event.location.name }}</span>{% endif %}
     </div>
+    <a class="ui medium header" href="{% if host_slug %}{% url 'event' host_slug=host_slug event_slug=event.slug %}{% else %}{% url 'event' event_slug=event.slug %}{% endif %}">{{ event.title }}</a>
+
+    <div class="description">
+      {% if event.teaser %} <p>{{ event.teaser | safe }}</p>
+      {% else %} <p>{{ event.description | safe | truncatewords:45 }}</p>
+      {% endif %}
+    </div>
+    <div class="extra content">
+      {% for host in hosts %}
+        <div class="meta">
+          {% if host %}
+            <a href="{% url 'host' host_slug=host.slug %}" class="wb-link">
+              <span class="wb-icon">{% include 'wbcore/svgs/puzzle-icon.svg' %}</span>
+              <span class="wb-name">{{ host.name|cut:"Weitblick " }}</span>
+            </a>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
 </div>
