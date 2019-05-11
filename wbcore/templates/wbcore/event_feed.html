@@ -26,7 +26,7 @@
 
     <div class="description">
       {% if occ.event.teaser %} <p>{{ occ.event.teaser | safe }}</p>
-      {% else %} <p>{{ occ.description | safe | truncatewords:45 }}</p>
+      {% else %} <p>{{ occ.description | safe | truncatechars:120 }}</p>
       {% endif %}
     </div>
     <div class="extra content">

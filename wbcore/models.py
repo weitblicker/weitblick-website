@@ -56,7 +56,7 @@ class Host(models.Model):
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
-    
+
 
     def search_title(self):
         return self.name
@@ -160,6 +160,7 @@ class Project(models.Model):
 
 class Event(ScheduleEvent):
     slug = models.SlugField(max_length=50, unique=True, null=True)
+    teaser = models.TextField(max_length=120, blank=True)
     projects = models.ManyToManyField(Project, blank=True)
     host = models.ManyToManyField(Host)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
