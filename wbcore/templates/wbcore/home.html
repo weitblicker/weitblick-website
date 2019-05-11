@@ -41,8 +41,7 @@
                   {% if occurrences %}
                     <div class="ui divided unstackable items">
                     {% for occ in occurrences %}
-                      <!-- TODO: use different template, this is used for events page and to wide here -->
-                      {% include 'wbcore/event_feed.html' with occ=occ host_slug=host.slug %}
+                      {% include 'wbcore/event_feed_side.html' with occ=occ host_slug=host.slug %}
                     {% endfor %}
                     </div>
                   {% endif %}
