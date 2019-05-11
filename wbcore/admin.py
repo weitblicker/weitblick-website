@@ -12,7 +12,7 @@ from django_google_maps import widgets as map_widgets
 from django_google_maps import fields as map_fields
 
 from .models import (
-    Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, Profile, ContactMessage, UserRelation,
+    Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, ContactMessage, UserRelation,
     Document, Team, Milestone, Donation, Milestep, BankAccount, TeamUserRelation, Content, MyUser
 )
 
@@ -25,6 +25,10 @@ class MyTranslatedAdmin(TabbedTranslationAdmin):
     pass
 
 
+class UserRelationInlineModel(admin.TabularInline):
+    model = MyUser.hosts.through
+
+
 class MyAdmin(admin.ModelAdmin):
     '''
     Implements a wysiwyg editor.
@@ -32,7 +36,6 @@ class MyAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.TextField: {'widget': TinyMCE(mce_attrs={'height': 200})},
         map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget(attrs={'data-map-type': 'roadmap'})},
-
     }
 
     def has_add_permission(self, request):
@@ -119,8 +122,8 @@ class UserCreationForm(forms.ModelForm):
 
     class Meta:
         model = MyUser
-        fields = ('email', 'date_of_birth', 'hosts')
-        exclude = ('date_joined',)
+        fields = ('first_name', 'last_name', 'email', 'date_of_birth')
+        exclude = ()
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -148,8 +151,8 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = MyUser
-        fields = ('email', 'password', 'date_of_birth', 'is_active', 'hosts', 'first_name', 'last_name')
-        exclude = ('date_joined',)
+        fields = ('email', 'password', 'date_of_birth', 'is_active', 'first_name', 'last_name')
+        exclude = ()
 
     def clean_password(self):
         # Regardless of what the user provides, return the initial value.
@@ -166,22 +169,22 @@ class UserAdmin(BaseUserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ('first_name', 'last_name', 'email', 'date_of_birth')
+    list_display = ('name', 'email', 'date_of_birth')
     list_filter = ('hosts', 'role')
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'date_of_birth',)}),
-        ('Permissions', {'fields': ('hosts', 'role')}),
+        ('Permissions', {'fields': ('role',)}),
     )
+    inlines = (UserRelationInlineModel,)
 
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
     # overrides get_fieldsets to use this attribute when creating a user.
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'date_of_birth', 'hosts', 'password1', 'password2'),
-            'exclude': ('date_joined',)},
-        ),
+            'fields': ('first_name', 'last_name', 'email', 'date_of_birth', 'password1', 'password2'),
+        },),
     )
     search_fields = ('email',)
     ordering = ('email', 'hosts')
@@ -203,7 +206,6 @@ admin.site.register(Partner, MyAdmin)
 admin.site.register(Project, MyAdmin)
 admin.site.register(Event, MyAdmin)
 admin.site.register(NewsPost, MyAdmin)
-admin.site.register(Profile, MyAdmin)
 admin.site.register(UserRelation, MyAdmin)
 admin.site.register(Document, MyAdmin)
 admin.site.register(Team, MyAdmin)

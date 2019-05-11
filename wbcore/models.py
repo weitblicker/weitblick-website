@@ -58,7 +58,7 @@ class Host(models.Model):
 
 
 class MyUserManager(BaseUserManager):
-    def create_user(self, email, date_of_birth, password=None):
+    def create_user(self, first_name, last_name, email, date_of_birth, password=None):
         """
         Creates and saves a User with the given email, date of
         birth and password.
@@ -66,7 +66,15 @@ class MyUserManager(BaseUserManager):
         if not email:
             raise ValueError('Users must have an email address')
 
+        if not first_name:
+            raise ValueError('Users must have a first name')
+
+        if not last_name:
+            raise ValueError('Users must have a last name')
+
         user = self.model(
+            first_name=first_name,
+            last_name=last_name,
             email=self.normalize_email(email),
             date_of_birth=date_of_birth,
         )
@@ -75,13 +83,15 @@ class MyUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, date_of_birth, password):
+    def create_superuser(self, first_name, last_name, email, date_of_birth, password):
         """
         Creates and saves a superuser with the given email, date of
         birth and password.
         """
         user = self.create_user(
-            email,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
             password=password,
             date_of_birth=date_of_birth,
         )
@@ -94,7 +104,6 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=60)
     first_name = models.CharField(max_length=60)
     last_name = models.CharField(max_length=60)
-    #date_joined = models.DateField()
     email = models.EmailField(
         verbose_name='email address',
         max_length=255,
@@ -111,7 +120,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     def is_super_admin(self):
         return self.role == 'super_admin'
 
-    hosts = models.ManyToManyField(Host)
+    hosts = models.ManyToManyField(Host, through='UserRelation')
 
     ROLE_CHOICES = (
         ('super_admin', 'Admin'),
@@ -125,10 +134,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     objects = MyUserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['date_of_birth']
-
-    def __str__(self):
-        return self.email
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'date_of_birth']
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
@@ -155,6 +161,20 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     def has_module_perms(self, app_label):
         return True
 
+    @property
+    def name(self):
+        return self.first_name + " " + self.last_name
+
+    image = models.ImageField(null=True, blank=True)
+    address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
+    since = models.DateField(auto_now_add=True)
+    until = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+    def belongs_to_host(self, host):
+        return self.host == host
 
 
 class Location(models.Model):
@@ -295,36 +315,15 @@ class Event(models.Model):
         return self.host == host
 
 
-class Profile(models.Model):
-    name = models.CharField(max_length=100)
-    user = models.OneToOneField(MyUser, on_delete=models.CASCADE)
-    host = models.ManyToManyField(Host, through='UserRelation')
-    image = models.ImageField(null=True, blank=True)
-    address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
-    since = models.DateField(auto_now_add=True)
-    until = models.DateField(null=True, blank=True)
-    STATUS_CHOICES = (
-        ('activ', 'Active'),
-        ('left', 'Left')
-    )
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
-
-    def __str__(self):
-        return self.name
-
-    def belongs_to_host(self, host):
-        return self.host == host
-
-
 class UserRelation(models.Model):
     host = models.ForeignKey(Host, on_delete=models.CASCADE)
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     TYPE_CHOICES = (
         ('user', 'User'),
         ('member', 'Member'),
         ('pending', 'Pending')
     )
-    member_type=models.CharField(max_length=20, choices=TYPE_CHOICES, default='pending')
+    member_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='pending')
     membership_fee = models.DecimalField(max_digits=5, decimal_places=2)
 
     def __str__(self):
@@ -479,7 +478,7 @@ class Team(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
-    member = models.ManyToManyField(Profile, through='TeamUserRelation')
+    member = models.ManyToManyField(MyUser, through='TeamUserRelation')
     image = models.ImageField(upload_to=save_team_image, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -494,7 +493,7 @@ class Team(models.Model):
 
 
 class TeamUserRelation(models.Model):
-    user = models.ForeignKey(Profile, on_delete= models.CASCADE)
+    user = models.ForeignKey(MyUser, on_delete= models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     text = models.TextField()
 
@@ -544,7 +543,7 @@ class Milestep(models.Model):
 
 class BankAccount(models.Model):
     account_holder = models.CharField(max_length=100)
-    profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
+    profile = models.OneToOneField(MyUser, on_delete=models.CASCADE)
     iban = IBANField(include_countries=IBAN_SEPA_COUNTRIES)
     bic = BICField()
 
