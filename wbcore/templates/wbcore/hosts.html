@@ -2,6 +2,7 @@
 {% load staticfiles %}
 {% block single-content %}
 
+{% include 'wbcore/hosts_map.html' %}
 {% if hosts %}
     <ul class="ui items">
     {% for host in hosts %}

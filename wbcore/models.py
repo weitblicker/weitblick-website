@@ -53,6 +53,8 @@ class Host(models.Model):
     founding_date = models.DateField()
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True)
+    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
+    
 
     def search_title(self):
         return self.name
