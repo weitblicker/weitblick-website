@@ -15,12 +15,17 @@ from collections import OrderedDict
 from .forms import ContactForm
 from email.message import EmailMessage
 
+from django.db.utils import OperationalError
+
 EMAIL_ADDRESS = os.environ.get('TEST_EMAIL_USER')
 EMAIL_PASSWORT = os.environ.get('TEST_EMAIL_PW')
 
 dot_nav_news = NewsPost.objects.all().order_by('-published')[:3]
 dot_nav_blog = BlogPost.objects.all().order_by('-published')[:3]
-dot_nav_events = Event.objects.all().order_by('-start_date')[:3]
+dot_nav_events = Event.objects.all().order_by('-start')[:3]
+
+print("\n\n", Event.objects.all().first(), "\n\n")
+
 
 dot_nav = {'news': dot_nav_news,
            'blog': dot_nav_blog,
@@ -125,7 +130,7 @@ def get_host_slugs(request, host_slug):
 def home_view(request):
     projects = Project.objects.all()
     hosts = Host.objects.all()
-    events = Event.objects.all().order_by('-start_date')[:3]
+    events = Event.objects.all().order_by('-start')[:3]
     posts = NewsPost.objects.all().order_by('-published')[:3]
     blog = BlogPost.objects.all().order_by('-published')[:3]
 

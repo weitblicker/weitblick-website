@@ -10,6 +10,7 @@ from localflavor.generic.countries.sepa import IBAN_SEPA_COUNTRIES
 from django.urls import reverse
 from django.conf import settings
 from django_google_maps import fields as map_fields
+from schedule.models.events import Event as ScheduleEvent
 
 
 class Address(models.Model):
@@ -155,26 +156,18 @@ class Project(models.Model):
         else:
             return None
 
-
-class Event(models.Model):
-    name = models.CharField(max_length=200)
+class Event(ScheduleEvent):
     slug = models.SlugField(max_length=50, unique=True, null=True)
     projects = models.ManyToManyField(Project, blank=True)
     host = models.ManyToManyField(Host)
-    description = models.TextField()
-    start_date = models.DateField()
-    start_time = models.TimeField(null=True, blank=True)
-    end_date = models.DateField(null=True, blank=True)
-    end_time = models.TimeField(null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
-    image = models.ForeignKey(Photo, null=True, blank =True, on_delete=models.SET_NULL)
+    image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     gallery = models.ForeignKey(Gallery, null=True, blank =True,on_delete=models.SET_NULL)
 
     def search_title(self):
-        return self.name
+        return self.title
 
     def search_url(self):
         return reverse('event', args=[self.slug])
@@ -187,17 +180,8 @@ class Event(models.Model):
     def get_model_name():
         return 'Events'
 
-    def author_name(self):
-        name = self.author_str
-        if self.author:
-            name = self.author.first_name + " " + self.author.last_name
-        return name
-
     class Meta:
-        get_latest_by = ['start_date', 'start_time']
-
-    def __str__(self):
-        return self.name
+        get_latest_by = ['start']
 
 
 class Profile(models.Model):

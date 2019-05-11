@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Necessary for the modeltranslation package 
+Necessary for the modeltranslation package
 
 """
 
@@ -18,24 +18,24 @@ class ProjectTranslationOptions(TranslationOptions):
 @register(Location)
 class LocationTranslationOptions(TranslationOptions):
     fields = ('name','city','description',)
-    
+
 @register(Address)
 class AddressTranslationOptions(TranslationOptions):
     fields = ('name','city',)
     prepopulated_fields={'name':'all'}
-    
+
 @register(Host)
 class HostTranslationOptions(TranslationOptions):
     fields = ('city',)
-    
+
 @register(Partner)
 class PartnerTranslationOptions(TranslationOptions):
     fields = ('name','description',)
 
 @register(Event)
 class EventTranslationOptions(TranslationOptions):
-    fields = ('name','description',)
-    
+    fields = ('title','description',)
+
 @register(NewsPost)
 class NewsPostTranslationOptions(TranslationOptions):
     fields = ('title','text', 'teaser')
@@ -47,7 +47,7 @@ class BlogPostTranslationOptions(TranslationOptions):
 @register(Document)
 class DocumentTranslationOptions(TranslationOptions):
     fields = ('title','description')
-    
+
 @register(Team)
 class TeamTranslationOptions(TranslationOptions):
     fields = ('name','description')
