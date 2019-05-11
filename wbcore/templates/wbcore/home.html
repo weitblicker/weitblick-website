@@ -38,8 +38,8 @@
             <div class="five wide column divided items">
                 <div class="column-content">
                     <a class="ui item header"href="{% url 'events' %}" >Events</a>
-                    {% for entry in events %}
-                        {% include 'wbcore/dot_nav_item.html' with type='event' id=entry.pk title=entry.title image=entry.image desc=entry.text|truncatewords:7 %}
+                    {% for event in events %}
+                        {% include 'wbcore/dot_nav_item.html' with type='event' slug=entry.slug title=event.name image=event.image desc=event.description|truncatewords:7 %}
                     {% endfor %}
                 </div>
             </div>

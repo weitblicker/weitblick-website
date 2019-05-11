@@ -100,12 +100,12 @@
         {% endif %}
     </div>
     <div class="ui two wide column unstackable items">
-        {% if host %} <a href="{% url 'events' host.slug %}"><h4 class="ui header">Events</h4></a>
-        {% else %} <a href="{% url 'events' %}"><h4 class="ui header">Events</h4></a>
+        {% if host %} <a class="ui item header href="{% url 'events' host.slug %}">Events</a>
+        {% else %} <a class="ui item header" href="{% url 'events' %}">Events</a>
         {% endif %}
         <div class="ui link list">
-            {% for entry in dot_nav.events %}
-                <a class="item">{{ entry.title }}</a>
+            {% for event in dot_nav.events %}
+                {% include 'wbcore/dot_nav_item.html' with type='event' slug=entry.slug title=event.name image=event.image photo=event.image desc=event.description|truncatewords:7 %}
             {% endfor %}
         </div>
     </div>
