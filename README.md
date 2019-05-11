@@ -61,3 +61,6 @@ Install Elastic Search 2. You can download it here: https://www.elastic.co/de/do
 * Use the django module command to build the search index: `python manage.py rebuild_index` type `y` or add a `--noinput` to the rebuild command. 
 * This search index should be updated later when adding content, for example by using a cron job running: `python manage.py update_index`
 
+### FAE (Frequently Appearing Errors)
+
+* no such table when database is empty: https://stackoverflow.com/questions/34548768/django-no-such-table-exception
