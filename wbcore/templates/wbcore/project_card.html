@@ -1,7 +1,9 @@
 {% load static %}
 <div class="ui fluid card">
   <div class="content">
-    <a class="ui fluid image" href="{% url 'project' slug %}">
+    {% if host %} <a class="ui fluid image" href="{% url 'project' host.slug slug %}">
+    {% else %} <a class="ui fluid image" href="{% url 'project' slug %}">
+    {% endif %}
       <div class="ui orange ribbon label">{{ country }}</div>
       {% if image %}<img src="{{ image.get_cardsize_url }}" alt="{{ image.title }}" style="margin-bottom: 15px"/>
       {% else %}
