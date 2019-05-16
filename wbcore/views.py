@@ -4,25 +4,26 @@ import smtplib
 
 from django.db.models import Count
 from django.http import HttpResponse, Http404
-from django.shortcuts import render, redirect
 from django.template import loader
 from django.urls import reverse
-from django.contrib import messages
-from django.core.mail import send_mail, BadHeaderError
-from datetime import timedelta, date
+from django.core.mail import BadHeaderError
+from datetime import date
+from wbcore.forms import ContactForm, JoinForm
+from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation
 from collections import OrderedDict
 from email.message import EmailMessage
+from datetime import datetime, timedelta
+from schedule.periods import Period
 
-from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost, Team
-from wbcore.forms import ContactForm, JoinForm
-
-
+# TODO move to settings
 EMAIL_ADDRESS = os.environ.get('TEST_EMAIL_USER')
 EMAIL_PASSWORT = os.environ.get('TEST_EMAIL_PW')
 
+# TODO make more generic and configurable
 dot_nav_news = NewsPost.objects.all().order_by('-published')[:3]
 dot_nav_blog = BlogPost.objects.all().order_by('-published')[:3]
-dot_nav_events = Event.objects.all().order_by('-start_date')[:3]
+dot_nav_events = Event.objects.all().order_by('-start')[:3]
+
 
 dot_nav = {'news': dot_nav_news,
            'blog': dot_nav_blog,
@@ -127,18 +128,21 @@ def get_host_slugs(request, host_slug):
 def home_view(request):
     projects = Project.objects.all()
     hosts = Host.objects.all()
-    events = Event.objects.all().order_by('-start_date')[:3]
     posts = NewsPost.objects.all().order_by('-published')[:3]
     blog = BlogPost.objects.all().order_by('-published')[:3]
+    events = Event.objects.all().order_by('-start')
+    period = Period(events, datetime.now(), datetime.now() + timedelta(365/2))
+    occurrences = period.get_occurrences()[:3]
 
     template = loader.get_template('wbcore/home.html')
+
 
     context = {
         'main_nav': get_main_nav(),
         'dot_nav': dot_nav,
         'projects': projects,
         'hosts': hosts,
-        'events': events,
+        'occurrences': occurrences,
         'posts': posts,
         'breadcrumb': [('Home', None)],
         'icon_links': icon_links
@@ -295,6 +299,7 @@ def privacy_view(request, host_slug=None):
     }
     return HttpResponse(template.render(context, request))
 
+
 def teams_view(request, host_slug=None):
     try:
         if not host_slug:
@@ -305,7 +310,7 @@ def teams_view(request, host_slug=None):
         raise Http404()
     if host:
         try:
-            breadcrumb = [('Team', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', None)]
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', None)]
         except:
             raise Http404()
     else:
@@ -325,22 +330,35 @@ def teams_view(request, host_slug=None):
     return HttpResponse(template.render(context, request))
 
 
-def team_view(request, host_slug=None):
+def team_view(request, host_slug=None, team_slug=None):
     try:
         host = Host.objects.get(slug=host_slug) if host_slug else None
     except Host.DoesNotExist:
         raise Http404()
 
+    try:
+        team = Team.objects.get(slug=team_slug, host=host)
+    except Team.DoesNotExist:
+        raise Http404()
+
+    if not team:    # TODO check if this is reachable, I think this is useless here.
+        raise Http404()
+
     if host:
         try:
-            breadcrumb = [('Team', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', None)]
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', reverse('teams')), (team.name, None)]
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('Team', None)]
+        breadcrumb = [('Home', reverse('home')), ('Team', reverse('teams')), (team.name, None)]
 
-    team = None
+    members = team.members.all()
+    relations = []
+    for member in members:
+        relations.append(TeamUserRelation.objects.get(user=member))
+
+    members_relations = sorted(zip(members, relations), key=lambda tup: (tup[1].priority, tup[0].name.split(" ")[-1]))
 
     template = loader.get_template('wbcore/team.html')
     context = {
@@ -348,7 +366,8 @@ def team_view(request, host_slug=None):
         'dot_nav': dot_nav,
         'host': host,
         'breadcrumb': breadcrumb,
-        'team': team
+        'team': team,
+        'members_relations': members_relations,
     }
     return HttpResponse(template.render(context, request))
 
@@ -529,7 +548,6 @@ def hosts_view(request):
     return HttpResponse(template.render(context, request))
 
 
-
 def host_view(request, host_slug):
     try:
         host = Host.objects.get(slug=host_slug) if host_slug else None
@@ -562,11 +580,14 @@ def events_view(request, host_slug=None):
         events = Event.objects.all()
         breadcrumb = [('Home', reverse('home')), ('Events', None)]
 
+    p = Period(events, datetime.now(), datetime.now() + timedelta(days=365/2))
+    occurrences = p.get_occurrences()
+
     template = loader.get_template('wbcore/events.html')
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': dot_nav,
-        'events': events,
+        'occurrences': occurrences,
         'host': host,
         'breadcrumb': breadcrumb,
     }
@@ -581,11 +602,11 @@ def event_view(request, host_slug=None, event_slug=None):
             breadcrumb = [('Home', reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
                           ("Events", reverse('events', args=[host_slug])),
-                          (event.name, None)]
+                          (event.title, None)]
         else:
             event = Event.objects.get(slug=event_slug)
             host = None
-            breadcrumb = [('Home', reverse('home')), ("Events", reverse('events')), (event.name, None)]
+            breadcrumb = [('Home', reverse('home')), ("Events", reverse('events')), (event.title, None)]
 
     except Event.DoesNotExist:
         raise Http404()
@@ -819,6 +840,7 @@ def sitemap_view(request, host_slug=None):
     }
     return HttpResponse(template.render(context, request))
 
+
 def donate_view(request, host_slug=None):
     host_slugs = get_host_slugs(request, host_slug)
 
@@ -844,26 +866,24 @@ def donate_view(request, host_slug=None):
     }
     return HttpResponse(template.render(context, request))
 
-def impressum_view(request, host_slug=None):
+
+def imprint_view(request, host_slug=None):
     host_slugs = get_host_slugs(request, host_slug)
 
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Impressum', None)]
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Imprint', None)]
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('Impressum', None)]
+        breadcrumb = [('Home', reverse('home')), ('Imprint', None)]
 
-    projects = Project.objects.all()
-
-    template = loader.get_template('wbcore/impressum.html')
+    template = loader.get_template('wbcore/imprint.html')
     context = {
-        'main_nav': get_main_nav(active='impressum'),
+        'main_nav': get_main_nav(),
         'dot_nav': dot_nav,
-        'projects': projects,
         'host': host,
         'breadcrumb': breadcrumb,
     }
@@ -899,9 +919,7 @@ def contact_view(request, host_slug=None):
             msg = EmailMessage()
             msg['From'] = EMAIL_ADDRESS
             msg['To'] = 'admin@weitblicker.org'
-            #msg['To'] = 'admin@weitblicker.org'
             host = Host.objects.get(name=form.cleaned_data['host'])
-            #msg['To'] = host.email
             msg['reply-to'] = form.cleaned_data['email']
             msg['Subject'] = form.cleaned_data['subject']
             msg.set_content('Name: ' + form.cleaned_data['name'] + "\n" + 'E-Mail: ' + form.cleaned_data['email'] + "\n\n" + "Nachricht: " + form.cleaned_data['message'])

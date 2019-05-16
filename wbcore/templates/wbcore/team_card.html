@@ -1,0 +1,34 @@
+{% load static %}
+{% if host %}
+<a class="ui raised link card" href="{% url 'team' host.slug team.slug %}">
+{% else %}
+<a class="ui raised link card" href="{% url 'team' team.slug %}">
+{% endif %}
+  <div class="image">
+    {% if not team.image %}
+      <div class="image">{% include 'wbcore/svgs/placeholder.svg' with text="Team"%}</div>
+    {% else %}
+      <img class="ui fluid image" src="{{ team.image.get_display_url }}">
+    {% endif %}
+  </div>
+  <div class="content">
+    <div class="header">
+      {{ team.name }}
+    </div>
+    <div class="description">
+      {{ team.description | truncatewords:30 }}
+    </div>
+  </div>
+  <div class="extra content">
+    <span>
+      <i class="user icon"></i>
+      {{ team.members.count }}
+    </span>
+    <div class="right floated author">
+      <div class="wb-link">
+        <span class="wb-icon">{% include 'wbcore/svgs/puzzle-icon.svg' %}</span>
+        <span class="wb-name">{{ team.host.name|cut:"Weitblick " }}</span>
+      </div>
+    </div>
+  </div>
+</a>

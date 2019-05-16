@@ -1,16 +1,16 @@
 from django.db import models
 from django_countries.fields import CountryField
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
-from django.contrib.auth.models import User, PermissionsMixin
+from django.contrib.auth.models import (
+    PermissionsMixin, BaseUserManager, AbstractBaseUser
+)
 from photologue.models import Gallery, Photo
 from os.path import splitext
 from localflavor.generic.models import IBANField, BICField
 from localflavor.generic.countries.sepa import IBAN_SEPA_COUNTRIES
 from django.urls import reverse
 from django_google_maps import fields as map_fields
-from django.contrib.auth.models import (
-    BaseUserManager, AbstractBaseUser
-)
+from schedule.models.events import Event as ScheduleEvent
 
 
 class Address(models.Model):
@@ -28,6 +28,30 @@ class Address(models.Model):
         return ", ".join(filter(None, [self.name, self.street, self.postal_code, self.city, self.country.name]))
 
 
+class Location(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.CharField(blank=True, null=True,max_length=300 )
+    country = CountryField()
+    postal_code = models.CharField(blank=True, null=True, max_length=20)
+    city = models.CharField(blank=True, null=True, max_length=30)
+    state = models.CharField(blank=True, null=True, max_length=30)
+    street = models.CharField(blank=True, null=True, max_length=30)
+    address = map_fields.AddressField(max_length=200, null=True)
+    geolocation = map_fields.GeoLocationField(max_length=100, null=True)
+
+    def belongs_to_host(self, host):
+        return True
+
+    def lat(self):
+        return self.geolocation.lat
+
+    def lng(self):
+        return self.geolocation.lon
+
+    def __str__(self):
+        return self.name + " (" + self.country.name + ")"
+
+
 class Host(models.Model):
     slug = models.SlugField(primary_key=True, max_length=50, unique=True)
     name = models.CharField(max_length=100, unique=True)
@@ -36,6 +60,7 @@ class Host(models.Model):
     founding_date = models.DateField()
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True)
+    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
 
     def belongs_to_host(self, host):
         return host == self
@@ -177,30 +202,6 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         return self.host == host
 
 
-class Location(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    description = models.CharField(blank=True, null=True,max_length=300 )
-    country = CountryField()
-    postal_code = models.CharField(blank=True, null=True, max_length=20)
-    city = models.CharField(blank=True, null=True, max_length=30)
-    state = models.CharField(blank=True, null=True, max_length=30)
-    street = models.CharField(blank=True, null=True, max_length=30)
-    address = map_fields.AddressField(max_length=200, null=True)
-    geolocation = map_fields.GeoLocationField(max_length=100, null=True)
-
-    def belongs_to_host(self, host):
-        return True
-
-    def lat(self):
-        return self.geolocation.lat
-
-    def lng(self):
-        return self.geolocation.lon
-
-    def __str__(self):
-        return self.name + " (" + self.country.name + ")"
-
-
 class Content(models.Model):
     TYPE_CHOICES = (
         ('welcome', 'Welcome'),
@@ -235,7 +236,6 @@ class Content(models.Model):
 
     def __str__(self):
         return dict(self.TYPE_CHOICES)[self.type] + " (" + self.host.name + ")"
-
 
 
 def save_partner_logo(instance, filename):
@@ -294,22 +294,33 @@ class Project(models.Model):
             return None
 
 
-class Event(models.Model):
-    name = models.CharField(max_length=200)
+class Event(ScheduleEvent):
     slug = models.SlugField(max_length=50, unique=True, null=True)
+    teaser = models.TextField(max_length=120, blank=True)
     projects = models.ManyToManyField(Project, blank=True)
     host = models.ManyToManyField(Host)
-    description = models.TextField()
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField(null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
+    image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     gallery = models.ForeignKey(Gallery, null=True, blank =True,on_delete=models.SET_NULL)
 
-    def __str__(self):
-        return self.name
+    def search_title(self):
+        return self.title
+
+    def search_url(self):
+        return reverse('event', args=[self.slug])
+
+    def search_image(self):
+        # TODO: return first image of gallery instead, if no image is set
+        return self.image.get_search_mini_url() if self.image else ""
+
+    @staticmethod
+    def get_model_name():
+        return 'Events'
+
+    class Meta:
+        get_latest_by = ['start']
 
     def belongs_to_host(self, host):
         return self.host == host
@@ -336,7 +347,7 @@ class UserRelation(models.Model):
 class NewsPost(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
-    image = models.ForeignKey(Photo, null=True, blank =True, on_delete=models.SET_NULL)
+    image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     added = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -470,32 +481,56 @@ class Document(models.Model):
         return self.title + " " + city
 
 
-def save_team_image(instance, filename):
-    return "teams/"+ instance.host.slug +"/" + instance.name.lower().replace(' ', '_') + splitext(filename)[1].lower()
-
-
 class Team(models.Model):
     name = models.CharField(max_length=100)
-    description = models.TextField(null=True, blank=True)
+    slug = models.SlugField(max_length=50, null=False, blank=False)
+    description = models.TextField(blank=True, default="")
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
     member = models.ManyToManyField(MyUser, through='TeamUserRelation')
-    image = models.ImageField(upload_to=save_team_image, null=True, blank=True)
+    image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     def belongs_to_host(self, host):
         return self.host == host
 
-    # TODO add host_slug
+    def search_title(self):
+        return self.name
+
+    def search_url(self):
+        return reverse('team', args=[self.slug])
+
+    def search_image(self):
+        return "" # TODO
+
+    @staticmethod
+    def get_model_name():
+        return "Team"
+
     def __str__(self):
-        city = ("(" + self.host.city + ")") if self.host else ''
-        return self.name + " " + city
+        return self.name + " (" + self.host.name + ")"
+
+    def validate_unique(self, *args, **kwargs):
+        super(Team, self).validate_unique(*args, **kwargs)
+
+        same_host_and_slug = Team.objects.filter(host=self.host, slug=self.slug)
+
+        if same_host_and_slug.exists() and (self not in same_host_and_slug):  # second part is necessary to be able to edit a team. Otherwise saving after editing will raise slug already exists error
+            print(same_host_and_slug, "\n", self)
+            raise ValidationError(
+                {
+                    NON_FIELD_ERRORS: [
+                        'The \"slug\" ' + self.slug + ' already exist!',
+                    ],
+                }
+            )
 
 
 class TeamUserRelation(models.Model):
-    user = models.ForeignKey(MyUser, on_delete= models.CASCADE)
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     text = models.TextField()
+    priority = models.IntegerField(default=99)
 
     def belongs_to_host(self, host):
         return self.team.host == host
@@ -520,6 +555,7 @@ class Donation(models.Model):
 
 class Milestone(models.Model):
     project = models.OneToOneField(Project, on_delete=models.CASCADE, null=True, blank=True)
+
     def __str__(self):
         return "Milestone für " + self.project.name
 

@@ -1,7 +1,25 @@
 {% extends 'wbcore/single_content.html' %}
+
+{% load staticfiles %}
+
 {% block single-content %}
-    <h1>Team</h1>
+
+<div class="ui vertical stripe segment">
+  <div class="ui one column stackable grid container content-block">
+    <div class="column">
+      <div class="ui basic segment">
+        <h1 class="ui header">Team</h1>
+      </div>
+    </div>
+  </div>
+  <div class="ui container content-block">
+    <div class="ui three stackable cards">
     {% for team in teams %}
-        <h2> {{ team.name }} </h2>
+        {% include 'wbcore/team_card.html' with team=team%}
     {% endfor %}
+    </div>
+  </div>
+
+
+</div>
 {% endblock %}

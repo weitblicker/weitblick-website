@@ -32,7 +32,8 @@ main_patterns = [
     path('idea/', views.idea_view, name='idea'),
     path('about/', views.about_view, name='about'),
     path('history/', views.history_view, name='history'),
-    path('team/', views.teams_view, name='team'),
+    path('team/', views.teams_view, name='teams'),
+    path('team/<str:team_slug>/', views.team_view, name='team'),
     path('contact/', views.contact_view, name='contact'),
     path('transparency/', views.transparency_view, name='transparency'),
     path('charter/', views.charter_view, name='charter'),
@@ -40,7 +41,7 @@ main_patterns = [
     path('facts/', views.facts_view, name='facts'),
     path('donate/', views.donate_view, name='donate'),
     path('privacy/', views.privacy_view, name="privacy"),
-    path('impressum/', views.impressum_view, name='impressum'),
+    path('imprint/', views.imprint_view, name='imprint'),
 ]
 
 urlpatterns = [

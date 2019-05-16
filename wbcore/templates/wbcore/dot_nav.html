@@ -3,65 +3,110 @@
 <div id="mobile-menu" class="ui grid mobile only">
     <div class="five wide column">
         <div class="ui fluid vertical menu">
+          {% if host %}
+            <a class="item" href="{% url 'news' host.slug %}">News</a>
+            <a class="item" href="{% url 'blog' host.slug %}" >Blog</a>
+          {% else %}
             <a class="item" href="{% url 'news' %}">News</a>
             <a class="item" href="{% url 'blog' %}" >Blog</a>
+          {% endif %}
         </div>
     </div>
     <div class="five wide column">
         <div class="ui fluid vertical menu">
-            <a class="item" href="{% url 'about' %}">About</a>
-            <div class="ui vertical fluid menu">
-                <a class="item" href="{% url 'history' %}">History</a>
-                <a class="item" href="{% url 'team' %}">Team</a>
-                <a class="item" href="{% url 'contact' %}">Contact</a>
-            </div>
+            {% if host %}
+                <a class="item" href="{% url 'about' host.slug %}">About</a>
+                <div class="ui vertical fluid menu">
+                    <a class="item" href="{% url 'history' host.slug %}">History</a>
+                    <a class="item" href="{% url 'team' host.slug %}">Team</a>
+                    <a class="item" href="{% url 'contact' host.slug %}">Contact</a>
+                </div>
+            {% else %}
+                <a class="item" href="{% url 'about' %}">About</a>
+                <div class="ui vertical fluid menu">
+                    <a class="item" href="{% url 'history' %}">History</a>
+                    <a class="item" href="{% url 'teams' %}">Team</a>
+                    <a class="item" href="{% url 'contact' %}">Contact</a>
+                </div>
+            {% endif %}
         </div>
     </div>
     <div class="five wide column">
         <div class="ui fluid vertical menu">
-            <a class="item" href="{% url 'facts' %}">Facts</a>
-            <div class="ui vertical fluid menu">
-                <a class="item" href="{% url 'transparency' %}">Transparency</a>
-                <a class="item" href="{% url 'charter' %}">Charter</a>
-                <a class="item" href="{% url 'reports' %}">Reports</a>
-            </div>
+            {% if host %}
+                <a class="item" href="{% url 'facts' host.slug %}">Facts</a>
+                <div class="ui vertical fluid menu">
+                    <a class="item" href="{% url 'transparency' host.slug %}">Transparency</a>
+                    <a class="item" href="{% url 'charter' host.slug %}">Charter</a>
+                    <a class="item" href="{% url 'reports' host.slug %}">Reports</a>
+                </div>
+            {% else %}
+                <a class="item" href="{% url 'facts' %}">Facts</a>
+                <div class="ui vertical fluid menu">
+                    <a class="item" href="{% url 'transparency' %}">Transparency</a>
+                    <a class="item" href="{% url 'charter' %}">Charter</a>
+                    <a class="item" href="{% url 'reports' %}">Reports</a>
+                </div>
+            {% endif %}
+
         </div>
     </div>
 </div>
 
 <div class="ui five column stackable grid tablet only computer only">
     <div class="ui two wide column unstackable items">
-        <a class="ui item header" href="{% url 'about' %}">About</a>
-        <div class="ui item"><a href="{% url 'idea' %}">Idea</a></div>
-        <div class="ui item"><a href="{% url 'history' %}">History</a></div>
-        <div class="ui item"><a href="{% url 'team' %}">Team</a></div>
-        <div class="ui item"><a href="{% url 'contact' %}">Contact</a></div>
+        {% if host %}
+            <a class="ui item header" href="{% url 'about' host.slug %}">About</a>
+            <div class="ui item"><a href="{% url 'idea' host.slug %}">Idea</a></div>
+            <div class="ui item"><a href="{% url 'history' host.slug %}">History</a></div>
+            <div class="ui item"><a href="{% url 'team' host.slug %}">Team</a></div>
+            <div class="ui item"><a href="{% url 'contact' host.slug %}">Contact</a></div>
+        {% else %}
+            <a class="ui item header" href="{% url 'about' %}">About</a>
+            <div class="ui item"><a href="{% url 'idea' %}">Idea</a></div>
+            <div class="ui item"><a href="{% url 'history' %}">History</a></div>
+            <div class="ui item"><a href="{% url 'teams' %}">Team</a></div>
+            <div class="ui item"><a href="{% url 'contact' %}">Contact</a></div>
+        {% endif %}
+
     </div>
     <div class="ui four wide column unstackable items">
-        <a class="ui item header" href="{% url 'news' %}">News</a>
+        {% if host %} <a class="ui item header" href="{% url 'news' host.slug %}">News</a>
+        {% else %} <a class="ui item header" href="{% url 'news' %}">News</a>
+        {% endif %}
         {% for entry in dot_nav.news %}
             {% include 'wbcore/dot_nav_item.html' with photo=entry.image type='news-post' id=entry.pk title=entry.title image=entry.image %}
         {% endfor %}
     </div>
     <div class="ui four wide column unstackable items">
-        <a class="ui item header"href="{% url 'blog' %}" >Blog</a>
+        {% if host %} <a class="ui item header"href="{% url 'blog' host.slug %}" >Blog</a>
+        {% else %} <a class="ui item header"href="{% url 'blog' %}" >Blog</a>
+        {% endif %}
         {% for entry in dot_nav.blog %}
             {% include 'wbcore/dot_nav_item.html' with photo=entry.image type='blog-post' id=entry.pk title=entry.title image=entry.image desc=entry.text|truncatewords:7 %}
         {% endfor %}
     </div>
     <div class="ui three wide column unstackable items">
-        <a class="ui item header" href="{% url 'facts' %}">Facts</a>
-        <div class="ui item"><a href="{% url 'transparency' %}">Transparency</a></div>
-        <div class="ui item"><a href="{% url 'charter' %}">Charter</a></div>
-        <div class="ui item"><a href="{% url 'reports' %}">Reports</a></div>
+        {% if host %}
+            <a class="ui item header" href="{% url 'facts' host.slug %}">Facts</a>
+            <div class="ui item"><a href="{% url 'transparency' host.slug %}">Transparency</a></div>
+            <div class="ui item"><a href="{% url 'charter' host.slug %}">Charter</a></div>
+            <div class="ui item"><a href="{% url 'reports' host.slug %}">Reports</a></div>
+        {% else %}
+            <a class="ui item header" href="{% url 'facts' %}">Facts</a>
+            <div class="ui item"><a href="{% url 'transparency' %}">Transparency</a></div>
+            <div class="ui item"><a href="{% url 'charter' %}">Charter</a></div>
+            <div class="ui item"><a href="{% url 'reports' %}">Reports</a></div>
+        {% endif %}
     </div>
     <div class="ui two wide column unstackable items">
-        <a href="{% url 'events' %}"><h4 class="ui header">Events</h4></a>
+        {% if host %} <a class="ui item header href="{% url 'events' host.slug %}">Events</a>
+        {% else %} <a class="ui item header" href="{% url 'events' %}">Events</a>
+        {% endif %}
         <div class="ui link list">
-            {% for entry in dot_nav.events %}
-                <a class="item">{{ entry.title }}</a>
+            {% for event in dot_nav.events %}
+                {% include 'wbcore/dot_nav_item.html' with type='event' slug=entry.slug title=event.name image=event.image photo=event.image desc=event.description|truncatewords:7 %}
             {% endfor %}
         </div>
     </div>
 </div>
-

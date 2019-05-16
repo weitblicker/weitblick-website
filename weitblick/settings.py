@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.sites',
     'django_countries',
+    'schedule',
     'haystack',
     'sass_processor',
     'tinymce',
@@ -171,7 +172,7 @@ LANGUAGES = (
     ('fr', _('French')),
     ('es', _('Spanish')),
 )
-MODELTRANSLATION_LANGUAGES = ('de','en','fr')
+MODELTRANSLATION_LANGUAGES = ('de', 'en', 'fr')
 MODELTRANSLATION_DEFAULT_LANGUAGE = 'de'
 
 # Static files (CSS, JavaScript, Images)

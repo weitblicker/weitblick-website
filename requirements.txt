@@ -19,3 +19,4 @@ django-modeltranslation
 django-tinymce4-lite
 python-slugify
 django-microsoft-auth
+django-scheduler
