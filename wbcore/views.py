@@ -530,12 +530,19 @@ def host_view(request, host_slug):
     except Host.DoesNotExist:
         raise Http404()
 
+    posts = NewsPost.objects.filter(host=host_slug).order_by('-published')[:5]
+    events = Event.objects.filter(host=host_slug).order_by('-start')[:3]
+    period = Period(events, datetime.now(), datetime.now() + timedelta(365/2))
+    occurrences = period.get_occurrences()
+
     template = loader.get_template('wbcore/host.html')
     context = {
         'host': host,
         'breadcrumb': [('Home', reverse('home')), (host.name, None)],
         'main_nav': get_main_nav(host=host),
         'dot_nav': dot_nav,
+        'posts': posts,
+        'occurrences': occurrences,
     }
     return HttpResponse(template.render(context, request))
 
