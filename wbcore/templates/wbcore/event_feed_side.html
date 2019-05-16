@@ -13,22 +13,19 @@
 
   <div class="content">
     <div class="meta">
-      <span class="date">
+      <div class="date">
         {% if occ.start.day == occ.end.day %}
-          {{ occ.start|date:"D, j. M Y"}}  &ensp; {{ occ.start|date:"H:i"}} - {{ occ.end|date:"H:i"}}
+          {{ occ.start|date:"D, j. M Y"}}, {{ occ.start|date:"H:i"}}
         {% else %}
-          {{ occ.start|date:"D, j. M Y"}} &ensp; &mdash; &ensp; {{ occ.end|date:"D, j. M Y"}}
+          {{ occ.start|date:"D, j. M Y"}} <br> &mdash; &ensp; {{ occ.end|date:"D, j. M Y"}}
         {% endif %}
-      </span>
-      {% if occ.event.location %} | <span>{{ occ.event.location.name }}</span>{% endif %}
+      </div>
+      <div class="location">
+        {% if occ.event.location %} <span>{{ occ.event.location.name }}</span>{% endif %}
+      </div>
     </div>
     <a class="ui medium header" href="{% if host_slug %}{% url 'event' host_slug=host_slug event_slug=occ.event.slug %}{% else %}{% url 'event' event_slug=occ.event.slug %}{% endif %}">{{ occ.title }}</a>
 
-    <div class="description">
-      {% if occ.event.teaser %} <p>{{ occ.event.teaser | safe }}</p>
-      {% else %} <p>{{ occ.description | safe | truncatechars:120 }}</p>
-      {% endif %}
-    </div>
     <div class="extra content">
       {% for host in occ.event.host.all %}
         <div class="meta">

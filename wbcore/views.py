@@ -15,13 +15,18 @@ from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost, Te
 from collections import OrderedDict
 from .forms import ContactForm
 from email.message import EmailMessage
+from datetime import datetime, timedelta
+from schedule.periods import Period
+
+from django.db.utils import OperationalError
 
 EMAIL_ADDRESS = os.environ.get('TEST_EMAIL_USER')
 EMAIL_PASSWORT = os.environ.get('TEST_EMAIL_PW')
 
 dot_nav_news = NewsPost.objects.all().order_by('-published')[:3]
 dot_nav_blog = BlogPost.objects.all().order_by('-published')[:3]
-dot_nav_events = Event.objects.all().order_by('-start_date')[:3]
+dot_nav_events = Event.objects.all().order_by('-start')[:3]
+
 
 dot_nav = {'news': dot_nav_news,
            'blog': dot_nav_blog,
@@ -126,18 +131,21 @@ def get_host_slugs(request, host_slug):
 def home_view(request):
     projects = Project.objects.all()
     hosts = Host.objects.all()
-    events = Event.objects.all().order_by('-start_date')[:3]
     posts = NewsPost.objects.all().order_by('-published')[:3]
     blog = BlogPost.objects.all().order_by('-published')[:3]
+    events = Event.objects.all().order_by('-start')
+    period = Period(events, datetime.now(), datetime.now() + timedelta(365/2))
+    occurrences = period.get_occurrences()[:3]
 
     template = loader.get_template('wbcore/home.html')
+
 
     context = {
         'main_nav': get_main_nav(),
         'dot_nav': dot_nav,
         'projects': projects,
         'hosts': hosts,
-        'events': events,
+        'occurrences': occurrences,
         'posts': posts,
         'breadcrumb': [('Home', None)],
         'icon_links': icon_links
@@ -548,11 +556,14 @@ def events_view(request, host_slug=None):
         events = Event.objects.all()
         breadcrumb = [('Home', reverse('home')), ('Events', None)]
 
+    p = Period(events, datetime.now(), datetime.now() + timedelta(days=365/2))
+    occurrences = p.get_occurrences()
+
     template = loader.get_template('wbcore/events.html')
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': dot_nav,
-        'events': events,
+        'occurrences': occurrences,
         'host': host,
         'breadcrumb': breadcrumb,
     }
@@ -567,11 +578,11 @@ def event_view(request, host_slug=None, event_slug=None):
             breadcrumb = [('Home', reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
                           ("Events", reverse('events', args=[host_slug])),
-                          (event.name, None)]
+                          (event.title, None)]
         else:
             event = Event.objects.get(slug=event_slug)
             host = None
-            breadcrumb = [('Home', reverse('home')), ("Events", reverse('events')), (event.name, None)]
+            breadcrumb = [('Home', reverse('home')), ("Events", reverse('events')), (event.title, None)]
 
     except Event.DoesNotExist:
         raise Http404()

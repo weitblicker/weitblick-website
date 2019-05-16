@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'localflavor',
     'wbcore.apps.WbcoreConfig',
     'django_google_maps',
+    'schedule'
 ]
 
 PHOTOLOGUE_DIR = 'images'

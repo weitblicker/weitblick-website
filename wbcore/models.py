@@ -11,6 +11,7 @@ from localflavor.generic.countries.sepa import IBAN_SEPA_COUNTRIES
 from django.urls import reverse
 from django.conf import settings
 from django_google_maps import fields as map_fields
+from schedule.models.events import Event as ScheduleEvent
 
 
 class Address(models.Model):
@@ -55,7 +56,7 @@ class Host(models.Model):
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
-    
+
 
     def search_title(self):
         return self.name
@@ -157,23 +158,33 @@ class Project(models.Model):
         else:
             return None
 
-
-class Event(models.Model):
-    name = models.CharField(max_length=200)
+class Event(ScheduleEvent):
     slug = models.SlugField(max_length=50, unique=True, null=True)
+    teaser = models.TextField(max_length=120, blank=True)
     projects = models.ManyToManyField(Project, blank=True)
     host = models.ManyToManyField(Host)
-    description = models.TextField()
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField(null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
+    image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     gallery = models.ForeignKey(Gallery, null=True, blank =True,on_delete=models.SET_NULL)
 
-    def __str__(self):
-        return self.name
+    def search_title(self):
+        return self.title
+
+    def search_url(self):
+        return reverse('event', args=[self.slug])
+
+    def search_image(self):
+        # TODO: return first image of gallery instead, if no image is set
+        return self.image.get_search_mini_url() if self.image else ""
+
+    @staticmethod
+    def get_model_name():
+        return 'Events'
+
+    class Meta:
+        get_latest_by = ['start']
 
 
 class Profile(models.Model):
@@ -212,7 +223,7 @@ class UserRelation(models.Model):
 class NewsPost(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
-    image = models.ForeignKey(Photo, null=True, blank =True, on_delete=models.SET_NULL)
+    image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     added = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)

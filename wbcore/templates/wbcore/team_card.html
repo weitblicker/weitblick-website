@@ -16,7 +16,7 @@
       {{ team.name }}
     </div>
     <div class="description">
-      {{ team.description | truncatewords:30 }}
+      {{ team.description | truncatewords:30 | safe}}
     </div>
   </div>
   <div class="extra content">
