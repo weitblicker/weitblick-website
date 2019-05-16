@@ -368,6 +368,13 @@ $logo-orange: #f3971b;
     padding: 0 !important;
 }
 
+.row.split-space {
+	background: $backgroundColor;
+    height: 20px !important;
+    padding: 1rem !important;
+		margin: 0 -1rem 0 -1rem !important;
+}
+
 @media only screen and (max-width: 700px) {
 	.ui.fixed.menu {
 		display: none !important;
