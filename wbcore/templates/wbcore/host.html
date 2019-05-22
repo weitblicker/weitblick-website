@@ -37,7 +37,20 @@
             </div>
           {% endif %}
         </div>
-      <div class="row split-space"></div>
+        <div class="row split-space"></div>
+        <div class="ui basic segment">
+          <a class="ui item header"href="{% url 'teams' %}">Teams</a>
+          <div class="ui divided unstackable items">
+            {% if teams %}
+              {% for team in teams %}
+                {% include 'wbcore/team_list.html' with team=team %}
+              {% endfor %}
+            {% else %}
+              <p>Keine Teams vorhanden!</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
     </div>
 </div>
 
