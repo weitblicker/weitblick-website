@@ -535,6 +535,7 @@ def host_view(request, host_slug):
     period = Period(events, datetime.now(), datetime.now() + timedelta(365/2))
     occurrences = period.get_occurrences()
     hosts = Host.objects.all()
+    teams = Team.objects.filter(host=host)
 
     template = loader.get_template('wbcore/host.html')
     context = {
@@ -545,6 +546,7 @@ def host_view(request, host_slug):
         'dot_nav': dot_nav,
         'posts': posts,
         'occurrences': occurrences,
+        'teams': teams
     }
     return HttpResponse(template.render(context, request))
 
