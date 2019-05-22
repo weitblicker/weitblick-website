@@ -534,10 +534,12 @@ def host_view(request, host_slug):
     events = Event.objects.filter(host=host_slug).order_by('-start')[:3]
     period = Period(events, datetime.now(), datetime.now() + timedelta(365/2))
     occurrences = period.get_occurrences()
+    hosts = Host.objects.all()
 
     template = loader.get_template('wbcore/host.html')
     context = {
         'host': host,
+        'hosts': hosts,
         'breadcrumb': [('Home', reverse('home')), (host.name, None)],
         'main_nav': get_main_nav(host=host),
         'dot_nav': dot_nav,
