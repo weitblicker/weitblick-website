@@ -1,0 +1,65 @@
+{% load staticfiles %}
+<script src="{% static 'highmaps/proj4.js'%}"></script>
+<script src="{% static 'highmaps/highmaps.js'%}"></script>
+<script src="{% static 'highmaps/de-all.js'%}"></script>
+
+<div id="container" style="width: 100%"></div>
+<script>
+var host_list = [];
+{% for host in hosts %}
+    host_list.push({
+    name: '{{host.name|cut:"Weitblick "}}',
+     slug: '{{host.slug}}',
+      label: '{{host.location.description|cut:"None"}}',
+       lat: parseFloat('{{host.location.geolocation.lat|floatformat:11}}'.replace(",", ".")),
+        lon: parseFloat('{{host.location.geolocation.lon|floatformat:11}}'.replace(",", "."))})
+{% endfor %}
+
+Highcharts.mapChart('container', {
+    title: {
+        text: ''
+    },
+    plotOptions:{
+        series: {
+            dataLabels: {
+                allowOverlap: true,
+                }
+            }   
+        },
+    legend: {
+            enabled: false
+            },
+    tooltip: {
+        headerFormat: '',
+        pointFormat: '<b>{point.name}</b>'
+    },
+    series: [{
+            mapData: Highcharts.maps['countries/de/de-all'],
+            joinBy: ['iso-a2', 'drilldown'],
+            name: 'hosts',
+            showInLegend: false,
+        },
+        {
+        // Specify points using lat/lon
+        type: 'mappoint',
+        name: 'Cities',
+        color: '#FF9900',
+        data: host_list,
+        dataLabels: {
+            align: 'center',
+            format: '{point.label}'
+        },
+        marker:{
+            symbol: 'url(/static/favicon.ico)'
+            },
+            events: {
+                                    click: function (e) {
+                                        console.log(e.point.slug);
+                                        window.location.href = '/' + e.point.slug;
+                                    }
+                                }
+         
+        },
+        ]
+})
+</script>
