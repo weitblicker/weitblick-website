@@ -25,8 +25,7 @@ SECRET_KEY = '+k(vot$ur$u-anq(+u-35=ves6(luzr$q+uwv+5!gn$(mk05ms'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
+ALLOWED_HOSTS = ["new.weitblicker.org", "new.weitblick.ngo", "new.weitblick.ong", 'localhost', '127.0.0.1']
 
 # Application definition
 
@@ -182,7 +181,11 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 ENV_PATH = os.path.abspath(os.path.dirname(__file__))
 MEDIA_ROOT = os.path.join(ENV_PATH, 'media/')
-STATIC_ROOT = os.path.join(ENV_PATH, 'static/')
+
+LOCAL_STATIC_ROOT = os.path.join(ENV_PATH, 'static/')
+SERVER_STATIC_ROOT = '/var/www/weitblick-new/static/'
+STATIC_ROOT = LOCAL_STATIC_ROOT if DEBUG else SERVER_STATIC_ROOT
+
 LOCALE_PATH = os.path.join(ENV_PATH, 'locale/')
 SASS_PROCESSOR_ROOT = STATIC_ROOT
 SITE_ID=1 #has fixed 'site not found' error when accessing admin page
