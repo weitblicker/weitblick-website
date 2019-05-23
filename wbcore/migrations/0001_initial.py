@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('photologue', '0012_auto_20190514_0745'),
+        ('photologue', '0011_auto_20190223_2138'),
         ('auth', '0009_alter_user_last_name_max_length'),
     ]
 
