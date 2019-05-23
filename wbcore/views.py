@@ -32,7 +32,7 @@ dot_nav = {'news': dot_nav_news,
 icon_links = OrderedDict([
     ('login',
         {'name': 'Login',
-         'link': 'https://new.weitblicker.org/admin',
+         'link': '/admin/login/',
          'icon': 'unlock alternate'}),
     ('facebook',
         {'name': 'Facebook',
