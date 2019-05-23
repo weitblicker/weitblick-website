@@ -25,6 +25,7 @@ urlpatterns = i18n_patterns(
     path('photologue/', include('photologue.urls', namespace='photologue')),
     path('', include('wbcore.urls')),
     path('tinymce/', include('tinymce.urls')),
+    path('microsoft/', include('microsoft_auth.urls', namespace='microsoft')),
     prefix_default_language=False)
 
 if settings.DEBUG is True:

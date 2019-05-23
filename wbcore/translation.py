@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Necessary for the modeltranslation package 
+Necessary for the modeltranslation package
 
 """
 
 from modeltranslation.translator import register, TranslationOptions
-from .models import Project, Location, Address, Host, Partner, Event, NewsPost, BlogPost, Document, Team, Milestep, Content
+from .models import Project, Location, Address, Host, Partner, NewsPost, BlogPost, Document, Team, Milestep, Content, Event
+from schedule.models.events import Event as ScheduleEvent
 
 @register(Content)
 class ContentTranslationOptions(TranslationOptions):
@@ -18,24 +19,28 @@ class ProjectTranslationOptions(TranslationOptions):
 @register(Location)
 class LocationTranslationOptions(TranslationOptions):
     fields = ('name','city','description',)
-    
+
 @register(Address)
 class AddressTranslationOptions(TranslationOptions):
     fields = ('name','city',)
     prepopulated_fields={'name':'all'}
-    
+
 @register(Host)
 class HostTranslationOptions(TranslationOptions):
     fields = ('city',)
-    
+
 @register(Partner)
 class PartnerTranslationOptions(TranslationOptions):
     fields = ('name','description',)
 
+@register(ScheduleEvent)
+class ScheduleEventTranslationOptions(TranslationOptions):
+    fields = ()
+
 @register(Event)
-class EventTranslationOptions(TranslationOptions):
-    fields = ('name','description',)
-    
+class EventTranslationOptions(ScheduleEventTranslationOptions):
+    fields = ('title', 'description',)
+
 @register(NewsPost)
 class NewsPostTranslationOptions(TranslationOptions):
     fields = ('title','text', 'teaser')
@@ -47,7 +52,7 @@ class BlogPostTranslationOptions(TranslationOptions):
 @register(Document)
 class DocumentTranslationOptions(TranslationOptions):
     fields = ('title','description')
-    
+
 @register(Team)
 class TeamTranslationOptions(TranslationOptions):
     fields = ('name','description')

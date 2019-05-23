@@ -24,6 +24,8 @@ Django = "==2.1.5"
 django_compressor = "*"
 Markdown = "*"
 Pillow = "*"
+django-scheduler = "*"
+django-microsoft-auth = "*"
 
 [dev-packages]
 

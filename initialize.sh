@@ -8,11 +8,11 @@ echo ""
 # Load Weitblick data
 echo "Starting to load the data in the database"
 python manage.py loaddata data/address.json
+python manage.py loaddata data/locations.json
 python manage.py loaddata data/hosts.json
 python manage.py loaddata data/images.json
 python manage.py loaddata data/news.json
 python manage.py loaddata data/blog.json
-python manage.py loaddata data/locations.json
 python manage.py loaddata data/partners.json
 python manage.py loaddata data/projects.json
 echo ""
