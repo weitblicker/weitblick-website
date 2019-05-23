@@ -151,6 +151,9 @@ $logo-orange: #f3971b;
 		font-weight: bold;
 		color: $orange;
 	}
+	.details{
+		color: $orange !important;
+	}
 	.wb-link{
 
 		.wb-icon{
@@ -392,6 +395,12 @@ $logo-orange: #f3971b;
 	}
 }
 
+a.details{
+	color: $orange;
+}
+.ui.orange.ribbon.label{
+	background: $orange !important;
+}
 // custom override here. Did not work through input.variables nor search.variables
 .menu > .search {
 	border: 1px solid $light-gray;

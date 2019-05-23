@@ -37,6 +37,9 @@
           {% endif %}
         </div>
       {% endfor %}
+      <a class="details" href="{% if host_slug %}{% url 'event' host_slug=host_slug event_slug=occ.event.slug %}{% else %}{% url 'event' event_slug=occ.event.slug %}{% endif %}">
+        › Details
+      </a>
     </div>
   </div>
 </div>
