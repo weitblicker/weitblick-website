@@ -19,7 +19,10 @@
             <p>{{ post.teaser }}</p>
         </div>
         <div class="extra">
-            <img class="ui avatar image" src="{% get_media_prefix %}kristy.png">{{ post.author_name }}
+          <a class="details right floated" href="{% if host_slug %}{% url 'news-post' host_slug=host_slug post_id=post.pk %}{% else %}{% url 'news-post' post_id=post.pk %}{% endif %}">
+            › Weiterlesen
+          </a>
+          <img class="ui avatar image" src="{% get_media_prefix %}kristy.png">{{ post.author_name }}
         </div>
     </div>
 </div>
