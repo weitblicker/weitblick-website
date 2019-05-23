@@ -353,7 +353,7 @@ def team_view(request, host_slug=None, team_slug=None):
         host = None
         breadcrumb = [('Home', reverse('home')), ('Team', reverse('teams')), (team.name, None)]
 
-    members = team.members.all()
+    members = team.member.all()
     relations = []
     for member in members:
         relations.append(TeamUserRelation.objects.get(user=member))
