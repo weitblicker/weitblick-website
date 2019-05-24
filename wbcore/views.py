@@ -22,7 +22,10 @@ EMAIL_PASSWORT = os.environ.get('TEST_EMAIL_PW')
 # TODO make more generic and configurable
 dot_nav_news = NewsPost.objects.all().order_by('-published')[:3]
 dot_nav_blog = BlogPost.objects.all().order_by('-published')[:3]
-dot_nav_events = Event.objects.all().order_by('-start')[:3]
+
+events =  Event.objects.all()#.order_by('-start')[:3]
+dot_nav_events = Period(events, datetime.now(), datetime.now() + timedelta(days=31)).get_occurrences()[:3]
+
 
 
 dot_nav = {'news': dot_nav_news,

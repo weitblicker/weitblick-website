@@ -104,8 +104,8 @@
         {% else %} <a class="ui item header" href="{% url 'events' %}">Events</a>
         {% endif %}
         <div class="ui link list">
-            {% for event in dot_nav.events %}
-                {% include 'wbcore/dot_nav_item.html' with type='event' slug=entry.slug title=event.name image=event.image photo=event.image desc=event.description|truncatewords:7 %}
+            {% for occ in dot_nav.events %}
+                {% include 'wbcore/dot_nav_item.html' with type='event' slug=occ.event.slug title=occ.title image=occ.event.image desc=occ.event.description|truncatechars:20 %}
             {% endfor %}
         </div>
     </div>
