@@ -25,8 +25,13 @@ class MyTranslatedAdmin(TabbedTranslationAdmin):
     pass
 
 
-class UserRelationInlineModel(admin.TabularInline):
+class UserRelationInlineModel(admin.StackedInline):
     model = MyUser.hosts.through
+    
+
+
+class TeamUserRelationInlineModel(admin.TabularInline):
+    model = Team.member.through
 
 
 class MyAdmin(admin.ModelAdmin):
@@ -191,6 +196,10 @@ class UserAdmin(BaseUserAdmin):
     filter_horizontal = ()
 
 
+class TeamAdmin(MyAdmin):
+    inlines = (TeamUserRelationInlineModel,)
+
+
 # since we're not using Django's built-in permissions,
 # register our own user model and unregister the Group model from admin.
 admin.site.unregister(MyUser)
@@ -206,13 +215,11 @@ admin.site.register(Partner, MyAdmin)
 admin.site.register(Project, MyAdmin)
 admin.site.register(Event, MyAdmin)
 admin.site.register(NewsPost, MyAdmin)
-admin.site.register(UserRelation, MyAdmin)
 admin.site.register(Document, MyAdmin)
-admin.site.register(Team, MyAdmin)
+admin.site.register(Team, TeamAdmin)
 admin.site.register(Milestone, MyAdmin)
 admin.site.register(Donation, MyAdmin)
 admin.site.register(Milestep, MyAdmin)
 admin.site.register(BlogPost, MyAdmin)
 admin.site.register(BankAccount, MyAdmin)
-admin.site.register(TeamUserRelation, MyAdmin)
 admin.site.register(ContactMessage, MyAdmin)
