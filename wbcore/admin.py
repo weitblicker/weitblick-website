@@ -27,11 +27,12 @@ class MyTranslatedAdmin(TabbedTranslationAdmin):
 
 class UserRelationInlineModel(admin.StackedInline):
     model = MyUser.hosts.through
-    
+
 
 
 class TeamUserRelationInlineModel(admin.TabularInline):
     model = Team.member.through
+
 
 
 class MyAdmin(admin.ModelAdmin):
@@ -42,6 +43,27 @@ class MyAdmin(admin.ModelAdmin):
         models.TextField: {'widget': TinyMCE(mce_attrs={'height': 200})},
         map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget(attrs={'data-map-type': 'roadmap'})},
     }
+
+    def get_queryset(self, request):
+        queryset = super(MyAdmin, self).get_queryset(request)
+
+        # super user can see everything
+        if request.user.is_super_admin:
+            return queryset
+
+        # if model is host display the users hosts
+        if queryset.model is Host:
+            return request.user.hosts.all()
+
+        # if many to many field hosts exists filter using it
+        try:
+            return queryset.filter(hosts__in=request.user.hosts.all())
+        except:
+            # if field host exists filter using it
+            try:
+                return queryset.filter(host__in=request.user.hosts.all())
+            except:
+                return queryset
 
     def has_add_permission(self, request):
         """

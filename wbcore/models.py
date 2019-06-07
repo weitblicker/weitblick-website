@@ -338,7 +338,7 @@ class UserRelation(models.Model):
     membership_fee = models.DecimalField(max_digits=5, decimal_places=2)
 
     def __str__(self):
-        return self.profile.name + ' in ' + self.host.name
+        return str(self.user) + " in " + self.host.name + " as " + dict(self.TYPE_CHOICES)[self.member_type]
 
     def belongs_to_host(self, host):
         return self.host == host
