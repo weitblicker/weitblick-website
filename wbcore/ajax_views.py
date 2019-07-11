@@ -13,8 +13,8 @@ from haystack.inputs import AutoQuery, Exact, Clean
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from itertools import groupby
-from datetime import datetime
-from datetime import date
+from datetime import datetime, date, timedelta
+from schedule.periods import Period
 import csv
 
 
@@ -189,15 +189,15 @@ def filter_events(request):
 
     if archive:
         try:
-            start = datetime.strptime(archive, '%Y-%m').date()
+            start = datetime.strptime(archive, '%Y-%m')
             if start.month is 12:
-                end = date(start.year+1, 1, 1)
+                end = start.replace(start.year+1, 1, 1)
             else:
-                end = date(start.year, start.month+1, 1)
+                end = start.replace(start.year, start.month+1, 1)
         except ValueError:
             try:
-                start = datetime.strptime(archive, '%Y').date()
-                end = date(start.year+1, 1, 1)
+                start = datetime.strptime(archive, '%Y')
+                end = start.replace(start.year+1, 1, 1)
             except ValueError:
                 start = None
                 end = None
@@ -213,23 +213,29 @@ def filter_events(request):
 
         results = SearchQuerySet()
         if host_slugs:
-            results = results.filter_or(host_slug__in=host_slugs)
+            results = results.filter_or(hosts_slug__in=host_slugs)
         if contains:
             results = results.filter_and(content__contains=contains)
-        if start:
-            results = results.filter_and(published__lte=end)
-            results = results.filter_and(published__gte=start)
 
-        results = results.models(Event).order_by('-published')[:20]
-
+        results = results.models(Event)
         print("Length:", len(results))
+
         events = [result.object for result in results]
+        if start:
+            print(start, end)
+            p = Period(events, start, end)
+        else:
+            now = datetime.now()
+            then = datetime.now().replace(year=now.year+10)
+            print(now, then)
+            p = Period(events, now, then)
+        occurrences = p.get_occurrences()[:20]
 
     except Host.DoesNotExist:
         raise Http404()
 
     context = {
-        'events': events,
+        'occurrences': occurrences,
         'host': host,
     }
     return HttpResponse(template.render(context, request))

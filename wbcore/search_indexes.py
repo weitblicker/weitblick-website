@@ -65,7 +65,7 @@ class EventsIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     model = indexes.CharField(model_attr='get_model_name', faceted=True)
     hosts_slug = indexes.MultiValueField()
-    #start = indexes.DateField(model_attr='start', null=True)
+    start = indexes.DateTimeField(model_attr='start')
 
     def get_model(self):
         return Event
