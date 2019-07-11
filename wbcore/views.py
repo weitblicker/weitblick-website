@@ -569,7 +569,7 @@ def events_view(request, host_slug=None):
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            events = Event.objects.filter(host__slug=host_slug)
+            events = Event.objects.filter(host__slug__in=host_slugs).distinct()
             breadcrumb = [('Home', reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
                           ('Events', None)]
@@ -582,6 +582,16 @@ def events_view(request, host_slug=None):
 
     p = Period(events, datetime.now(), datetime.now() + timedelta(days=365/2))
     occurrences = p.get_occurrences()
+    hosts = Host.objects.all()
+
+    if Event.objects.count():
+        latest = Event.objects.latest('start')
+        erliest = Event.objects.earliest('start')
+        start_date = erliest.start
+        end_date = latest.start
+        year_months = range_year_month(start_date, end_date)
+    else:
+        year_months = None
 
     template = loader.get_template('wbcore/events.html')
     context = {
@@ -589,7 +599,9 @@ def events_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'occurrences': occurrences,
         'host': host,
+        'hosts': hosts,
         'breadcrumb': breadcrumb,
+        'years': year_months,
     }
     return HttpResponse(template.render(context, request))
 
