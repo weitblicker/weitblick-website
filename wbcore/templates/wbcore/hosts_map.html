@@ -24,7 +24,7 @@ Highcharts.mapChart('container', {
             dataLabels: {
                 allowOverlap: true,
                 }
-            }   
+            }
         },
     legend: {
             enabled: false
@@ -50,7 +50,9 @@ Highcharts.mapChart('container', {
             format: '{point.label}'
         },
         marker:{
-            symbol: 'url(/static/favicon.ico)'
+            symbol: 'url(/static/puzzle-icon.svg)',
+            width: 16,
+            height: 16
             },
             events: {
                                     click: function (e) {
@@ -58,7 +60,7 @@ Highcharts.mapChart('container', {
                                         window.location.href = '/' + e.point.slug;
                                     }
                                 }
-         
+
         },
         ]
 })
