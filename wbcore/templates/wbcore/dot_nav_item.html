@@ -2,8 +2,12 @@
 <div class="ui item">
   {% if image %}
     {% if type == 'event'%}
-      <a href="{% url type event_slug=event.slug %}" class="ui top aligned image">
-        <img src="{{ image.get_menusize_url }}" class="thumbnail" alt="{{ photo.title }}">
+      <a href="{% url type event_slug=slug %}" class="ui top aligned image">
+        {% if image %}
+          <img src="{{ image.get_menusize_url }}" alt="{{ image.title }}">
+        {% else %}
+          <div class="image" style="margin-bottom:15px;">{% include 'wbcore/svgs/placeholder.svg' with text="Event"%}</div>
+        {% endif %}
       </a>
     {% else %}
       <a href="{% url type post_id=id %}" class="ui top aligned image">
@@ -13,7 +17,10 @@
   {% endif %}
   <div class="content">
     {% if type == 'event'%}
-      <a href="{% url type event_slug=event.slug %}">{{ title }}</a>
+      <a href="{% url type event_slug=slug %}">
+        {{ title }}<br>
+        <em>{{ desc | safe }}</em>
+      </a>
     {% else %}
       <a href="{% url type post_id=id %}">{{ title }}</a>
     {% endif %}

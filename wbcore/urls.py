@@ -41,7 +41,7 @@ main_patterns = [
     path('facts/', views.facts_view, name='facts'),
     path('donate/', views.donate_view, name='donate'),
     path('privacy/', views.privacy_view, name="privacy"),
-    path('impressum/', views.impressum_view, name='impressum'),
+    path('imprint/', views.imprint_view, name='imprint'),
 ]
 
 urlpatterns = [

@@ -1,41 +1,29 @@
 import csv
 import os
 import smtplib
-import pdb
 
 from django.db.models import Count
 from django.http import HttpResponse, Http404
-from django.shortcuts import render, redirect
 from django.template import loader
 from django.urls import reverse
-from django.contrib import messages
-from django.core.mail import send_mail, BadHeaderError
-from datetime import timedelta, date
+from django.core.mail import BadHeaderError
+from datetime import date
+from wbcore.forms import ContactForm, JoinForm
 from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation
 from collections import OrderedDict
-from .forms import ContactForm
 from email.message import EmailMessage
 from datetime import datetime, timedelta
 from schedule.periods import Period
 
-from django.db.utils import OperationalError
-
+# TODO move to settings
 EMAIL_ADDRESS = os.environ.get('TEST_EMAIL_USER')
 EMAIL_PASSWORT = os.environ.get('TEST_EMAIL_PW')
 
-dot_nav_news = NewsPost.objects.all().order_by('-published')[:3]
-dot_nav_blog = BlogPost.objects.all().order_by('-published')[:3]
-dot_nav_events = Event.objects.all().order_by('-start')[:3]
-
-
-dot_nav = {'news': dot_nav_news,
-           'blog': dot_nav_blog,
-           'events': dot_nav_events}
 
 icon_links = OrderedDict([
     ('login',
         {'name': 'Login',
-         'link': 'https://new.weitblicker.org/admin',
+         'link': '/admin/login/',
          'icon': 'unlock alternate'}),
     ('facebook',
         {'name': 'Facebook',
@@ -117,6 +105,20 @@ def get_main_nav(host=None, active=None):
     return nav
 
 
+def get_dot_nav(host=None):
+    if host:
+        news = NewsPost.objects.filter(host=host).order_by('-published')[:3]
+        blog = BlogPost.objects.filter(host=host).order_by('-published')[:3]
+        events = Event.objects.filter(host=host)
+        occurences =  Period(events, datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
+    else:
+        news = NewsPost.objects.all().order_by('-published')[:3]
+        blog = BlogPost.objects.all().order_by('-published')[:3]
+        events =  Event.objects.all()#.order_by('-start')[:3]
+        occurences = Period(events, datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
+    return {'news': news, 'blog': blog, 'events': occurences}
+
+
 def get_host_slugs(request, host_slug):
     if host_slug:
         host_slugs = [host_slug]
@@ -142,7 +144,7 @@ def home_view(request):
 
     context = {
         'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(),
         'projects': projects,
         'hosts': hosts,
         'occurrences': occurrences,
@@ -171,7 +173,7 @@ def reports_view(request, host_slug=None):
     template = loader.get_template('wbcore/reports.html')
     context = {
         'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
     }
@@ -196,7 +198,7 @@ def charter_view(request, host_slug=None):
     template = loader.get_template('wbcore/charter.html')
     context = {
         'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
     }
@@ -221,7 +223,7 @@ def transparency_view(request, host_slug=None):
     template = loader.get_template('wbcore/transparency.html')
     context = {
         'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
     }
@@ -246,7 +248,7 @@ def facts_view(request, host_slug=None):
     template = loader.get_template('wbcore/facts.html')
     context = {
         'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
     }
@@ -271,7 +273,7 @@ def history_view(request, host_slug=None):
     template = loader.get_template('wbcore/history.html')
     context = {
         'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
     }
@@ -296,7 +298,7 @@ def privacy_view(request, host_slug=None):
     template = loader.get_template('wbcore/privacy.html')
     context = {
         'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
     }
@@ -325,7 +327,7 @@ def teams_view(request, host_slug=None):
     template = loader.get_template('wbcore/teams.html')
     context = {
         'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
         'teams': teams
@@ -344,7 +346,7 @@ def team_view(request, host_slug=None, team_slug=None):
     except Team.DoesNotExist:
         raise Http404()
 
-    if not team:
+    if not team:    # TODO check if this is reachable, I think this is useless here.
         raise Http404()
 
     if host:
@@ -356,7 +358,7 @@ def team_view(request, host_slug=None, team_slug=None):
         host = None
         breadcrumb = [('Home', reverse('home')), ('Team', reverse('teams')), (team.name, None)]
 
-    members = team.members.all()
+    members = team.member.all()
     relations = []
     for member in members:
         relations.append(TeamUserRelation.objects.get(user=member))
@@ -366,7 +368,7 @@ def team_view(request, host_slug=None, team_slug=None):
     template = loader.get_template('wbcore/team.html')
     context = {
         'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
         'team': team,
@@ -393,7 +395,7 @@ def about_view(request, host_slug=None):
     template = loader.get_template('wbcore/about.html')
     context = {
         'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
     }
@@ -417,7 +419,7 @@ def idea_view(request, host_slug=None):
     template = loader.get_template('wbcore/idea.html')
     context = {
         'main_nav': get_main_nav(active='idea', host=host),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'projects': projects,
         'host': host,
         'breadcrumb': breadcrumb,
@@ -452,7 +454,7 @@ def projects_view(request, host_slug=None):
 
     context = {
         'main_nav': get_main_nav(host=host, active='projects'),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'projects': projects,
         'project_list': project_list,
         'breadcrumb': breadcrumb,
@@ -470,13 +472,36 @@ def join_view(request, host_slug=None):
         host = Host.objects.get(slug=host_slug) if host_slug else None
     except Host.DoesNotExist:
         raise Http404()
+
     template = loader.get_template('wbcore/join.html')
+
+    if host:
+        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
+    else:
+        breadcrumb = [('Home', reverse('home')), ('Contact', None)]
+
+    success = False
+
+    if request.method == 'POST':
+        form = JoinForm(request.POST)
+        if form.is_valid():
+            form.save()
+            success = True
+    else:
+        if host:
+            form = JoinForm(initial={'hosts': [host_slug]})
+        else:
+            form = JoinForm()
+
     context = {
         'main_nav': get_main_nav(active='join'),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': [('Home', reverse('home')), ('Join in', None)],
+        'join_form': form,
+        'success': success,
     }
+
     return HttpResponse(template.render(context, request))
 
 
@@ -504,7 +529,7 @@ def project_view(request, host_slug=None, project_slug=None):
         'main_nav': get_main_nav(host=host, active='projects'),
         'project': project,
         'host': host,
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'breadcrumb': breadcrumb,
     }
     return HttpResponse(template.render(context, request))
@@ -517,11 +542,10 @@ def hosts_view(request):
     context = {
         'hosts': hosts,
         'main_nav': get_main_nav(active='hosts'),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(),
         'breadcrumb': [('Home', reverse('home')), ("Unions", None)],
     }
     return HttpResponse(template.render(context, request))
-
 
 
 def host_view(request, host_slug):
@@ -543,7 +567,7 @@ def host_view(request, host_slug):
         'hosts': hosts,
         'breadcrumb': [('Home', reverse('home')), (host.name, None)],
         'main_nav': get_main_nav(host=host),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'posts': posts,
         'occurrences': occurrences,
         'teams': teams
@@ -573,7 +597,7 @@ def events_view(request, host_slug=None):
     template = loader.get_template('wbcore/events.html')
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'occurrences': occurrences,
         'host': host,
         'breadcrumb': breadcrumb,
@@ -603,7 +627,7 @@ def event_view(request, host_slug=None, event_slug=None):
     template = loader.get_template('wbcore/events.html')
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'event': event,
         'breadcrumb': breadcrumb,
         'host': host
@@ -634,7 +658,7 @@ def blog_view(request, host_slug=None):
 
     context = {
         'main_nav': get_main_nav(host=host, active='blog'),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'posts': posts,
         'host': host,
         'breadcrumb': breadcrumb,
@@ -664,7 +688,7 @@ def blog_post_view(request, host_slug=None, post_id=None):
 
     context = {
         'main_nav': get_main_nav(host=host, active='blog'),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'post': post,
         'breadcrumb': breadcrumb,
         'host': host,
@@ -724,7 +748,7 @@ def news_view(request, host_slug=None):
 
     context = {
         'main_nav': get_main_nav(host=host, active='news'),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'posts': posts,
         'host': host,
         'hosts': hosts,
@@ -756,7 +780,7 @@ def news_post_view(request, host_slug=None, post_id=None):
 
     context = {
         'main_nav': get_main_nav(host=host, active='news'),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'post': post,
         'breadcrumb': breadcrumb,
         'host': host,
@@ -766,11 +790,14 @@ def news_post_view(request, host_slug=None, post_id=None):
 
 def host_projects_view(request, host_slug):
     template = loader.get_template('wbcore/projects.html')
-    host = Host.objects.get(slug=host_slug)
+    try:
+        host = Host.objects.get(slug=host_slug) if host_slug else None
+    except Host.DoesNotExist:
+        raise Http404()
     projects = Project.objects.filter(hosts__slug=host_slug)
     context = {
         'main_nav': get_main_nav(host=host, active='projects'),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'projects': projects,
         'host': host,
         'breadcrumb': [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Projects', None)],
@@ -780,11 +807,14 @@ def host_projects_view(request, host_slug):
 
 def host_events_view(request, host_slug):
     template = loader.get_template('wbcore/events.html')
-    host = Host.objects.get(slug=host_slug)
+    try:
+        host = Host.objects.get(slug=host_slug) if host_slug else None
+    except Host.DoesNotExist:
+        raise Http404()
     events = Event.objects.filter(hosts__slug=host_slug)
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'events': events,
         'host': host,
         'breadcrumb': [('Home', reverse('home')), (host.name, reverse('host', host_slug)), ("Events", None)],
@@ -796,7 +826,7 @@ def search_view(request, query=None):
     template = loader.get_template('wbcore/search.html')
     context = {
         'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(),
         'breadcrumb': [('Home', reverse('home')), ("Search", None)],
     }
     return HttpResponse(template.render(context), request)
@@ -820,12 +850,13 @@ def sitemap_view(request, host_slug=None):
     template = loader.get_template('wbcore/sitemap.html')
     context = {
         'main_nav': get_main_nav(active='sitemap'),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'projects': projects,
         'host': host,
         'breadcrumb': breadcrumb,
     }
     return HttpResponse(template.render(context, request))
+
 
 def donate_view(request, host_slug=None):
     host_slugs = get_host_slugs(request, host_slug)
@@ -845,37 +876,36 @@ def donate_view(request, host_slug=None):
     template = loader.get_template('wbcore/donate.html')
     context = {
         'main_nav': get_main_nav(active='donate'),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'projects': projects,
         'host': host,
         'breadcrumb': breadcrumb,
     }
     return HttpResponse(template.render(context, request))
 
-def impressum_view(request, host_slug=None):
+
+def imprint_view(request, host_slug=None):
     host_slugs = get_host_slugs(request, host_slug)
 
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Impressum', None)]
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Imprint', None)]
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('Impressum', None)]
+        breadcrumb = [('Home', reverse('home')), ('Imprint', None)]
 
-    projects = Project.objects.all()
-
-    template = loader.get_template('wbcore/impressum.html')
+    template = loader.get_template('wbcore/imprint.html')
     context = {
-        'main_nav': get_main_nav(active='impressum'),
-        'dot_nav': dot_nav,
-        'projects': projects,
+        'main_nav': get_main_nav(),
+        'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
     }
     return HttpResponse(template.render(context, request))
+
 
 def contact_view(request, host_slug=None):
     try:
@@ -891,7 +921,7 @@ def contact_view(request, host_slug=None):
     template = loader.get_template('wbcore/contact.html')
     context = {
         'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
         'success': False,
@@ -906,9 +936,7 @@ def contact_view(request, host_slug=None):
             msg = EmailMessage()
             msg['From'] = EMAIL_ADDRESS
             msg['To'] = 'admin@weitblicker.org'
-            #msg['To'] = 'admin@weitblicker.org'
             host = Host.objects.get(name=form.cleaned_data['host'])
-            #msg['To'] = host.email
             msg['reply-to'] = form.cleaned_data['email']
             msg['Subject'] = form.cleaned_data['subject']
             msg.set_content('Name: ' + form.cleaned_data['name'] + "\n" + 'E-Mail: ' + form.cleaned_data['email'] + "\n\n" + "Nachricht: " + form.cleaned_data['message'])
@@ -944,7 +972,7 @@ def sitemap_view(request):
     hosts = Host.objects.all()
     context = {
         'main_nav': get_main_nav(),
-        'dot_nav': dot_nav,
+        'dot_nav': get_dot_nav(),
         'hosts': hosts,
         'breadcrumb': [('Home', reverse('home')), ("Sitemap", None)],
     }

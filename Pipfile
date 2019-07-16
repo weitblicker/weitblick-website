@@ -25,6 +25,7 @@ django_compressor = "*"
 Markdown = "*"
 Pillow = "*"
 django-scheduler = "*"
+django-microsoft-auth = "*"
 
 [dev-packages]
 

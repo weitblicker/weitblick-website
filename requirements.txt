@@ -1,7 +1,7 @@
 Django==2.1.5
 django-countries
 django-sass-processor
-django-photologue
+django-photologue==3.8.1
 django-compressor
 django-localflavor
 django-filter
@@ -18,4 +18,5 @@ markdown
 django-modeltranslation
 django-tinymce4-lite
 python-slugify
+django-microsoft-auth
 django-scheduler

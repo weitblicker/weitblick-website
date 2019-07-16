@@ -17,7 +17,7 @@
         {% if occ.start.day == occ.end.day %}
           {{ occ.start|date:"D, j. M Y"}}, {{ occ.start|date:"H:i"}}
         {% else %}
-          {{ occ.start|date:"D, j. M Y"}} <br> &mdash; &ensp; {{ occ.end|date:"D, j. M Y"}}
+          {{ occ.start|date:"j. M"}} - {{ occ.end|date:"j. M Y"}}
         {% endif %}
       </div>
       <div class="location">
@@ -37,6 +37,9 @@
           {% endif %}
         </div>
       {% endfor %}
+      <a class="details" href="{% if host_slug %}{% url 'event' host_slug=host_slug event_slug=occ.event.slug %}{% else %}{% url 'event' event_slug=occ.event.slug %}{% endif %}">
+        › Details
+      </a>
     </div>
   </div>
 </div>

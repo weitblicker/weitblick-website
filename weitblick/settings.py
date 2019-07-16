@@ -25,8 +25,7 @@ SECRET_KEY = '+k(vot$ur$u-anq(+u-35=ves6(luzr$q+uwv+5!gn$(mk05ms'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
+ALLOWED_HOSTS = ["new.weitblicker.org", "new.weitblick.ngo", "new.weitblick.ong", 'localhost', '127.0.0.1']
 
 # Application definition
 
@@ -41,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.sites',
     'django_countries',
+    'schedule',
     'haystack',
     'sass_processor',
     'tinymce',
@@ -48,10 +48,12 @@ INSTALLED_APPS = [
     'sortedm2m',
     'rest_framework',
     'localflavor',
-    'wbcore.apps.WbcoreConfig',
     'django_google_maps',
-    'schedule'
+    'microsoft_auth',
+    'wbcore.apps.WbcoreConfig',
 ]
+
+AUTH_USER_MODEL = 'wbcore.MyUser'
 
 PHOTOLOGUE_DIR = 'images'
 
@@ -84,6 +86,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'microsoft_auth.context_processors.microsoft',
             ],
             'loaders': [
                 'django.template.loaders.filesystem.Loader',
@@ -139,6 +142,16 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+AUTHENTICATION_BACKENDS = [
+    'microsoft_auth.backends.MicrosoftAuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend'
+]
+
+MICROSOFT_AUTH_CLIENT_ID = '461a1fd8-9c6d-42b1-a74f-5dcdb912d89d'
+MICROSOFT_AUTH_CLIENT_SECRET = '-Klk0zF]9EIxDG6@s7gMwM/v:ha.cB2]'
+MICROSOFT_AUTH_LOGIN_TYPE = 'ma'
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
@@ -158,7 +171,7 @@ LANGUAGES = (
     ('fr', _('French')),
     ('es', _('Spanish')),
 )
-MODELTRANSLATION_LANGUAGES = ('de','en','fr')
+MODELTRANSLATION_LANGUAGES = ('de', 'en', 'fr')
 MODELTRANSLATION_DEFAULT_LANGUAGE = 'de'
 
 # Static files (CSS, JavaScript, Images)
@@ -168,7 +181,11 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 ENV_PATH = os.path.abspath(os.path.dirname(__file__))
 MEDIA_ROOT = os.path.join(ENV_PATH, 'media/')
-STATIC_ROOT = os.path.join(ENV_PATH, 'static/')
+
+LOCAL_STATIC_ROOT = os.path.join(ENV_PATH, 'static/')
+SERVER_STATIC_ROOT = '/var/www/weitblick-new/static/'
+STATIC_ROOT = LOCAL_STATIC_ROOT if DEBUG else SERVER_STATIC_ROOT
+
 LOCALE_PATH = os.path.join(ENV_PATH, 'locale/')
 SASS_PROCESSOR_ROOT = STATIC_ROOT
 SITE_ID=1 #has fixed 'site not found' error when accessing admin page
@@ -195,3 +212,4 @@ HAYSTACK_CONNECTIONS = {
     },
 }
 GOOGLE_MAPS_API_KEY = 'AIzaSyCtEff9Z-Kl_nRc5GU28LvwzXFlz-6ltHc'
+

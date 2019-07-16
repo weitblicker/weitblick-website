@@ -4,11 +4,11 @@
 
 <div class="item">
   <a class="image" href="{% if host_slug %}{% url 'event' host_slug event_slug=occ.event.slug %}{% else %}{% url 'event' event_slug=occ.event.slug %}{% endif %}">
-      {% if occ.image %}
-      <img src="{{ occ.event.image.get_listsize_url }}" alt="{{ occ.event.image.title }}">
-      {% else %}
-          <div class="image" style="margin-bottom:15px;">{% include 'wbcore/svgs/placeholder.svg' with text="Event"%}</div>
-      {% endif %}
+    {% if occ.event.image %}
+      <img src="{{ occ.event.image.get_widelistsize_url }}" alt="{{ occ.event.image.title }}">
+    {% else %}
+      <div class="image" style="margin-bottom:15px;">{% include 'wbcore/svgs/placeholder.svg' with text="Event"%}</div>
+    {% endif %}
   </a>
 
   <div class="content">
