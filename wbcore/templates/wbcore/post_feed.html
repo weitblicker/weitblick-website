@@ -4,7 +4,7 @@
 
     {% if post.image %}
     <a class="image" href="{% if host_slug %}{% url 'news-post' host_slug=host_slug post_id=post.pk %}{% else %}{% url 'news-post' post_id=post.pk %}{% endif %}">
-        <img src="{{ post.image.get_listsize_url }}" alt="{{ post.image.title }}">
+        <img src="{{ post.image.get_display_url }}" alt="{{ post.image.title }}">
     </a>
     {% endif %}
 
