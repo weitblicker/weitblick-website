@@ -3,9 +3,13 @@
 The new Weitblick website is *Django*, and *Python* based. The search engine we use is called *Elasticsearch*, which is Java based. Downloading this code you can run and test the website with default content on you computer.
 
 ## Installation
+If you have [Docker](https://docs.docker.com/compose/install/) installed, you can just run:
 
-#### Required Software & Tools 
-This project requires [Python 3](https://www.python.org/), [Java 8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html), [Tidy](http://binaries.html-tidy.org/) and [Elastic Search 2](https://www.elastic.co/de/downloads/past-releases/elasticsearch-2-4-2).
+            docker-compose up --build
+
+It will install, build and run everything for you. For more info see the [Docker Documentation](https://docs.docker.com/compose/reference/overview/). Otherwise, follow the following steps to set up everything natively. This might be better for development, because then you don't have to rebuild the container for each change.
+
+*Required Software & Tools:* [Python 3](https://www.python.org/), [Java 8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html), [Tidy](http://binaries.html-tidy.org/) and [Elastic Search 2](https://www.elastic.co/de/downloads/past-releases/elasticsearch-2-4-2).
 
 
 #### Buildtools for Visual Studio 2019
@@ -101,8 +105,6 @@ Database migration and loading data can be achieved running the script `initaliz
 
 * `python3 manage.py createsuperuser
 
-### Configure Microsoft Login
-To enable the login via Microsoft OAuth2 with the official Weitblick intranet accounts got to http://localhost:8000/admin/sites/site/1/change/ and set domain name to `localhost:8000`.
 
 #### Start Server
 
@@ -110,6 +112,10 @@ Next we run the django server:
 
       python manage.py runserver
 
+Now if everything worked, you can access the website on `http://localhost:3000`
+
+### Configure Microsoft Login
+To enable the login via Microsoft OAuth2 with the official Weitblick intranet accounts got to http://localhost:8000/admin/sites/site/1/change/ and set domain name to `localhost:8000`.
 
 ## FAE (Frequently Appearing Errors)
 
