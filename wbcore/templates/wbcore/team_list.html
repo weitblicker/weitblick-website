@@ -1,0 +1,28 @@
+{% load static %}
+
+<div class="item">
+
+
+  <a class="image" href="{% url 'team' host.slug team.slug %}">
+    <div class="image">
+      {% if not team.image %}
+        <div class="image">{% include 'wbcore/svgs/placeholder.svg' with text="Team"%}</div>
+      {% else %}
+        <img class="ui fluid image" src="{{ team.image.get_display_url }}">
+      {% endif %}
+    </div>
+  </a>
+
+  <div class="content">
+    <a class="ui medium header" href="{% url 'team' host.slug team.slug %}">{{ team.name }}</a>
+    <div class="description">
+      {{ team.description | truncatewords:10 | safe}}
+    </div>
+    <div class="extra">
+      <a class="details right floated" href="{% url 'team' host.slug team.slug %}">› Details</a>
+      <span>
+        <i class="user icon"></i>{{ team.members.count }}
+      </span>
+    </div>
+  </div>
+</div>
