@@ -51,7 +51,10 @@ and then hit: `curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py`
 
 ### Create a SuperUser for Admin Interface
 
-* `python3 manage.py createsuperuser`
+* `python3 manage.py createsuperuser
+
+### Configure Microsoft Login
+To enable the login via Microsoft OAuth2 with the official Weitblick intranet accounts got to http://localhost:8000/admin/sites/site/1/change/ and set domain name to `localhost:8000`.
 
 ### Elastic Search
 
