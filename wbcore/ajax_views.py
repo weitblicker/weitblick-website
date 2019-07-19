@@ -182,37 +182,36 @@ def filter_events(request):
     host_slugs = list(set().union(*host_slugs))
     host_slugs = [x.strip(' ') for x in host_slugs]
 
-    archive = request.GET.get("archive")
-    to = request.GET.get("to")
+    start_date = request.GET.get("start_date")
+    end_date = request.GET.get("end_date")
 
     start = None
     end = None
 
-    if archive:
+    # set start and end for search query
+    if start_date:
         try:
-            start = datetime.strptime(archive, '%Y-%m')
+            start = datetime.strptime(start_date, '%Y-%m')
         except ValueError:
             try:
-                start = datetime.strptime(archive, '%Y')
+                start = datetime.strptime(start_date, '%Y')
             except ValueError:
                 start = None
-    if to:
+    if end_date:
         try:
-            end = datetime.strptime(to, '%Y-%m')
+            end = datetime.strptime(end_date, '%Y-%m')
             if end.month == 12:
-                end.replace(year=end.year+1, month=1)
+                end = end.replace(year=end.year+1, month=1)
             else:
-                end.replace(month=end.month+1)
+                end = end.replace(month=end.month+1)
         except ValueError:
             try:
-                end = datetime.strptime(to, '%Y')
+                end = datetime.strptime(end_date, '%Y')
                 end = end.replace(year=end.year+1)
             except ValueError:
                 end = None
 
-    print('from', archive)
-    print('to', to)
-    print("Date", start, end)
+    print("Date", start, '- ', end)
     print("Contains:", contains)
     host_slug = None
 
@@ -230,6 +229,8 @@ def filter_events(request):
         results = results.models(Event)
         print("Length:", len(results))
 
+        # search results for start and end date
+        # handle cases where no dates are given
         events = [result.object for result in results]
         if start and end:
             p = Period(events, start, end)
