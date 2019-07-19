@@ -217,6 +217,35 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('email', 'hosts')
     filter_horizontal = ()
 
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+        formfield = super(UserAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
+        print(**kwargs)
+        print(formfield)
+        if db_field is not 'role':
+            return formfield
+        #elif request.user.is_super_admin:
+        #    return formfield
+        else:
+            if request.user.role is 'host_admin':
+                return formfield
+        #return formfield
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = super(UserAdmin, self). get_readonly_fields(request, obj)
+
+        if request.user is obj:
+            return readonly_fields + ('role',)
+        elif request.user.is_super_admin:
+            return readonly_fields
+        elif not request.user.role is 'host_admin':
+            return readonly_fields + ('role',)
+
+        return  readonly_fields
+
+    def get_fields(self, request, obj=None):
+        fields = super(UserAdmin, self).get_fields(request, obj)
+        return fields
+
 
 class TeamAdmin(MyAdmin):
     inlines = (TeamUserRelationInlineModel,)

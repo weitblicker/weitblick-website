@@ -616,7 +616,7 @@ def events_view(request, host_slug=None):
     }
     return HttpResponse(template.render(context, request))
 
-# TODO maybe replace by showing detail information in events_view (-> react?)
+
 def event_view(request, host_slug=None, event_slug=None):
     try:
         if host_slug:
