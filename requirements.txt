@@ -1,4 +1,4 @@
-Django==2.1.5
+Django==2.2.3
 django-countries
 django-sass-processor
 django-photologue==3.9
