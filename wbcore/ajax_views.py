@@ -183,6 +183,7 @@ def filter_events(request):
     host_slugs = [x.strip(' ') for x in host_slugs]
 
     archive = request.GET.get("archive")
+    to = request.GET.get("to")
 
     start = None
     end = None
@@ -190,18 +191,27 @@ def filter_events(request):
     if archive:
         try:
             start = datetime.strptime(archive, '%Y-%m')
-            if start.month is 12:
-                end = start.replace(start.year+1, 1, 1)
-            else:
-                end = start.replace(start.year, start.month+1, 1)
         except ValueError:
             try:
                 start = datetime.strptime(archive, '%Y')
-                end = start.replace(start.year+1, 1, 1)
             except ValueError:
                 start = None
+    if to:
+        try:
+            end = datetime.strptime(to, '%Y-%m')
+            if end.month == 12:
+                end.replace(year=end.year+1, month=1)
+            else:
+                end.replace(month=end.month+1)
+        except ValueError:
+            try:
+                end = datetime.strptime(to, '%Y')
+                end = end.replace(year=end.year+1)
+            except ValueError:
                 end = None
 
+    print('from', archive)
+    print('to', to)
     print("Date", start, end)
     print("Contains:", contains)
     host_slug = None
@@ -221,13 +231,17 @@ def filter_events(request):
         print("Length:", len(results))
 
         events = [result.object for result in results]
-        if start:
-            print(start, end)
+        if start and end:
             p = Period(events, start, end)
+        if start:
+            then = start.replace(year=start.year+10)
+            p = Period(events, start, then)
+        elif end:
+            now = datetime.now()
+            p = Period(events, now, end)
         else:
             now = datetime.now()
             then = datetime.now().replace(year=now.year+10)
-            print(now, then)
             p = Period(events, now, then)
         occurrences = p.get_occurrences()[:20]
 

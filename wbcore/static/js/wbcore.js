@@ -61,13 +61,15 @@ $(document)
         let event_filter_union = "";
         let event_filter_search = "";
         let event_filter_archive = "";
+        let event_filter_to = "";
 
-        let filter_events = function(union, search, archive){
-            console.log("Filter:", union, search, archive);
+        let filter_events = function(union, search, archive, to){
+            console.log("Filter:", union, search, archive, to);
             data = {};
             if(union) data['union'] = union;
             if(search) data['search'] = search;
             if(archive) data['archive'] = archive;
+            if(to) data['to'] = to;
             $.ajax({
                 url: '/ajax/filter-events/',
                 data: data,
@@ -175,14 +177,24 @@ $(document)
         });
 
         $('#event-filter-clear').on('click', function() {
-            $('#event-filter-archive').dropdown('clear');
-            event_filter_archive = "";
             $('#event-filter-hosts').dropdown('clear');
             event_filter_union = "";
+            $('#event-filter-archive').dropdown('clear');
+            event_filter_archive = "";
+            $('#event-filter-to').dropdown('clear');
+            event_filter_to = "";
             $('#event-filter-search').val('');
             event_filter_search = "";
-            filter_events(event_filter_union, event_filter_search, event_filter_archive);
+            filter_events(event_filter_union, event_filter_search, event_filter_archive, event_filter_to);
         });
+
+        $('#event-filter-hosts')
+            .dropdown({
+                onChange: function(value, text, choice){
+                    event_filter_union = value;
+                    filter_events(event_filter_union, event_filter_search, event_filter_archive, event_filter_to);
+                },
+            });
 
         $('#event-filter-archive')
             .dropdown({
@@ -190,21 +202,23 @@ $(document)
                 onChange: function(value, text, choice){
                     event_filter_archive = value;
                     console.log(value, text, choice);
-                    filter_events(event_filter_union, event_filter_search, event_filter_archive);
+                    filter_events(event_filter_union, event_filter_search, event_filter_archive, event_filter_to);
                 },
             });
 
-        $('#event-filter-hosts')
+        $('#event-filter-to')
             .dropdown({
+                allowCategorySelection: true,
                 onChange: function(value, text, choice){
-                    event_filter_union = value;
-                    filter_events(event_filter_union, event_filter_search, event_filter_archive);
+                    event_filter_to = value;
+                    console.log(value, text, choice);
+                    filter_events(event_filter_union, event_filter_search, event_filter_archive, event_filter_to);
                 },
             });
 
         $('#event-filter-search').on("change paste keyup", function() {
             event_filter_search = $(this).val();
-            filter_events(event_filter_union, event_filter_search, event_filter_archive);
+            filter_events(event_filter_union, event_filter_search, event_filter_archive, event_filter_to);
         });
 
         $('#project-filter-clear').on('click', function() {
