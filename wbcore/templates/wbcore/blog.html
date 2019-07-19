@@ -2,14 +2,16 @@
 {% load staticfiles %}
 {% block single-content %}
 
-{% if posts %}
-    <div class="ui unstackable items">
-    {% for post in posts %}
-        {% include 'wbcore/blog_post_feed.html' with post=post host_slug=host.slug %}
-    {% endfor %}
+<div class="ui stackable grid container content-block">
+  <div class="ten wide column divided items">
+    <div id="news-list" class="ui basic segment">
+    {% if item_list %}
+        {% include 'wbcore/item_list.html' %}
+    {% else %}
+        <p>No posts available.</p>
     </div>
-{% else %}
-    <p>No posts available.</p>
+  </div>
+</div>
 {% endif %}
 {% endblock %}
 

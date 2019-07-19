@@ -114,7 +114,7 @@ def filter_projects(request):
 @api_view(['GET', 'POST'])
 def filter_news(request):
 
-    template = loader.get_template('wbcore/news_list.html')
+    template = loader.get_template('wbcore/item_list.html')
     host_slugs = request.GET.getlist("union")
     contains = request.GET.get("search")
     host_slugs = list(csv.reader(host_slugs))
@@ -170,6 +170,7 @@ def filter_news(request):
     context = {
         'posts': posts,
         'host': host,
+        'item_list': posts,
     }
     return HttpResponse(template.render(context, request))
 

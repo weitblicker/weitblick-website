@@ -662,6 +662,7 @@ def blog_view(request, host_slug=None):
         'posts': posts,
         'host': host,
         'breadcrumb': breadcrumb,
+        'item_list': posts,
     }
     return HttpResponse(template.render(context, request))
 
@@ -743,6 +744,8 @@ def news_view(request, host_slug=None):
 
     if host:
         breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ("News", None)]
+        for post in posts:
+            post.current_host = host
     else:
         breadcrumb = [('Home', reverse('home')), ('News', None)]
 
@@ -754,6 +757,8 @@ def news_view(request, host_slug=None):
         'hosts': hosts,
         'breadcrumb': breadcrumb,
         'years': year_months,
+        'item_list': posts,
+        'ajax_endpoint': reverse('ajax-filter-news'),
     }
     return HttpResponse(template.render(context, request))
 

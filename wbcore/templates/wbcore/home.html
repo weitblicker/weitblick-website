@@ -28,7 +28,7 @@
                 {% if posts %}
                     <div class="ui divided unstackable items">
                     {% for post in posts %}
-                        {% include 'wbcore/post_feed.html' with post=post host_slug=host.slug %}
+                        {% include 'wbcore/list_item.html' with item=post %}
                     {% endfor %}
                     </div>
                 {% endif %}
