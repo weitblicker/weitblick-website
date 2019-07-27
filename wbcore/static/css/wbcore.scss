@@ -190,16 +190,19 @@ $logo-orange: #f3971b;
 
 	}
 	.item{
+		padding: 8px 0;
 		.content{
 			min-height: 65px;
 		}
-		font-size: 1.2em;
 		img{
 			border: solid;
 			border-width: 1px;
 			border-color: white;
-
+			
 		}
+	}
+	.item:hover{
+		background: rgba(0, 0, 0, 0.13);
 	}
 	display: none;
 	background-image: url('/media/colorbg/yellow.svg');
@@ -207,10 +210,23 @@ $logo-orange: #f3971b;
 	background-position: center;
 	background-repeat: no-repeat;
 	a{
+		font-size: 1.4em;
 		color: $dark-gray;
 		font-family: 'Open Sans';
 		&.image{
 			width: 65px;
+		}
+	}
+	div.column{
+		@media(max-width:723px) {
+			padding: 1px 10px;
+			margin-top: 13px;
+			border-left: 1px solid #d29612;
+			width: 33% !important;
+			&>div>a{
+				font-size: 1.6em;
+				color: #ffffff;
+			}
 		}
 	}
 	.header{
