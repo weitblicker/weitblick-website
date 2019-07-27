@@ -363,6 +363,21 @@ $logo-orange: #f3971b;
 	a:hover {
 		background: $orange;
 	}
+
+	@media(max-width:723px) {
+		position: initial;
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		width: 100vw;
+		background: #969696;
+
+		a {
+			width: 100%;
+			.icon {
+				width: 100%;
+			}
+		}
+	}
 }
 
 .column.split-space {

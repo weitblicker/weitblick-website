@@ -21,10 +21,6 @@ EMAIL_PASSWORT = os.environ.get('TEST_EMAIL_PW')
 
 
 icon_links = OrderedDict([
-    ('login',
-        {'name': 'Login',
-         'link': '/admin/login/',
-         'icon': 'unlock alternate'}),
     ('facebook',
         {'name': 'Facebook',
          'link': 'https://www.facebook.com/weitblick/',
@@ -49,6 +45,10 @@ icon_links = OrderedDict([
         {'name': 'E-Mail',
          'link': 'mailto:info@weitblicker.org',
          'icon': 'envelope outline'}),
+    ('login',
+        {'name': 'Login',
+         'link': '/admin/login/',
+         'icon': 'unlock alternate'}),
 ])
 
 
