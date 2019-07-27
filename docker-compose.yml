@@ -23,6 +23,8 @@ services:
     # restart: on-failure:5 
     environment: 
       elasticURL: "http://elasticsearch2:9200"
+    volumes:
+      - ./wbcore/:/app/wbcore/
     ports:
     - "3000:3000"
     - "8000:8000"

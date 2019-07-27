@@ -11,8 +11,7 @@ RUN apt-get -qq update \
     && pip install pipenv \
     && pipenv install --dev --ignore-pipfile
 
-# migrate stage
-FROM install as copy_code
+FROM install as run
 
 COPY . /app/
 WORKDIR /app/
@@ -39,8 +38,8 @@ CMD echo "\033[0;36m--------> STAGE: wait for db startup <--------" \
     # && pipenv run python manage.py loaddata data/news.json \
     # && echo "\033[0;36m--------> STAGE: Load: blog <--------" \
     # && pipenv run python manage.py loaddata data/blog.json \
-    # && echo "\033[0;36m--------> STAGE: Load: partners <--------" \
-    # && pipenv run python manage.py loaddata data/partners.json \
+    && echo "\033[0;36m--------> STAGE: Load: partners <--------" \
+    && pipenv run python manage.py loaddata data/partners.json \
     # && echo "\033[0;36m--------> STAGE: Load: projects <--------" \
     # && pipenv run python manage.py loaddata data/projects.json \
     && echo "\033[0;36m--------> STAGE: Creating superuser <--------" \
