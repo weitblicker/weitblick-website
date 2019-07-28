@@ -1,0 +1,43 @@
+version: '3.7'
+services:
+  elasticsearch2:
+    image: elasticsearch:2.4.2-alpine
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.zen.ping.unicast.hosts=elasticsearch"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    # volumes:
+    #   - esdata:/usr/share/elasticsearch/data
+    networks:
+      - net
+
+  server:
+    build:
+     context: .
+     dockerfile: Dockerfile
+    # restart: on-failure:5 
+    environment: 
+      elasticURL: "http://elasticsearch2:9200"
+    volumes:
+      - ./wbcore/:/app/wbcore/
+    ports:
+    - "3000:3000"
+    - "8000:8000"
+    networks:
+    - net
+    links:
+    - elasticsearch2
+    depends_on:
+    - elasticsearch2
+
+volumes:
+  esdata:
+    driver: local
+
+networks:
+  net:
