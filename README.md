@@ -5,9 +5,9 @@ The new Weitblick website is *Django*, and *Python* based. The search engine we 
 ## Installation
 If you have [Docker](https://docs.docker.com/compose/install/) installed, you can just run:
 
-            docker-compose up --build
+            docker-compose up
 
-It will install, build and run everything for you. For more info see the [Docker Documentation](https://docs.docker.com/compose/reference/overview/). Otherwise, follow the following steps to set up everything natively. This might be better for development, because then you don't have to rebuild the container for each change.
+It will install, build and run everything for you. For more info see the [Docker Documentation](https://docs.docker.com/compose/reference/overview/). Changes in the wbcore folder will be avaliable instantly, other changes will require a rebuild of the container using the `--build` flag when starting. Otherwise, follow the following steps to set up everything natively.
 
 *Required Software & Tools:* [Python 3](https://www.python.org/), [Java 8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html), [Tidy](http://binaries.html-tidy.org/) and [Elastic Search 2](https://www.elastic.co/de/downloads/past-releases/elasticsearch-2-4-2).
 
