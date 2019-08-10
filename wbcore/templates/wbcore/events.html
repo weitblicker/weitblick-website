@@ -10,6 +10,8 @@
       </div>
     </div>
   </div>
+  
+  {% include 'wbcore/filter.html' %}
 
   <div class="ui stackable grid container content-block">
     <div class="ten wide column divided items">
@@ -20,86 +22,10 @@
 
     <div class="six wide column divided items">
       <div class="column-content">
-        <div class="ui basic segment">
-          <div class="ui divided unstackable items">
-            <h3>Filter Events</h3>
-            <div class="ui form segment">
-              <div class="ui two unstackable fields">
-                <div class="field">
-                  <label>Hosts</label>
-                  <div id="event-filter-hosts" class="ui multiple search selection dropdown">
-                    <input name="tags" type="hidden">
-                    <i class="dropdown icon"></i>
-                    <div class="default text">Union</div>
-                    <div class="menu">
-                      {% for host in hosts %}
-                        <div class="item" data-value="{{ host.slug }}">{{ host.name|cut:"Weitblick " }}</div>
-                      {% endfor %}
-                    </div>
-                  </div>
-                </div>
-                <div class="field">
-                  <label>Clear Filter</label>
-                  <div id="event-filter-clear" class="ui fluid teal button">Clear</div>
-                </div>
-              </div>
-              <div class="ui two unstackable fields">
-                <div class="field">
-                  <label>From</label>
-                  <div id="event-filter-start_date" class="ui fluid basic dropdown button">
-                    <span class="text">year or month</span>
-                    <i class="dropdown icon"></i>
-                    <div class="menu">
-                      {% for year, months in years.items %}
-                        <div class="item" data-value="{{ year|date:'Y' }}">
-                          <i class="dropdown icon"></i>
-                          <span class="text">{{ year|date:'Y' }}</span>
-                          <div class="menu">
-                            {% for month in months %}
-                              <div class="item" data-value="{{ month|date:'Y-m' }}">{{ month|date:'F Y' }}</div>
-                            {% endfor %}
-                          </div>
-                        </div>
-                      {% endfor %}
-                    </div>
-                  </div>
-                </div>
-
-                <div class="field">
-                  <label>To</label>
-                  <div id="event-filter-end_date" class="ui fluid basic dropdown button">
-                    <span class="text">year or month</span>
-                    <i class="dropdown icon"></i>
-                    <div class="menu">
-                      {% for year, months in years.items %}
-                        <div class="item" data-value="{{ year|date:'Y' }}">
-                          <i class="dropdown icon"></i>
-                          <span class="text">{{ year|date:'Y' }}</span>
-                          <div class="menu">
-                            {% for month in months %}
-                              <div class="item" data-value="{{ month|date:'Y-m' }}">{{ month|date:'F Y' }}</div>
-                            {% endfor %}
-                          </div>
-                        </div>
-                      {% endfor %}
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-
-              <div class="field">
-                <label>Search</label>
-                <input id="event-filter-search" type="text" placeholder="Search in Events">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="ui basic segment">
-          <h3>Calendar</h3>
-          <!-- put visualization here -->
-        </div>
+      </div>
+      <div class="ui basic segment">
+        <h3>Calendar</h3>
+        <!-- put visualization here -->
       </div>
     </div>
   </div>

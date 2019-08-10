@@ -443,3 +443,89 @@ a.details{
 .menu > .search {
 	border: 1px solid $light-gray;
 }
+
+
+#SearchAndFilter {
+	width: 100vw;
+	max-width: 750px;
+	display: flex;
+	justify-content: center;
+	align-items: stretch;
+	flex-direction: row;
+	margin: 13px auto;
+	font-size: 17px;
+	
+	@media screen and (max-width: 500px) {
+		background: #ebebeb;
+	}
+
+	#searchbox {
+		@media screen and (max-width: 500px) {
+			flex: 1 1 calc(100% - 20px);
+			max-width: calc(100% - 20px);
+			background: #cccccc27;
+		}
+		flex: 2 1 calc(100% - 180px);
+		max-width: calc(100% - 180px);
+		height: 40px;
+		background: #cccccc8c;
+		display: inline-block;
+		margin: 5px 0 5px 5px;
+		border-radius: 7px;
+		
+		input {
+			@media screen and (max-width: 500px) {
+				width: calc(100% - 38px);
+			}
+			background: transparent;
+			border: 0;
+			outline: 0;
+			height: 100%;
+			width: calc(100% - 46px);
+			padding: 5px;
+			padding-left: 16px;
+		}
+		
+		input:focus + button {
+			opacity: 1;
+		}
+		
+		button {
+			opacity: 0;
+			background: darkgray;
+			border-radius: 50%;
+			line-height: 20px;
+			font-size: 14px;
+			width: 23px;
+			height: 23px;
+		}
+	
+	}
+
+	button {
+		@media screen and (max-width: 500px) {
+			width: 45px;
+			font-size: 15px;
+		}
+		width: 80px;
+		height: 40px;
+		background: darkgray;
+		color: white;
+		border: 0;
+		border-radius: 7px;
+		cursor: pointer;
+		margin: 5px;
+		align-self: flex-end;
+	}
+	
+	#searchBtn {
+		@media screen and (max-width: 500px) {
+			display: none;
+		}
+		background: $logo-orange;
+		margin-left: 10px;
+	}
+
+	
+
+}
