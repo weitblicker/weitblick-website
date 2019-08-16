@@ -317,7 +317,7 @@ class Event(ScheduleEvent):
 
     @staticmethod
     def get_model_name():
-        return 'Events'
+        return 'Event'
 
     class Meta:
         get_latest_by = ['start']
@@ -606,4 +606,3 @@ class ContactMessage(models.Model):
 
     def belongs_to_host(self, host):
         return host == self.host
-

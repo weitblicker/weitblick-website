@@ -3,7 +3,7 @@
 <!-- occ = occurrence of an event, use occ.event. for attributes not in original Event class by django-scheduler -->
 
 <div class="item">
-  <a class="image" href="{% if host_slug %}{% url 'event' host_slug event_slug=occ.event.slug %}{% else %}{% url 'event' event_slug=occ.event.slug %}{% endif %}">
+  <a class="image" href="{% if host_slug %}{% url 'event' host_slug=host_slug event_slug=occ.event.slug %}{% else %}{% url 'event' event_slug=occ.event.slug %}{% endif %}">
     {% if occ.event.image %}
       <img src="{{ occ.event.image.get_widelistsize_url }}" alt="{{ occ.event.image.title }}">
     {% else %}

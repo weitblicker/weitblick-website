@@ -13,8 +13,8 @@ from haystack.inputs import AutoQuery, Exact, Clean
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from itertools import groupby
-from datetime import datetime
-from datetime import date
+from datetime import datetime, date, timedelta
+from schedule.periods import Period
 import csv
 
 
@@ -149,7 +149,7 @@ def filter_news(request):
         #posts = NewsPost.objects.filter(host__slug__in=host_slugs).distinct()
         host = Host.objects.get(slug=host_slug) if host_slug else None
         print("Host Slugs", host_slugs)
-        
+
         results = SearchQuerySet()
         if host_slugs:
             results = results.filter_or(host_slug__in=host_slugs)
@@ -163,7 +163,7 @@ def filter_news(request):
 
         print("Length:", len(results))
         posts = [result.object for result in results]
-        
+
     except Host.DoesNotExist:
         raise Http404()
 
@@ -173,3 +173,84 @@ def filter_news(request):
     }
     return HttpResponse(template.render(context, request))
 
+@api_view(['GET', 'POST'])
+def filter_events(request):
+    template = loader.get_template('wbcore/events_list.html')
+    host_slugs = request.GET.getlist("union")
+    contains = request.GET.get("search")
+    host_slugs = list(csv.reader(host_slugs))
+    host_slugs = list(set().union(*host_slugs))
+    host_slugs = [x.strip(' ') for x in host_slugs]
+
+    start_date = request.GET.get("start_date")
+    end_date = request.GET.get("end_date")
+
+    start = None
+    end = None
+
+    # set start and end for search query
+    if start_date:
+        try:
+            start = datetime.strptime(start_date, '%Y-%m')
+        except ValueError:
+            try:
+                start = datetime.strptime(start_date, '%Y')
+            except ValueError:
+                start = None
+    if end_date:
+        try:
+            end = datetime.strptime(end_date, '%Y-%m')
+            if end.month == 12:
+                end = end.replace(year=end.year+1, month=1)
+            else:
+                end = end.replace(month=end.month+1)
+        except ValueError:
+            try:
+                end = datetime.strptime(end_date, '%Y')
+                end = end.replace(year=end.year+1)
+            except ValueError:
+                end = None
+
+    print("Date", start, '- ', end)
+    print("Contains:", contains)
+    host_slug = None
+
+    try:
+        #posts = Event.objects.filter(host__slug__in=host_slugs).distinct()
+        host = Host.objects.get(slug=host_slug) if host_slug else None
+        print("Host Slugs", host_slugs)
+
+        results = SearchQuerySet()
+        if host_slugs:
+            results = results.filter_or(hosts_slug__in=host_slugs)
+        if contains:
+            results = results.filter_and(content__contains=contains)
+
+        results = results.models(Event)
+        print("Length:", len(results))
+
+        # search results for start and end date
+        # handle cases where no dates are given
+        events = [result.object for result in results]
+        if start and end:
+            p = Period(events, start, end)
+        if start:
+            then = start.replace(year=start.year+10)
+            p = Period(events, start, then)
+        elif end:
+            now = datetime.now()
+            p = Period(events, now, end)
+        else:
+            now = datetime.now()
+            then = datetime.now().replace(year=now.year+10)
+            p = Period(events, now, then)
+        occurrences = p.get_occurrences()[:20]
+
+    except Host.DoesNotExist:
+        raise Http404()
+
+    context = {
+        'occurrences': occurrences,
+        'host': host,
+    }
+    return HttpResponse(template.render(context, request))
