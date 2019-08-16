@@ -204,12 +204,17 @@ REST_FRAMEWORK = {
     ]
 }
 
+
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
-        'URL': 'http://127.0.0.1:9200/',
+        'URL': os.getenv('elasticURL', 'http://127.0.0.1:9200/'),
         'INDEX_NAME': 'haystack',
     },
 }
+
+
+
+
 GOOGLE_MAPS_API_KEY = 'AIzaSyCtEff9Z-Kl_nRc5GU28LvwzXFlz-6ltHc'
 
