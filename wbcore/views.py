@@ -621,11 +621,11 @@ def events_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
-        'occurrences': occurrences,
+        #'occurrences': occurrences,
         'host': host,
         'hosts': hosts,
         'breadcrumb': breadcrumb,
-        'years': year_months,
+        'from_to': year_months,
         'item_list': occurrences,
         'ajax_endpoint': reverse('ajax-filter-events'),
     }
