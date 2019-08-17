@@ -7,12 +7,11 @@ from django.http import HttpResponse, Http404
 from django.template import loader
 from django.urls import reverse
 from django.core.mail import BadHeaderError
-from datetime import date
 from wbcore.forms import ContactForm, JoinForm
 from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation
 from collections import OrderedDict
 from email.message import EmailMessage
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from schedule.periods import Period
 
 # TODO move to settings
@@ -604,6 +603,20 @@ def events_view(request, host_slug=None):
     else:
         year_months = None
 
+    # set attributes to fill list_item template
+    for occ in occurrences:
+        occ.image = occ.event.image
+        #occ.date = occ.start
+        occ.show_date = f"{occ.start.strftime('%a, %d. %b %Y')} - {occ.end.strftime('%a, %d. %b %Y')}"
+        occ.hosts = occ.event.host.all()
+        if host_slug:
+            print(host_slug)
+            occ.link = reverse('event', kwargs={'event_slug': occ.event.slug, 'host_slug': host_slug})
+        else:
+            occ.link = reverse('event', args=[occ.event.slug])
+        occ.teaser = occ.description
+
+
     template = loader.get_template('wbcore/events.html')
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
@@ -613,6 +626,8 @@ def events_view(request, host_slug=None):
         'hosts': hosts,
         'breadcrumb': breadcrumb,
         'years': year_months,
+        'item_list': occurrences,
+        'ajax_endpoint': reverse('ajax-filter-events'),
     }
     return HttpResponse(template.render(context, request))
 
@@ -728,8 +743,6 @@ def range_year_month(start_date, end_date):
 
 
 def news_view(request, host_slug=None):
-    template = loader.get_template('wbcore/news.html')
-
     host_slugs = get_host_slugs(request, host_slug)
     try:
         if host_slugs:
@@ -761,6 +774,7 @@ def news_view(request, host_slug=None):
     else:
         breadcrumb = [('Home', reverse('home')), ('News', None)]
 
+    template = loader.get_template('wbcore/news.html')
     context = {
         'main_nav': get_main_nav(host=host, active='news'),
         'dot_nav': get_dot_nav(host=host),

@@ -176,7 +176,7 @@ def filter_news(request):
 
 @api_view(['GET', 'POST'])
 def filter_events(request):
-    template = loader.get_template('wbcore/events_list.html')
+    template = loader.get_template('wbcore/item_list.html')
     host_slugs = request.GET.getlist("union")
     contains = request.GET.get("search")
     host_slugs = list(csv.reader(host_slugs))

@@ -17,7 +17,7 @@
         <div class="row split-space"></div>
         <div id="news-list" class="ui basic segment">
           <a class="ui item header" href="{% url 'news' %}">News</a>
-          {% include 'wbcore/news_list.html' %}
+          {% include 'wbcore/item_list.html' with item_list=posts %}
         </div>
       </div>
       <div class="column divided items split-space" style="z-index: -1;"></div>
