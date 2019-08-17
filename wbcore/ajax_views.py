@@ -16,6 +16,7 @@ from itertools import groupby
 from datetime import datetime, date, timedelta
 from schedule.periods import Period
 import csv
+from .views import item_list_from_occ
 
 
 def remove_tags(text):
@@ -251,7 +252,68 @@ def filter_events(request):
         raise Http404()
 
     context = {
-        'occurrences': occurrences,
+        'item_list': item_list_from_occ(occurrences),
         'host': host,
+    }
+    return HttpResponse(template.render(context, request))
+
+@api_view(['GET', 'POST'])
+def filter_blog(request):
+
+    template = loader.get_template('wbcore/item_list.html')
+    host_slugs = request.GET.getlist("union")
+    contains = request.GET.get("search")
+    host_slugs = list(csv.reader(host_slugs))
+    host_slugs = list(set().union(*host_slugs))
+    host_slugs = [x.strip(' ') for x in host_slugs]
+
+    archive = request.GET.get("archive")
+
+    start = None
+    end = None
+
+    if archive:
+        try:
+            start = datetime.strptime(archive, '%Y-%m').date()
+            if start.month is 12:
+                end = date(start.year+1, 1, 1)
+            else:
+                end = date(start.year, start.month+1, 1)
+        except ValueError:
+            try:
+                start = datetime.strptime(archive, '%Y').date()
+                end = date(start.year+1, 1, 1)
+            except ValueError:
+                start = None
+                end = None
+
+    print("Date", start, end)
+    print("Contains:", contains)
+    host_slug = None
+
+    try:
+        host = Host.objects.get(slug=host_slug) if host_slug else None
+        print("Host Slugs", host_slugs)
+
+        results = SearchQuerySet()
+        if host_slugs:
+            results = results.filter_or(host_slug__in=host_slugs)
+        if contains:
+            results = results.filter_and(content__contains=contains)
+        if start:
+            results = results.filter_and(published__lte=end)
+            results = results.filter_and(published__gte=start)
+
+        results = results.models(BlogPost).order_by('-published')[:20]
+
+        print("Length:", len(results))
+        posts = [result.object for result in results]
+
+    except Host.DoesNotExist:
+        raise Http404()
+
+    context = {
+        'host': host,
+        'item_list': posts,
     }
     return HttpResponse(template.render(context, request))

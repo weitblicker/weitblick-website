@@ -128,6 +128,21 @@ def get_host_slugs(request, host_slug):
         host_slugs = [x.strip(' ') for x in host_slugs]
     return host_slugs
 
+def item_list_from_occ(occurrences, host_slug=None):
+    # set attributes to fill list_item template
+    item_list = []
+    for occ in occurrences:
+        occ.image = occ.event.image
+        # occ.date = occ.start
+        occ.show_date = f"{occ.start.strftime('%a, %d. %b %Y')} - {occ.end.strftime('%a, %d. %b %Y')}"
+        occ.hosts = occ.event.host.all()
+        if host_slug:
+            occ.link = reverse('event', kwargs={'event_slug': occ.event.slug, 'host_slug': host_slug})
+        else:
+            occ.link = reverse('event', args=[occ.event.slug])
+        occ.teaser = occ.description
+        item_list.append(occ)
+    return item_list
 
 def home_view(request):
     projects = Project.objects.all()
@@ -603,20 +618,6 @@ def events_view(request, host_slug=None):
     else:
         year_months = None
 
-    # set attributes to fill list_item template
-    for occ in occurrences:
-        occ.image = occ.event.image
-        #occ.date = occ.start
-        occ.show_date = f"{occ.start.strftime('%a, %d. %b %Y')} - {occ.end.strftime('%a, %d. %b %Y')}"
-        occ.hosts = occ.event.host.all()
-        if host_slug:
-            print(host_slug)
-            occ.link = reverse('event', kwargs={'event_slug': occ.event.slug, 'host_slug': host_slug})
-        else:
-            occ.link = reverse('event', args=[occ.event.slug])
-        occ.teaser = occ.description
-
-
     template = loader.get_template('wbcore/events.html')
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
@@ -626,7 +627,7 @@ def events_view(request, host_slug=None):
         'hosts': hosts,
         'breadcrumb': breadcrumb,
         'from_to': year_months,
-        'item_list': occurrences,
+        'item_list': item_list_from_occ(occurrences, host_slug),
         'ajax_endpoint': reverse('ajax-filter-events'),
     }
     return HttpResponse(template.render(context, request))
@@ -677,6 +678,17 @@ def blog_view(request, host_slug=None):
         raise Http404()
 
     posts = posts.order_by('-published')[:20]
+    hosts = Host.objects.all()
+
+    if BlogPost.objects.count():
+        latest = BlogPost.objects.latest('published')
+        earliest = BlogPost.objects.earliest('published')
+        start_date = earliest.published
+        end_date = latest.published
+
+        year_months = range_year_month(start_date, end_date)
+    else:
+        year_months = None
 
     if host:
         breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ("Blog", None)]
@@ -686,10 +698,13 @@ def blog_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host, active='blog'),
         'dot_nav': get_dot_nav(host=host),
-        'posts': posts,
-        'host': host,
         'breadcrumb': breadcrumb,
+        'host': host,
+        'posts': posts,
+        'hosts': hosts,
+        'years': year_months,
         'item_list': posts,
+        'ajax_endpoint': reverse('ajax-filter-blog'),
     }
     return HttpResponse(template.render(context, request))
 
@@ -778,10 +793,10 @@ def news_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host, active='news'),
         'dot_nav': get_dot_nav(host=host),
-        'posts': posts,
         'host': host,
-        'hosts': hosts,
         'breadcrumb': breadcrumb,
+        'posts': posts,
+        'hosts': hosts,
         'years': year_months,
         'item_list': posts,
         'ajax_endpoint': reverse('ajax-filter-news'),

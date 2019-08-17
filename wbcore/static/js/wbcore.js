@@ -95,10 +95,14 @@ $(document)
         $('#filter-clear').on('click', function() {
             $('filter-countries').dropdown('clear');
             filter_country = "";
-            $('#filter-archive').dropdown('clear');
-            filter_archive = "";
             $('#filter-hosts').dropdown('clear');
             filter_union = "";
+            $('#filter-archive').dropdown('clear');
+            filter_archive = "";
+            $('#filter-from').dropdown('clear');
+            filter_from = "";
+            $('#filter-to').dropdown('clear');
+            filter_to = "";
             $('#filter-search').val('');
             filter_search = "";
             filter();

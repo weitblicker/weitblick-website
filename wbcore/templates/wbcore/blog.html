@@ -1,18 +1,33 @@
 {% extends 'wbcore/single_content.html' %}
 {% load staticfiles %}
-{% block single-content %}
+{% block content %}
 
-<div class="ui stackable grid container content-block">
-  <div class="ten wide column divided items">
-    <div id="news-list" class="ui basic segment">
-    {% if item_list %}
-        {% include 'wbcore/item_list.html' %}
-    {% else %}
-        <p>No posts available.</p>
+<div class="ui vertical stripe segment">
+	<div class="ui one column stackable grid container content-block">
+		<div class="column">
+			<div class="ui basic segment">
+				<h1 class="ui header">Blog</h1>
+				<!-- <img class="ui fluid image" src="{% static 'images/blog_header.png' %}"> -->
+			</div>
+		</div>
+	</div>
+
+	<div class="ui stackable grid container content-block">
+        <div class="ten wide column divided items">
+            {% if item_list %}
+                {% include 'wbcore/item_list.html' %}
+            {% else %}
+                <p>No posts available.</p>
+            {% endif %}
+        </div>
+        <div class="six wide column divided items">
+            {% include 'wbcore/list_filter.html' %}
+        </div>
     </div>
-  </div>
 </div>
-{% endif %}
+
 {% endblock %}
+
+
 
 
