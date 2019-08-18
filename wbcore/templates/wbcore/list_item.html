@@ -15,15 +15,28 @@
 
     <div class="content">
         <div class="meta">
+            {% if item.country %}
+                <span>{{ item.country }}</span>
+            {% endif %}
+
             {% if item.show_date %}
+                {% if item.country %}<span> | </span>{% endif %}
                 <span class="date">{{ item.show_date }}</span>
             {% elif item.date %}
+                {% if item.country %}<span> | </span>{% endif %}
                 <span class="date">{{ item.date | date:"D, j. M Y" }}</span>
             {% elif item.published %}
+                {% if item.country %}<span> | </span>{% endif %}
                 <span class="date">{{ item.published | date:"D, j. M Y" }}</span>
             {% endif %}
-            {% if item.hosts %}
-                <span> | </span>
+
+            {% if item.hosts_list %}
+                {% if item.show_date or item.date or item.published %}<span> | </span>{% endif %}
+                {% for host in item.hosts_list %}
+                    {% include 'wbcore/host_icon.html' with host=host %}
+                {% endfor %}
+            {% elif item.hosts %}
+                {% if item.show_date or item.date or item.published %}<span> | </span>{% endif %}
                 {% for host in item.hosts %}
                     {% include 'wbcore/host_icon.html' with host=host %}
                 {% endfor %}
@@ -32,7 +45,7 @@
         <a class="ui medium header" href="{{ item.link }}">{{ item.title }}</a>
 
         <div class="description">
-            <p>{{ item.teaser | safe | truncatewords:"30"}}</p>
+            <p>{{ item.teaser | striptags | safe | truncatewords:"40"}}</p>
         </div>
         <div class="extra">
           {% if item.author %}

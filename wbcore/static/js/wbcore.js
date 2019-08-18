@@ -93,8 +93,6 @@ $(document)
         };
 
         $('#filter-clear').on('click', function() {
-            $('filter-countries').dropdown('clear');
-            filter_country = "";
             $('#filter-hosts').dropdown('clear');
             filter_union = "";
             $('#filter-archive').dropdown('clear');
@@ -103,6 +101,10 @@ $(document)
             filter_from = "";
             $('#filter-to').dropdown('clear');
             filter_to = "";
+            $('#filter-country').dropdown('clear');
+            filter_country = "";
+            $('#filter-visibility').dropdown('clear');
+            filter_visibility = "";
             $('#filter-search').val('');
             filter_search = "";
             filter();
@@ -154,12 +156,12 @@ $(document)
         $('#filter-visibility')
             .dropdown({
                 onChange: function(value, text, choice){
-                    project_filter_visibility = value;
+                    filter_visibility = value;
                     filter();
                 },
             });
 
-        $('#filter-countries')
+        $('#filter-country')
             .dropdown({
                 onChange: function(value, text, choice){
                     filter_country = value;

@@ -16,7 +16,7 @@ from itertools import groupby
 from datetime import datetime, date, timedelta
 from schedule.periods import Period
 import csv
-from .views import item_list_from_occ, item_list_from_blogposts
+from .views import item_list_from_occ, item_list_from_blogposts, item_list_from_proj
 
 
 def remove_tags(text):
@@ -65,9 +65,9 @@ def search(request, query):
 
 
 @api_view(['GET', 'POST'])
-def filter_projects(request):
+def filter_projects(request, host_slug=None):
 
-    template = loader.get_template('wbcore/projects_list.html')
+    template = loader.get_template('wbcore/item_list.html')
     host_slugs = request.GET.getlist("union")
     contains = request.GET.get("search")
     country_codes = request.GET.getlist("country")
@@ -84,7 +84,6 @@ def filter_projects(request):
     host_slug = None
 
     try:
-        #posts = NewsPost.objects.filter(host__slug__in=host_slugs).distinct()
         host = Host.objects.get(slug=host_slug) if host_slug else None
 
         results = SearchQuerySet()
@@ -92,7 +91,7 @@ def filter_projects(request):
             results = results.filter_or(hosts_slug__in=host_slugs)
         if visibility == 'completed':
             results = results.filter_and(completed=True)
-        if visibility == 'current':
+        elif visibility == 'current':
             results = results.exclude(completed=True)
         if country_codes:
             results = results.filter_and(country_code__in=country_codes)
@@ -106,8 +105,8 @@ def filter_projects(request):
         raise Http404()
 
     context = {
-        'projects': projects,
         'host': host,
+        'item_list': item_list_from_proj(projects, host_slug)
     }
     return HttpResponse(template.render(context, request))
 

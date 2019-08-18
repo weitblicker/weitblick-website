@@ -158,6 +158,24 @@ def item_list_from_blogposts(blogposts, host_slug=None):
         item_list.append(post)
     return item_list
 
+def item_list_from_proj(projects, host_slug=None):
+    item_list = []
+    for project in projects:
+        project.image = project.teaser_image()
+        project.country = project.location.country.name
+        project.published = None  # do not show published date, but rather if active or not
+        project.hosts_list = project.hosts.all()
+        current_host = Host.objects.get(slug=host_slug) if host_slug else None
+        if current_host and current_host in project.hosts.all():
+            project.link = reverse('project', kwargs={'project_slug': project.slug, 'host_slug': host_slug})
+        else:
+            project.link = reverse('project', args=[project.slug])
+        project.title = project.name
+        project.teaser = project.short_description if project.short_description else project.description
+        #project.teaser = project.description
+        item_list.append(project)
+    return item_list
+
 def home_view(request):
     projects = Project.objects.all()
     hosts = Host.objects.all()
@@ -478,18 +496,20 @@ def projects_view(request, host_slug=None):
 
     hosts = Host.objects.all()
 
+    template = loader.get_template('wbcore/projects.html')
     context = {
         'main_nav': get_main_nav(host=host, active='projects'),
         'dot_nav': get_dot_nav(host=host),
-        'projects': projects,
-        'project_list': project_list,
         'breadcrumb': breadcrumb,
+        'item_list': item_list_from_proj(projects, host_slug),
+        'project_list': project_list,
         'host': host,
         'hosts': hosts,
         'posts': posts,
         'countries': countries,
+        'filter_visibility': True,
+        'ajax_endpoint': reverse('ajax-filter-projects'),
     }
-    template = loader.get_template('wbcore/projects.html')
     return HttpResponse(template.render(context, request))
 
 

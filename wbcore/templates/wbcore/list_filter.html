@@ -99,6 +99,39 @@
                     </div>
                 {% endif %}
 
+                <div class="ui two unstackable fields">
+                    {% if countries %}
+                        <div class="field eleven wide">
+                            <label>Country</label>
+                            <div id="filter-country" class="ui multiple search selection dropdown">
+                                <input name="tags" type="hidden">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Country</div>
+                                <div class="menu">
+                                    {% for country in countries %}
+                                        <div class="item" data-value="{{ country.code }}">{{ country.name }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if filter_visibility %}
+                        <div class="field five wide">
+                            <label>Visibility</label>
+                            <div id="filter-visibility" class="ui selection dropdown">
+                                <input type="hidden" name="gender">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Visibility</div>
+                                <div class="menu">
+                                    <div class="item" data-value="all">All</div>
+                                    <div class="item" data-value="current">Current</div>
+                                    <div class="item" data-value="completed">Completed</div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
                 <div class="field">
                     <label>Search</label>
                     <input id="filter-search" type="text" placeholder="Search in News">
