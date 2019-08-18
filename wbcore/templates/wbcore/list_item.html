@@ -18,13 +18,16 @@
             {% if item.show_date %}
                 <span class="date">{{ item.show_date }}</span>
             {% elif item.date %}
-                <span class="date">{{ item.date | date:"D, j. M Y" }}</span> |
+                <span class="date">{{ item.date | date:"D, j. M Y" }}</span>
             {% elif item.published %}
-                <span class="date">{{ item.published | date:"D, j. M Y" }}</span> |
+                <span class="date">{{ item.published | date:"D, j. M Y" }}</span>
             {% endif %}
-            {% for host in item.hosts %}
-                {% include 'wbcore/host_icon.html' with host=host %}
-            {% endfor %}
+            {% if item.hosts %}
+                <span> | </span>
+                {% for host in item.hosts %}
+                    {% include 'wbcore/host_icon.html' with host=host %}
+                {% endfor %}
+            {% endif %}
         </div>
         <a class="ui medium header" href="{{ item.link }}">{{ item.title }}</a>
 

@@ -16,7 +16,7 @@ from itertools import groupby
 from datetime import datetime, date, timedelta
 from schedule.periods import Period
 import csv
-from .views import item_list_from_occ
+from .views import item_list_from_occ, item_list_from_blogposts
 
 
 def remove_tags(text):
@@ -292,26 +292,13 @@ def filter_blog(request):
         print("Host Slugs", host_slugs)
 
         results = SearchQuerySet()
-
-        print('***', len(results.models(BlogPost)))
-        if start:
-            pass
-            #results = results.filter_and(published__lte=end)
-            #results = results.filter_and(published__gte=start)
-            #results = results.filter_and(published=date(year=2008, month=8, day=2))
-        print('***', len(results.models(BlogPost)))
-
         if host_slugs:
             results = results.filter_or(host_slug__in=host_slugs)
-        print('***', len(results.models(BlogPost)))
         if contains:
             results = results.filter_and(content__contains=contains)
-        print('***', len(results.models(BlogPost)))
         if start:
             results = results.filter_and(published__lte=end)
             results = results.filter_and(published__gte=start)
-        print('***', len(results.models(BlogPost)))
-
         results = results.models(BlogPost).order_by('-published')[:20]
 
         print("Length:", len(results))
@@ -322,6 +309,6 @@ def filter_blog(request):
 
     context = {
         'host': host,
-        'item_list': posts,
+        'item_list': item_list_from_blogposts(posts, host_slug),
     }
     return HttpResponse(template.render(context, request))

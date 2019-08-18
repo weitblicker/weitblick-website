@@ -136,12 +136,26 @@ def item_list_from_occ(occurrences, host_slug=None):
         # occ.date = occ.start
         occ.show_date = f"{occ.start.strftime('%a, %d. %b %Y')} - {occ.end.strftime('%a, %d. %b %Y')}"
         occ.hosts = occ.event.host.all()
-        if host_slug:
+        current_host = Host.objects.get(slug=host_slug) if host_slug else None
+        if current_host and current_host in occ.event.host.all():
             occ.link = reverse('event', kwargs={'event_slug': occ.event.slug, 'host_slug': host_slug})
         else:
             occ.link = reverse('event', args=[occ.event.slug])
         occ.teaser = occ.description
         item_list.append(occ)
+    return item_list
+
+def item_list_from_blogposts(blogposts, host_slug=None):
+    item_list = []
+    for post in blogposts:
+        if not post.teaser:
+            post.teaser = post.text
+        current_host = Host.objects.get(slug=host_slug) if host_slug else None
+        if current_host and post.host and current_host in post.host.all():
+            post.link = reverse('blog-post', kwargs={'post_id': post.id, 'host_slug': host_slug})
+        else:
+            post.link = reverse('blog-post', args=[post.id])
+        item_list.append(post)
     return item_list
 
 def home_view(request):
@@ -154,8 +168,6 @@ def home_view(request):
     occurrences = period.get_occurrences()[:3]
 
     template = loader.get_template('wbcore/home.html')
-
-
     context = {
         'main_nav': get_main_nav(),
         'dot_nav': get_dot_nav(),
@@ -622,10 +634,8 @@ def events_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
-        #'occurrences': occurrences,
-        'host': host,
-        'hosts': hosts,
         'breadcrumb': breadcrumb,
+        'hosts': hosts,
         'from_to': year_months,
         'item_list': item_list_from_occ(occurrences, host_slug),
         'ajax_endpoint': reverse('ajax-filter-events'),
@@ -652,7 +662,7 @@ def event_view(request, host_slug=None, event_slug=None):
     except Host.DoesNotExist:
         raise Http404()
 
-    template = loader.get_template('wbcore/events.html')
+    template = loader.get_template('wbcore/event.html')
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
@@ -700,10 +710,9 @@ def blog_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'breadcrumb': breadcrumb,
         'host': host,
-        'posts': posts,
         'hosts': hosts,
         'years': year_months,
-        'item_list': posts,
+        'item_list': item_list_from_blogposts(posts, host_slug),
         'ajax_endpoint': reverse('ajax-filter-blog'),
     }
     return HttpResponse(template.render(context, request))
