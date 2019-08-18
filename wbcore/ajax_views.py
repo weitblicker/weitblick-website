@@ -259,7 +259,6 @@ def filter_events(request):
 
 @api_view(['GET', 'POST'])
 def filter_blog(request):
-
     template = loader.get_template('wbcore/item_list.html')
     host_slugs = request.GET.getlist("union")
     contains = request.GET.get("search")
@@ -275,10 +274,7 @@ def filter_blog(request):
     if archive:
         try:
             start = datetime.strptime(archive, '%Y-%m').date()
-            if start.month is 12:
-                end = date(start.year+1, 1, 1)
-            else:
-                end = date(start.year, start.month+1, 1)
+            end = date(start.year, start.month+1, 1) if start.month!=12 else date(start.year+1, 1, 1)
         except ValueError:
             try:
                 start = datetime.strptime(archive, '%Y').date()
@@ -296,13 +292,25 @@ def filter_blog(request):
         print("Host Slugs", host_slugs)
 
         results = SearchQuerySet()
+
+        print('***', len(results.models(BlogPost)))
+        if start:
+            pass
+            #results = results.filter_and(published__lte=end)
+            #results = results.filter_and(published__gte=start)
+            #results = results.filter_and(published=date(year=2008, month=8, day=2))
+        print('***', len(results.models(BlogPost)))
+
         if host_slugs:
             results = results.filter_or(host_slug__in=host_slugs)
+        print('***', len(results.models(BlogPost)))
         if contains:
             results = results.filter_and(content__contains=contains)
+        print('***', len(results.models(BlogPost)))
         if start:
             results = results.filter_and(published__lte=end)
             results = results.filter_and(published__gte=start)
+        print('***', len(results.models(BlogPost)))
 
         results = results.models(BlogPost).order_by('-published')[:20]
 
