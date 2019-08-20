@@ -6,20 +6,22 @@
         <div class="ui stackable grid container content-block">
 
         {% include 'wbcore/breadcrumb.html' %}
+        
+        <div class="ui row">
+          <div class="column" id="puzzles">
+            {% include 'wbcore/svgs/puzzle.svg' with id='puzzle-svg-1' title='Idee' description='Was ist Weitblick?' icon='wbcore/svgs/idea.svg' link='idea' background='colorbg/grey.svg' hover='colorbg/yellow.svg' type='up' %}
+            
+            {% include 'wbcore/svgs/puzzle.svg' with id='puzzle-svg-2' title='Projects' description='Wen unterstützen wir?' icon='wbcore/svgs/leaf.svg' link='projects'  background='colorbg/grey.svg' hover='colorbg/yellow.svg'  type='down' %}
+            
+            {% include 'wbcore/svgs/puzzle.svg' with id='puzzle-svg-3' title='Events' description='Was tun wir?' icon='wbcore/svgs/hand.svg' link='events' background='colorbg/grey.svg' hover='colorbg/yellow.svg' type='up' %}
+            
+            {% include 'wbcore/svgs/puzzle.svg' with id='puzzle-svg-4' title='Mitmachen' description='Komm vorbei!' icon='wbcore/svgs/people.svg' link='join' background='colorbg/grey.svg' hover='colorbg/yellow.svg' type='down' %}
+          </div>
+        </div>
+
         {% include 'wbcore/socialbuttons.html' %}
 
-        <div class="ui row">
-    		<div class="column" id="puzzles">
-    			{% include 'wbcore/svgs/puzzle.svg' with id='puzzle-svg-1' title='Idee' description='Was ist Weitblick?' icon='wbcore/svgs/idea.svg' link='idea' background='colorbg/grey.svg' hover='colorbg/yellow.svg' type='up' %}
-
-    			{% include 'wbcore/svgs/puzzle.svg' with id='puzzle-svg-2' title='Projects' description='Wen unterstützen wir?' icon='wbcore/svgs/leaf.svg' link='projects'  background='colorbg/grey.svg' hover='colorbg/yellow.svg'  type='down' %}
-
-    			{% include 'wbcore/svgs/puzzle.svg' with id='puzzle-svg-3' title='Events' description='Was tun wir?' icon='wbcore/svgs/hand.svg' link='events' background='colorbg/grey.svg' hover='colorbg/yellow.svg' type='up' %}
-
-    			{% include 'wbcore/svgs/puzzle.svg' with id='puzzle-svg-4' title='Mitmachen' description='Komm vorbei!' icon='wbcore/svgs/people.svg' link='join' background='colorbg/grey.svg' hover='colorbg/yellow.svg' type='down' %}
-    		</div>
-        </div>
-    </div>
+      </div>
 
     <div class="ui vertical stripe segment">
     	<div class="ui stackable grid container content-block">
