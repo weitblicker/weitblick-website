@@ -664,61 +664,47 @@ def events_view(request, host_slug=None):
     return HttpResponse(template.render(context, request))
 
 
-# def event_view(request, host_slug=None, event_slug=None):
-#     try:
-#         if host_slug:
-#             event = Event.objects.get(slug=event_slug, host__slug=host_slug)
-#             host = Host.objects.get(slug=host_slug)
-#             breadcrumb = [('Home', reverse('home')),
-#                           (host.name, reverse('host', args=[host_slug])),
-#                           ("Events", reverse('events', args=[host_slug])),
-#                           (event.title, None)]
-#         else:
-#             event = Event.objects.get(slug=event_slug)
-#             host = None
-#             breadcrumb = [('Home', reverse('home')), ("Events", reverse('events')), (event.title, None)]
-#
-#     except Event.DoesNotExist:
-#         raise Http404()
-#     except Host.DoesNotExist:
-#         raise Http404()
-#
-#     template = loader.get_template('wbcore/events.html')
-#     context = {
-#         'main_nav': get_main_nav(host=host, active='events'),
-#         'dot_nav': get_dot_nav(host=host),
-#         'event': event,
-#         'breadcrumb': breadcrumb,
-#         'host': host
-#     }
-#     return HttpResponse(template.render(context, request))
-
 def event_view(request, host_slug=None, event_slug=None):
     try:
         if host_slug:
-            form = EventForm.objects.get(title=event_slug)
+            event = Event.objects.get(slug=event_slug, host__slug=host_slug)
             host = Host.objects.get(slug=host_slug)
             breadcrumb = [('Home', reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
                           ("Events", reverse('events', args=[host_slug])),
-                          (form.title, None)]
+                          (event.title, None)]
         else:
-            form = EventForm.objects.get(title=event_slug)
+            event = Event.objects.get(slug=event_slug)
             host = None
-            breadcrumb = [('Home', reverse('home')), ("Events", reverse('events')), (form.title, None)]
+            breadcrumb = [('Home', reverse('home')), ("Events", reverse('events')), (event.title, None)]
 
-    except EventForm.DoesNotExist:
+    except Event.DoesNotExist:
         raise Http404()
     except Host.DoesNotExist:
         raise Http404()
+
+    if event.form:
+        form_instance = event.form
+        form_class = form_instance.form()
+        if request.method == 'POST':
+            form = form_class(request.POST)
+            if form.is_valid():
+                form_instance.process(form, request)
+                form = form_class()  # reset form
+                form.success = True
+        else:
+            form = form_class()
+    else:
+        form = None
 
     template = loader.get_template('wbcore/event.html')
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
+        'event': event,
         'form': form,
         'breadcrumb': breadcrumb,
-        'host': host
+        'host': host,
     }
     return HttpResponse(template.render(context, request))
 

@@ -11,6 +11,7 @@ from localflavor.generic.countries.sepa import IBAN_SEPA_COUNTRIES
 from django.urls import reverse
 from django_google_maps import fields as map_fields
 from schedule.models.events import Event as ScheduleEvent
+from form_designer.models import Form as EventForm
 
 
 class Address(models.Model):
@@ -303,7 +304,8 @@ class Event(ScheduleEvent):
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
-    gallery = models.ForeignKey(Gallery, null=True, blank =True,on_delete=models.SET_NULL)
+    gallery = models.ForeignKey(Gallery, null=True, blank=True,on_delete=models.SET_NULL)
+    form = models.OneToOneField(EventForm, null=True, blank=True, on_delete=models.SET_NULL)
 
     def search_title(self):
         return self.title

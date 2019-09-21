@@ -1,0 +1,27 @@
+<h2 class="ui header">Anmeldung</h2>
+<form class="ui form" action="{% url 'event' event_slug=event.slug %}" method="post">
+    {% csrf_token %}
+    {% if form.success %}
+        <div class="ui positive message">
+            <div class="header">Wir haben die Anmeldung erhalten. Vielen Dank!</div>
+        </div>
+    {% endif %}
+
+    {% for field in form %}
+        {% for error in field.errors %}
+            <div class="ui negative message">
+                <div class="header">{{ error|escape }}</div>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {% for field in form %}
+        <div class=" field">
+            <label>{{ field.label_tag }}</label>
+            {{ field }}
+        </div>
+    {% endfor %}
+    <div class="field">
+        <input class="ui submit button orange" type="submit" value="Anmelden">
+    </div>
+</form>
