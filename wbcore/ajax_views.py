@@ -16,6 +16,7 @@ from itertools import groupby
 from datetime import datetime, date, timedelta
 from schedule.periods import Period
 import csv
+from .views import item_list_from_occ, item_list_from_blogposts, item_list_from_proj
 
 
 def remove_tags(text):
@@ -64,9 +65,9 @@ def search(request, query):
 
 
 @api_view(['GET', 'POST'])
-def filter_projects(request):
+def filter_projects(request, host_slug=None):
 
-    template = loader.get_template('wbcore/projects_list.html')
+    template = loader.get_template('wbcore/item_list.html')
     host_slugs = request.GET.getlist("union")
     contains = request.GET.get("search")
     country_codes = request.GET.getlist("country")
@@ -83,7 +84,6 @@ def filter_projects(request):
     host_slug = None
 
     try:
-        #posts = NewsPost.objects.filter(host__slug__in=host_slugs).distinct()
         host = Host.objects.get(slug=host_slug) if host_slug else None
 
         results = SearchQuerySet()
@@ -91,7 +91,7 @@ def filter_projects(request):
             results = results.filter_or(hosts_slug__in=host_slugs)
         if visibility == 'completed':
             results = results.filter_and(completed=True)
-        if visibility == 'current':
+        elif visibility == 'current':
             results = results.exclude(completed=True)
         if country_codes:
             results = results.filter_and(country_code__in=country_codes)
@@ -105,8 +105,8 @@ def filter_projects(request):
         raise Http404()
 
     context = {
-        'projects': projects,
         'host': host,
+        'item_list': item_list_from_proj(projects, host_slug)
     }
     return HttpResponse(template.render(context, request))
 
@@ -114,7 +114,7 @@ def filter_projects(request):
 @api_view(['GET', 'POST'])
 def filter_news(request):
 
-    template = loader.get_template('wbcore/news_list.html')
+    template = loader.get_template('wbcore/item_list.html')
     host_slugs = request.GET.getlist("union")
     contains = request.GET.get("search")
     host_slugs = list(csv.reader(host_slugs))
@@ -170,12 +170,13 @@ def filter_news(request):
     context = {
         'posts': posts,
         'host': host,
+        'item_list': posts,
     }
     return HttpResponse(template.render(context, request))
 
 @api_view(['GET', 'POST'])
 def filter_events(request):
-    template = loader.get_template('wbcore/events_list.html')
+    template = loader.get_template('wbcore/item_list.html')
     host_slugs = request.GET.getlist("union")
     contains = request.GET.get("search")
     host_slugs = list(csv.reader(host_slugs))
@@ -250,7 +251,63 @@ def filter_events(request):
         raise Http404()
 
     context = {
-        'occurrences': occurrences,
+        'item_list': item_list_from_occ(occurrences),
         'host': host,
+    }
+    return HttpResponse(template.render(context, request))
+
+@api_view(['GET', 'POST'])
+def filter_blog(request):
+    template = loader.get_template('wbcore/item_list.html')
+    host_slugs = request.GET.getlist("union")
+    contains = request.GET.get("search")
+    host_slugs = list(csv.reader(host_slugs))
+    host_slugs = list(set().union(*host_slugs))
+    host_slugs = [x.strip(' ') for x in host_slugs]
+
+    archive = request.GET.get("archive")
+
+    start = None
+    end = None
+
+    if archive:
+        try:
+            start = datetime.strptime(archive, '%Y-%m').date()
+            end = date(start.year, start.month+1, 1) if start.month!=12 else date(start.year+1, 1, 1)
+        except ValueError:
+            try:
+                start = datetime.strptime(archive, '%Y').date()
+                end = date(start.year+1, 1, 1)
+            except ValueError:
+                start = None
+                end = None
+
+    print("Date", start, end)
+    print("Contains:", contains)
+    host_slug = None
+
+    try:
+        host = Host.objects.get(slug=host_slug) if host_slug else None
+        print("Host Slugs", host_slugs)
+
+        results = SearchQuerySet()
+        if host_slugs:
+            results = results.filter_or(host_slug__in=host_slugs)
+        if contains:
+            results = results.filter_and(content__contains=contains)
+        if start:
+            results = results.filter_and(published__lte=end)
+            results = results.filter_and(published__gte=start)
+        results = results.models(BlogPost).order_by('-published')[:20]
+
+        print("Length:", len(results))
+        posts = [result.object for result in results]
+
+    except Host.DoesNotExist:
+        raise Http404()
+
+    context = {
+        'host': host,
+        'item_list': item_list_from_blogposts(posts, host_slug),
     }
     return HttpResponse(template.render(context, request))
