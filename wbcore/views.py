@@ -14,6 +14,7 @@ from collections import OrderedDict
 from email.message import EmailMessage
 from datetime import datetime, timedelta
 from schedule.periods import Period
+from form_designer.models import Form as EventForm
 
 # TODO move to settings
 EMAIL_ADDRESS = os.environ.get('TEST_EMAIL_USER')
@@ -617,21 +618,50 @@ def events_view(request, host_slug=None):
     return HttpResponse(template.render(context, request))
 
 
+# def event_view(request, host_slug=None, event_slug=None):
+#     try:
+#         if host_slug:
+#             event = Event.objects.get(slug=event_slug, host__slug=host_slug)
+#             host = Host.objects.get(slug=host_slug)
+#             breadcrumb = [('Home', reverse('home')),
+#                           (host.name, reverse('host', args=[host_slug])),
+#                           ("Events", reverse('events', args=[host_slug])),
+#                           (event.title, None)]
+#         else:
+#             event = Event.objects.get(slug=event_slug)
+#             host = None
+#             breadcrumb = [('Home', reverse('home')), ("Events", reverse('events')), (event.title, None)]
+#
+#     except Event.DoesNotExist:
+#         raise Http404()
+#     except Host.DoesNotExist:
+#         raise Http404()
+#
+#     template = loader.get_template('wbcore/events.html')
+#     context = {
+#         'main_nav': get_main_nav(host=host, active='events'),
+#         'dot_nav': get_dot_nav(host=host),
+#         'event': event,
+#         'breadcrumb': breadcrumb,
+#         'host': host
+#     }
+#     return HttpResponse(template.render(context, request))
+
 def event_view(request, host_slug=None, event_slug=None):
     try:
         if host_slug:
-            event = Event.objects.get(slug=event_slug, host__slug=host_slug)
+            form = EventForm.objects.get(title=event_slug)
             host = Host.objects.get(slug=host_slug)
             breadcrumb = [('Home', reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
                           ("Events", reverse('events', args=[host_slug])),
-                          (event.title, None)]
+                          (form.title, None)]
         else:
-            event = Event.objects.get(slug=event_slug)
+            form = EventForm.objects.get(title=event_slug)
             host = None
-            breadcrumb = [('Home', reverse('home')), ("Events", reverse('events')), (event.title, None)]
+            breadcrumb = [('Home', reverse('home')), ("Events", reverse('events')), (form.title, None)]
 
-    except Event.DoesNotExist:
+    except EventForm.DoesNotExist:
         raise Http404()
     except Host.DoesNotExist:
         raise Http404()
@@ -640,7 +670,7 @@ def event_view(request, host_slug=None, event_slug=None):
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
-        'event': event,
+        'form': form,
         'breadcrumb': breadcrumb,
         'host': host
     }
