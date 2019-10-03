@@ -7,12 +7,11 @@ from django.http import HttpResponse, Http404
 from django.template import loader
 from django.urls import reverse
 from django.core.mail import BadHeaderError
-from datetime import date
 from wbcore.forms import ContactForm, JoinForm
 from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation
 from collections import OrderedDict
 from email.message import EmailMessage
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from schedule.periods import Period
 
 # TODO move to settings
@@ -129,6 +128,53 @@ def get_host_slugs(request, host_slug):
         host_slugs = [x.strip(' ') for x in host_slugs]
     return host_slugs
 
+def item_list_from_occ(occurrences, host_slug=None):
+    # set attributes to fill list_item template
+    item_list = []
+    for occ in occurrences:
+        occ.image = occ.event.image
+        # occ.date = occ.start
+        occ.show_date = f"{occ.start.strftime('%a, %d. %b %Y')} - {occ.end.strftime('%a, %d. %b %Y')}"
+        occ.hosts = occ.event.host.all()
+        current_host = Host.objects.get(slug=host_slug) if host_slug else None
+        if current_host and current_host in occ.event.host.all():
+            occ.link = reverse('event', kwargs={'event_slug': occ.event.slug, 'host_slug': host_slug})
+        else:
+            occ.link = reverse('event', args=[occ.event.slug])
+        occ.teaser = occ.description
+        item_list.append(occ)
+    return item_list
+
+def item_list_from_blogposts(blogposts, host_slug=None):
+    item_list = []
+    for post in blogposts:
+        if not post.teaser:
+            post.teaser = post.text
+        current_host = Host.objects.get(slug=host_slug) if host_slug else None
+        if current_host and post.host and current_host in post.host.all():
+            post.link = reverse('blog-post', kwargs={'post_id': post.id, 'host_slug': host_slug})
+        else:
+            post.link = reverse('blog-post', args=[post.id])
+        item_list.append(post)
+    return item_list
+
+def item_list_from_proj(projects, host_slug=None):
+    item_list = []
+    for project in projects:
+        project.image = project.teaser_image()
+        project.country = project.location.country.name
+        project.published = None  # do not show published date, but rather if active or not
+        project.hosts_list = project.hosts.all()
+        current_host = Host.objects.get(slug=host_slug) if host_slug else None
+        if current_host and current_host in project.hosts.all():
+            project.link = reverse('project', kwargs={'project_slug': project.slug, 'host_slug': host_slug})
+        else:
+            project.link = reverse('project', args=[project.slug])
+        project.title = project.name
+        project.teaser = project.short_description if project.short_description else project.description
+        #project.teaser = project.description
+        item_list.append(project)
+    return item_list
 
 def home_view(request):
     projects = Project.objects.all()
@@ -140,8 +186,6 @@ def home_view(request):
     occurrences = period.get_occurrences()[:3]
 
     template = loader.get_template('wbcore/home.html')
-
-
     context = {
         'main_nav': get_main_nav(),
         'dot_nav': get_dot_nav(),
@@ -452,18 +496,20 @@ def projects_view(request, host_slug=None):
 
     hosts = Host.objects.all()
 
+    template = loader.get_template('wbcore/projects.html')
     context = {
         'main_nav': get_main_nav(host=host, active='projects'),
         'dot_nav': get_dot_nav(host=host),
-        'projects': projects,
-        'project_list': project_list,
         'breadcrumb': breadcrumb,
+        'item_list': item_list_from_proj(projects, host_slug),
+        'project_list': project_list,
         'host': host,
         'hosts': hosts,
         'posts': posts,
         'countries': countries,
+        'filter_visibility': True,
+        'ajax_endpoint': reverse('ajax-filter-projects'),
     }
-    template = loader.get_template('wbcore/projects.html')
     return HttpResponse(template.render(context, request))
 
 
@@ -608,11 +654,11 @@ def events_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
-        'occurrences': occurrences,
-        'host': host,
-        'hosts': hosts,
         'breadcrumb': breadcrumb,
-        'years': year_months,
+        'hosts': hosts,
+        'from_to': year_months,
+        'item_list': item_list_from_occ(occurrences, host_slug),
+        'ajax_endpoint': reverse('ajax-filter-events'),
     }
     return HttpResponse(template.render(context, request))
 
@@ -636,7 +682,7 @@ def event_view(request, host_slug=None, event_slug=None):
     except Host.DoesNotExist:
         raise Http404()
 
-    template = loader.get_template('wbcore/events.html')
+    template = loader.get_template('wbcore/event.html')
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
@@ -662,6 +708,17 @@ def blog_view(request, host_slug=None):
         raise Http404()
 
     posts = posts.order_by('-published')[:20]
+    hosts = Host.objects.all()
+
+    if BlogPost.objects.count():
+        latest = BlogPost.objects.latest('published')
+        earliest = BlogPost.objects.earliest('published')
+        start_date = earliest.published
+        end_date = latest.published
+
+        year_months = range_year_month(start_date, end_date)
+    else:
+        year_months = None
 
     if host:
         breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ("Blog", None)]
@@ -671,9 +728,12 @@ def blog_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host, active='blog'),
         'dot_nav': get_dot_nav(host=host),
-        'posts': posts,
-        'host': host,
         'breadcrumb': breadcrumb,
+        'host': host,
+        'hosts': hosts,
+        'years': year_months,
+        'item_list': item_list_from_blogposts(posts, host_slug),
+        'ajax_endpoint': reverse('ajax-filter-blog'),
     }
     return HttpResponse(template.render(context, request))
 
@@ -727,8 +787,6 @@ def range_year_month(start_date, end_date):
 
 
 def news_view(request, host_slug=None):
-    template = loader.get_template('wbcore/news.html')
-
     host_slugs = get_host_slugs(request, host_slug)
     try:
         if host_slugs:
@@ -755,17 +813,22 @@ def news_view(request, host_slug=None):
 
     if host:
         breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ("News", None)]
+        for post in posts:
+            post.current_host = host
     else:
         breadcrumb = [('Home', reverse('home')), ('News', None)]
 
+    template = loader.get_template('wbcore/news.html')
     context = {
         'main_nav': get_main_nav(host=host, active='news'),
         'dot_nav': get_dot_nav(host=host),
-        'posts': posts,
         'host': host,
-        'hosts': hosts,
         'breadcrumb': breadcrumb,
+        'posts': posts,
+        'hosts': hosts,
         'years': year_months,
+        'item_list': posts,
+        'ajax_endpoint': reverse('ajax-filter-news'),
     }
     return HttpResponse(template.render(context, request))
 
