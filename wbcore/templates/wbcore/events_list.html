@@ -1,7 +1,0 @@
-{% if occurrences %}
-    <div class="ui divided unstackable items">
-    {% for occ in occurrences %}
-        {% include 'wbcore/event_feed.html' with occ=occ host_slug=host.slug %}
-    {% endfor %}
-    </div>
-{% endif %}

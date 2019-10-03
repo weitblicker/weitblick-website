@@ -14,13 +14,7 @@ $(document)
             })
         ;
 
-        // create sidebar and attach to menu open
-        /*$('.ui.sidebar')
-          .sidebar('attach events', '.toc.item')
-        ;*/
-
         $('.popup-menu-btn').click(function(){
-            // $('#popup-menu.show').css('height', $('#popup-menu').first().height());
             $('#popup-menu').slideToggle();
         });
 
@@ -31,89 +25,6 @@ $(document)
             type: 'category',
             minCharacters: 3,
         });
-
-        let news_filter_union = "";
-        let news_filter_search = "";
-        let news_filter_archive = "";
-
-        let filter_news = function(union, search, archive){
-            console.log("Filter:", union, search, archive);
-            data = {};
-            if(union) data['union'] = union;
-            if(search) data['search'] = search;
-            if(archive) data['archive'] = archive;
-            $.ajax({
-                url: '/ajax/filter-news/',
-                data: data,
-                dataType: 'html',
-                success: function (data) {
-                    let news_list = $('#news-list');
-                    news_list.children().fadeOut('fast');
-                    news_list.html(data);
-                    news_list.children().fadeIn('fast');
-                },
-                error: function(error){
-                    console.log(error)
-                }
-            });
-        };
-
-        let event_filter_union = "";
-        let event_filter_search = "";
-        let event_filter_start_date = "";
-        let event_filter_end_date = "";
-
-        let filter_events = function(union, search, start_date, end_date){
-            console.log("Filter:", union, search, start_date, end_date);
-            data = {};
-            if(union) data['union'] = union;
-            if(search) data['search'] = search;
-            if(start_date) data['start_date'] = start_date;
-            if(end_date) data['end_date'] = end_date;
-            $.ajax({
-                url: '/ajax/filter-events/',
-                data: data,
-                dataType: 'html',
-                success: function (data) {
-                    let events_list = $('#events-list');
-                    events_list.children().fadeOut('fast');
-                    events_list.html(data);
-                    events_list.children().fadeIn('fast');
-                },
-                error: function(error){
-                    console.log(error)
-                }
-            });
-        };
-
-        let project_filter_union = "";
-        let project_filter_search = "";
-        let project_filter_country = "";
-        let project_filter_visibility = "";
-
-        let filter_projects = function(union, search, country, visibility){
-            console.log("Filter union:", union, "search: ", search, "country:", country, "visibility:", visibility);
-            data = {};
-            if(union) data['union'] = union;
-            if(search) data['search'] = search;
-            if(country) data['country'] = country;
-            if(visibility) data['visibility'] = visibility;
-            $.ajax({
-                url: '/ajax/filter-projects/',
-                data: data,
-                dataType: 'html',
-                success: function (data) {
-                    console.log("success...", data)
-                    let projects_list = $('#projects-list');
-                    projects_list.children().fadeOut('fast');
-                    projects_list.html(data);
-                    projects_list.children().fadeIn('fast');
-                },
-                error: function(error){
-                    console.log(error)
-                }
-            });
-        };
 
         $('#search').find('.dropdown').dropdown(
             {
@@ -127,7 +38,7 @@ $(document)
             {
                 type: 'category',
                 selector:{
-                  results: '.results',
+                    results: '.results',
                 },
                 searchOnFocus: true,
                 transition: 'fade-in',
@@ -143,136 +54,119 @@ $(document)
             }
         );
 
-        $('#news-filter-clear').on('click', function() {
-            $('#news-filter-archive').dropdown('clear');
-            news_filter_archive = "";
-            $('#news-filter-hosts').dropdown('clear');
-            news_filter_union = "";
-            $('#news-filter-search').val('');
-            news_filter_search = "";
-            filter_news(news_filter_union, news_filter_search, news_filter_archive);
+
+        let filter_union = "";
+        let filter_search = "";
+        let filter_country = "";
+        let filter_visibility = "";
+        let filter_archive = "";
+        let filter_from = "";
+        let filter_to = "";
+
+        let filter = function(){
+            console.log($('#filter').data('ajax-endpoint'));
+            console.log("Filter union:", filter_union, "search: ", filter_search,
+                "country:", filter_country, "visibility:", filter_visibility);
+            data = {};
+            if(filter_union) data['union'] = filter_union;
+            if(filter_search) data['search'] = filter_search;
+            if(filter_country) data['country'] = filter_country;
+            if(filter_visibility) data['visibility'] = filter_visibility;
+            if(filter_archive) data['archive'] = filter_archive;
+            if(filter_from) data['from'] = filter_from;
+            if(filter_to) data['to'] = filter_to;
+            $.ajax({
+                url: $('#filter').data('ajax-endpoint'),
+                data: data,
+                dataType: 'html',
+                success: function (data) {
+                    console.log("success...", data)
+                    let projects_list = $('#item-list');
+                    projects_list.children().fadeOut('fast');
+                    projects_list.html(data);
+                    projects_list.children().fadeIn('fast');
+                },
+                error: function(error){
+                    console.log(error)
+                }
+            });
+        };
+
+        $('#filter-clear').on('click', function() {
+            $('#filter-hosts').dropdown('clear');
+            filter_union = "";
+            $('#filter-archive').dropdown('clear');
+            filter_archive = "";
+            $('#filter-from').dropdown('clear');
+            filter_from = "";
+            $('#filter-to').dropdown('clear');
+            filter_to = "";
+            $('#filter-country').dropdown('clear');
+            filter_country = "";
+            $('#filter-visibility').dropdown('clear');
+            filter_visibility = "";
+            $('#filter-search').val('');
+            filter_search = "";
+            filter();
         });
 
-        $('#news-filter-archive')
+        $('#filter-hosts')
+            .dropdown({
+                onChange: function(value, text, choice){
+                    filter_union = value;
+                    filter();
+                },
+            });
+
+        $('#filter-archive')
             .dropdown({
                 allowCategorySelection: true,
                 onChange: function(value, text, choice){
-                    news_filter_archive = value;
+                    filter_archive = value;
                     console.log(value, text, choice);
-                    filter_news(news_filter_union, news_filter_search, news_filter_archive);
+                    filter();
                 },
             });
 
-        $('#news-filter-hosts')
-            .dropdown({
-                onChange: function(value, text, choice){
-                    news_filter_union = value;
-                    filter_news(news_filter_union, news_filter_search, news_filter_archive);
-                },
-            });
-
-        $('#news-filter-search').on("change paste keyup", function() {
-            news_filter_search = $(this).val();
-            filter_news(news_filter_union, news_filter_search, news_filter_archive);
-        });
-
-        $('#event-filter-clear').on('click', function() {
-            $('#event-filter-hosts').dropdown('clear');
-            event_filter_union = "";
-            $('#event-filter-start_date').dropdown('clear');
-            event_filter_start_date = "";
-            $('#event-filter-end_date').dropdown('clear');
-            event_filter_end_date = "";
-            $('#event-filter-search').val('');
-            event_filter_search = "";
-            filter_events(event_filter_union, event_filter_search, event_filter_start_date, event_filter_end_date);
-        });
-
-        $('#event-filter-hosts')
-            .dropdown({
-                onChange: function(value, text, choice){
-                    event_filter_union = value;
-                    filter_events(event_filter_union, event_filter_search, event_filter_start_date, event_filter_end_date);
-                },
-            });
-
-        $('#event-filter-start_date')
+        $('#filter-from')
             .dropdown({
                 allowCategorySelection: true,
                 onChange: function(value, text, choice){
-                    event_filter_start_date = value;
+                    filter_from = value;
                     console.log(value, text, choice);
-                    filter_events(event_filter_union, event_filter_search, event_filter_start_date, event_filter_end_date);
+                    filter();
                 },
             });
 
-        $('#event-filter-end_date')
+        $('#filter-to')
             .dropdown({
                 allowCategorySelection: true,
                 onChange: function(value, text, choice){
-                    event_filter_end_date = value;
+                    filter_to = value;
                     console.log(value, text, choice);
-                    filter_events(event_filter_union, event_filter_search, event_filter_start_date, event_filter_end_date);
+                    filter();
                 },
             });
 
-        $('#event-filter-search').on("change paste keyup", function() {
-            event_filter_search = $(this).val();
-            filter_events(event_filter_union, event_filter_search, event_filter_start_date, event_filter_end_date);
+        $('#filter-search').on("change paste keyup", function() {
+            filter_search = $(this).val();
+            filter();
         });
 
-        $('#project-filter-clear').on('click', function() {
-            $('#project-filter-countries').dropdown('clear');
-            project_filter_country = "";
-            $('#project-filter-hosts').dropdown('clear');
-            project_filter_union = "";
-            $('#project-filter-search').val('');
-            project_filter_search = "";
-            $('#project-filter-visibility').dropdown('clear');
-            project_filter_visibility = "";
-            filter_projects(project_filter_union, project_filter_search, project_filter_country, project_filter_visibility);
-        });
-
-        $('#project-filter-hosts')
+        $('#filter-visibility')
             .dropdown({
                 onChange: function(value, text, choice){
-                    project_filter_union = value;
-                    filter_projects(project_filter_union,
-                        project_filter_search,
-                        project_filter_country,
-                        project_filter_visibility);
+                    filter_visibility = value;
+                    filter();
                 },
             });
 
-        $('#project-filter-visibility')
+        $('#filter-country')
             .dropdown({
                 onChange: function(value, text, choice){
-                    project_filter_visibility = value;
-                    filter_projects(project_filter_union,
-                        project_filter_search,
-                        project_filter_country,
-                        project_filter_visibility);
+                    filter_country = value;
+                    filter();
                 },
             });
-
-        $('#project-filter-countries')
-            .dropdown({
-                onChange: function(value, text, choice){
-                    project_filter_country = value;
-                    filter_projects(project_filter_union,
-                        project_filter_search,
-                        project_filter_country,
-                        project_filter_visibility);
-                },
-            });
-
-        $('#project-filter-search').on("change paste keyup", function() {
-            project_filter_search = $(this).val();
-
-            console.log(project_filter_search)
-            filter_projects(project_filter_union,
-                project_filter_search,
-                project_filter_country,
-                project_filter_visibility);
-        });
     });
+

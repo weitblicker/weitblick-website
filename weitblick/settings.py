@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'django_google_maps',
     'microsoft_auth',
     'wbcore.apps.WbcoreConfig',
+    'form_designer',
+    'admin_ordering',
 ]
 
 AUTH_USER_MODEL = 'wbcore.User'

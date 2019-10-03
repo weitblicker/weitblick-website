@@ -54,6 +54,8 @@ class NewsPostIndex(indexes.SearchIndex, indexes.Indexable):
 class BlogPostIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     model = indexes.CharField(model_attr='get_model_name', faceted=True)
+    host_slug = indexes.CharField()
+    published = indexes.DateTimeField(model_attr='published')
 
     def get_model(self):
         return BlogPost

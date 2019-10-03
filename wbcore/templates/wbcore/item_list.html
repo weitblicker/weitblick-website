@@ -1,0 +1,9 @@
+<div id="item-list" class="ui basic segment">
+{% if item_list %}
+    <div class="ui divided unstackable items">
+    {% for item in item_list %}
+        {% include 'wbcore/list_item.html' %}
+    {% endfor %}
+    </div>
+{% endif %}
+</div>
