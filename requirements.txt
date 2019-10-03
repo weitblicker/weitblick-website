@@ -1,7 +1,7 @@
-Django==2.2.3
+Django==2.2.6
 django-countries
 django-sass-processor
-django-photologue==3.9
+django-photologue==3.10
 django-compressor
 django-localflavor
 django-filter

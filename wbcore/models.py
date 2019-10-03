@@ -83,7 +83,7 @@ class Host(models.Model):
         return self.name
 
 
-class MyUserManager(BaseUserManager):
+class UserManager(BaseUserManager):
     def create_user(self, first_name, last_name, email, date_of_birth, password=None):
         """
         Creates and saves a User with the given email, date of
@@ -121,12 +121,12 @@ class MyUserManager(BaseUserManager):
             password=password,
             date_of_birth=date_of_birth,
         )
-        user.is_admin = True
+        user.is_super_admin = True
         user.save(using=self._db)
         return user
 
 
-class MyUser(AbstractBaseUser, PermissionsMixin):
+class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=60)
     first_name = models.CharField(max_length=60)
     last_name = models.CharField(max_length=60)
@@ -142,28 +142,24 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     def is_staff(self):
         return True;
 
-    @property
-    def is_super_admin(self):
-        return self.role == 'super_admin'
+    is_super_admin = models.BooleanField(default=False)
+
+    def get_maintaining_hosts(self):
+        admin_relations = self.userrelation_set.filter(member_type='admin').all()
+        return [relation.host for relation in admin_relations]
+
+    def is_admin_of_host(self, host):
+        return host in self.get_maintaining_hosts()
 
     hosts = models.ManyToManyField(Host, through='UserRelation')
 
-    ROLE_CHOICES = (
-        ('super_admin', 'Admin'),
-        ('host_admin', 'Host Admin'),
-        ('member', 'Member'),
-        ('banker', 'Banker'),
-        ('applicant', 'Applicant'),
-    )
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='applicant')
-
-    objects = MyUserManager()
+    objects = UserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'date_of_birth']
 
     def has_perm(self, perm, obj=None):
-        "Does the user have a specific permission?"
+        # Does the user have a specific permission?
         if obj:
             print("has perm:", perm, obj)
 
@@ -177,10 +173,21 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         if perm.startswith("wbcore.view"):
             return True
 
-        if self.role == 'host_admin':
-            for host in self.hosts.all():
-                if obj.belongs_to_host(host):
-                    return True
+        # Get all host objects where the user is an admin
+        # If the object belongs to any of these hosts the
+        # user has the right to access it
+        for host in self.userrelation_set.filter(member_type='admin'):
+
+            print("test", obj, self)
+
+            if obj.belongs_to_host(host):
+                if isinstance(obj, User):
+                    if obj.is_super_admin:
+                        return False
+                    if obj.userrelation_set.get(member_type='admin'):
+                        return False
+
+                return True
 
         return False
 
@@ -200,7 +207,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         return self.name
 
     def belongs_to_host(self, host):
-        return self.host == host
+        return host in self.hosts.all()
 
 
 class Content(models.Model):
@@ -330,13 +337,15 @@ class Event(ScheduleEvent):
 
 class UserRelation(models.Model):
     host = models.ForeignKey(Host, on_delete=models.CASCADE)
-    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     TYPE_CHOICES = (
-        ('user', 'User'),
+        ('admin', 'Admin'),
+        ('editor', 'Editor'),
+        ('author', 'Author'),
         ('member', 'Member'),
-        ('pending', 'Pending')
+        ('applicant', 'Applicant'),
     )
-    member_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='pending')
+    member_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='applicant')
     membership_fee = models.DecimalField(max_digits=5, decimal_places=2)
 
     def __str__(self):
@@ -365,7 +374,7 @@ class NewsPost(models.Model):
     teaser = models.TextField()
     host = models.ForeignKey(Host, to_field='slug', on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
-    author = models.ForeignKey(MyUser, on_delete=models.SET_NULL, null=True, blank=True)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     author_str = models.CharField(max_length=200, null=True, blank=True)
     gallery = models.ForeignKey(Gallery, null=True, blank =True, on_delete=models.SET_NULL)
 
@@ -427,7 +436,7 @@ class BlogPost(models.Model):
     teaser = models.TextField()
     host = models.ForeignKey(Host, to_field='slug', on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
-    author = models.ForeignKey(MyUser, on_delete=models.SET_NULL, null=True, blank=True)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     author_str = models.CharField(max_length=200, null=True, blank=True)
     gallery = models.ForeignKey(Gallery, null=True, blank =True, on_delete=models.SET_NULL)
 
@@ -500,7 +509,7 @@ class Team(models.Model):
     slug = models.SlugField(max_length=50, null=False, blank=False)
     description = models.TextField(blank=True, default="")
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
-    member = models.ManyToManyField(MyUser, through='TeamUserRelation')
+    member = models.ManyToManyField(User, through='TeamUserRelation')
     image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -541,7 +550,7 @@ class Team(models.Model):
 
 
 class TeamUserRelation(models.Model):
-    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     text = models.TextField()
     priority = models.IntegerField(default=99)
@@ -593,7 +602,7 @@ class Milestep(models.Model):
 
 class BankAccount(models.Model):
     account_holder = models.CharField(max_length=100)
-    profile = models.OneToOneField(MyUser, on_delete=models.CASCADE)
+    profile = models.OneToOneField(User, on_delete=models.CASCADE)
     iban = IBANField(include_countries=IBAN_SEPA_COUNTRIES)
     bic = BICField()
 

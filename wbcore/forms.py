@@ -1,6 +1,6 @@
 from django import forms
 from wbcore.models import (
-    ContactMessage, MyUser
+    ContactMessage, User
 )
 
 
@@ -14,7 +14,7 @@ class ContactForm(forms.ModelForm):
 
 class JoinForm(forms.ModelForm):
     class Meta:
-        model = MyUser
+        model = User
         fields = ['first_name', 'last_name', 'email', 'hosts']
         labels = {
             'hosts': 'Verein',
