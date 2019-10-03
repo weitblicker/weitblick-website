@@ -13,7 +13,7 @@ from django_google_maps import fields as map_fields
 
 from .models import (
     Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, ContactMessage, UserRelation,
-    Document, Team, Milestone, Donation, Milestep, BankAccount, TeamUserRelation, Content, MyUser
+    Document, Team, Milestone, Donation, Milestep, BankAccount, TeamUserRelation, Content, User
 )
 
 
@@ -26,7 +26,7 @@ class MyTranslatedAdmin(TabbedTranslationAdmin):
 
 
 class UserRelationInlineModel(admin.StackedInline):
-    model = MyUser.hosts.through
+    model = User.hosts.through
 
 
 
@@ -148,7 +148,7 @@ class UserCreationForm(forms.ModelForm):
     password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
 
     class Meta:
-        model = MyUser
+        model = User
         fields = ('first_name', 'last_name', 'email', 'date_of_birth')
         exclude = ()
 
@@ -177,7 +177,7 @@ class UserChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField()
 
     class Meta:
-        model = MyUser
+        model = User
         fields = ('email', 'password', 'date_of_birth', 'is_active', 'first_name', 'last_name')
         exclude = ()
 
@@ -253,8 +253,8 @@ class TeamAdmin(MyAdmin):
 
 # since we're not using Django's built-in permissions,
 # register our own user model and unregister the Group model from admin.
-admin.site.unregister(MyUser)
-admin.site.register(MyUser, UserAdmin)
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
 admin.site.unregister(Group)
 
 

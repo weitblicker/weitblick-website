@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'wbcore.apps.WbcoreConfig',
 ]
 
-AUTH_USER_MODEL = 'wbcore.MyUser'
+AUTH_USER_MODEL = 'wbcore.User'
 
 PHOTOLOGUE_DIR = 'images'
 
