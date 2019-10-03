@@ -18,7 +18,6 @@
                 {% include 'wbcore/item_list.html' %}
                 {% block js %}
                     {{ block.super }}
-                    <script src="/static/jquery/jquery.min.js"></script>
                     <script src="/static/js/el-pagination.js"></script>
                     <script>$.endlessPaginate({paginateOnScroll: true});</script>
                 {% endblock %}
