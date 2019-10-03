@@ -13,6 +13,7 @@ from collections import OrderedDict
 from email.message import EmailMessage
 from datetime import date, datetime, timedelta
 from schedule.periods import Period
+from form_designer.models import Form as EventForm
 
 # TODO move to settings
 EMAIL_ADDRESS = os.environ.get('TEST_EMAIL_USER')
@@ -682,13 +683,28 @@ def event_view(request, host_slug=None, event_slug=None):
     except Host.DoesNotExist:
         raise Http404()
 
+    if event.form:
+        form_instance = event.form
+        form_class = form_instance.form()
+        if request.method == 'POST':
+            form = form_class(request.POST)
+            if form.is_valid():
+                form_instance.process(form, request)
+                form = form_class()  # reset form
+                form.success = True
+        else:
+            form = form_class()
+    else:
+        form = None
+
     template = loader.get_template('wbcore/event.html')
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
         'event': event,
+        'form': form,
         'breadcrumb': breadcrumb,
-        'host': host
+        'host': host,
     }
     return HttpResponse(template.render(context, request))
 

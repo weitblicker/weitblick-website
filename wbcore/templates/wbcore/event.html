@@ -1,4 +1,21 @@
 {% extends 'wbcore/single_content.html' %}
+{% load staticfiles %}
 {% block single-content %}
-    <p>Event</p>
+    {% if event %}
+        <div class="ui vertical stripe segment">
+
+            <div class="ui stackable grid container content-block">
+                <div class="sixteen wide column divided items">
+                    <h1 class="ui item header">{{ event.title }}</h1>
+                    <div>{{ event.description | safe }}</div>
+
+                    {% if form %}
+                        {% include 'wbcore/event_form.html' with event=event form=form %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p>No event available.</p>
+    {% endif %}
 {% endblock %}
