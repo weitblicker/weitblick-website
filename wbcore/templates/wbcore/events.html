@@ -1,5 +1,6 @@
 {% extends 'wbcore/single_content.html' %}
 {% load staticfiles %}
+
 {% block single-content %}
 <div class="ui vertical stripe segment">
   <div class="ui one column stackable grid container content-block">
@@ -15,6 +16,12 @@
     <div class="ten wide column divided items">
       {% include 'wbcore/item_list.html' %}
     </div>
+    {% block js %}
+        {{ block.super }}
+        <script src="/static/jquery/jquery.min.js"></script>
+        <script src="/static/js/el-pagination.js"></script>
+        <script>$.endlessPaginate({paginateOnScroll: true});</script>
+    {% endblock %}
 
     <div class="six wide column divided items">
       {% include 'wbcore/list_filter.html' %}

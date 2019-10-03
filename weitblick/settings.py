@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'wbcore.apps.WbcoreConfig',
     'form_designer',
     'admin_ordering',
+    'el_pagination',
 ]
 
 AUTH_USER_MODEL = 'wbcore.MyUser'
@@ -89,6 +90,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'microsoft_auth.context_processors.microsoft',
+                'django.template.context_processors.request',  # for el-pagination
             ],
             'loaders': [
                 'django.template.loaders.filesystem.Loader',
