@@ -120,7 +120,7 @@ class UserManager(BaseUserManager):
             password=password,
             date_of_birth=date_of_birth,
         )
-        user.role = 'super_admin'
+        user.is_super_admin = True
         user.save(using=self._db)
         return user
 
@@ -141,20 +141,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_staff(self):
         return True;
 
-    @property
-    def is_super_admin(self):
-        return self.role == 'super_admin'
+    is_super_admin = models.BooleanField(default=False)
+
+    def get_maintaining_hosts(self):
+        admin_relations = self.userrelation_set.filter(member_type='admin').all()
+        return [relation.host for relation in admin_relations]
+
+    def is_admin_of_host(self, host):
+        return host in self.get_maintaining_hosts()
 
     hosts = models.ManyToManyField(Host, through='UserRelation')
-
-    ROLE_CHOICES = (
-        ('super_admin', 'Admin'),
-        ('host_admin', 'Host Admin'),
-        ('member', 'Member'),
-        ('banker', 'Banker'),
-        ('applicant', 'Applicant'),
-    )
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='applicant')
 
     objects = UserManager()
 
@@ -176,12 +172,21 @@ class User(AbstractBaseUser, PermissionsMixin):
         if perm.startswith("wbcore.view"):
             return True
 
-        # If the user is a host admin, he or she has the full
-        # access to to all objects which belongs to the host.
-        if self.role == 'host_admin':
-            for host in self.hosts.all():
-                if obj.belongs_to_host(host):
-                    return True
+        # Get all host objects where the user is an admin
+        # If the object belongs to any of these hosts the
+        # user has the right to access it
+        for host in self.userrelation_set.filter(member_type='admin'):
+
+            print("test", obj, self)
+
+            if obj.belongs_to_host(host):
+                if isinstance(obj, User):
+                    if obj.is_super_admin:
+                        return False
+                    if obj.userrelation_set.get(member_type='admin'):
+                        return False
+
+                return True
 
         return False
 
@@ -332,11 +337,13 @@ class UserRelation(models.Model):
     host = models.ForeignKey(Host, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     TYPE_CHOICES = (
-        ('user', 'User'),
+        ('admin', 'Admin'),
+        ('editor', 'Editor'),
+        ('author', 'Author'),
         ('member', 'Member'),
-        ('pending', 'Pending')
+        ('applicant', 'Applicant'),
     )
-    member_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='pending')
+    member_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='applicant')
     membership_fee = models.DecimalField(max_digits=5, decimal_places=2)
 
     def __str__(self):

@@ -10,6 +10,7 @@ from modeltranslation.admin import TabbedTranslationAdmin
 from tinymce import TinyMCE
 from django_google_maps import widgets as map_widgets
 from django_google_maps import fields as map_fields
+from itertools import chain
 
 from .models import (
     Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, ContactMessage, UserRelation,
@@ -28,11 +29,25 @@ class MyTranslatedAdmin(TabbedTranslationAdmin):
 class UserRelationInlineModel(admin.StackedInline):
     model = User.hosts.through
 
+    def formfield_for_choice_field(self, db_field, request=None, **kwargs):
+        formfield = super().formfield_for_choice_field(db_field, request, **kwargs)
+
+        print("User relation inline model : ", kwargs)
+
+        if request and request.user.is_super_admin:
+            return formfield
+        if db_field.name == 'member_type':
+            choices = dict(db_field.get_choices())
+            del choices['admin']
+            del choices['']
+            print(tuple(choices.items()))
+            kwargs['choices'] = tuple(choices.items())
+
+        return db_field.formfield(**kwargs)
 
 
 class TeamUserRelationInlineModel(admin.TabularInline):
     model = Team.member.through
-
 
 
 class MyAdmin(admin.ModelAdmin):
@@ -197,11 +212,10 @@ class UserAdmin(BaseUserAdmin):
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
     list_display = ('name', 'email', 'date_of_birth')
-    list_filter = ('hosts', 'role')
+    list_filter = ('hosts',)
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'date_of_birth',)}),
-        ('Permissions', {'fields': ('role',)}),
     )
     inlines = (UserRelationInlineModel,)
 
@@ -217,34 +231,63 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('email', 'hosts')
     filter_horizontal = ()
 
-    def formfield_for_choice_field(self, db_field, request, **kwargs):
-        formfield = super(UserAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
-        print(**kwargs)
-        print(formfield)
-        if db_field is not 'role':
-            return formfield
-        #elif request.user.is_super_admin:
-        #    return formfield
-        else:
-            if request.user.role is 'host_admin':
-                return formfield
-        #return formfield
-
     def get_readonly_fields(self, request, obj=None):
-        readonly_fields = super(UserAdmin, self). get_readonly_fields(request, obj)
+        readonly_fields = super().get_readonly_fields(request, obj)
 
-        if request.user is obj:
-            return readonly_fields + ('role',)
-        elif request.user.is_super_admin:
-            return readonly_fields
-        elif not request.user.role is 'host_admin':
-            return readonly_fields + ('role',)
-
-        return  readonly_fields
+        return readonly_fields
 
     def get_fields(self, request, obj=None):
-        fields = super(UserAdmin, self).get_fields(request, obj)
+        fields = super().get_fields(request, obj)
         return fields
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+
+        # super user can see everything
+        if request.user.is_super_admin:
+            return queryset
+
+        hosts = request.user.get_maintaining_hosts()
+        for host in hosts:
+            print("Test", host)
+        return queryset.filter(hosts__in=request.user.get_maintaining_hosts())
+
+    def has_add_permission(self, request):
+        if request.user.is_super_admin:
+            return True
+        return False
+
+    def is_admin_of(self, request, other_user):
+        if request.user.is_super_admin:
+            return True
+        user_admin_hosts = request.user.get_maintaining_hosts()
+        if user_admin_hosts:
+            if other_user:
+                if other_user.userrelation_set.filter(host__in=user_admin_hosts):
+                    return True
+                return False
+            return True
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return self.is_admin_of(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        return self.is_admin_of(request, obj)
+
+    def has_view_permission(self, request, obj=None):
+        return self.is_admin_of(request, obj)
+
+    def has_view_or_change_permission(self, request, obj=None):
+        print("has view or change permission", request.user.name)
+        return self.has_view_permission(request, obj) or self.has_change_permission(request, obj)
+
+    def has_module_permission(self, request):
+        if request.user.is_authenticated:
+            print("has module permission", request.user.name, request.user.is_super_admin)
+            return True
+        else:
+            return False
 
 
 class TeamAdmin(MyAdmin):
