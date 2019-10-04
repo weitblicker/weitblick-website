@@ -151,6 +151,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_admin_of_host(self, host):
         return host in self.get_maintaining_hosts()
 
+    def role(self):
+        roles =dict(UserRelation.TYPE_CHOICES)
+        return [roles[member.member_type] for member in self.userrelation_set.all()]
+
     hosts = models.ManyToManyField(Host, through='UserRelation')
 
     objects = UserManager()
@@ -194,9 +198,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def has_module_perms(self, app_label):
         return True
 
-    @property
     def name(self):
         return self.first_name + " " + self.last_name
+
+    name.admin_order_field = 'first_name'
 
     image = models.ImageField(null=True, blank=True)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
@@ -204,7 +209,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     until = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return self.name()
 
     def belongs_to_host(self, host):
         return host in self.hosts.all()
@@ -349,6 +354,7 @@ class UserRelation(models.Model):
     membership_fee = models.DecimalField(max_digits=5, decimal_places=2)
 
     def __str__(self):
+        print("member type", self.member_type, self.user)
         return str(self.user) + " in " + self.host.name + " as " + dict(self.TYPE_CHOICES)[self.member_type]
 
     def belongs_to_host(self, host):

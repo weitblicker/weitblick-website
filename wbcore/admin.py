@@ -10,6 +10,8 @@ from modeltranslation.admin import TabbedTranslationAdmin
 from tinymce import TinyMCE
 from django_google_maps import widgets as map_widgets
 from django_google_maps import fields as map_fields
+from copy import copy
+
 from itertools import chain
 
 from .models import (
@@ -29,10 +31,41 @@ class MyTranslatedAdmin(TabbedTranslationAdmin):
 class UserRelationInlineModel(admin.StackedInline):
     model = User.hosts.through
 
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        #print("formset", formset, obj, kwargs)
+        #print("formset queryset", formset)
+        return formset
+
+    def get_fields(self, request, obj=None):
+        fields = super().get_fields(request, obj)
+        #print("fields:", fields, "obj:", obj)
+        return fields
+
+    def get_queryset(self, request):
+        admin_hosts = request.user.get_maintaining_hosts()
+        queryset = super().get_queryset(request)
+        #print("Query Set:", queryset)
+        if request.user.is_super_admin:
+            return queryset
+
+        #print("queryset:", queryset)
+        #for host in admin_hosts:
+        #    queryset = queryset.exclude(user=request.user, host=host)
+        queryset = queryset.exclude(user__is_super_admin=True)
+        #print("queryset:", queryset)
+
+        request_user_relations = queryset.filter(user=request.user)
+        print("request user queryset:", request_user_relations)
+
+        admin_hosts = request.user.get_maintaining_hosts()
+        if admin_hosts:
+            queryset = queryset.filter(host__in=admin_hosts)
+
+        return queryset | request_user_relations
+
     def formfield_for_choice_field(self, db_field, request=None, **kwargs):
         formfield = super().formfield_for_choice_field(db_field, request, **kwargs)
-
-        print("User relation inline model : ", kwargs)
 
         if request and request.user.is_super_admin:
             return formfield
@@ -40,10 +73,60 @@ class UserRelationInlineModel(admin.StackedInline):
             choices = dict(db_field.get_choices())
             del choices['admin']
             del choices['']
-            print(tuple(choices.items()))
             kwargs['choices'] = tuple(choices.items())
 
         return db_field.formfield(**kwargs)
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = super().get_readonly_fields(request, obj)
+        if request.user.is_super_admin:
+            return readonly_fields
+
+        #print("Object read only:", obj)
+
+        if UserAdmin.is_admin_of(request, obj):
+            readonly_fields += ('host',)
+
+        if obj == request.user:
+            readonly_fields += ('member_type',)
+
+        return readonly_fields
+
+    def has_add_permission(self, request):
+        if request.user.is_super_admin:
+            return True
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        if request.user.is_super_admin:
+            return True
+
+        if request.user == obj:
+            return True
+
+        return UserAdmin.is_admin_of(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if request.user == obj:
+            return False
+        return UserAdmin.is_admin_of(request, obj)
+
+    def has_view_permission(self, request, obj=None):
+        return True
+        print("Object read:", obj)
+        if request.user == obj:
+            return True
+
+        return UserAdmin.is_admin_of(request, obj)
+
+    def has_view_or_change_permission(self, request, obj=None):
+        return self.has_view_permission(request, obj) or self.has_change_permission(request, obj)
+
+    def has_module_permission(self, request):
+        if request.user.is_authenticated:
+            return True
+        else:
+            return False
 
 
 class TeamUserRelationInlineModel(admin.TabularInline):
@@ -81,56 +164,21 @@ class MyAdmin(admin.ModelAdmin):
                 return queryset
 
     def has_add_permission(self, request):
-        """
-        Return True if the given request has permission to add an object.
-        Can be overridden by the user in subclasses.
-        """
         opts = self.opts
         codename = get_permission_codename('add', opts)
         return request.user.has_perm("%s.%s" % (opts.app_label, codename))
 
     def has_change_permission(self, request, obj=None):
-        """
-        Return True if the given request has permission to change the given
-        Django model instance, the default implementation doesn't examine the
-        `obj` parameter.
-
-        Can be overridden by the user in subclasses. In such case it should
-        return True if the given request has permission to change the `obj`
-        model instance. If `obj` is None, this should return True if the given
-        request has permission to change *any* object of the given type.
-        """
         opts = self.opts
         codename = get_permission_codename('change', opts)
         return request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
 
     def has_delete_permission(self, request, obj=None):
-        """
-        Return True if the given request has permission to change the given
-        Django model instance, the default implementation doesn't examine the
-        `obj` parameter.
-
-        Can be overridden by the user in subclasses. In such case it should
-        return True if the given request has permission to delete the `obj`
-        model instance. If `obj` is None, this should return True if the given
-        request has permission to delete *any* object of the given type.
-        """
         opts = self.opts
         codename = get_permission_codename('delete', opts)
         return request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
 
     def has_view_permission(self, request, obj=None):
-        """
-        Return True if the given request has permission to view the given
-        Django model instance. The default implementation doesn't examine the
-        `obj` parameter.
-
-        If overridden by the user in subclasses, it should return True if the
-        given request has permission to view the `obj` model instance. If `obj`
-        is None, it should return True if the request has permission to view
-        any object of the given type.
-        """
-
         opts = self.opts
         codename_view = get_permission_codename('view', opts)
         codename_change = get_permission_codename('change', opts)
@@ -143,16 +191,6 @@ class MyAdmin(admin.ModelAdmin):
         return self.has_view_permission(request, obj) or self.has_change_permission(request, obj)
 
     def has_module_permission(self, request):
-        """
-        Return True if the given request has any permission in the given
-        app label.
-
-        Can be overridden by the user in subclasses. In such case it should
-        return True if the given request has permission to view the module on
-        the admin index page and access the module's index page. Overriding it
-        does not restrict access to the add, change or delete views. Use
-        `ModelAdmin.has_(add|change|delete)_permission` for that.
-        """
         return request.user.has_module_perms(self.opts.app_label)
 
 
@@ -193,7 +231,7 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'date_of_birth', 'is_active', 'first_name', 'last_name')
+        fields = ('is_super_admin', 'email', 'password', 'date_of_birth', 'is_active', 'first_name', 'last_name')
         exclude = ()
 
     def clean_password(self):
@@ -204,6 +242,18 @@ class UserChangeForm(forms.ModelForm):
 
 
 class UserAdmin(BaseUserAdmin):
+    class RoleListFilter(admin.SimpleListFilter):
+        title = 'Role'
+        parameter_name = 'role'
+
+        def lookups(self, request, model_admin):
+            return UserRelation.TYPE_CHOICES
+
+        def queryset(self, request, queryset):
+            if self.value():
+                queryset = queryset.filter(userrelation__member_type=self.value())
+            return queryset
+
     # The forms to add and change user instances
     form = UserChangeForm
     add_form = UserCreationForm
@@ -211,12 +261,14 @@ class UserAdmin(BaseUserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ('name', 'email', 'date_of_birth')
-    list_filter = ('hosts',)
+    list_display = ('name', 'email', 'date_of_birth', 'role')
+    list_filter = ('hosts', RoleListFilter,)
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
+        ('Account', {'fields': ('email', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'date_of_birth',)}),
     )
+
+    exclude = ()
     inlines = (UserRelationInlineModel,)
 
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
@@ -231,13 +283,41 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('email', 'hosts')
     filter_horizontal = ()
 
+    def get_fieldsets(self, request, obj=None):
+        fieldset = super().get_fieldsets(request, obj)
+        if request.user.is_super_admin:
+            print("is super admin!!!!")
+            fieldset_dict = dict(fieldset)
+            if 'is_super_admin' not in fieldset_dict['Account']['fields']:
+                fieldset_dict['Account']['fields'] += ('is_super_admin',)
+        else:
+            fieldset_dict = dict(fieldset)
+            fieldset_sublist = list(fieldset_dict['Account']['fields'])
+            if 'is_super_admin' in fieldset_sublist:
+                fieldset_sublist.remove('is_super_admin')
+                fieldset_dict['Account']['fields'] = tuple(fieldset_sublist)
+                print("Fieldset dict", fieldset_dict)
+        print("FieldSet", fieldset)
+
+        return fieldset
+
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = super().get_readonly_fields(request, obj)
-
+        if request.user.is_super_admin and request.user == obj:
+            readonly_fields = readonly_fields + ('is_super_admin',)
+        print('readonly_field', readonly_fields)
         return readonly_fields
+
+    def get_exclude(self, request, obj=None):
+        exclude = super().get_exclude(request, obj)
+        if not request.user.is_super_admin:
+            exclude = exclude + ('is_super_admin',)
+        print("Exclude", exclude)
+        return exclude
 
     def get_fields(self, request, obj=None):
         fields = super().get_fields(request, obj)
+        print("fields", fields)
         return fields
 
     def get_queryset(self, request):
@@ -245,19 +325,16 @@ class UserAdmin(BaseUserAdmin):
 
         # super user can see everything
         if request.user.is_super_admin:
-            return queryset
+            return queryset.distinct()
 
-        hosts = request.user.get_maintaining_hosts()
-        for host in hosts:
-            print("Test", host)
-        return queryset.filter(hosts__in=request.user.get_maintaining_hosts())
+        admin_in_hosts = request.user.get_maintaining_hosts()
+        if admin_in_hosts:
+            return queryset.filter(hosts__in=request.user.get_maintaining_hosts())
 
-    def has_add_permission(self, request):
-        if request.user.is_super_admin:
-            return True
-        return False
+        return queryset.filter(pk=request.user.pk)
 
-    def is_admin_of(self, request, other_user):
+    @staticmethod
+    def is_admin_of(request, other_user):
         if request.user.is_super_admin:
             return True
         user_admin_hosts = request.user.get_maintaining_hosts()
@@ -269,22 +346,29 @@ class UserAdmin(BaseUserAdmin):
             return True
         return False
 
+    def has_add_permission(self, request):
+        if request.user.is_super_admin:
+            return True
+        return False
+
     def has_change_permission(self, request, obj=None):
-        return self.is_admin_of(request, obj)
+        return any((UserAdmin.is_admin_of(request, obj), request.user == obj))
 
     def has_delete_permission(self, request, obj=None):
-        return self.is_admin_of(request, obj)
+        if request.user.is_super_admin:
+            return True
+        if request.user == obj:
+            return False
+        return UserAdmin.is_admin_of(request, obj)
 
     def has_view_permission(self, request, obj=None):
-        return self.is_admin_of(request, obj)
+        return any((obj is None, UserAdmin.is_admin_of(request, obj), request.user == obj))
 
     def has_view_or_change_permission(self, request, obj=None):
-        print("has view or change permission", request.user.name)
         return self.has_view_permission(request, obj) or self.has_change_permission(request, obj)
 
     def has_module_permission(self, request):
         if request.user.is_authenticated:
-            print("has module permission", request.user.name, request.user.is_super_admin)
             return True
         else:
             return False
