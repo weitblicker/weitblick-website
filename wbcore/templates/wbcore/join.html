@@ -1,9 +1,9 @@
 {% extends 'wbcore/single_content.html' %}
 {% block single-content %}
-    <h1>Join</h1>
 
-    <div class="ui one column stackable grid container content-block">
-        <form class="ui column form" action="{% url 'join' %}" method="post">
+    <div class="ui stackable grid container content-block">
+        <form class="ui form eight wide column" action="{% url 'join' %}" method="post">
+            <h1>Join</h1>
             {% csrf_token %}
             {% if success %}
                 <div class="ui positive message">
@@ -11,7 +11,14 @@
                 </div>
             {% endif %}
 
-            {% for field in join_form %}
+            {% for field in user_form %}
+                {% for error in field.errors %}
+                    <div class="ui negative message">
+                        <div class="header">{{ error|escape }}</div>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            {% for field in bank_form %}
                 {% for error in field.errors %}
                     <div class="ui negative message">
                         <div class="header">{{ error|escape }}</div>
@@ -19,24 +26,37 @@
                 {% endfor %}
             {% endfor %}
 
-            <div class="fields">
-                <div class="required eight wide field">
-                    {{ join_form.hosts.label_tag }} {{ join_form.hosts }}
+            <div class="two fields">
+                <div class="required field">
+                    {{ user_form.host.label_tag }} {{ user_form.host }}
                 </div>
-                <div class="eight wide required field">
-                    {{ join_form.email.label_tag }} {{ join_form.email }}
+                <div class="required field">
+                    {{ user_form.email.label_tag }} {{ user_form.email }}
+                </div>
+            </div>
+            <div class="two fields">
+                <div class="required field">
+                    {{ user_form.first_name.label_tag }} {{ user_form.first_name }}
+                </div>
+                <div class="required field">
+                    {{ user_form.last_name.label_tag }} {{ user_form.last_name }}
+                </div>
+            </div>
+            <div class="one field">
+                <div class="required field">
+                    {{ bank_form.account_holder.label_tag }} {{ bank_form.account_holder }}
+                </div>
+            </div>
+            <div class="two fields">
+                <div class="required field">
+                    {{ bank_form.iban.label_tag }} {{ bank_form.iban }}
+                </div>
+                <div class="required field">
+                    {{ bank_form.bic.label_tag }} {{ bank_form.bic }}
                 </div>
             </div>
             <div class="fields">
-                <div class="eight wide field">
-                    {{ join_form.first_name.label_tag }} {{ join_form.first_name }}
-                </div>
-                <div class="eight wide field">
-                    {{ join_form.last_name.label_tag }} {{ join_form.last_name }}
-                </div>
-            </div>
-            <div class="fields">
-                <div class="sixteen wide field">
+                <div class="field">
                     <input class="ui submit button orange" type="submit" value="Join Weitblick e.V.">
                 </div>
             </div>

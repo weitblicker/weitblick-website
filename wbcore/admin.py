@@ -61,6 +61,8 @@ class UserRelationInlineModel(admin.StackedInline):
         if request and request.user.is_super_admin:
             return formfield
         if db_field.name == 'member_type':
+
+            print(kwargs)
             choices = dict(db_field.get_choices())
             del choices['admin']
             del choices['']

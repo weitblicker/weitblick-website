@@ -616,7 +616,7 @@ class BankAccount(models.Model):
         return self.profile.belongs_to_host(host)
 
     def __str__(self):
-        return 'Bankdaten von '+self.profile.name
+        return 'Bankdaten von '+self.profile.name()
 
 
 class ContactMessage(models.Model):
