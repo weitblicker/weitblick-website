@@ -33,30 +33,21 @@ class UserRelationInlineModel(admin.StackedInline):
 
     def get_formset(self, request, obj=None, **kwargs):
         formset = super().get_formset(request, obj, **kwargs)
-        #print("formset", formset, obj, kwargs)
-        #print("formset queryset", formset)
         return formset
 
     def get_fields(self, request, obj=None):
         fields = super().get_fields(request, obj)
-        #print("fields:", fields, "obj:", obj)
         return fields
 
     def get_queryset(self, request):
         admin_hosts = request.user.get_maintaining_hosts()
         queryset = super().get_queryset(request)
-        #print("Query Set:", queryset)
         if request.user.is_super_admin:
             return queryset
 
-        #print("queryset:", queryset)
-        #for host in admin_hosts:
-        #    queryset = queryset.exclude(user=request.user, host=host)
         queryset = queryset.exclude(user__is_super_admin=True)
-        #print("queryset:", queryset)
 
         request_user_relations = queryset.filter(user=request.user)
-        print("request user queryset:", request_user_relations)
 
         admin_hosts = request.user.get_maintaining_hosts()
         if admin_hosts:
@@ -81,8 +72,6 @@ class UserRelationInlineModel(admin.StackedInline):
         readonly_fields = super().get_readonly_fields(request, obj)
         if request.user.is_super_admin:
             return readonly_fields
-
-        #print("Object read only:", obj)
 
         if UserAdmin.is_admin_of(request, obj):
             readonly_fields += ('host',)
@@ -113,7 +102,6 @@ class UserRelationInlineModel(admin.StackedInline):
 
     def has_view_permission(self, request, obj=None):
         return True
-        print("Object read:", obj)
         if request.user == obj:
             return True
 
@@ -310,8 +298,6 @@ class UserAdmin(BaseUserAdmin):
             if 'is_super_admin' in fieldset_sublist:
                 fieldset_sublist.remove('is_super_admin')
                 fieldset_dict['Account']['fields'] = tuple(fieldset_sublist)
-                print("Fieldset dict", fieldset_dict)
-        print("FieldSet", fieldset)
 
         return fieldset
 
@@ -319,19 +305,16 @@ class UserAdmin(BaseUserAdmin):
         readonly_fields = super().get_readonly_fields(request, obj)
         if request.user.is_super_admin and request.user == obj:
             readonly_fields = readonly_fields + ('is_super_admin',)
-        print('readonly_field', readonly_fields)
         return readonly_fields
 
     def get_exclude(self, request, obj=None):
         exclude = super().get_exclude(request, obj)
         if not request.user.is_super_admin:
             exclude = exclude + ('is_super_admin',)
-        print("Exclude", exclude)
         return exclude
 
     def get_fields(self, request, obj=None):
         fields = super().get_fields(request, obj)
-        print("fields", fields)
         return fields
 
     def get_queryset(self, request):
