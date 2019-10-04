@@ -254,6 +254,21 @@ class UserAdmin(BaseUserAdmin):
                 queryset = queryset.filter(userrelation__member_type=self.value())
             return queryset
 
+    class HostListFilter(admin.SimpleListFilter):
+        title = 'Host'
+        parameter_name = 'host'
+
+        def lookups(self, request, model_admin):
+            if request.user.is_super_admin:
+                return [(host.slug, host.name) for host in Host.objects.all()]
+
+            return [(host.slug, host.name) for host in request.user.hosts.all()]
+
+        def queryset(self, request, queryset):
+            if self.value():
+                queryset = queryset.filter(userrelation__host__slug=self.value())
+            return queryset
+
     # The forms to add and change user instances
     form = UserChangeForm
     add_form = UserCreationForm
@@ -262,7 +277,7 @@ class UserAdmin(BaseUserAdmin):
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
     list_display = ('name', 'email', 'date_of_birth', 'role')
-    list_filter = ('hosts', RoleListFilter,)
+    list_filter = (HostListFilter, RoleListFilter,)
     fieldsets = (
         ('Account', {'fields': ('email', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'date_of_birth',)}),
@@ -286,7 +301,6 @@ class UserAdmin(BaseUserAdmin):
     def get_fieldsets(self, request, obj=None):
         fieldset = super().get_fieldsets(request, obj)
         if request.user.is_super_admin:
-            print("is super admin!!!!")
             fieldset_dict = dict(fieldset)
             if 'is_super_admin' not in fieldset_dict['Account']['fields']:
                 fieldset_dict['Account']['fields'] += ('is_super_admin',)
