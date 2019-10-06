@@ -1,9 +1,9 @@
-from django.forms import ModelForm, Select, ModelChoiceField
+from django.forms import ModelForm, Select, ModelChoiceField, NumberInput, CheckboxInput, BooleanField
 from django.core.exceptions import ValidationError
 from localflavor.generic.forms import BICFormField, IBANFormField
 
 from wbcore.models import (
-    ContactMessage, User, BankAccount, Host
+    ContactMessage, User, BankAccount, Host, UserRelation, Address
 )
 
 
@@ -11,18 +11,36 @@ class ContactForm(ModelForm):
     class Meta:
         model = ContactMessage
         fields = ['host', 'name', 'email', 'reason', 'subject', 'message']
-        labels = {'host': 'Verein', 'name': 'Name', 'email':'E-Mail', 'reason': 'Anlass', 'subject': 'Betreff', 'message': 'Nachricht'}
-        required = {'host': True, 'name': False, 'email': True, 'reason': False, 'subject': 'Betreff', 'message': 'Nachricht'}
+        labels = {
+            'host': 'Verein',
+            'name': 'Name',
+            'email':'E-Mail',
+            'reason': 'Anlass',
+            'subject': 'Betreff',
+            'message': 'Nachricht'
+        }
+
+        required = {
+            'host': True,
+            'name': False,
+            'email': True,
+            'reason': False,
+            'subject': True,
+            'message': True
+        }
 
 
 class BankForm(ModelForm):
+    agree = BooleanField(label_suffix="", label="I agree to the terms and conditions")
+
     class Meta:
         model = BankAccount
-        fields = ['account_holder', 'iban', 'bic']
+        fields = ['account_holder', 'iban', 'bic', 'agree']
         labels = {
             'account_holder': 'Kontoinhaber',
             'iban': 'IBAN',
             'bic': 'BIC',
+            'agree': 'I agree to the terms and conditions',
         }
         field_classes={
             'iban': IBANFormField,
@@ -32,47 +50,69 @@ class BankForm(ModelForm):
             'account_holder',
             'iban',
             'bic',
+            'agree',
         }
 
 
-class UserForm(ModelForm):
+class AddressForm(ModelForm):
+    class Meta:
+        model = Address
 
-    host = ModelChoiceField(queryset=None)
+        fields = ['street', 'postal_code', 'city', 'country']
+
+        labels = {
+            'street': 'Straße und Hausnummer',
+            'postal_code': 'Postleitzahl',
+            'city': 'Ort / Stadt',
+            'country': 'Land',
+        }
+
+        required = {
+            'street': True,
+            'postal_code': True,
+            'city': True,
+            'country': True,
+        }
+
+
+class UserRelationForm(ModelForm):
+
+    class Meta:
+        model = UserRelation
+
+        fields = ['host', 'membership_fee']
+
+        labels = {
+            'host': 'Verein',
+            'membership_fee': 'Mitgliedsbeitrag',
+        }
+
+        required = {
+            'host': True,
+            'membership_fee': True,
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['host'].queryset = Host.objects.exclude(slug='bundesverband')
 
+
+class UserForm(ModelForm):
+
     class Meta:
         model = User
 
-        fields = ['first_name', 'last_name', 'email', 'host']
+        fields = ['first_name', 'last_name', 'email', 'date_of_birth']
         labels = {
-            'host': 'Verein',
             'first_name': 'Vorname',
             'last_name': 'Nachname',
             'email': 'E-Mail',
+            'date_of_birth': 'Geburtsdatum',
         }
 
-        #widgets = {
-        #    'host': Select(attrs={'class': 'ui dropdown'}),
-        #}
         required = {
-            'host': True,
             'first_name': True,
             'last_name': True,
             'email': True,
         }
-
-    def _clean_fields(self):
-        print("huhu")
-        super()._clean_fields()
-
-    def clean(self):
-        try:
-            super().clean()
-        except ValidationError as e:
-            print("exception", e)
-            raise e
-
 

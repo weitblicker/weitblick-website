@@ -7,8 +7,10 @@ from django.http import HttpResponse, Http404
 from django.template import loader
 from django.urls import reverse
 from django.core.mail import BadHeaderError
-from wbcore.forms import ContactForm, UserForm, BankForm
-from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation
+from wbcore.forms import (
+    ContactForm, UserForm, BankForm, UserRelationForm, AddressForm)
+from wbcore.models import (
+    Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation, UserRelation, JoinPage)
 from collections import OrderedDict
 from email.message import EmailMessage
 from datetime import date, datetime, timedelta
@@ -521,36 +523,58 @@ def join_view(request, host_slug=None):
         raise Http404()
 
     template = loader.get_template('wbcore/join.html')
+    join_page = None
 
     if host:
         breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
+        submit_url = reverse('join', args=[host_slug])
+        try:
+            join_page = host.joinpage
+            print("Join Page", join_page)
+        except JoinPage.DoesNotExist:
+            pass
     else:
+        submit_url = reverse('join')
         breadcrumb = [('Home', reverse('home')), ('Contact', None)]
 
     success = False
 
     if request.method == 'POST':
+        addr_form = AddressForm(request.POST)
+        urel_form = UserRelationForm(request.POST)
         user_form = UserForm(request.POST)
         bank_form = BankForm(request.POST)
-        if user_form.is_valid() and bank_form.is_valid():
-            host_slug = request.POST['host']
-            user = user_form.save()
-            user_relation = user.userrelation_set.create(
-                host=Host.objects.get(slug=host_slug),
-                membership_fee=2.3,
-            )
-            user_relation.save()
+        print(request.POST)
+
+        if all([user_form.is_valid(), bank_form.is_valid(), urel_form.is_valid(), addr_form.is_valid()]):
+
+            addr = addr_form.save()
+
+            user = user_form.save(commit=False)
+            user.address = addr
+            user.save()
+
+            addr.name = user.name()
+            addr.save()
+
+            urel = urel_form.save(commit=False)
+            urel.user = user
+            urel.save()
+
             bank = bank_form.save(commit=False)
             bank.profile = user
             bank.save()
+
             success = True
     else:
         if host:
-            user_form = UserForm(initial={'hosts': [host_slug]})
-            bank_form = BankForm()
+            urel_form = UserRelationForm(initial={'host': host_slug})
         else:
-            user_form = UserForm()
-            bank_form = BankForm()
+            urel_form = UserRelationForm()
+
+        addr_form = AddressForm()
+        user_form = UserForm()
+        bank_form = BankForm()
 
     context = {
         'main_nav': get_main_nav(active='join'),
@@ -559,8 +583,17 @@ def join_view(request, host_slug=None):
         'breadcrumb': [('Home', reverse('home')), ('Join in', None)],
         'user_form': user_form,
         'bank_form': bank_form,
+        'urel_form': urel_form,
+        'addr_form': addr_form,
+        'submit_url': submit_url,
         'success': success,
     }
+
+    if join_page:
+        print("TestTestTest")
+        context['image'] = join_page.image
+        context['sepa_text'] = join_page.sepa_text
+        context['text'] = join_page.text
 
     return HttpResponse(template.render(context, request))
 

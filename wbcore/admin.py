@@ -16,7 +16,7 @@ from itertools import chain
 
 from .models import (
     Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, ContactMessage, UserRelation,
-    Document, Team, Milestone, Donation, Milestep, BankAccount, TeamUserRelation, Content, User
+    Document, Team, Milestone, Donation, Milestep, BankAccount, TeamUserRelation, Content, User, JoinPage
 )
 
 
@@ -121,6 +121,15 @@ class UserRelationInlineModel(admin.StackedInline):
 
 class TeamUserRelationInlineModel(admin.TabularInline):
     model = Team.member.through
+
+
+class JoinPageInlineModel(admin.StackedInline):
+    model = JoinPage
+
+    formfield_overrides = {
+        models.TextField: {'widget': TinyMCE(mce_attrs={'height': 200})},
+        map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget(attrs={'data-map-type': 'roadmap'})},
+    }
 
 
 class MyAdmin(admin.ModelAdmin):
@@ -377,17 +386,19 @@ class TeamAdmin(MyAdmin):
     inlines = (TeamUserRelationInlineModel,)
 
 
+class HostAdmin(MyAdmin):
+    inlines = (JoinPageInlineModel,)
+
 # since we're not using Django's built-in permissions,
 # register our own user model and unregister the Group model from admin.
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.unregister(Group)
 
-
 admin.site.register(Address, MyAdmin)
 admin.site.register(Content, MyAdmin)
 admin.site.register(Location, MyAdmin)
-admin.site.register(Host, MyAdmin)
+admin.site.register(Host, HostAdmin)
 admin.site.register(Partner, MyAdmin)
 admin.site.register(Project, MyAdmin)
 admin.site.register(Event, MyAdmin)

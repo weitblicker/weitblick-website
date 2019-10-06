@@ -1,5 +1,6 @@
 from django.db import models
 from django_countries.fields import CountryField
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.contrib.auth.models import (
     PermissionsMixin, BaseUserManager, AbstractBaseUser
@@ -81,6 +82,16 @@ class Host(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class JoinPage(models.Model):
+    enable_form = models.BooleanField(default=False)
+    text = models.TextField()
+    image = models.OneToOneField(Photo, on_delete=models.SET_NULL, null=True)
+    sepa_text = models.TextField()
+    min_fee = models.IntegerField()
+    max_fee = models.IntegerField()
+    host = models.OneToOneField(Host, on_delete=models.CASCADE, null=True)
 
 
 class UserManager(BaseUserManager):
@@ -351,7 +362,9 @@ class UserRelation(models.Model):
         ('applicant', 'Applicant'),
     )
     member_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='applicant')
-    membership_fee = models.DecimalField(max_digits=5, decimal_places=2)
+    membership_fee = models.DecimalField(
+        max_digits=5, decimal_places=2,
+        validators=[MinValueValidator(2), MaxValueValidator(30)])
 
     def __str__(self):
         print("member type", self.member_type, self.user)
