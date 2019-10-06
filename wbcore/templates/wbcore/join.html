@@ -2,15 +2,16 @@
 {% block single-content %}
 
     <div class="ui stackable grid container content-block">
-
         <div class="eight wide column">
             <h1>Mitglied werden</h1>
             {% if image %}<img class="ui fluid image" src="{{ image.get_display_url }}" alt="{{ image.title }}" style="margin-bottom: 15px"/>{% endif %}
             {{ text | safe }}
         </div>
+        {% if enable_form %}
         <form class="ui form eight wide column" action="{{ submit_url }}" method="post">
             <h2>Antragsformular</h2>
             {% csrf_token %}
+            {{ urel_form.host }}
 
             {% if success %}
                 <div class="ui positive message">
@@ -47,15 +48,16 @@
                 {% endfor %}
             {% endfor %}
 
+            <h4>Persönliche Daten</h4>
             <div class="two fields">
                 <div class="required field">
-                    {{ urel_form.host.label_tag }} {{ urel_form.host }}
+                    {{ user_form.first_name.label_tag }} {{ user_form.first_name }}
                 </div>
                 <div class="required field">
-                    {{ user_form.email.label_tag }} {{ user_form.email }}
+                    {{ user_form.last_name.label_tag }} {{ user_form.last_name }}
                 </div>
             </div>
-            <div class="onw field">
+            <div class="two fields">
                 <div class="required field">
                     {{ user_form.date_of_birth.label_tag }}
                     <div class="ui calendar">
@@ -65,15 +67,26 @@
                         </div>
                     </div>
                 </div>
+                <div class="required field">
+                    {{ user_form.email.label_tag }} {{ user_form.email }}
+                </div>
             </div>
             <div class="two fields">
                 <div class="required field">
-                    {{ user_form.first_name.label_tag }} {{ user_form.first_name }}
+                    {{ addr_form.street.label_tag }} {{ addr_form.street }}
                 </div>
                 <div class="required field">
-                    {{ user_form.last_name.label_tag }} {{ user_form.last_name }}
+                    {{ addr_form.postal_code.label_tag }} {{ addr_form.postal_code }}
                 </div>
             </div>
+            <div class="two fields">
+                <div class="required field">
+                    {{ addr_form.city.label_tag }} {{ addr_form.city }}
+                </div>
+                <div class="required field">
+                    {{ addr_form.country.label_tag }} {{ addr_form.country }}
+                </div>
+            </div>            <h4>Mitgliedsbeitrag und Kontodaten</h4>
             <div class="two fields">
                 <div class="required field">
                     {{ bank_form.account_holder.label_tag }} {{ bank_form.account_holder }}
@@ -94,25 +107,7 @@
                     {{ bank_form.bic.label_tag }} {{ bank_form.bic }}
                 </div>
             </div>
-            <div class="two fields">
-                <div class="required field">
-                    {{ addr_form.street.label_tag }} {{ addr_form.street }}
-                </div>
-                <div class="required field">
-                    {{ addr_form.postal_code.label_tag }} {{ addr_form.postal_code }}
-                </div>
-            </div>
-            <div class="two fields">
-                <div class="required field">
-                    {{ addr_form.city.label_tag }} {{ addr_form.city }}
-                </div>
-                <div class="required field">
-                    {{ addr_form.country.label_tag }} {{ addr_form.country }}
-                </div>
-            </div>
-
             {{ sepa_text | safe }}
-
             <div class="two inline fields">
                 <div class="required inline field">
                     <div class="ui checkbox">
@@ -121,9 +116,10 @@
                     </div>
                 </div>
                 <div class="field">
-                    <button class="ui button" type="submit">Join Weitblick e.V."</button>
+                    <button class="ui button" type="submit">Join {{ host.name }}</button>
                 </div>
             </div>
         </form>
+        {% endif %}
     </div>
 {% endblock %}

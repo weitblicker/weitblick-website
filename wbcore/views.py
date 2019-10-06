@@ -544,9 +544,15 @@ def join_view(request, host_slug=None):
         urel_form = UserRelationForm(request.POST)
         user_form = UserForm(request.POST)
         bank_form = BankForm(request.POST)
-        print(request.POST)
 
-        if all([user_form.is_valid(), bank_form.is_valid(), urel_form.is_valid(), addr_form.is_valid()]):
+
+        host_matches = "host" in request.POST and request.POST["host"] is host_slug
+
+        if all([host_matches,
+                user_form.is_valid(),
+                bank_form.is_valid(),
+                urel_form.is_valid(),
+                addr_form.is_valid()]):
 
             addr = addr_form.save()
 
@@ -581,11 +587,6 @@ def join_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': [('Home', reverse('home')), ('Join in', None)],
-        'user_form': user_form,
-        'bank_form': bank_form,
-        'urel_form': urel_form,
-        'addr_form': addr_form,
-        'submit_url': submit_url,
         'success': success,
     }
 
@@ -594,6 +595,12 @@ def join_view(request, host_slug=None):
         context['image'] = join_page.image
         context['sepa_text'] = join_page.sepa_text
         context['text'] = join_page.text
+        context['user_form'] = user_form
+        context['bank_form'] = bank_form
+        context['urel_form'] = urel_form
+        context['addr_form'] = addr_form
+        context['submit_url'] = submit_url
+        context['enable_form'] = join_page.enable_form
 
     return HttpResponse(template.render(context, request))
 

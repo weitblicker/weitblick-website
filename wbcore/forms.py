@@ -1,4 +1,4 @@
-from django.forms import ModelForm, Select, ModelChoiceField, NumberInput, CheckboxInput, BooleanField
+from django.forms import ModelForm, Select, ModelChoiceField, NumberInput, CheckboxInput, BooleanField, HiddenInput
 from django.core.exceptions import ValidationError
 from localflavor.generic.forms import BICFormField, IBANFormField
 
@@ -90,6 +90,10 @@ class UserRelationForm(ModelForm):
         required = {
             'host': True,
             'membership_fee': True,
+        }
+
+        widgets = {
+            'host': HiddenInput,
         }
 
     def __init__(self, *args, **kwargs):
