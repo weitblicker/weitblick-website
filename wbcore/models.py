@@ -147,7 +147,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         unique=True,
     )
     date_of_birth = models.DateField(null=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
 
     @property
     def is_staff(self):

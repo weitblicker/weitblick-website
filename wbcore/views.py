@@ -6,15 +6,21 @@ from django.db.models import Count
 from django.http import HttpResponse, Http404
 from django.template import loader
 from django.urls import reverse
-from django.core.mail import BadHeaderError
+from django.core.mail import EmailMessage
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_text
+from django.contrib.auth import login, authenticate
+from weitblick import settings
+
+from wbcore.tokens import account_activation_token
 from wbcore.forms import (
-    ContactForm, UserForm, BankForm, UserRelationForm, AddressForm)
+    ContactForm, UserForm, BankForm, UserRelationForm, AddressForm, User)
 from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation, UserRelation, JoinPage)
 from collections import OrderedDict
-from email.message import EmailMessage
 from datetime import date, datetime, timedelta
 from schedule.periods import Period
+from django.contrib.sites.models import Site
 from form_designer.models import Form as EventForm
 
 # TODO move to settings
@@ -131,6 +137,7 @@ def get_host_slugs(request, host_slug):
         host_slugs = [x.strip(' ') for x in host_slugs]
     return host_slugs
 
+
 def item_list_from_occ(occurrences, host_slug=None):
     # set attributes to fill list_item template
     item_list = []
@@ -148,6 +155,7 @@ def item_list_from_occ(occurrences, host_slug=None):
         item_list.append(occ)
     return item_list
 
+
 def item_list_from_blogposts(blogposts, host_slug=None):
     item_list = []
     for post in blogposts:
@@ -160,6 +168,7 @@ def item_list_from_blogposts(blogposts, host_slug=None):
             post.link = reverse('blog-post', args=[post.id])
         item_list.append(post)
     return item_list
+
 
 def item_list_from_proj(projects, host_slug=None):
     item_list = []
@@ -178,6 +187,7 @@ def item_list_from_proj(projects, host_slug=None):
         #project.teaser = project.description
         item_list.append(project)
     return item_list
+
 
 def home_view(request):
     projects = Project.objects.all()
@@ -516,6 +526,34 @@ def projects_view(request, host_slug=None):
     return HttpResponse(template.render(context, request))
 
 
+def signup(user, host):
+    subject = 'Mitgliedsantrag ' + host.name
+    message = loader.render_to_string('wbcore/activation_email.html', {
+        'domain': Site.objects.get_current().domain,
+        'user': user,
+        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+        'token': account_activation_token.make_token(user),
+    })
+    email = EmailMessage(body=message, subject=subject, to=[user.email], reply_to=[host.email])
+    email.send()
+
+
+def activate_user(request, uidb64, token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        login(request, user)
+        # return redirect('home')
+        return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
+    else:
+        return HttpResponse('Activation link is invalid!')
+
+
 def join_view(request, host_slug=None):
     try:
         host = Host.objects.get(slug=host_slug) if host_slug else None
@@ -545,8 +583,7 @@ def join_view(request, host_slug=None):
         user_form = UserForm(request.POST)
         bank_form = BankForm(request.POST)
 
-
-        host_matches = "host" in request.POST and request.POST["host"] is host_slug
+        host_matches = "host" in request.POST and request.POST["host"] == host_slug
 
         if all([host_matches,
                 user_form.is_valid(),
@@ -570,6 +607,8 @@ def join_view(request, host_slug=None):
             bank = bank_form.save(commit=False)
             bank.profile = user
             bank.save()
+
+            signup(user, host)
 
             success = True
     else:
@@ -1077,26 +1116,27 @@ def contact_view(request, host_slug=None):
             form.save()
 
             # sent info via email
-            msg = EmailMessage()
-            msg['From'] = EMAIL_ADDRESS
-            msg['To'] = 'admin@weitblicker.org'
-            host = Host.objects.get(name=form.cleaned_data['host'])
-            msg['reply-to'] = form.cleaned_data['email']
-            msg['Subject'] = form.cleaned_data['subject']
-            msg.set_content('Name: ' + form.cleaned_data['name'] + "\n" + 'E-Mail: ' + form.cleaned_data['email'] + "\n\n" + "Nachricht: " + form.cleaned_data['message'])
+            name = form.cleaned_data['name']
+            email_addr = form.cleaned_data['email']
+            msg = form.cleaned_data['message']
+
+            # TODO use template for this
+            message = 'Name: ' + name + '\n'
+            message += 'E-Mail: ' + email_addr + '\n\n'
+            message += 'Nachricht: ' + msg
+
+            email = EmailMessage(
+                to=['admin@weitblicker.org'],
+                reply_to=[form.cleaned_data['email']],
+                subject=form.cleaned_data['email'],
+                body=message
+            )
             try:
-                # TODO: optimize, ssl from the start (smtplib.SMTP_SSL) and/or django internal (django.core.mail.send_mail)
-                with smtplib.SMTP('smtp.office365.com', 587) as smtp:
-                    smtp.ehlo()
-                    smtp.starttls()
-                    smtp.ehlo()
-                    smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORT)
-                    smtp.send_message(msg)
-                context['success'] = True
-                form = ContactForm()
-            except BadHeaderError:
+               email.send()
+               context['success'] = True
+            # TODO handle error case more specifically
+            except:
                 return HttpResponse('Invalid header found.')
-                context['success'] = False
             return HttpResponse(template.render(context, request))
         else:
             context['success'] = False

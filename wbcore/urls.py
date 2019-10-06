@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from django.conf.urls import include
 from django.contrib.sitemaps.views import sitemap
 from .sitemaps import NewsPostSitemap, ProjectSitemap, BlogPostSitemap, EventSitemap, TeamSitemap, HostSitemap
@@ -53,6 +53,8 @@ urlpatterns = [
     path('sitemap/', views.sitemap_view, name='sitemap'),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('search/<str:query>/', views.search_view, name='search'),
+    re_path(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+            views.activate_user, name='activate'),
     # path('search/', include('haystack.urls')),
 ]
 
