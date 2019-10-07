@@ -1,0 +1,30 @@
+{% extends 'wbcore/single_content.html' %}
+{% block single-content %}
+
+    <div class="ui stackabldde grid container content-block">
+        <div class="sixteen wide column">
+            <div class="ui placeholder segment">
+                <div class="ui icon header">
+                {% if success %}
+                    <i class="check icon"></i>
+                    <p>
+                        Hey {{ user.first_name }}.<br>
+                        That worked, welcome to the Weitblick community!
+                    </p>
+                    <p>
+                        Thank you for your email confirmation. An admin will finish your membership application.<br>
+                        Now you can login your preliminary account.
+                    </p>
+                {% else %}
+                    <i class="exclamation triangle icon"></i>
+                    <p>Activation link is invalid!</p>
+                    <a href="/admin"><div class="ui primary button">Login</div></a>
+                    {# TODO add help info #}
+                {% endif %}
+                </div>
+                {% if success %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

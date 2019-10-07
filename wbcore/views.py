@@ -8,6 +8,7 @@ from django.core.mail import EmailMessage
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_text
 from django.contrib.auth import login
+from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.sites.models import Site
 
 from collections import OrderedDict
@@ -534,19 +535,28 @@ def signup(user, host):
 
 
 def activate_user(request, uidb64, token):
+
+    template = loader.get_template('wbcore/user_activation.html')
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
     except(TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
     if user is not None and account_activation_token.check_token(user, token):
+
         user.is_active = True
         user.save()
         login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-        # return redirect('home')
-        return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
+        success = True
     else:
-        return HttpResponse('Activation link is invalid!')
+        success = False
+
+    context = {
+        'success': success,
+        'user': user,
+    }
+
+    return HttpResponse(template.render(context, request))
 
 
 def join_view(request, host_slug=None):
