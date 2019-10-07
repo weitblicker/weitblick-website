@@ -75,11 +75,10 @@ class UserRelationInlineModel(admin.StackedInline):
         if request.user.is_super_admin:
             return readonly_fields
 
-        if UserAdmin.is_admin_of(request, obj):
-            readonly_fields += ('host',)
-
-        if obj == request.user:
+        if not UserAdmin.is_admin_of(request, obj) or obj == request.user:
             readonly_fields += ('member_type',)
+
+        readonly_fields += ('host', 'membership_fee')
 
         return readonly_fields
 
@@ -92,10 +91,12 @@ class UserRelationInlineModel(admin.StackedInline):
         if request.user.is_super_admin:
             return True
 
-        if request.user == obj:
+        # allow host admins to change some details, see readonly fields
+        if UserAdmin.is_admin_of(request, obj):
             return True
 
-        return UserAdmin.is_admin_of(request, obj)
+        # all others are not allows to change their profile
+        return False
 
     def has_delete_permission(self, request, obj=None):
         if request.user == obj:
@@ -103,10 +104,15 @@ class UserRelationInlineModel(admin.StackedInline):
         return UserAdmin.is_admin_of(request, obj)
 
     def has_view_permission(self, request, obj=None):
-        return True
-        if request.user == obj:
+        # user is allowed to see his / her own profile
+        if obj is None:
             return True
 
+        if request.user == obj:
+            print("user has view permission!")
+            return True
+
+        # host admins can see all users and relations ships of the host they are admins in.
         return UserAdmin.is_admin_of(request, obj)
 
     def has_view_or_change_permission(self, request, obj=None):
@@ -314,8 +320,14 @@ class UserAdmin(BaseUserAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = super().get_readonly_fields(request, obj)
+
         if request.user.is_super_admin and request.user == obj:
-            readonly_fields = readonly_fields + ('is_super_admin',)
+            readonly_fields += ('is_super_admin',)
+
+        if request.user.is_super_admin:
+            return readonly_fields
+
+        readonly_fields += ('email',)
         return readonly_fields
 
     def get_exclude(self, request, obj=None):
