@@ -1,6 +1,4 @@
 import csv
-import os
-import smtplib
 
 from django.db.models import Count
 from django.http import HttpResponse, Http404
@@ -9,23 +7,20 @@ from django.urls import reverse
 from django.core.mail import EmailMessage
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_text
-from django.contrib.auth import login, authenticate
-from weitblick import settings
+from django.contrib.auth import login
+from django.contrib.sites.models import Site
 
-from wbcore.tokens import account_activation_token
-from wbcore.forms import (
-    ContactForm, UserForm, BankForm, UserRelationForm, AddressForm, User)
-from wbcore.models import (
-    Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation, UserRelation, JoinPage)
 from collections import OrderedDict
 from datetime import date, datetime, timedelta
 from schedule.periods import Period
-from django.contrib.sites.models import Site
-from form_designer.models import Form as EventForm
 
-# TODO move to settings
-EMAIL_ADDRESS = os.environ.get('TEST_EMAIL_USER')
-EMAIL_PASSWORT = os.environ.get('TEST_EMAIL_PW')
+from wbcore.tokens import account_activation_token
+
+from wbcore.forms import (
+    ContactForm, UserForm, BankForm, UserRelationForm, AddressForm, User)
+
+from wbcore.models import (
+    Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation, UserRelation, JoinPage)
 
 
 icon_links = OrderedDict([
