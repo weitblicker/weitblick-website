@@ -1,17 +1,46 @@
 {% extends 'wbcore/single_content.html' %}
 {% block single-content %}
-    <h1>Join</h1>
 
-    <div class="ui one column stackable grid container content-block">
-        <form class="ui column form" action="{% url 'join' %}" method="post">
+    <div class="ui stackable grid container content-block">
+        <div class="eight wide column">
+            <h1>Mitglied werden</h1>
+            {% if image %}<img class="ui fluid image" src="{{ image.get_display_url }}" alt="{{ image.title }}" style="margin-bottom: 15px"/>{% endif %}
+            {{ text | safe }}
+        </div>
+        {% if enable_form %}
+        <form class="ui form eight wide column" action="{{ submit_url }}" method="post">
+            <h2>Antragsformular</h2>
             {% csrf_token %}
+            {{ urel_form.host }}
+
             {% if success %}
                 <div class="ui positive message">
                     <div class="header">Thank you for becoming part of Weitblick e.V.</div>
                 </div>
             {% endif %}
 
-            {% for field in join_form %}
+            {% for field in addr_form %}
+                {% for error in field.errors %}
+                    <div class="ui negative message">
+                        <div class="header">{{ error|escape }}</div>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            {% for field in user_form %}
+                {% for error in field.errors %}
+                    <div class="ui negative message">
+                        <div class="header">{{ error|escape }}</div>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            {% for field in bank_form %}
+                {% for error in field.errors %}
+                    <div class="ui negative message">
+                        <div class="header">{{ error|escape }}</div>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            {% for field in urel_form %}
                 {% for error in field.errors %}
                     <div class="ui negative message">
                         <div class="header">{{ error|escape }}</div>
@@ -19,27 +48,79 @@
                 {% endfor %}
             {% endfor %}
 
-            <div class="fields">
-                <div class="required eight wide field">
-                    {{ join_form.hosts.label_tag }} {{ join_form.hosts }}
+            <h4>Persönliche Daten</h4>
+            <div class="two fields">
+                <div class="required field">
+                    {{ user_form.first_name.label_tag }} {{ user_form.first_name }}
                 </div>
-                <div class="eight wide required field">
-                    {{ join_form.email.label_tag }} {{ join_form.email }}
-                </div>
-            </div>
-            <div class="fields">
-                <div class="eight wide field">
-                    {{ join_form.first_name.label_tag }} {{ join_form.first_name }}
-                </div>
-                <div class="eight wide field">
-                    {{ join_form.last_name.label_tag }} {{ join_form.last_name }}
+                <div class="required field">
+                    {{ user_form.last_name.label_tag }} {{ user_form.last_name }}
                 </div>
             </div>
-            <div class="fields">
-                <div class="sixteen wide field">
-                    <input class="ui submit button orange" type="submit" value="Join Weitblick e.V.">
+            <div class="two fields">
+                <div class="required field">
+                    {{ user_form.date_of_birth.label_tag }}
+                    <div class="ui calendar">
+                        <div class="ui input left icon">
+                            <i class="calendar icon"></i>
+                            {{ user_form.date_of_birth }}
+                        </div>
+                    </div>
+                </div>
+                <div class="required field">
+                    {{ user_form.email.label_tag }} {{ user_form.email }}
+                </div>
+            </div>
+            <div class="two fields">
+                <div class="required field">
+                    {{ addr_form.street.label_tag }} {{ addr_form.street }}
+                </div>
+                <div class="required field">
+                    {{ addr_form.postal_code.label_tag }} {{ addr_form.postal_code }}
+                </div>
+            </div>
+            <div class="two fields">
+                <div class="required field">
+                    {{ addr_form.city.label_tag }} {{ addr_form.city }}
+                </div>
+                <div class="required field">
+                    {{ addr_form.country.label_tag }} {{ addr_form.country }}
+                </div>
+            </div>
+            <h4>Mitgliedsbeitrag und Kontodaten</h4>
+            <div class="two fields">
+                <div class="required field">
+                    {{ bank_form.account_holder.label_tag }} {{ bank_form.account_holder }}
+                </div>
+                <div class="required field">
+                    {{ urel_form.membership_fee.label_tag }}
+                    <div class="ui input right icon">
+                    <i class="euro sign icon"></i>
+                        {{ urel_form.membership_fee }}
+                    </div>
+                </div>
+            </div>
+            <div class="two fields">
+                <div class="required field">
+                    {{ bank_form.iban.label_tag }} {{ bank_form.iban }}
+                </div>
+                <div class="required field">
+                    {{ bank_form.bic.label_tag }} {{ bank_form.bic }}
+                </div>
+            </div>
+            {{ sepa_text | safe }}
+            <div class="two inline fields">
+                <div class="required inline field">
+                    <div class="ui checkbox">
+                        {{ bank_form.agree }}
+                        {{ bank_form.agree.label_tag }}
+                    </div>
+                </div>
+                <div class="field">
+                    <button class="ui button" type="submit">Join {{ host.name }}</button>
                 </div>
             </div>
         </form>
+        {% endif %}
     </div>
 {% endblock %}

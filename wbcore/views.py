@@ -1,23 +1,27 @@
 import csv
-import os
-import smtplib
 
 from django.db.models import Count
 from django.http import HttpResponse, Http404
 from django.template import loader
 from django.urls import reverse
-from django.core.mail import BadHeaderError
-from wbcore.forms import ContactForm, JoinForm
-from wbcore.models import Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation
+from django.core.mail import EmailMessage
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_text
+from django.contrib.auth import login
+from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.sites.models import Site
+
 from collections import OrderedDict
-from email.message import EmailMessage
 from datetime import date, datetime, timedelta
 from schedule.periods import Period
-from form_designer.models import Form as EventForm
 
-# TODO move to settings
-EMAIL_ADDRESS = os.environ.get('TEST_EMAIL_USER')
-EMAIL_PASSWORT = os.environ.get('TEST_EMAIL_PW')
+from wbcore.tokens import account_activation_token
+
+from wbcore.forms import (
+    ContactForm, UserForm, BankForm, UserRelationForm, AddressForm, User)
+
+from wbcore.models import (
+    Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation, UserRelation, JoinPage)
 
 
 icon_links = OrderedDict([
@@ -129,13 +133,14 @@ def get_host_slugs(request, host_slug):
         host_slugs = [x.strip(' ') for x in host_slugs]
     return host_slugs
 
+
 def item_list_from_occ(occurrences, host_slug=None):
     # set attributes to fill list_item template
     item_list = []
     for occ in occurrences:
         occ.image = occ.event.image
         # occ.date = occ.start
-        occ.show_date = f"{occ.start.strftime('%a, %d. %b %Y')} - {occ.end.strftime('%a, %d. %b %Y')}"
+        occ.show_date = occ.start.strftime('%a, %d. %b %Y') + " - " + occ.end.strftime('%a, %d. %b %Y')
         occ.hosts = occ.event.host.all()
         current_host = Host.objects.get(slug=host_slug) if host_slug else None
         if current_host and current_host in occ.event.host.all():
@@ -145,6 +150,7 @@ def item_list_from_occ(occurrences, host_slug=None):
         occ.teaser = occ.description
         item_list.append(occ)
     return item_list
+
 
 def item_list_from_blogposts(blogposts, host_slug=None):
     item_list = []
@@ -158,6 +164,7 @@ def item_list_from_blogposts(blogposts, host_slug=None):
             post.link = reverse('blog-post', args=[post.id])
         item_list.append(post)
     return item_list
+
 
 def item_list_from_proj(projects, host_slug=None):
     item_list = []
@@ -176,6 +183,7 @@ def item_list_from_proj(projects, host_slug=None):
         #project.teaser = project.description
         item_list.append(project)
     return item_list
+
 
 def home_view(request):
     projects = Project.objects.all()
@@ -517,6 +525,65 @@ def projects_view(request, host_slug=None):
     return HttpResponse(template.render(context, request))
 
 
+def signup(user, host):
+    subject = 'Mitgliedsantrag ' + host.name
+    message = loader.render_to_string('wbcore/activation_email.html', {
+        'domain': Site.objects.get_current().domain,
+        'user': user,
+        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+        'token': account_activation_token.make_token(user),
+    })
+    email = EmailMessage(body=message, subject=subject, to=[user.email], reply_to=[host.email])
+    email.send()
+
+
+def activate_user(request, uidb64, token):
+
+    pswd_form = None
+    template = loader.get_template('wbcore/user_activation.html')
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        invalid = False
+        success = False
+        message = ""
+        if not user.is_active:
+            if request.method == 'POST':
+                pswd_form = SetPasswordForm(user, request.POST)
+
+                if pswd_form.is_valid():
+                    pswd_form.save()
+                    user.is_active = True
+                    user.save()
+                    success = True
+                    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            else:
+                pswd_form = SetPasswordForm(user)
+
+        else:
+            message = "The user has been activated already!"
+            invalid = True
+            success = False
+    else:
+        message = "The activation link is not valid!"
+        invalid = True
+        success = False
+
+    context = {
+        'invalid': invalid,
+        'message': message,
+        'success': success,
+        'user': user,
+        'pswd_form': pswd_form,
+        'submit_url': reverse('activate', args=[uidb64, token])
+    }
+
+    return HttpResponse(template.render(context, request))
+
+
 def join_view(request, host_slug=None):
     try:
         host = Host.objects.get(slug=host_slug) if host_slug else None
@@ -524,33 +591,86 @@ def join_view(request, host_slug=None):
         raise Http404()
 
     template = loader.get_template('wbcore/join.html')
+    join_page = None
 
     if host:
         breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
+        submit_url = reverse('join', args=[host_slug])
+        try:
+            join_page = host.joinpage
+            print("Join Page", join_page)
+        except JoinPage.DoesNotExist:
+            pass
     else:
+        submit_url = reverse('join')
         breadcrumb = [('Home', reverse('home')), ('Contact', None)]
 
     success = False
 
     if request.method == 'POST':
-        form = JoinForm(request.POST)
-        if form.is_valid():
-            form.save()
+        addr_form = AddressForm(request.POST)
+        urel_form = UserRelationForm(request.POST)
+        user_form = UserForm(request.POST)
+        bank_form = BankForm(request.POST)
+        pswd_form = SetPasswordForm(request.POST)
+
+        host_matches = "host" in request.POST and request.POST["host"] == host_slug
+
+        if all([host_matches,
+                user_form.is_valid(),
+                bank_form.is_valid(),
+                urel_form.is_valid(),
+                addr_form.is_valid()]):
+
+            addr = addr_form.save()
+
+            user = user_form.save(commit=False)
+            user.address = addr
+            user.save()
+
+            addr.name = user.name()
+            addr.save()
+
+            urel = urel_form.save(commit=False)
+            urel.user = user
+            urel.save()
+
+            bank = bank_form.save(commit=False)
+            bank.profile = user
+            bank.save()
+
+            signup(user, host)
+
             success = True
     else:
         if host:
-            form = JoinForm(initial={'hosts': [host_slug]})
+            urel_form = UserRelationForm(initial={'host': host_slug})
         else:
-            form = JoinForm()
+            urel_form = UserRelationForm()
+
+        addr_form = AddressForm()
+        user_form = UserForm()
+        bank_form = BankForm()
 
     context = {
         'main_nav': get_main_nav(active='join'),
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': [('Home', reverse('home')), ('Join in', None)],
-        'join_form': form,
         'success': success,
     }
+
+    if join_page:
+        print("TestTestTest")
+        context['image'] = join_page.image
+        context['sepa_text'] = join_page.sepa_text
+        context['text'] = join_page.text
+        context['user_form'] = user_form
+        context['bank_form'] = bank_form
+        context['urel_form'] = urel_form
+        context['addr_form'] = addr_form
+        context['submit_url'] = submit_url
+        context['enable_form'] = join_page.enable_form
 
     return HttpResponse(template.render(context, request))
 
@@ -1035,26 +1155,27 @@ def contact_view(request, host_slug=None):
             form.save()
 
             # sent info via email
-            msg = EmailMessage()
-            msg['From'] = EMAIL_ADDRESS
-            msg['To'] = 'admin@weitblicker.org'
-            host = Host.objects.get(name=form.cleaned_data['host'])
-            msg['reply-to'] = form.cleaned_data['email']
-            msg['Subject'] = form.cleaned_data['subject']
-            msg.set_content('Name: ' + form.cleaned_data['name'] + "\n" + 'E-Mail: ' + form.cleaned_data['email'] + "\n\n" + "Nachricht: " + form.cleaned_data['message'])
+            name = form.cleaned_data['name']
+            email_addr = form.cleaned_data['email']
+            msg = form.cleaned_data['message']
+
+            # TODO use template for this
+            message = 'Name: ' + name + '\n'
+            message += 'E-Mail: ' + email_addr + '\n\n'
+            message += 'Nachricht: ' + msg
+
+            email = EmailMessage(
+                to=['admin@weitblicker.org'],
+                reply_to=[form.cleaned_data['email']],
+                subject=form.cleaned_data['email'],
+                body=message
+            )
             try:
-                # TODO: optimize, ssl from the start (smtplib.SMTP_SSL) and/or django internal (django.core.mail.send_mail)
-                with smtplib.SMTP('smtp.office365.com', 587) as smtp:
-                    smtp.ehlo()
-                    smtp.starttls()
-                    smtp.ehlo()
-                    smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORT)
-                    smtp.send_message(msg)
-                context['success'] = True
-                form = ContactForm()
-            except BadHeaderError:
+               email.send()
+               context['success'] = True
+            # TODO handle error case more specifically
+            except:
                 return HttpResponse('Invalid header found.')
-                context['success'] = False
             return HttpResponse(template.render(context, request))
         else:
             context['success'] = False

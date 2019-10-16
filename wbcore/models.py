@@ -1,5 +1,6 @@
 from django.db import models
 from django_countries.fields import CountryField
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.contrib.auth.models import (
     PermissionsMixin, BaseUserManager, AbstractBaseUser
@@ -83,6 +84,16 @@ class Host(models.Model):
         return self.name
 
 
+class JoinPage(models.Model):
+    enable_form = models.BooleanField(default=False)
+    text = models.TextField()
+    image = models.OneToOneField(Photo, on_delete=models.SET_NULL, null=True)
+    sepa_text = models.TextField()
+    min_fee = models.IntegerField()
+    max_fee = models.IntegerField()
+    host = models.OneToOneField(Host, on_delete=models.CASCADE, null=True)
+
+
 class UserManager(BaseUserManager):
     def create_user(self, first_name, last_name, email, date_of_birth, password=None):
         """
@@ -103,8 +114,8 @@ class UserManager(BaseUserManager):
             last_name=last_name,
             email=self.normalize_email(email),
             date_of_birth=date_of_birth,
+            is_active=True
         )
-
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -151,6 +162,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_admin_of_host(self, host):
         return host in self.get_maintaining_hosts()
 
+    def role(self):
+        roles =dict(UserRelation.TYPE_CHOICES)
+        return [roles[member.member_type] for member in self.userrelation_set.all()]
+
     hosts = models.ManyToManyField(Host, through='UserRelation')
 
     objects = UserManager()
@@ -194,9 +209,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def has_module_perms(self, app_label):
         return True
 
-    @property
     def name(self):
         return self.first_name + " " + self.last_name
+
+    name.admin_order_field = 'first_name'
 
     image = models.ImageField(null=True, blank=True)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
@@ -204,7 +220,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     until = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return self.name()
 
     def belongs_to_host(self, host):
         return host in self.hosts.all()
@@ -346,9 +362,12 @@ class UserRelation(models.Model):
         ('applicant', 'Applicant'),
     )
     member_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='applicant')
-    membership_fee = models.DecimalField(max_digits=5, decimal_places=2)
+    membership_fee = models.DecimalField(
+        max_digits=5, decimal_places=2,
+        validators=[MinValueValidator(2), MaxValueValidator(30)])
 
     def __str__(self):
+        print("member type", self.member_type, self.user)
         return str(self.user) + " in " + self.host.name + " as " + dict(self.TYPE_CHOICES)[self.member_type]
 
     def belongs_to_host(self, host):
@@ -610,7 +629,7 @@ class BankAccount(models.Model):
         return self.profile.belongs_to_host(host)
 
     def __str__(self):
-        return 'Bankdaten von '+self.profile.name
+        return 'Bankdaten von '+self.profile.name()
 
 
 class ContactMessage(models.Model):

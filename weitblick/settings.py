@@ -58,6 +58,15 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'wbcore.User'
 
+ADMINS = [('Sebastian Pütz', 'sebastian.puetz@weitblicker.org')]
+
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT'))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_USE_TLS = True
+
 PHOTOLOGUE_DIR = 'images'
 
 SUMMERNOTE_THEME = 'bs4'

@@ -1,0 +1,76 @@
+{% extends 'wbcore/single_content.html' %}
+{% block single-content %}
+    <div class="ui stackabldde grid container content-block">
+    {% if invalid %}
+        <div class="sixteen wide column">
+            <div class="ui placeholder segment">
+                <div class="ui icon header">
+                    <i class="exclamation triangle icon"></i>
+                    <p>{{ message }}</p>
+                    <a href="/admin"><div class="ui primary button">Login</div></a>
+                    {# TODO add help info #}
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+
+        <div class="eight wide column">
+            <div class="ui placeholder segment">
+                <div class="ui icon header">
+                    {% if success %}
+                        <i class="check icon"></i>
+                        <p>
+                            Thank you {{ user.first_name }}, that worked! <br>
+                            Welcome to the Weitblick community! <br> Cheers 🍺
+                        </p>
+                        {# TODO add help info #}
+                    {% else %}
+                        <p>
+                            Hey {{ user.first_name }}.<br>
+                            Now after you verified your email address, you need to setup your password.
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="eight wide column">
+            <div class="ui placeholder segment">
+                <div class="ui icon header">
+                    {% if success %}
+                        <p>
+                            An admin will finish your membership application.<br>
+                            Now you can login your preliminary account.<br>
+                            <a href="/admin"><div class="ui button">Login</div></a>
+                        </p>
+
+                    {% else %}
+                    <form class="ui form eight wide column" action="{{ submit_url }}" method="post">
+                        {% csrf_token %}
+                        {% for field in pswd_form %}
+                            {% for error in field.errors %}
+                                <div class="ui negative message">
+                                    <div class="header">{{ error|escape }}</div>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                        <div class="three fields">
+                            <div class="required field">
+                                {{ pswd_form.new_password1.label_tag }} {{ pswd_form.new_password1 }}
+                            </div>
+                            <div class="required field">
+                                {{ pswd_form.new_password2.label_tag }} {{ pswd_form.new_password2 }}
+                            </div>
+                            <div class="field">
+                                <label>&nbsp;</label>
+                                <button class="ui button" type="submit">Finish application</button>
+                            </div>
+                        </div>
+                    </form>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    </div>
+{% endblock %}
