@@ -536,6 +536,7 @@ def signup(user, host):
 
 def activate_user(request, uidb64, token):
 
+    pswd_form = None
     template = loader.get_template('wbcore/user_activation.html')
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
@@ -543,17 +544,38 @@ def activate_user(request, uidb64, token):
     except(TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
     if user is not None and account_activation_token.check_token(user, token):
+        invalid = False
+        success = False
+        message = ""
+        if not user.is_active:
+            if request.method == 'POST':
+                pswd_form = SetPasswordForm(user, request.POST)
 
-        user.is_active = True
-        user.save()
-        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-        success = True
+                if pswd_form.is_valid():
+                    pswd_form.save()
+                    user.is_active = True
+                    user.save()
+                    success = True
+                    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            else:
+                pswd_form = SetPasswordForm(user)
+
+        else:
+            message = "The user has been activated already!"
+            invalid = True
+            success = False
     else:
+        message = "The activation link is not valid!"
+        invalid = True
         success = False
 
     context = {
+        'invalid': invalid,
+        'message': message,
         'success': success,
         'user': user,
+        'pswd_form': pswd_form,
+        'submit_url': reverse('activate', args=[uidb64, token])
     }
 
     return HttpResponse(template.render(context, request))
@@ -587,6 +609,7 @@ def join_view(request, host_slug=None):
         urel_form = UserRelationForm(request.POST)
         user_form = UserForm(request.POST)
         bank_form = BankForm(request.POST)
+        pswd_form = SetPasswordForm(request.POST)
 
         host_matches = "host" in request.POST and request.POST["host"] == host_slug
 

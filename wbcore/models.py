@@ -114,8 +114,8 @@ class UserManager(BaseUserManager):
             last_name=last_name,
             email=self.normalize_email(email),
             date_of_birth=date_of_birth,
+            is_active=True
         )
-
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -147,7 +147,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         unique=True,
     )
     date_of_birth = models.DateField(null=True)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     @property
     def is_staff(self):
