@@ -140,7 +140,7 @@ def item_list_from_occ(occurrences, host_slug=None):
     for occ in occurrences:
         occ.image = occ.event.image
         # occ.date = occ.start
-        occ.show_date = f"{occ.start.strftime('%a, %d. %b %Y')} - {occ.end.strftime('%a, %d. %b %Y')}"
+        occ.show_date = occ.start.strftime('%a, %d. %b %Y') + " - " + occ.end.strftime('%a, %d. %b %Y')
         occ.hosts = occ.event.host.all()
         current_host = Host.objects.get(slug=host_slug) if host_slug else None
         if current_host and current_host in occ.event.host.all():
