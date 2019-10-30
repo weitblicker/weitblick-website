@@ -1,32 +1,44 @@
-from wbcore.models import NewsPost, BlogPost, Host, Event, Project
+from wbcore.models import NewsPost, BlogPost, Host, Event, Project, Location
 from rest_framework import serializers
 
 
-class BlogPostSerializer(serializers.HyperlinkedModelSerializer):
+class BlogPostSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='pk')
     class Meta:
         model = BlogPost
-        fields = ('title', 'text', 'image', 'added', 'updated', 'published', 'range', 'teaser')
+        fields = ('id', 'title', 'text', 'image', 'added', 'updated', 'published', 'range', 'teaser')
 
 
-class NewsPostSerializer(serializers.HyperlinkedModelSerializer):
+class NewsPostSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='pk')
     class Meta:
         model = NewsPost
-        fields = ('title', 'text', 'image', 'added', 'updated', 'published', 'range', 'teaser')
+        fields = ('id', 'title', 'text', 'image', 'added', 'updated', 'published', 'range', 'teaser')
 
 
-class HostSerializer(serializers.HyperlinkedModelSerializer):
+class HostSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='slug')
     class Meta:
         model = Host
-        fields = ('name', 'slug', 'city')
+        fields = ('id', 'name', 'city')
 
 
-class ProjectSerializer(serializers.HyperlinkedModelSerializer):
+class ProjectSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='pk')
     class Meta:
         model = Project
-        fields = ('name', 'slug', 'hosts', 'description', 'location', 'partner')
+        fields = ('id', 'name', 'slug', 'hosts', 'description', 'location', 'partner')
 
 
-class EventSerializer(serializers.HyperlinkedModelSerializer):
+class EventSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='pk')
     class Meta:
         model = Event
-        fields = ('name', 'projects', 'host')
+        fields = ('id', 'name', 'projects', 'host')
+
+
+class LocationSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='pk')
+    class Meta:
+        model = Location
+        fields = ('id', 'name', 'description', 'country', 'postal_code', 'city', 'state', 'street', 'address', 'lat', 'lng')
