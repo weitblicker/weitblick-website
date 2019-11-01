@@ -27,8 +27,8 @@ class ProjectSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     class Meta:
         model = Project
-        fields = ('id', 'name', 'slug', 'hosts', 'description', 'location', 'partner')
-
+        fields = ('id', 'start_date', 'end_date', 'published', 'name', 'slug', 'hosts', 'description', 'location',
+                  'partner',)
 
 class EventSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')

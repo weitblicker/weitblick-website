@@ -80,10 +80,13 @@ def filter_projects(request):
     visibility = request.GET.get("visibility")
     country_codes = parse_country(request)
     limit = parse_limit(request)
+    start, end = parse_archive_start_end(request)
+
+    print("Start:", start, "End:", end)
 
     results = SearchQuerySet()
     if host_slugs:
-        results = results.filter_or(hosts_slug__in=host_slugs)
+        results = results.filter(hosts_slug__in=host_slugs)
     if visibility == 'completed':
         results = results.filter_and(completed=True)
     elif visibility == 'current':
@@ -92,6 +95,12 @@ def filter_projects(request):
         results = results.filter_and(country_code__in=country_codes)
     if contains:
         results = results.filter_and(text__contains=contains)
+    if start:
+        results &= SearchQuerySet().filter(start_date__gte=start) | SearchQuerySet().filter(end_date__gte=start)
+    if end:
+        results &= SearchQuerySet().filter(start_date__lte=end) | SearchQuerySet().filter(end_date__lte=end)
+
+    #print("query:", results.query)
 
     results = results.models(Project).all()[:limit]
     projects = [result.object for result in results]
@@ -106,9 +115,6 @@ def filter_news(request):
     limit = parse_limit(request)
     start, end = parse_archive_start_end(request)
 
-    print("Date", start, end)
-    print("Contains:", contains)
-    print("Host Slugs", host_slugs)
     results = SearchQuerySet()
 
     if host_slugs:
@@ -116,8 +122,10 @@ def filter_news(request):
     if contains:
         results = results.filter_and(content__contains=contains)
     if start:
-        results = results.filter_and(published__lte=end)
         results = results.filter_and(published__gte=start)
+    if end:
+        results = results.filter_and(published__lte=end)
+
 
     results = results.models(NewsPost).order_by('-published')[:limit]
     print("Length:", len(results))
@@ -140,8 +148,10 @@ def filter_blog(request):
     if contains:
         results = results.filter_and(content__contains=contains)
     if start:
-        results = results.filter_and(published__lte=end)
         results = results.filter_and(published__gte=start)
+    if end:
+        results = results.filter_and(published__lte=end)
+
     results = results.models(BlogPost).order_by('-published')[:limit]
     return [result.object for result in results]
 
