@@ -84,6 +84,25 @@ class Host(models.Model):
         return self.name
 
 
+class SocialMediaLink(models.Model):
+    CHOICES = (
+        ('facebook', 'Facebook'),
+        ('instagram', 'Instagram'),
+        ('youtube', 'YouTube'),
+        ('twitter', 'Twitter'),
+    )
+
+    type = models.CharField(max_length=20, choices=CHOICES, blank=False)
+    link = models.URLField()
+    host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
+
+    def belongs_to_host(self, host):
+        return self.host is host
+
+    def __str__(self):
+        return dict(self.CHOICES)[self.type]
+
+
 class JoinPage(models.Model):
     enable_form = models.BooleanField(default=False)
     text = models.TextField()
@@ -648,3 +667,5 @@ class ContactMessage(models.Model):
 
     def belongs_to_host(self, host):
         return host == self.host
+
+

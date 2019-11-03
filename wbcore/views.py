@@ -21,7 +21,7 @@ from wbcore.forms import (
     ContactForm, UserForm, BankForm, UserRelationForm, AddressForm, User)
 
 from wbcore.models import (
-    Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation, UserRelation, JoinPage)
+    Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation, UserRelation, JoinPage, SocialMediaLink)
 
 
 icon_links = OrderedDict([
@@ -711,6 +711,7 @@ def hosts_view(request):
         'main_nav': get_main_nav(active='hosts'),
         'dot_nav': get_dot_nav(),
         'breadcrumb': [('Home', reverse('home')), ("Unions", None)],
+        'icon_links': icon_links
     }
     return HttpResponse(template.render(context, request))
 
@@ -718,6 +719,10 @@ def hosts_view(request):
 def host_view(request, host_slug):
     try:
         host = Host.objects.get(slug=host_slug) if host_slug else None
+
+        # replacing the link with the social media link # TODO no hardcoded links in general!
+        for social_link in host.socialmedialink_set.all():
+            icon_links[social_link.type]['link'] = social_link.link
     except Host.DoesNotExist:
         raise Http404()
 
@@ -728,6 +733,7 @@ def host_view(request, host_slug):
     hosts = Host.objects.all()
     teams = Team.objects.filter(host=host)
 
+
     template = loader.get_template('wbcore/host.html')
     context = {
         'host': host,
@@ -737,7 +743,8 @@ def host_view(request, host_slug):
         'dot_nav': get_dot_nav(host=host),
         'posts': posts,
         'occurrences': occurrences,
-        'teams': teams
+        'teams': teams,
+        'icon_links': icon_links
     }
     return HttpResponse(template.render(context, request))
 

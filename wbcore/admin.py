@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
+from django.contrib.contenttypes.admin import GenericInlineModelAdmin, GenericStackedInline, GenericTabularInline
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth import get_permission_codename
@@ -16,7 +17,8 @@ from itertools import chain
 
 from .models import (
     Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, ContactMessage, UserRelation,
-    Document, Team, Milestone, Donation, Milestep, BankAccount, TeamUserRelation, Content, User, JoinPage
+    Document, Team, Milestone, Donation, Milestep, BankAccount, TeamUserRelation, Content, User, JoinPage,
+    SocialMediaLink
 )
 
 
@@ -136,6 +138,12 @@ class JoinPageInlineModel(admin.StackedInline):
         models.TextField: {'widget': TinyMCE(mce_attrs={'height': 200})},
         map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget(attrs={'data-map-type': 'roadmap'})},
     }
+
+
+class SocialMediaLinkInlineModel(admin.TabularInline):
+    model = SocialMediaLink
+    extra = 1
+    show_change_link = True
 
 
 class MyAdmin(admin.ModelAdmin):
@@ -399,14 +407,13 @@ class TeamAdmin(MyAdmin):
 
 
 class HostAdmin(MyAdmin):
-    inlines = (JoinPageInlineModel,)
+    inlines = (JoinPageInlineModel, SocialMediaLinkInlineModel)
 
 # since we're not using Django's built-in permissions,
 # register our own user model and unregister the Group model from admin.
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.unregister(Group)
-
 admin.site.register(Address, MyAdmin)
 admin.site.register(Content, MyAdmin)
 admin.site.register(Location, MyAdmin)
