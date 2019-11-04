@@ -203,6 +203,7 @@ def home_view(request):
         'occurrences': occurrences,
         'posts': posts,
         'breadcrumb': [('Home', None)],
+        'item_list': posts,
         'icon_links': icon_links
     }
     return HttpResponse(template.render(context, request))

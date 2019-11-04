@@ -121,6 +121,10 @@ $logo-orange: #f3971b;
 	padding-top: 15px;
 }
 
+.pusher.content{
+	margin-top: 1rem;
+}
+
 #mobile-menu .menu{
 	background: transparent;
 }
@@ -352,6 +356,20 @@ $logo-orange: #f3971b;
 	display: none;
 }
 
+#header-image{
+	.dimmer {
+		background-color: rgba(255, 255, 255, .55);
+		text-align: left;
+		justify-content: left;
+		align-items: start;
+	}
+}
+
+.highcharts-credits{
+	display: none;
+}
+
+
 #icon-links {
 	.icon{
 		line-height: 1;
@@ -366,6 +384,7 @@ $logo-orange: #f3971b;
 	width: 50px;
 	position: absolute;
 	right: -50px;
+	top: 0;
 	padding: 0;
 	a {
 		vertical-align: middle;
@@ -431,6 +450,10 @@ $logo-orange: #f3971b;
 		margin-top: 0.5em;
 		font-size: 1.5em;
 	}
+}
+
+.ui.segment{
+	margin-top: 2rem;
 }
 
 a.details{
