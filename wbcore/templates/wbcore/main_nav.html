@@ -1,87 +1,92 @@
 {% load static %}
-<div id="main-menu" class="ui mobile reversed stackable grid container">
-    <div class="ui twelve wide column">
-        <div class="ui stackable menu">
-            <div class="ui category search item">
-                <div class="ui large transparent icon input">
-                    <input class="prompt" type="text" placeholder="Search ...">
-                    <i class="search link icon"></i>
+<div class="ui container">
+    <div class="segment">
+        <div id="main-menu" class="ui mobile reversed stackable grid container">
+            <div class="ui twelve wide column">
+                <div class="ui stackable menu">
+                    <div class="ui category search item">
+                        <div class="ui large transparent icon input">
+                            <input class="prompt" type="text" placeholder="Search ...">
+                            <i class="search link icon"></i>
+                        </div>
+                        <div class="results"></div>
+                    </div>
                 </div>
-                <div class="results"></div>
+                <div class="ui grid">
+                    <!-- computer only menu -->
+                    <div class="ui computer only row compact menu" id="menu-nav">
+                        {% for key, elem in main_nav.items %}
+                            {% if elem.link %}
+                                <a class="item" href="{{ elem.link }}">
+                                    <i class="icon">{% include elem.icon %}</i>
+                                    {{ elem.name }}</a>
+                            {% else %}
+                                <a class="item active" href="#">
+                                    <i class="icon">{% include elem.icon %}</i>
+                                    {{ elem.name }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                        <a class="popup-menu-btn item">
+                            <i class="fitted large chevron down icon"></i>
+                        </a>
+                    </div>
+
+                    <!-- tablet menu only -->
+                    <div class="ui tablet only row fluid seven item labeled icon menu" id="menu-nav">
+                        {% for key, elem in main_nav.items %}
+                            {% if elem.link %}
+                                <a class="item" href="{{ elem.link }}">
+                                    <i class="icon">{% include elem.icon %}</i>
+                                    {{ elem.name }}
+                                </a>
+                            {% else %}
+                                <a class="item active" href="#">
+                                    <i class="icon">{% include elem.icon %}</i>
+                                    {{ elem.name }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                        <a class="popup-menu-btn item">
+                            <i class="fitted large chevron down icon"></i>
+                            More
+                        </a>
+                    </div>
+
+                    <!-- mobile menu only -->
+                    <div class="ui mobile only row fluid three item labeled icon menu" id="menu-nav">
+                        {% for key, elem in main_nav.items %}
+                            {% if elem.mobile %}
+                                {% if elem.link %}
+                                    <a class="item" href="{{ elem.link }}">
+                                        <i class="icon">{% include elem.icon %}</i>
+                                        {{ elem.name }}
+                                    </a>
+                                {% else %}
+                                    <a class="item active" href="#">
+                                        <i class="icon">{% include elem.icon %}</i>
+                                        {{ elem.name }}</a>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        <a class="popup-menu-btn item">
+                            <i class="fitted large chevron down icon"></i>
+                            More
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="four wide column">
+                <div class="right menu">
+                    {% include 'wbcore/logo.html' %}
+                </div>
             </div>
         </div>
-        <div class="ui grid">
-            <!-- computer only menu -->
-            <div class="ui computer only row compact menu" id="menu-nav">
-                {% for key, elem in main_nav.items %}
-                    {% if elem.link %}
-                        <a class="item" href="{{ elem.link }}">
-                            <i class="icon">{% include elem.icon %}</i>
-                            {{ elem.name }}</a>
-                    {% else %}
-                        <a class="item active" href="#">
-                            <i class="icon">{% include elem.icon %}</i>
-                            {{ elem.name }}
-                        </a>
-                    {% endif %}
-                {% endfor %}
-                <a class="popup-menu-btn item">
-                  <i class="fitted large chevron down icon"></i>
-                </a>
+        <div class="ui stackable container">
+            <div id="popup-menu" class="ui one column grid">
+                {% include 'wbcore/dot_nav.html' %}
             </div>
-
-            <!-- tablet menu only -->
-            <div class="ui tablet only row fluid seven item labeled icon menu" id="menu-nav">
-                {% for key, elem in main_nav.items %}
-                    {% if elem.link %}
-                        <a class="item" href="{{ elem.link }}">
-                            <i class="icon">{% include elem.icon %}</i>
-                            {{ elem.name }}
-                        </a>
-                    {% else %}
-                        <a class="item active" href="#">
-                            <i class="icon">{% include elem.icon %}</i>
-                            {{ elem.name }}
-                        </a>
-                    {% endif %}
-                {% endfor %}
-                <a class="popup-menu-btn item">
-                    <i class="fitted large chevron down icon"></i>
-                    More
-                </a>
-            </div>
-
-            <!-- mobile menu only -->
-            <div class="ui mobile only row fluid three item labeled icon menu" id="menu-nav">
-                {% for key, elem in main_nav.items %}
-                    {% if elem.mobile %}
-                        {% if elem.link %}
-                            <a class="item" href="{{ elem.link }}">
-                                <i class="icon">{% include elem.icon %}</i>
-                                {{ elem.name }}
-                            </a>
-                        {% else %}
-                            <a class="item active" href="#">
-                                <i class="icon">{% include elem.icon %}</i>
-                                {{ elem.name }}</a>
-                        {% endif %}
-                    {% endif %}
-                {% endfor %}
-                <a class="popup-menu-btn item">
-                    <i class="fitted large chevron down icon"></i>
-                    More
-                </a>
-            </div>
-        </div>
-    </div>
-    <div class="four wide column">
-        <div class="right menu">
-            {% include 'wbcore/logo.html' %}
         </div>
     </div>
 </div>
-<div class="ui stackable container">
-    <div id="popup-menu" class="ui one column grid">
-        {% include 'wbcore/dot_nav.html' %}
-    </div>
-</div>
+

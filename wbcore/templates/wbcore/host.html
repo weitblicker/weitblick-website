@@ -2,33 +2,55 @@
 {% load staticfiles %}
 
 {% block content %}
-<div class="fluid container segment" style="max-height: 400px; overflow: hidden; margin-top: 12px;">
-  <img class="ui fluid image" style="margin: -20% 0 0 0" src="{% static 'images/union_header3.jpg' %}">
-</div>
-<div class="ui vertical">
-    <div class="ui stackable grid container" style="margin-top: -20px;">
-      <div class="ten wide column divided items content-block">
-        <div class="ui basic segment">
-          {% include 'wbcore/breadcrumb.html' %}
-          <h1> {{ host.name }} </h1>
-          <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer
+<div class="ui vertical stripe">
+    <div class="ui stackable grid container">
+      <div class="ten wide column divided items">
+
+        <div class="ui rounded fluid image">
+            <div class="ui active bottom dimmer">
+                <div class="content">
+                    <h1> {{ host.name }} </h1>
+                    {% include 'wbcore/breadcrumb.html' %}
+                </div>
+            </div>
+            <img class="ui fluid image" src="{% static 'images/union_header3.jpg' %}">
+        </div>
+
+
+
+        <div class="ui segment">
+          <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore
+              et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+              Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit
+              amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna
+              aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+              Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+              Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut
+              labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et
+              ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+              Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel
+              illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit
+              praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet,
+              consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat
+              volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut
+              aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse
+              molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio
+              dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam
+              liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer
           </p>
         </div>
-        <div class="row split-space"></div>
-        <div id="news-list" class="ui basic segment">
+        <div id="news-list" class="ui segment">
           <a class="ui item header" href="{% url 'news' %}">News</a>
           {% include 'wbcore/item_list.html' with item_list=posts %}
         </div>
       </div>
-      <div class="column divided items split-space" style="z-index: -1;"></div>
-      <div class="five wide column divided items content-block" style="width: 35.25%!important;">
-        {% include 'wbcore/socialbuttons.html' %}
-        <div class="ui basic segment">
+
+      <div class="six wide column divided items">
+        <div class="ui segment">
           <h3>Weitblick Deutschlandweit</h3>
           {% include 'wbcore/hosts_map.html' %}
         </div>
-        <div class="row split-space"></div>
-        <div class="ui basic segment">
+        <div class="ui segment">
           <a class="ui item header"href="{% url 'events' %}">Events</a>
           {% if occurrences %}
             <div class="ui divided unstackable items">
@@ -38,8 +60,7 @@
             </div>
           {% endif %}
         </div>
-        <div class="row split-space"></div>
-        <div class="ui basic segment">
+        <div class="ui segment">
           <a class="ui item header"href="{% url 'teams' %}">Teams</a>
           <div class="ui divided unstackable items">
             {% if teams %}
