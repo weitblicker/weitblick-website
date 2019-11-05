@@ -195,6 +195,11 @@ $logo-orange: #f3971b;
 	}
 	.item{
 		padding: 8px 0;
+		margin: 0.2rem;
+		color: white;
+		a{
+			color: white;
+		}
 		.content{
 			min-height: 65px;
 		}
@@ -206,10 +211,13 @@ $logo-orange: #f3971b;
 		}
 	}
 	.item:hover{
-		background: rgba(0, 0, 0, 0.13);
+		a{
+			color: $light-gray;
+		}
+		color: $light-gray;
 	}
 	display: none;
-	background-image: url('/media/colorbg/yellow.svg');
+	background: linear-gradient(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)), url('/media/colorbg/yellow.svg');
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
