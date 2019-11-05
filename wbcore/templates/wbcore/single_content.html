@@ -1,17 +1,15 @@
 {% extends 'wbcore/base.html' %}
 
 {% block content %}
+    <div class="ui middle aligned stackable grid container">
+        <div class="ui sixteen wide column">
+            <div class="ui segment">
+                {% include 'wbcore/breadcrumb.html' %}
 
-    <div class="ui vertical stripe segment">
-        <div class="ui middle aligned stackable grid container content-block">
+                {% block single-content %}{% endblock %}
 
-            {% include 'wbcore/breadcrumb.html' %}
-
-            {% block single-content %}{% endblock %}
-
-            {% include 'wbcore/socialbuttons.html' %}
-
+                {% include 'wbcore/socialbuttons.html' %}
+            </div>
         </div>
     </div>
-
 {% endblock %}

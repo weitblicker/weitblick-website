@@ -256,6 +256,18 @@ $logo-orange: #f3971b;
 	}
 }
 
+.popup-menu-btn .icon{
+    -moz-transition: all 0.3s linear;
+    -webkit-transition: all 0.3s linear;
+    transition: all 0.3s linear;
+}
+
+.popup-menu-btn .icon.halfway.rotated{
+	-webkit-transform: rotate(-180deg);
+	transform: rotate(-180deg);
+}
+
+
 #logo{
 	margin-top: 0 !important;
 	margin-bottom: 0 !important;
