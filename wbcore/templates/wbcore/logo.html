@@ -1,6 +1,6 @@
 {% if host %}
     <a class="logo host{% if inverse %} inverse{% endif %}" href="{% url 'host' host.slug %}">
-        {% include 'wbcore/svgs/logo.svg' with text=host.name|cut:"Weitblick "|upper %}
+        {% include 'wbcore/svgs/logo.svg' with text=host.name|cut:"Weitblick "|cut:" e.V."|upper %}
     </a>
 {% else %}
     <a class="logo claim{% if inverse %} inverse{% endif %}" href="{% url 'home' %}" class="ui item">

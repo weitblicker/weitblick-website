@@ -42,10 +42,20 @@
                   </div>
               </div>
             {% endif %}
-
-            <div class="seven wide column">
-                <h4 class="ui inverted header">Footer Header</h4>
-                <p>Extra space for a call to action inside the footer that could help re-engage users.</p>
+            <div class="four wide column">
+            </div>
+            <div class="three wide column">
+                {% if host %}
+                    <h4 class="ui inverted header">{{ host.name }}</h4>
+                    <p class="ui inverted list">
+                        {{ host.address.street }}
+                        <br>{{ host.address.postal_code }} {{ host.address.city }}
+                        <br>{{ host.address.country.name }}
+                    </p>
+                    <p class="ui inverted link list">
+                        <a class="item" href="mailto:{{ host.email }}">{{ host.email }}</a>
+                    </p>
+                {% endif %}
             </div>
             <div class="three wide column">
                 {% include 'wbcore/logo.html' with inverse=True %}
