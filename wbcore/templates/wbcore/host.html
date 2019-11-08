@@ -30,7 +30,7 @@
                 </p>
             </div>
             <div id="news-list" class="ui segment">
-                <i class="header newspaper outline icon"></i>
+                <i class="label newspaper outline icon"></i>
                 <a class="ui item title header" href="{% url 'news' %}">News</a>
                 {% include 'wbcore/item_list.html' with item_list=posts %}
             </div>
@@ -38,12 +38,12 @@
 
         <div class="six wide column divided items">
             <div class="ui segment">
-                <i class="header map outline icon"></i>
+                <i class="label map outline icon"></i>
                 <a class="ui item title header"href="{% url 'hosts' %}">Weitblick Vereine</a>
                 {% include 'wbcore/hosts_map.html' %}
             </div>
             <div class="ui segment">
-                <i class="header calendar alternate outline icon"></i>
+                <i class="label calendar alternate outline icon"></i>
                 <a class="ui item title header"href="{% url 'events' %}">Events</a>
                 {% if occurrences %}
                     <div class="ui divided unstackable items">
@@ -54,7 +54,7 @@
                 {% endif %}
             </div>
             <div class="ui segment">
-                <i class="header user friends icon"></i>
+                <i class="label users icon"></i>
                 <a class="ui item title header"href="{% url 'teams' %}">Teams</a>
                 <div class="ui divided unstackable items">
                     {% if teams %}

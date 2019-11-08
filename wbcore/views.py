@@ -230,6 +230,7 @@ def reports_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -255,6 +256,7 @@ def charter_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -280,6 +282,7 @@ def transparency_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -305,6 +308,7 @@ def facts_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -330,6 +334,7 @@ def history_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -355,6 +360,7 @@ def privacy_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -384,7 +390,8 @@ def teams_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
-        'teams': teams
+        'teams': teams,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -427,6 +434,7 @@ def team_view(request, host_slug=None, team_slug=None):
         'breadcrumb': breadcrumb,
         'team': team,
         'members_relations': members_relations,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -452,6 +460,7 @@ def about_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -477,6 +486,7 @@ def idea_view(request, host_slug=None):
         'projects': projects,
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -519,6 +529,7 @@ def projects_view(request, host_slug=None):
         'countries': countries,
         'filter_visibility': True,
         'ajax_endpoint': reverse('ajax-filter-projects'),
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -530,6 +541,7 @@ def signup(user, host):
         'user': user,
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
         'token': account_activation_token.make_token(user),
+        'icon_links': icon_links,
     })
     email = EmailMessage(body=message, subject=subject, to=[user.email], reply_to=[host.email])
     email.send()
@@ -576,6 +588,7 @@ def activate_user(request, uidb64, token):
         'success': success,
         'user': user,
         'pswd_form': pswd_form,
+        'icon_links': icon_links,
         'submit_url': reverse('activate', args=[uidb64, token])
     }
 
@@ -656,6 +669,7 @@ def join_view(request, host_slug=None):
         'host': host,
         'breadcrumb': [('Home', reverse('home')), ('Join in', None)],
         'success': success,
+        'icon_links': icon_links,
     }
 
     if join_page:
@@ -699,6 +713,7 @@ def project_view(request, host_slug=None, project_slug=None):
         'host': host,
         'dot_nav': get_dot_nav(host=host),
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -745,7 +760,7 @@ def host_view(request, host_slug):
         'posts': posts,
         'occurrences': occurrences,
         'teams': teams,
-        'icon_links': icon_links
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -788,6 +803,7 @@ def events_view(request, host_slug=None):
         'from_to': year_months,
         'item_list': item_list_from_occ(occurrences, host_slug),
         'ajax_endpoint': reverse('ajax-filter-events'),
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -833,6 +849,7 @@ def event_view(request, host_slug=None, event_slug=None):
         'form': form,
         'breadcrumb': breadcrumb,
         'host': host,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -878,6 +895,7 @@ def blog_view(request, host_slug=None):
         'years': year_months,
         'item_list': item_list_from_blogposts(posts, host_slug),
         'ajax_endpoint': reverse('ajax-filter-blog'),
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -908,6 +926,7 @@ def blog_post_view(request, host_slug=None, post_id=None):
         'post': post,
         'breadcrumb': breadcrumb,
         'host': host,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -972,6 +991,7 @@ def news_view(request, host_slug=None):
         'hosts': hosts,
         'years': year_months,
         'item_list': posts,
+        'icon_links': icon_links,
         'ajax_endpoint': reverse('ajax-filter-news'),
     }
     return HttpResponse(template.render(context, request))
@@ -1003,6 +1023,7 @@ def news_post_view(request, host_slug=None, post_id=None):
         'post': post,
         'breadcrumb': breadcrumb,
         'host': host,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -1020,6 +1041,7 @@ def host_projects_view(request, host_slug):
         'projects': projects,
         'host': host,
         'breadcrumb': [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Projects', None)],
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -1037,6 +1059,7 @@ def host_events_view(request, host_slug):
         'events': events,
         'host': host,
         'breadcrumb': [('Home', reverse('home')), (host.name, reverse('host', host_slug)), ("Events", None)],
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -1047,6 +1070,7 @@ def search_view(request, query=None):
         'main_nav': get_main_nav(),
         'dot_nav': get_dot_nav(),
         'breadcrumb': [('Home', reverse('home')), ("Search", None)],
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context), request)
 
@@ -1073,6 +1097,7 @@ def sitemap_view(request, host_slug=None):
         'projects': projects,
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -1099,6 +1124,7 @@ def donate_view(request, host_slug=None):
         'projects': projects,
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -1122,6 +1148,7 @@ def imprint_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -1144,6 +1171,7 @@ def contact_view(request, host_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'success': False,
+        'icon_links': icon_links,
     }
 
     if request.method == 'POST':
@@ -1195,5 +1223,6 @@ def sitemap_view(request):
         'dot_nav': get_dot_nav(),
         'hosts': hosts,
         'breadcrumb': [('Home', reverse('home')), ("Sitemap", None)],
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context), request)
