@@ -19,14 +19,16 @@
         </div>
         <div class="ten wide column divided items">
             <div class="ui segment">
-                <a class="ui item header" href="{% url 'news' %}">News</a>
+                <i class="header newspaper outline icon"></i>
+                <a class="ui item title header" href="{% url 'news' %}">News</a>
                 {% include 'wbcore/item_list.html' with items=posts%}
             </div>
         </div>
 
         <div class="six wide column divided items">
             <div class="ui segment">
-                <a class="ui item header"href="{% url 'events' %}">Events</a>
+                <i class="header calendar alternate outline icon"></i>
+                <a class="ui item title header"href="{% url 'events' %}">Events</a>
                 {% if occurrences %}
                     <div class="ui divided unstackable items">
                         {% for occ in occurrences %}
