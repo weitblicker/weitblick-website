@@ -26,6 +26,11 @@ class GallerySerializer(serializers.ModelSerializer):
 class BlogPostSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     gallery = GallerySerializer(read_only=True)
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, post):
+        serializer = PhotoSerializer(instance=post.image)
+        return serializer.data
 
     class Meta:
         model = BlogPost
