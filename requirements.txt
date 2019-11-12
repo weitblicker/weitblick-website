@@ -11,6 +11,8 @@ django-haystack
 pytidylib
 psycopg2-binary
 djangorestframework
+django-rest-auth
+django-rest-auth[with_social]
 Pillow
 libsass
 num2words

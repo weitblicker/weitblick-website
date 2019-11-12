@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from rest_framework.urlpatterns import format_suffix_patterns
 from wbcore import rest_views
 
@@ -20,6 +20,10 @@ rest_patterns = [
 
     path('locations/', rest_views.location_list, name="rest-blog-posts"),
     path('blog/<int:pk>/', rest_views.location_detail, name="rest-blog-post"),
+
+    path('auth/', include('rest_auth.urls')),
+    path('auth/registration/', include('rest_auth.registration.urls'))
+    #path('users', include('users.', )
 ]
 
 rest_patterns = format_suffix_patterns(rest_patterns)
