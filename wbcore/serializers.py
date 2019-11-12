@@ -4,9 +4,11 @@ from photologue.models import Gallery, Photo
 
 
 class PhotoSerializer(serializers.ModelSerializer):
+    url = serializers.ImageField(source='image')
+
     class Meta:
         model = Photo
-        fields = ('id', 'title', 'caption', 'image', 'date_taken', 'crop_from')
+        fields = ('id', 'title', 'caption', 'url', 'date_taken', 'crop_from')
 
 
 class GallerySerializer(serializers.ModelSerializer):
@@ -26,11 +28,7 @@ class GallerySerializer(serializers.ModelSerializer):
 class BlogPostSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     gallery = GallerySerializer(read_only=True)
-    image = serializers.SerializerMethodField()
-
-    def get_image(self, post):
-        serializer = PhotoSerializer(instance=post.image)
-        return serializer.data
+    image = PhotoSerializer()
 
     class Meta:
         model = BlogPost
@@ -40,6 +38,7 @@ class BlogPostSerializer(serializers.ModelSerializer):
 class NewsPostSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     gallery = GallerySerializer(read_only=True)
+    image = PhotoSerializer()
 
     class Meta:
         model = NewsPost
