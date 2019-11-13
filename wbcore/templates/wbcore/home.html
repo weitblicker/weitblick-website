@@ -21,7 +21,7 @@
             <div class="ui segment">
                 <i class="label newspaper outline icon"></i>
                 <a class="ui item title header" href="{% url 'news' %}">News</a>
-                {% include 'wbcore/item_list.html' with items=posts%}
+                {% include 'wbcore/item_list.html' with item_list=news_item_list %}
             </div>
         </div>
 
@@ -45,7 +45,7 @@
                 <i class="label globe africa icon"></i>
                 <a class="ui item title header"href="{% url 'blog' %}">Blog</a>
                 <div class="ui items">
-                    {% include 'wbcore/item_list.html' with item_list=blog image_size='small' %}
+                    {% include 'wbcore/item_list.html' with item_list=blog_item_list image_size='small' %}
                 </div>
             </div>
         </div>

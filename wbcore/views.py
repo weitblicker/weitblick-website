@@ -152,6 +152,23 @@ def item_list_from_occ(occurrences, host_slug=None):
     return item_list
 
 
+def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='news_id', text=True):
+    item_list = []
+    for post in posts:
+        if not post.teaser:
+            post.teaser = post.text
+
+        if not text:
+            post.teaser = ""
+        current_host = Host.objects.get(slug=host_slug) if host_slug else None
+        if current_host and post.host and current_host in post.host.all():
+            post.link = reverse(post_type, kwargs={id_key: post.id, 'host_slug': host_slug})
+        else:
+            post.link = reverse(post_type, args=[post.id])
+        item_list.append(post)
+    return item_list
+
+
 def item_list_from_blogposts(blogposts, host_slug=None):
     item_list = []
     for post in blogposts:
@@ -188,25 +205,28 @@ def item_list_from_proj(projects, host_slug=None):
 def home_view(request):
     projects = Project.objects.all()
     hosts = Host.objects.all()
-    posts = NewsPost.objects.all().order_by('-published')[:3]
+    news = NewsPost.objects.all().order_by('-published')[:3]
     blog = BlogPost.objects.all().order_by('-published')[:3]
     events = Event.objects.all().order_by('-start')
     period = Period(events, datetime.now(), datetime.now() + timedelta(365/2))
     occurrences = period.get_occurrences()[:3]
+
 
     template = loader.get_template('wbcore/home.html')
     context = {
         'main_nav': get_main_nav(),
         'dot_nav': get_dot_nav(),
         'projects': projects,
-        'blog': blog,
+        'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id', text=False),
+        'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
         'hosts': hosts,
         'occurrences': occurrences,
-        'posts': posts,
         'breadcrumb': [('Home', None)],
-        'item_list': posts,
         'icon_links': icon_links
     }
+
+    print(context['news_item_list'])
+
     return HttpResponse(template.render(context, request))
 
 
