@@ -199,6 +199,7 @@ def home_view(request):
         'main_nav': get_main_nav(),
         'dot_nav': get_dot_nav(),
         'projects': projects,
+        'blog': blog,
         'hosts': hosts,
         'occurrences': occurrences,
         'posts': posts,
