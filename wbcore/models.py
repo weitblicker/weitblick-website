@@ -545,6 +545,7 @@ class Document(models.Model):
 class Team(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=50, null=False, blank=False)
+    teaser = models.TextField(blank=True, default="")
     description = models.TextField(blank=True, default="")
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
     member = models.ManyToManyField(User, through='TeamUserRelation')
