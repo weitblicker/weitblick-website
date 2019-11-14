@@ -9,11 +9,6 @@
         <div class="ui segment">
             {% if item_list %}
                 {% include 'wbcore/item_list.html' %}
-                {% block js %}
-                    {{ block.super }}
-                    <script src="/static/js/el-pagination.js"></script>
-                    <script>$.endlessPaginate({paginateOnScroll: true});</script>
-                {% endblock %}
             {% else %}
                 <p>No posts available.</p>
             {% endif %}

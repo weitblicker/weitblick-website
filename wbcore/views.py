@@ -538,7 +538,7 @@ def projects_view(request, host_slug=None):
     hosts = Host.objects.all()
 
     if request.is_ajax():
-        template = loader.get_template('wbcore/item_list.html')
+        template = loader.get_template('wbcore/list_items.html')
     else:
         template = loader.get_template('wbcore/projects.html')
     context = {
@@ -819,7 +819,7 @@ def events_view(request, host_slug=None):
         year_months = None
 
     if request.is_ajax():
-        template = loader.get_template('wbcore/item_list.html')
+        template = loader.get_template('wbcore/list_items.html')
     else:
         template = loader.get_template('wbcore/events.html')
     context = {
@@ -912,7 +912,7 @@ def blog_view(request, host_slug=None):
         breadcrumb = [('Home', reverse('home')), ('Blog', None)]
 
     if request.is_ajax():
-        template = loader.get_template('wbcore/item_list.html')
+        template = loader.get_template('wbcore/list_items.html')
     else:
         template = loader.get_template('wbcore/blog.html')
     context = {
@@ -1011,7 +1011,7 @@ def news_view(request, host_slug=None):
         breadcrumb = [('Home', reverse('home')), ('News', None)]
 
     if request.is_ajax():
-        template = loader.get_template('wbcore/item_list.html')
+        template = loader.get_template('wbcore/list_items.html')
     else:
         template = loader.get_template('wbcore/news.html')
     context = {

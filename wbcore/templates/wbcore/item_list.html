@@ -1,13 +1,13 @@
-{%  load el_pagination_tags %}
-
 {% if item_list %}
-    {% lazy_paginate item_list %}
-    <div id="item-list" class="ui basic segment">
-        <div class="ui divided unstackable items">
-            {% for item in item_list %}
-                {% include 'wbcore/list_item.html' %}
-            {% endfor %}
-        </div>
+    <div id="item-list" class="ui divided unstackable items">
+        {% include  'wbcore/list_items.html' with item_list=item_list %}
     </div>
-    {% show_more %}
+
+
+    {% block js %}
+        <script src="/static/js/el-pagination.js"></script>
+        <script>$.endlessPaginate();</script>
+    {% endblock %}
+
 {% endif %}
+
