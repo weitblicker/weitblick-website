@@ -119,9 +119,16 @@ def get_dot_nav(host=None):
     else:
         news = NewsPost.objects.all().order_by('-published')[:3]
         blog = BlogPost.objects.all().order_by('-published')[:3]
-        events = Event.objects.all()#.order_by('-start')[:3]
-        occurences = Period(events, datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
-    return {'news': news, 'blog': blog, 'events': occurences}
+        occurences = Period(Event.objects.all(), datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
+        events = [occ.event for occ in occurences]
+        for event in events:
+            if event.start.day == event.end.day:
+                event.show_date = event.start.strftime('%a, %d. %b %Y')
+                event.show_date += "<br>" + event.start.strftime('%H:%M') + " - " + event.end.strftime('%H:%M')
+            else:
+                event.show_date = event.start.strftime('%a, %d. %b')
+                event.show_date += " -<br>" + event.end.strftime('%a, %d. %b %Y')
+    return {'news': news, 'blog': blog, 'events': events}
 
 
 def get_host_slugs(request, host_slug):

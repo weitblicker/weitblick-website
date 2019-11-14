@@ -50,11 +50,9 @@
         {% if host %} <a class="ui item header href="{% url 'events' host.slug %}">Events</a>
         {% else %} <a class="ui item header" href="{% url 'events' %}">Events</a>
         {% endif %}
-        <div class="ui link list">
-            {% for occ in dot_nav.events %}
-                {% include 'wbcore/dot_nav_item.html' with type='event' slug=occ.event.slug title=occ.event.title image=occ.event.image photo=event.image desc=occ.event.description|truncatewords:7 %}
-            {% endfor %}
-        </div>
+        {% for event in dot_nav.events %}
+            {% include 'wbcore/dot_nav_item.html' with type='event' slug=event.slug title=event.title desc=event.description|truncatewords:7 show_date=event.show_date %}
+        {% endfor %}
     </div>
 </div>
 

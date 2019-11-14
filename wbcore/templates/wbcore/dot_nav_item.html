@@ -1,26 +1,17 @@
 {% load static %}
-<div class="ui item">
-    {% if type == 'event'%}
-        <a href="{% url type event_slug=slug %}" class="ui top aligned image">
-            {% if image %}
-                <img src="{{ image.get_menusize_url }}" alt="{{ image.title }}">
-            {% else %}
-                <div class="image" style="margin-bottom:15px;">{% include 'wbcore/svgs/placeholder.svg' with text="Event"%}</div>
-            {% endif %}
+<div class="item">
+    {% if image %}
+        <a href="{% url type post_id=id %}" class="ui top aligned image">
+            <img src="{{ image.get_menusize_url }}" class="thumbnail" alt="{{ image.title }}">
         </a>
-    {% else %}
-        {% if image %}
-            <a href="{% url type post_id=id %}" class="ui top aligned image">
-                <img src="{{ image.get_menusize_url }}" class="thumbnail" alt="{{ image.title }}">
-            </a>
-        {% endif %}
+    {% elif type == 'event' %}
+        <i class="clock outline icon"></i>
     {% endif %}
+
     <div class="content">
         {% if type == 'event'%}
-            <a href="{% url type event_slug=slug %}">
-                {{ title }}<br>
-                <em>{{ desc | safe }}</em>
-            </a>
+            <a href="{% url type event_slug=slug %}">{{ title }}</a>
+            <p>{{ show_date | safe }}</p>
         {% else %}
             <a href="{% url type post_id=id %}">{{ title }}</a>
             <p>{{ desc }}</p>
