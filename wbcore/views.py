@@ -913,6 +913,7 @@ def event_view(request, host_slug=None, event_slug=None):
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
         'event': event,
+        'projects': item_list_from_proj(event.projects.all(), host_slug=host_slug),
         'form': form,
         'breadcrumb': breadcrumb,
         'host': host,
