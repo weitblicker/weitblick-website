@@ -1,23 +1,23 @@
 {% load static %}
 
 <div class="item">
-  <a class="image" href="#">
-    {% if not member.image %}
-    <div class="ui medium circular image" style="margin-bottom:15px;">
-      {% include 'wbcore/svgs/profile.svg' %}
+    <div class="ui circular small image">
+        {% if not member.image %}
+            {% include 'wbcore/svgs/profile.svg' %}
+        {% else %}
+            <img src="{{ member.image.get_listsize_url }}">
+        {% endif %}
     </div>
-    {% else %}
-    <div class="ui medium circular image">
-      <img src="{{ member.image.get_listsize_url }}">
+    <div class="middle aligned content">
+        <a class="header" href="#"><h2>{{ member.name }}</h2></a>
+        <div class="meta">
+            {{ relation.role }}
+        </div>
+        <div class="description">
+            <p>{{ relation.text | safe }}</p>
+        </div>
+        <a class="extra" href="mailto:{{ relation.email }}">
+            {{ relation.email }}
+        </a>
     </div>
-    {% endif %}
-  </a>
-
-
-  <div class="content">
-    <a class="ui medium header" href="#"> <h2>{{ member.name }}</h2> </a>
-    <div class="description">
-      <p>{{ relation.text | safe }}</p>
-    </div>
-  </div>
 </div>
