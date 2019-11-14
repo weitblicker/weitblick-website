@@ -348,6 +348,7 @@ class Event(ScheduleEvent):
     image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     gallery = models.ForeignKey(Gallery, null=True, blank=True,on_delete=models.SET_NULL)
     form = models.OneToOneField(EventForm, null=True, blank=True, on_delete=models.SET_NULL)
+    cost = models.CharField(max_length=50, blank=True, default="")
 
     def search_title(self):
         return self.title
