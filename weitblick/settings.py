@@ -90,13 +90,15 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'weitblick.urls'
 
+import markdown_fenced_code_tabs
+
 from photologue import PHOTOLOGUE_APP_DIR
-TEMPLATE_DIRS = [PHOTOLOGUE_APP_DIR]
+TEMPLATE_DIRS = [PHOTOLOGUE_APP_DIR,  markdown_fenced_code_tabs]
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['markdown_fenced_code_tabs'],
         'APP_DIRS': False,
         'OPTIONS': {
             'context_processors': [
@@ -166,9 +168,41 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend'
 ]
 
+
 MICROSOFT_AUTH_CLIENT_ID = '461a1fd8-9c6d-42b1-a74f-5dcdb912d89d'
 MICROSOFT_AUTH_CLIENT_SECRET = '-Klk0zF]9EIxDG6@s7gMwM/v:ha.cB2]'
 MICROSOFT_AUTH_LOGIN_TYPE = 'ma'
+
+MARTOR_ENABLE_CONFIGS = {
+    'imgur': 'false',     # to enable/disable imgur/custom uploader.
+    'mention': 'false',  # to enable/disable mention
+    'jquery': 'true',    # to include/revoke jquery (require for admin default django)
+    'living': 'true',   # to enable/disable live updates in preview
+    'spellcheck': 'true',  # to enable/disable spellcheck in form textareas
+}
+
+MARTOR_MARKDOWN_EXTENSIONS = [
+    'markdown.extensions.extra',
+    'markdown.extensions.nl2br',
+    'markdown.extensions.smarty',
+    'markdown.extensions.fenced_code',
+    'markdown_fenced_code_tabs',
+    # Custom markdown extensions.
+    'martor.extensions.urlize',
+    'martor.extensions.del_ins',    # ~~strikethrough~~ and ++underscores++
+    'martor.extensions.mention',    # to parse markdown mention
+    'martor.extensions.emoji',      # to parse markdown emoji
+    'martor.extensions.mdx_video',  # to parse embed/iframe video
+]
+
+
+MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
+    'markdown_fenced_code_tabs': {
+        'single_block_as_tab': False,
+        'active_class': 'active',
+        'template': 'default',
+    }
+}
 
 
 # Internationalization

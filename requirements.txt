@@ -26,3 +26,4 @@ django-microsoft-auth
 django-scheduler
 form_designer
 django-el-pagination
+markdown-fenced-code-tabs
