@@ -29,13 +29,11 @@
             <div class="ui segment">
                 <i class="label calendar alternate outline icon"></i>
                 <a class="ui item title header"href="{% url 'events' %}">Events</a>
-                {% if occurrences %}
-                    <div class="ui divided unstackable items">
-                        {% for occ in occurrences %}
-                            {% include 'wbcore/event_feed_side.html' with occ=occ host_slug=host.slug %}
-                        {% endfor %}
-                    </div>
-                {% endif %}
+                <div class="ui items">
+                    {% include 'wbcore/item_list.html' with item_list=event_item_list image_size='small' %}
+                </div>
+
+
             </div>
             <div class="ui segment">
                 <i class="label donate icon"></i>

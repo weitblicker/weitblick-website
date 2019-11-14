@@ -14,6 +14,7 @@ from django.contrib.sites.models import Site
 from collections import OrderedDict
 from datetime import date, datetime, timedelta
 from schedule.periods import Period
+import locale
 
 from wbcore.tokens import account_activation_token
 
@@ -114,11 +115,11 @@ def get_dot_nav(host=None):
         news = NewsPost.objects.filter(host=host).order_by('-published')[:3]
         blog = BlogPost.objects.filter(host=host).order_by('-published')[:3]
         events = Event.objects.filter(host=host)
-        occurences =  Period(events, datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
+        occurences = Period(events, datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
     else:
         news = NewsPost.objects.all().order_by('-published')[:3]
         blog = BlogPost.objects.all().order_by('-published')[:3]
-        events =  Event.objects.all()#.order_by('-start')[:3]
+        events = Event.objects.all()#.order_by('-start')[:3]
         occurences = Period(events, datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
     return {'news': news, 'blog': blog, 'events': occurences}
 
@@ -134,20 +135,27 @@ def get_host_slugs(request, host_slug):
     return host_slugs
 
 
-def item_list_from_occ(occurrences, host_slug=None):
+def item_list_from_occ(occurrences, host_slug=None, text=True):
     # set attributes to fill list_item template
     item_list = []
     for occ in occurrences:
         occ.image = occ.event.image
-        # occ.date = occ.start
-        occ.show_date = occ.start.strftime('%a, %d. %b %Y') + " - " + occ.end.strftime('%a, %d. %b %Y')
+        locale.setlocale(locale.LC_ALL, "de_DE")
+        if occ.start.day == occ.end.day:
+            occ.show_date = occ.start.strftime('%a, %d. %b %Y')
+        else:
+            occ.show_date = occ.start.strftime('%d. %b') + " - " + occ.end.strftime('%d. %b %Y')
         occ.hosts = occ.event.host.all()
         current_host = Host.objects.get(slug=host_slug) if host_slug else None
         if current_host and current_host in occ.event.host.all():
             occ.link = reverse('event', kwargs={'event_slug': occ.event.slug, 'host_slug': host_slug})
         else:
             occ.link = reverse('event', args=[occ.event.slug])
-        occ.teaser = occ.description
+        if text:
+            occ.teaser = occ.event.teaser if occ.event.teaser else occ.description
+        else:
+            occ.teaser = ""
+        occ.show_text = text
         item_list.append(occ)
     return item_list
 
@@ -165,6 +173,7 @@ def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='n
             post.link = reverse(post_type, kwargs={id_key: post.id, 'host_slug': host_slug})
         else:
             post.link = reverse(post_type, args=[post.id])
+        post.show_text = text
         item_list.append(post)
     return item_list
 
@@ -220,7 +229,7 @@ def home_view(request):
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id', text=False),
         'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
         'hosts': hosts,
-        'occurrences': occurrences,
+        'event_item_list': item_list_from_occ(occurrences, text=False),
         'breadcrumb': [('Home', None)],
         'icon_links': icon_links
     }
@@ -537,7 +546,10 @@ def projects_view(request, host_slug=None):
 
     hosts = Host.objects.all()
 
-    template = loader.get_template('wbcore/projects.html')
+    if request.is_ajax():
+        template = loader.get_template('wbcore/list_items.html')
+    else:
+        template = loader.get_template('wbcore/projects.html')
     context = {
         'main_nav': get_main_nav(host=host, active='projects'),
         'dot_nav': get_dot_nav(host=host),
@@ -802,7 +814,7 @@ def events_view(request, host_slug=None):
         events = Event.objects.all()
         breadcrumb = [('Home', reverse('home')), ('Events', None)]
 
-    p = Period(events, datetime.now(), datetime.now() + timedelta(days=365/2))
+    p = Period(events, datetime.now(), datetime.now() + timedelta(days=365))
     occurrences = p.get_occurrences()
     hosts = Host.objects.all()
 
@@ -815,7 +827,10 @@ def events_view(request, host_slug=None):
     else:
         year_months = None
 
-    template = loader.get_template('wbcore/events.html')
+    if request.is_ajax():
+        template = loader.get_template('wbcore/list_items.html')
+    else:
+        template = loader.get_template('wbcore/events.html')
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
@@ -876,8 +891,6 @@ def event_view(request, host_slug=None, event_slug=None):
 
 
 def blog_view(request, host_slug=None):
-    template = loader.get_template('wbcore/blog.html')
-
     host_slugs = get_host_slugs(request, host_slug)
     try:
         if host_slugs:
@@ -889,7 +902,7 @@ def blog_view(request, host_slug=None):
     except Host.DoesNotExist:
         raise Http404()
 
-    posts = posts.order_by('-published')[:20]
+    posts = posts.order_by('-published')
     hosts = Host.objects.all()
 
     if BlogPost.objects.count():
@@ -907,6 +920,10 @@ def blog_view(request, host_slug=None):
     else:
         breadcrumb = [('Home', reverse('home')), ('Blog', None)]
 
+    if request.is_ajax():
+        template = loader.get_template('wbcore/list_items.html')
+    else:
+        template = loader.get_template('wbcore/blog.html')
     context = {
         'main_nav': get_main_nav(host=host, active='blog'),
         'dot_nav': get_dot_nav(host=host),
@@ -982,7 +999,7 @@ def news_view(request, host_slug=None):
     except Host.DoesNotExist:
         raise Http404()
 
-    posts = posts.order_by('-published')[:20]
+    posts = posts.order_by('-published')
     hosts = Host.objects.all()
 
     if NewsPost.objects.count():
@@ -1002,7 +1019,10 @@ def news_view(request, host_slug=None):
     else:
         breadcrumb = [('Home', reverse('home')), ('News', None)]
 
-    template = loader.get_template('wbcore/news.html')
+    if request.is_ajax():
+        template = loader.get_template('wbcore/list_items.html')
+    else:
+        template = loader.get_template('wbcore/news.html')
     context = {
         'main_nav': get_main_nav(host=host, active='news'),
         'dot_nav': get_dot_nav(host=host),

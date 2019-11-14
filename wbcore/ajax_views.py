@@ -57,7 +57,7 @@ def search(request, query):
 
 @api_view(['GET', 'POST'])
 def filter_projects_view(request, host_slug=None):
-    template = loader.get_template('wbcore/item_list.html')
+    template = loader.get_template('wbcore/list_items.html')
     projects = filter_projects(request)
     host = None  # TODO filter if on host specific news page
     context = {
@@ -69,8 +69,8 @@ def filter_projects_view(request, host_slug=None):
 
 @api_view(['GET', 'POST'])
 def filter_news_view(request):
-    template = loader.get_template('wbcore/item_list.html')
-    posts = filter_news(request)
+    template = loader.get_template('wbcore/list_items.html')
+    posts = filter_news(request, default_limit=-1)
     host = None  # TODO filter if on host specific news page
     context = {
         'host': host,
@@ -81,7 +81,7 @@ def filter_news_view(request):
 
 @api_view(['GET', 'POST'])
 def filter_events_view(request):
-    template = loader.get_template('wbcore/item_list.html')
+    template = loader.get_template('wbcore/list_items.html')
     event_occurrences = filter_events(request)
     host = None  # TODO filter if on host specific news page
     context = {
@@ -93,7 +93,7 @@ def filter_events_view(request):
 
 @api_view(['GET', 'POST'])
 def filter_blog_view(request):
-    template = loader.get_template('wbcore/item_list.html')
+    template = loader.get_template('wbcore/list_items.html')
     host = None  # TODO filter if on host specific news page
     context = {
         'host': host,

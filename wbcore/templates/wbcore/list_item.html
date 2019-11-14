@@ -31,12 +31,20 @@
             {% endif %}
 
             {% if item.hosts_list %}
-                {% if item.show_date or item.date or item.published %}<span> | </span>{% endif %}
+                {% if item.show_text %}
+                    {% if item.show_date or item.date or item.published %}<span> | </span>{% endif %}
+                {% else %}
+                    <br>
+                {% endif %}
                 {% for host in item.hosts_list %}
                     {% include 'wbcore/host_icon.html' with host=host %}
                 {% endfor %}
             {% elif item.hosts %}
-                {% if item.show_date or item.date or item.published %}<span> | </span>{% endif %}
+                {% if item.show_text %}
+                    {% if item.show_date or item.date or item.published %}<span> | </span>{% endif %}
+                {% else %}
+                    <br>
+                {% endif %}
                 {% for host in item.hosts %}
                     {% include 'wbcore/host_icon.html' with host=host %}
                 {% endfor %}
@@ -48,16 +56,16 @@
             <p>{{ item.teaser | striptags | safe | truncatewords:"40"}}</p>
         </div>
         <div class="extra">
-          {% if item.author %}
-              <img class="ui avatar image" src="{% get_media_prefix %}{% if item.author.image %}{{ item.author.image }}{% else %}kristy.png{% endif %}">
-             {{ item.author.name }}
-          {% elif item.author_str %}
-              <img class="ui avatar image" src="{% get_media_prefix %}kristy.png">
-             {{ item.author_str }}
-          {% endif %}
-          <a class="details right floated" href="{{ item.link }}">
-            › Weiterlesen
-          </a>
+            {% if item.author %}
+                <img class="ui avatar image" src="{% get_media_prefix %}{% if item.author.image %}{{ item.author.image }}{% else %}kristy.png{% endif %}">
+                {{ item.author.name }}
+            {% elif item.author_str %}
+                <img class="ui avatar image" src="{% get_media_prefix %}kristy.png">
+                {{ item.author_str }}
+            {% endif %}
+            {% if item.show_text %}
+                <a class="details right floated" href="{{ item.link }}"> › Weiterlesen </a>
+            {% endif %}
         </div>
     </div>
 </div>

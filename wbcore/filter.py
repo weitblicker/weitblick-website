@@ -29,6 +29,10 @@ def parse_limit(request, default=20):
             limit = int(limit_str)
         except ValueError:
             pass
+
+    if limit is -1:
+        return None
+
     return limit
 
 
@@ -74,12 +78,12 @@ def parse_archive_start_end(request):
     return start, end
 
 
-def filter_projects(request):
+def filter_projects(request, default_limit=None):
     host_slugs = parse_union(request)
     contains = request.GET.get("search")
     visibility = request.GET.get("visibility")
     country_codes = parse_country(request)
-    limit = parse_limit(request)
+    limit = parse_limit(request, default=default_limit) if default_limit else parse_limit(request)
     start, end = parse_archive_start_end(request)
 
     print("Start:", start, "End:", end)
@@ -100,19 +104,19 @@ def filter_projects(request):
     if end:
         results &= SearchQuerySet().filter(start_date__lte=end) | SearchQuerySet().filter(end_date__lte=end)
 
-    #print("query:", results.query)
+    results = results.models(Project).all()
+    if limit:
+        results = results[:limit]
 
-    results = results.models(Project).all()[:limit]
     projects = [result.object for result in results]
-
     return projects
 
 
-def filter_news(request):
+def filter_news(request, default_limit=None):
     # read hosts list or single
     host_slugs = parse_union(request)
     contains = request.GET.get("search")
-    limit = parse_limit(request)
+    limit = parse_limit(request, default=default_limit) if default_limit else parse_limit(request)
     start, end = parse_archive_start_end(request)
 
     results = SearchQuerySet()
@@ -126,18 +130,19 @@ def filter_news(request):
     if end:
         results = results.filter_and(published__lte=end)
 
+    results = results.models(NewsPost).order_by('-published')
+    if limit:
+        results = results[:limit]
 
-    results = results.models(NewsPost).order_by('-published')[:limit]
-    print("Length:", len(results))
     posts = [result.object for result in results]
     return posts
 
 
-def filter_blog(request):
+def filter_blog(request, default_limit=None):
     host_slugs = parse_union(request)
     contains = request.GET.get("search")
     start, end = parse_archive_start_end(request)
-    limit = parse_limit(request)
+    limit = parse_limit(request, default=default_limit) if default_limit else parse_limit(request)
 
     print("Date", start, end)
     print("Contains:", contains)
@@ -152,15 +157,18 @@ def filter_blog(request):
     if end:
         results = results.filter_and(published__lte=end)
 
-    results = results.models(BlogPost).order_by('-published')[:limit]
+    results = results.models(BlogPost).order_by('-published')
+    if limit:
+        results = results[:limit]
+
     return [result.object for result in results]
 
 
-def filter_events(request):
+def filter_events(request, default_limit=None):
     host_slugs = parse_union(request)
     contains = request.GET.get("search")
     start, end = parse_archive_start_end(request)
-    limit = parse_limit(request)
+    limit = parse_limit(request, default=default_limit) if default_limit else parse_limit(request)
 
     print("Date", start, '- ', end)
     print("Contains:", contains)
@@ -189,6 +197,9 @@ def filter_events(request):
         now = datetime.now()
         then = datetime.now().replace(year=now.year + 10)
         p = Period(events, now, then)
-    occurrences = p.get_occurrences()[:limit]
+
+    occurrences = p.get_occurrences()
+    if limit:
+        occurrences = occurrences[:limit]
 
     return occurrences

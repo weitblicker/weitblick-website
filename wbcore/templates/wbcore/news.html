@@ -1,30 +1,30 @@
 {% extends 'wbcore/single_content.html' %}
 {% load staticfiles %}
 {% block content %}
-    <div class="ui stackable grid container">
-        <div class="sixteen wide column divided items">
-            <div id="header-image" class="ui fluid image">
-                <div class="ui active bottom dimmer">
-                    <div class="content">
-                        <h1 class="ui header">News</h1>
-                    </div>
+
+<div class="ui stackable grid container">
+    <div class="sixteen wide column divided items">
+        <div id="header-image" class="ui fluid image">
+            <div class="ui active bottom dimmer">
+                <div class="content">
+                    <h1 class="ui header">News</h1>
                 </div>
-                <img src="{% static 'images/news_header.jpg' %}">
             </div>
-        </div>
-
-        <div class="ten wide column divided items">
-            <div class="ui segment">
-                {% include 'wbcore/item_list.html' %}
-            </div>
-        </div>
-
-        <div class="six wide column divided items">
-            <div class="ui segment">
-                {% include 'wbcore/list_filter.html' %}
-            </div>
+            <img src="{% static 'images/news_header.jpg' %}">
         </div>
     </div>
+
+    <div class="ten wide column divided items">
+        <div class="ui segment">
+            {% include 'wbcore/item_list.html' %}
+        </div>
+    </div>
+
+    <div class="six wide column divided items">
+        <div class="ui segment">
+            {% include 'wbcore/list_filter.html' %}
+        </div>
+    </div>
+</div>
+
 {% endblock %}
-
-

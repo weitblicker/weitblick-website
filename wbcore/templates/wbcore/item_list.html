@@ -1,7 +1,13 @@
 {% if item_list %}
-    <div class="ui divided unstackable items">
-    {% for item in item_list %}
-        {% include 'wbcore/list_item.html' %}
-    {% endfor %}
+    <div id="item-list" class="ui divided unstackable items">
+        {% include  'wbcore/list_items.html' with item_list=item_list %}
     </div>
+
+
+    {% block js %}
+        <script src="/static/js/el-pagination.js"></script>
+        <script>$.endlessPaginate();</script>
+    {% endblock %}
+
 {% endif %}
+
