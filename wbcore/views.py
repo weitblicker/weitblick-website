@@ -114,12 +114,13 @@ def get_dot_nav(host=None):
         news = NewsPost.objects.filter(host=host).order_by('-published')[:3]
         blog = BlogPost.objects.filter(host=host).order_by('-published')[:3]
         events = Event.objects.filter(host=host)
-        occurences =  Period(events, datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
+        occurences = Period(events, datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
     else:
         news = NewsPost.objects.all().order_by('-published')[:3]
         blog = BlogPost.objects.all().order_by('-published')[:3]
-        events =  Event.objects.all()#.order_by('-start')[:3]
+        events = Event.objects.all()#.order_by('-start')[:3]
         occurences = Period(events, datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
+    print([vars(event) for event in occurences])
     return {'news': news, 'blog': blog, 'events': occurences}
 
 
