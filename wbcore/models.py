@@ -592,6 +592,8 @@ class TeamUserRelation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     text = models.TextField()
+    role = models.TextField(blank=True, default="")
+    email = models.EmailField(max_length=100, blank=True, default="")
     priority = models.IntegerField(default=99)
 
     def belongs_to_host(self, host):
