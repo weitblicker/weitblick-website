@@ -8,7 +8,7 @@ from django import forms
 
 from django.db import models
 from modeltranslation.admin import TabbedTranslationAdmin
-from tinymce import TinyMCE
+from martor.widgets import AdminMartorWidget
 from django_google_maps import widgets as map_widgets
 from django_google_maps import fields as map_fields
 from copy import copy
@@ -135,7 +135,7 @@ class JoinPageInlineModel(admin.StackedInline):
     model = JoinPage
 
     formfield_overrides = {
-        models.TextField: {'widget': TinyMCE(mce_attrs={'height': 200})},
+        models.TextField: {'widget': AdminMartorWidget},
         map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget(attrs={'data-map-type': 'roadmap'})},
     }
 
@@ -146,12 +146,12 @@ class SocialMediaLinkInlineModel(admin.TabularInline):
     show_change_link = True
 
 
-class MyAdmin(admin.ModelAdmin):
+class MyAdmin(TabbedTranslationAdmin):
     '''
     Implements a wysiwyg editor.
     '''
     formfield_overrides = {
-        models.TextField: {'widget': TinyMCE(mce_attrs={'height': 200})},
+        models.TextField: {'widget': AdminMartorWidget},
         map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget(attrs={'data-map-type': 'roadmap'})},
     }
 
