@@ -26,6 +26,7 @@ urlpatterns = i18n_patterns(
     path('', include('wbcore.urls')),
     path('tinymce/', include('tinymce.urls')),
     path('microsoft/', include('microsoft_auth.urls', namespace='microsoft')),
+    path('martor/', include('martor.urls')),
     prefix_default_language=False)
 
 if settings.DEBUG is True:

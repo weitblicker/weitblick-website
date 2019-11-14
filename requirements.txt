@@ -18,6 +18,7 @@ Pillow
 libsass
 num2words
 markdown
+martor
 django-modeltranslation
 django-tinymce4-lite
 python-slugify

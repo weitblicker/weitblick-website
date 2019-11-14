@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'schedule',
     'haystack',
     'sass_processor',
+    'martor',
     'tinymce',
     'photologue',
     'sortedm2m',
