@@ -14,6 +14,7 @@ from django.contrib.sites.models import Site
 from collections import OrderedDict
 from datetime import date, datetime, timedelta
 from schedule.periods import Period
+import locale
 
 from wbcore.tokens import account_activation_token
 
@@ -134,20 +135,27 @@ def get_host_slugs(request, host_slug):
     return host_slugs
 
 
-def item_list_from_occ(occurrences, host_slug=None):
+def item_list_from_occ(occurrences, host_slug=None, text=True):
     # set attributes to fill list_item template
     item_list = []
     for occ in occurrences:
         occ.image = occ.event.image
-        # occ.date = occ.start
-        occ.show_date = occ.start.strftime('%a, %d. %b %Y') + " - " + occ.end.strftime('%a, %d. %b %Y')
+        locale.setlocale(locale.LC_ALL, "de_DE")
+        if occ.start.day == occ.end.day:
+            occ.show_date = occ.start.strftime('%a, %d. %b %Y')
+        else:
+            occ.show_date = occ.start.strftime('%d. %b') + " - " + occ.end.strftime('%d. %b %Y')
         occ.hosts = occ.event.host.all()
         current_host = Host.objects.get(slug=host_slug) if host_slug else None
         if current_host and current_host in occ.event.host.all():
             occ.link = reverse('event', kwargs={'event_slug': occ.event.slug, 'host_slug': host_slug})
         else:
             occ.link = reverse('event', args=[occ.event.slug])
-        occ.teaser = occ.description
+        if text:
+            occ.teaser = occ.event.teaser if occ.event.teaser else occ.description
+        else:
+            occ.teaser = ""
+        occ.show_text = text
         item_list.append(occ)
     return item_list
 
@@ -165,6 +173,7 @@ def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='n
             post.link = reverse(post_type, kwargs={id_key: post.id, 'host_slug': host_slug})
         else:
             post.link = reverse(post_type, args=[post.id])
+        post.show_text = text
         item_list.append(post)
     return item_list
 
@@ -220,7 +229,7 @@ def home_view(request):
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id', text=False),
         'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
         'hosts': hosts,
-        'occurrences': occurrences,
+        'event_item_list': item_list_from_occ(occurrences, text=False),
         'breadcrumb': [('Home', None)],
         'icon_links': icon_links
     }
