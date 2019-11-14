@@ -206,8 +206,23 @@ def item_list_from_proj(projects, host_slug=None):
             project.link = reverse('project', args=[project.slug])
         project.title = project.name
         project.teaser = project.short_description if project.short_description else project.description
-        #project.teaser = project.description
         item_list.append(project)
+    return item_list
+
+def item_list_from_teams(teams, host_slug=None):
+    item_list = []
+    for team in teams:
+        team.title = team.name
+        team.teaser = team.teaser if team.teaser else team.description
+        team.image = team.image
+        team.country = None
+        team.published = None
+        team.hosts_list = [team.host]
+        if host_slug:
+            team.link = reverse('team', kwargs={'team_slug': team.slug, 'host_slug': host_slug})
+        else:
+            team.link = reverse('team', kwargs={'team_slug': team.slug})
+        item_list.append(team)
     return item_list
 
 
@@ -397,22 +412,22 @@ def privacy_view(request, host_slug=None):
 
 def teams_view(request, host_slug=None):
     try:
-        if not host_slug:
-            host = Host.objects.get(slug='bundesverband')
-        else:
+        if host_slug:
             host = Host.objects.get(slug=host_slug)
+        else:
+            host = None
     except Host.DoesNotExist:
         raise Http404()
     if host:
         try:
             breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', None)]
+            teams = Team.objects.filter(host=host)
         except:
             raise Http404()
     else:
         host = None
         breadcrumb = [('Home', reverse('home')), ('Team', None)]
-
-    teams = Team.objects.filter(host=host)
+        teams = Team.objects.filter(host=Host.objects.get(slug='bundesverband'))
 
     template = loader.get_template('wbcore/teams.html')
     context = {
@@ -420,7 +435,7 @@ def teams_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
-        'teams': teams,
+        'item_list': item_list_from_teams(teams, host_slug),
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
@@ -433,7 +448,10 @@ def team_view(request, host_slug=None, team_slug=None):
         raise Http404()
 
     try:
-        team = Team.objects.get(slug=team_slug, host=host)
+        if host:
+            team = Team.objects.get(slug=team_slug, host=host)
+        else:
+            team = Team.objects.get(slug=team_slug, host=Host.objects.get(slug='bundesverband'))
     except Team.DoesNotExist:
         raise Http404()
 
@@ -454,7 +472,7 @@ def team_view(request, host_slug=None, team_slug=None):
     for member in members:
         relations.append(TeamUserRelation.objects.get(user=member))
 
-    members_relations = sorted(zip(members, relations), key=lambda tup: (tup[1].priority, tup[0].name.split(" ")[-1]))
+    members_relations = sorted(zip(members, relations), key=lambda tup: (tup[1].priority, tup[0].name().split(" ")[-1]))
 
     template = loader.get_template('wbcore/team.html')
     context = {

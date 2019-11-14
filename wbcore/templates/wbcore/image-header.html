@@ -6,7 +6,11 @@
                 <h1 class="ui header">{{ title }}</h1>
             </div>
         </div>
-        <img src="{{ image }}" alt="{{ img_alt }}">
+        {% if image %}
+            <img class="ui fluid image" src="{{ image }}" alt="{{ img_alt }}">
+        {% else %}
+            <div class="image">{% include 'wbcore/svgs/placeholder.svg' with text=title %}</div>
+        {% endif %}
     </div>
 </div>
 

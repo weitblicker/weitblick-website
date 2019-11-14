@@ -545,6 +545,7 @@ class Document(models.Model):
 class Team(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=50, null=False, blank=False)
+    teaser = models.TextField(blank=True, default="")
     description = models.TextField(blank=True, default="")
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
     member = models.ManyToManyField(User, through='TeamUserRelation')
@@ -591,13 +592,15 @@ class TeamUserRelation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     text = models.TextField()
+    role = models.TextField(blank=True, default="")
+    email = models.EmailField(max_length=100, blank=True, default="")
     priority = models.IntegerField(default=99)
 
     def belongs_to_host(self, host):
         return self.team.host == host
 
     def __str__(self):
-        return self.user.name + ' in ' + self.team.name
+        return self.user.name() + ' in ' + self.team.name
 
 
 class Donation(models.Model):
