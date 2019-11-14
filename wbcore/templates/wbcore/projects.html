@@ -20,8 +20,14 @@
             <div class="ui segment">
                 {% include 'wbcore/list_filter.html' %}
             </div>
+
             <div class="ui segment">
-                <h3>Project Blog Posts</h3>
+                <i class="label globe africa icon"></i>
+                {% if host %}
+                    <a class="ui item title header" href="{% url 'blog' host_slug=host.slug %}">Projects</a>
+                {% else %}
+                    <a class="ui item title header" href="{% url 'blog' %}">Project Blog Posts</a>
+                {% endif %}
                 {% if posts %}
                     <div class="ui unstackable items">
                         {% for post in posts %}

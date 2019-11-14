@@ -32,50 +32,54 @@
     </div>
     <div class="ui eight wide column">
         <form class="ui form segment" action="{% url 'contact' %}" method="post">
-            {% csrf_token %}
-            {% if success %}
-                <div class="ui positive message">
-                    <div class="header">Your message has been delivered. Thank you.</div>
-                </div>
-            {% endif %}
-
-            {% for field in contact_form %}
-                {% for error in field.errors %}
-                    <div class="ui negative message">
-                        <div class="header">{{ error|escape }}</div>
+            <i class="label envelope outline icon"></i>
+            <span class="ui item title header" %}">Schreib uns</span>
+            <div class="ui items">
+                {% csrf_token %}
+                {% if success %}
+                    <div class="ui positive message">
+                        <div class="header">Your message has been delivered. Thank you.</div>
                     </div>
-                {% endfor %}
-            {% endfor %}
+                {% endif %}
 
-            <div class="fields">
-                <div class="required eight wide field">
-                    {{ contact_form.host.label_tag }} {{ contact_form.host }}
+                {% for field in contact_form %}
+                    {% for error in field.errors %}
+                        <div class="ui negative message">
+                            <div class="header">{{ error|escape }}</div>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
+                <div class="fields">
+                    <div class="required eight wide field">
+                        {{ contact_form.host.label_tag }} {{ contact_form.host }}
+                    </div>
+                    <div class="required eight wide field">
+                        {{ contact_form.reason.label_tag }} {{ contact_form.reason }}
+                    </div>
                 </div>
-                <div class="required eight wide field">
-                    {{ contact_form.reason.label_tag }} {{ contact_form.reason }}
+                <div class="fields">
+                    <div class="eight wide field">
+                        {{ contact_form.name.label_tag }} {{ contact_form.name }}
+                    </div>
+                    <div class="eight wide required field">
+                        {{ contact_form.email.label_tag }} {{ contact_form.email }}
+                    </div>
                 </div>
-            </div>
-            <div class="fields">
-                <div class="eight wide field">
-                    {{ contact_form.name.label_tag }} {{ contact_form.name }}
+                <div class="fields">
+                    <div class="sixteen wide required field">
+                        {{ contact_form.subject.label_tag }} {{ contact_form.subject }}
+                    </div>
                 </div>
-                <div class="eight wide required field">
-                    {{ contact_form.email.label_tag }} {{ contact_form.email }}
+                <div class="fields">
+                    <div class="sixteen wide required field">
+                        {{ contact_form.message.label_tag }} {{ contact_form.message }}
+                    </div>
                 </div>
-            </div>
-            <div class="fields">
-                <div class="sixteen wide required field">
-                    {{ contact_form.subject.label_tag }} {{ contact_form.subject }}
-                </div>
-            </div>
-            <div class="fields">
-                <div class="sixteen wide required field">
-                    {{ contact_form.message.label_tag }} {{ contact_form.message }}
-                </div>
-            </div>
-            <div class="fields">
-                <div class="sixteen wide field">
-                    <input class="ui submit button orange" type="submit" value="Abschicken">
+                <div class="fields">
+                    <div class="sixteen wide field">
+                        <input class="ui submit button orange" type="submit" value="Abschicken">
+                    </div>
                 </div>
             </div>
         </form>

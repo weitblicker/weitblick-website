@@ -239,7 +239,7 @@ def item_list_from_teams(teams, host_slug=None):
 def home_view(request):
     projects = Project.objects.all()
     hosts = Host.objects.all()
-    news = NewsPost.objects.all().order_by('-published')[:6]
+    news = NewsPost.objects.all().order_by('-published')[:5]
     blog = BlogPost.objects.all().order_by('-published')[:3]
     events = Event.objects.all().order_by('-start')
     period = Period(events, datetime.now(), datetime.now() + timedelta(365/2))
