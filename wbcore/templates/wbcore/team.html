@@ -10,7 +10,7 @@
         {% if not team.image %}
           <div class="image">{% include 'wbcore/svgs/placeholder.svg' with text="Team"%}</div>
         {% else %}
-          <img class="ui fluid image" src="{{ team.image.get_header_url }}">
+          <img class="ui fluid image" src="{{ team.image.get_headersize_url }}">
         {% endif %}
       </div>
     </div>

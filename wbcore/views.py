@@ -463,7 +463,7 @@ def team_view(request, host_slug=None, team_slug=None):
     for member in members:
         relations.append(TeamUserRelation.objects.get(user=member))
 
-    members_relations = sorted(zip(members, relations), key=lambda tup: (tup[1].priority, tup[0].name.split(" ")[-1]))
+    members_relations = sorted(zip(members, relations), key=lambda tup: (tup[1].priority, tup[0].name().split(" ")[-1]))
 
     template = loader.get_template('wbcore/team.html')
     context = {
