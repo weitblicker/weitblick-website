@@ -52,7 +52,7 @@
         {% endif %}
         <div class="ui link list">
             {% for occ in dot_nav.events %}
-                {% include 'wbcore/dot_nav_item.html' with type='event' slug=occ.event.slug title=occ.event.name image=occ.event.image photo=event.image desc=occ.event.description|truncatewords:7 %}
+                {% include 'wbcore/dot_nav_item.html' with type='event' slug=occ.event.slug title=occ.event.title image=occ.event.image photo=event.image desc=occ.event.description|truncatewords:7 %}
             {% endfor %}
         </div>
     </div>

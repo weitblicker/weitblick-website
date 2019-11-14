@@ -120,7 +120,6 @@ def get_dot_nav(host=None):
         blog = BlogPost.objects.all().order_by('-published')[:3]
         events = Event.objects.all()#.order_by('-start')[:3]
         occurences = Period(events, datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
-    print([vars(event) for event in occurences])
     return {'news': news, 'blog': blog, 'events': occurences}
 
 
