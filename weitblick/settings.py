@@ -47,6 +47,11 @@ INSTALLED_APPS = [
     'photologue',
     'sortedm2m',
     'rest_framework',
+    'rest_framework.authtoken',
+    'allauth',
+    'allauth.account',
+    'rest_auth',
+    'rest_auth.registration',
     'localflavor',
     'django_google_maps',
     'microsoft_auth',
@@ -61,7 +66,7 @@ AUTH_USER_MODEL = 'wbcore.User'
 ADMINS = [('Sebastian Pütz', 'sebastian.puetz@weitblicker.org')]
 
 EMAIL_HOST = os.environ.get('EMAIL_HOST')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT'))
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT')) if os.environ.get('EMAIL_PORT') is not None else None
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

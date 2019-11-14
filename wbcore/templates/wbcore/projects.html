@@ -2,44 +2,42 @@
 {% load staticfiles %}
 
 {% block content %}
-<div class="ui vertical stripe segment">
-  <div class="ui stackable grid container content-block">
-    {% include 'wbcore/breadcrumb.html' %}
-    {% include 'wbcore/projects_map.html' %}
-  </div>
+    <div class="ui vertical stackable grid container">
 
-  <div class="ui vertical stripe segment">
-    <div class="ui middle aligned stackable grid container content-block">
-      <div class="ui stackable grid container content-block">
-        <div id="projects-list" class="ten wide column divided items">
-          {% include 'wbcore/item_list.html'%}
+        {% include 'wbcore/image-header.html' with title="Projects" image='/static/images/join_header.jpg'%}
+
+        <div class="ten wide column divided items">
+            <div class="ui segment">
+                {% include 'wbcore/projects_map.html' %}
+            </div>
+
+            <div class="ui segment">
+                {% include 'wbcore/item_list.html'%}
+            </div>
         </div>
         {% block js %}
           {{ block.super }}
           <script src="/static/js/el-pagination.js"></script>
           <script>$.endlessPaginate({paginateOnScroll: true});</script>
         {% endblock %}
+
         <div class="six wide column divided items">
-          <div class="column-content">
-            {% include 'wbcore/list_filter.html' %}
-            <div class="blog-news">
-              <div class="ui basic segment">
+            <div class="ui segment">
+                {% include 'wbcore/list_filter.html' %}
+            </div>
+            <div class="ui segment">
                 <h3>Project Blog Posts</h3>
                 {% if posts %}
-                  <div class="ui unstackable items">
-                    {% for post in posts %}
-                      {% include 'wbcore/list_item.html' with item=post no_image=True %}
-                    {% endfor %}
-                  </div>
+                    <div class="ui unstackable items">
+                        {% for post in posts %}
+                            {% include 'wbcore/list_item.html' with item=post no_image=True %}
+                        {% endfor %}
+                    </div>
                 {% else %}
-                  <p>No posts available.</p>
+                    <p>No posts available.</p>
                 {% endif %}
-              </div>
+
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
-</div>
 {% endblock %}

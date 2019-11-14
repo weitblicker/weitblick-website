@@ -3,11 +3,11 @@
 <div class="item">
 
     {% if not no_image %}
-        <a class="image" href="{{ item.link }}">
+        <a class="{% if image_size %}ui {{ image_size }} {% endif %}image" href="{{ item.link }}">
             {% if item.image %}
                 <img src="{{ item.image.get_listsize_url }}" alt="{{ item.image.title }}">
             {% else %}
-                <div class="image">{% include 'wbcore/svgs/placeholder.svg' with text=item.get_model_name %}</div>
+                <div class="ui image {{ image_size }}">{% include 'wbcore/svgs/placeholder.svg' with text=item.get_model_name %}</div>
             {% endif %}
         </a>
     {% endif %}

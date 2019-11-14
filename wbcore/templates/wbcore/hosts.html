@@ -1,15 +1,40 @@
-{% extends 'wbcore/single_content.html' %}
+{% extends 'wbcore/base.html' %}
 {% load staticfiles %}
-{% block single-content %}
+{% block content %}
+    <div class="ui one column stackable grid container">
+        {% include 'wbcore/image-header.html' with title="Weitblick Vereine" image='/static/images/events_header.jpg'%}
 
-{% include 'wbcore/hosts_map.html' %}
-{% if hosts %}
-    <ul class="ui items">
-    {% for host in hosts %}
-    	<li class="item"><a href="{% url 'host' host.slug %}">{{ host.name }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No posts available.</p>
-{% endif %}
+        <div class="ten wide column divided items">
+            <div class="ui segment">
+                {% if hosts %}
+                        <div class="ui two column grid list">
+                        {% for host in hosts %}
+                            <div class="column">
+                                <a class="ui item" href="{% url 'host' host.slug %}">
+                                    <div class="ui avatar" style="width: 25px; height: 25px; margin-right: 1rem; float: left">
+                                        {% include 'wbcore/svgs/puzzle-icon.svg' %}
+                                    </div>
+                                    <div class="content">
+                                        <div class="header">
+                                            {{ host.name }}
+                                        </div>
+                                        <div class="description">
+                                            {{ host.email }}
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        {% endfor %}
+                        </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="six wide column divided items">
+            <div class="ui segment">
+                {% include 'wbcore/hosts_map.html' %}
+            </div>
+        </div>
+    </div>
+
 {% endblock %}

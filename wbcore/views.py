@@ -21,7 +21,7 @@ from wbcore.forms import (
     ContactForm, UserForm, BankForm, UserRelationForm, AddressForm, User)
 
 from wbcore.models import (
-    Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation, UserRelation, JoinPage)
+    Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation, UserRelation, JoinPage, SocialMediaLink)
 
 
 icon_links = OrderedDict([
@@ -114,11 +114,11 @@ def get_dot_nav(host=None):
         news = NewsPost.objects.filter(host=host).order_by('-published')[:3]
         blog = BlogPost.objects.filter(host=host).order_by('-published')[:3]
         events = Event.objects.filter(host=host)
-        occurences =  Period(events, datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
+        occurences = Period(events, datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
     else:
         news = NewsPost.objects.all().order_by('-published')[:3]
         blog = BlogPost.objects.all().order_by('-published')[:3]
-        events =  Event.objects.all()#.order_by('-start')[:3]
+        events = Event.objects.all()#.order_by('-start')[:3]
         occurences = Period(events, datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
     return {'news': news, 'blog': blog, 'events': occurences}
 
@@ -149,6 +149,23 @@ def item_list_from_occ(occurrences, host_slug=None):
             occ.link = reverse('event', args=[occ.event.slug])
         occ.teaser = occ.description
         item_list.append(occ)
+    return item_list
+
+
+def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='news_id', text=True):
+    item_list = []
+    for post in posts:
+        if not post.teaser:
+            post.teaser = post.text
+
+        if not text:
+            post.teaser = ""
+        current_host = Host.objects.get(slug=host_slug) if host_slug else None
+        if current_host and post.host and current_host in post.host.all():
+            post.link = reverse(post_type, kwargs={id_key: post.id, 'host_slug': host_slug})
+        else:
+            post.link = reverse(post_type, args=[post.id])
+        item_list.append(post)
     return item_list
 
 
@@ -188,23 +205,28 @@ def item_list_from_proj(projects, host_slug=None):
 def home_view(request):
     projects = Project.objects.all()
     hosts = Host.objects.all()
-    posts = NewsPost.objects.all().order_by('-published')[:3]
+    news = NewsPost.objects.all().order_by('-published')[:3]
     blog = BlogPost.objects.all().order_by('-published')[:3]
     events = Event.objects.all().order_by('-start')
     period = Period(events, datetime.now(), datetime.now() + timedelta(365/2))
     occurrences = period.get_occurrences()[:3]
+
 
     template = loader.get_template('wbcore/home.html')
     context = {
         'main_nav': get_main_nav(),
         'dot_nav': get_dot_nav(),
         'projects': projects,
+        'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id', text=False),
+        'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
         'hosts': hosts,
         'occurrences': occurrences,
-        'posts': posts,
         'breadcrumb': [('Home', None)],
         'icon_links': icon_links
     }
+
+    print(context['news_item_list'])
+
     return HttpResponse(template.render(context, request))
 
 
@@ -229,6 +251,7 @@ def reports_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -254,6 +277,7 @@ def charter_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -279,6 +303,7 @@ def transparency_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -304,6 +329,7 @@ def facts_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -329,6 +355,7 @@ def history_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -354,6 +381,7 @@ def privacy_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -383,7 +411,8 @@ def teams_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
-        'teams': teams
+        'teams': teams,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -426,6 +455,7 @@ def team_view(request, host_slug=None, team_slug=None):
         'breadcrumb': breadcrumb,
         'team': team,
         'members_relations': members_relations,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -451,6 +481,7 @@ def about_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -476,6 +507,7 @@ def idea_view(request, host_slug=None):
         'projects': projects,
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -521,6 +553,7 @@ def projects_view(request, host_slug=None):
         'countries': countries,
         'filter_visibility': True,
         'ajax_endpoint': reverse('ajax-filter-projects'),
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -532,6 +565,7 @@ def signup(user, host):
         'user': user,
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
         'token': account_activation_token.make_token(user),
+        'icon_links': icon_links,
     })
     email = EmailMessage(body=message, subject=subject, to=[user.email], reply_to=[host.email])
     email.send()
@@ -578,6 +612,7 @@ def activate_user(request, uidb64, token):
         'success': success,
         'user': user,
         'pswd_form': pswd_form,
+        'icon_links': icon_links,
         'submit_url': reverse('activate', args=[uidb64, token])
     }
 
@@ -658,6 +693,7 @@ def join_view(request, host_slug=None):
         'host': host,
         'breadcrumb': [('Home', reverse('home')), ('Join in', None)],
         'success': success,
+        'icon_links': icon_links,
     }
 
     if join_page:
@@ -701,6 +737,7 @@ def project_view(request, host_slug=None, project_slug=None):
         'host': host,
         'dot_nav': get_dot_nav(host=host),
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -714,6 +751,7 @@ def hosts_view(request):
         'main_nav': get_main_nav(active='hosts'),
         'dot_nav': get_dot_nav(),
         'breadcrumb': [('Home', reverse('home')), ("Unions", None)],
+        'icon_links': icon_links
     }
     return HttpResponse(template.render(context, request))
 
@@ -721,6 +759,10 @@ def hosts_view(request):
 def host_view(request, host_slug):
     try:
         host = Host.objects.get(slug=host_slug) if host_slug else None
+
+        # replacing the link with the social media link # TODO no hardcoded links in general!
+        for social_link in host.socialmedialink_set.all():
+            icon_links[social_link.type]['link'] = social_link.link
     except Host.DoesNotExist:
         raise Http404()
 
@@ -731,6 +773,7 @@ def host_view(request, host_slug):
     hosts = Host.objects.all()
     teams = Team.objects.filter(host=host)
 
+
     template = loader.get_template('wbcore/host.html')
     context = {
         'host': host,
@@ -740,7 +783,8 @@ def host_view(request, host_slug):
         'dot_nav': get_dot_nav(host=host),
         'posts': posts,
         'occurrences': occurrences,
-        'teams': teams
+        'teams': teams,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -786,6 +830,7 @@ def events_view(request, host_slug=None):
         'from_to': year_months,
         'item_list': item_list_from_occ(occurrences, host_slug),
         'ajax_endpoint': reverse('ajax-filter-events'),
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -831,6 +876,7 @@ def event_view(request, host_slug=None, event_slug=None):
         'form': form,
         'breadcrumb': breadcrumb,
         'host': host,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -878,6 +924,7 @@ def blog_view(request, host_slug=None):
         'years': year_months,
         'item_list': item_list_from_blogposts(posts, host_slug),
         'ajax_endpoint': reverse('ajax-filter-blog'),
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -908,6 +955,7 @@ def blog_post_view(request, host_slug=None, post_id=None):
         'post': post,
         'breadcrumb': breadcrumb,
         'host': host,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -975,6 +1023,7 @@ def news_view(request, host_slug=None):
         'hosts': hosts,
         'years': year_months,
         'item_list': posts,
+        'icon_links': icon_links,
         'ajax_endpoint': reverse('ajax-filter-news'),
     }
     return HttpResponse(template.render(context, request))
@@ -1006,6 +1055,7 @@ def news_post_view(request, host_slug=None, post_id=None):
         'post': post,
         'breadcrumb': breadcrumb,
         'host': host,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -1023,6 +1073,7 @@ def host_projects_view(request, host_slug):
         'projects': projects,
         'host': host,
         'breadcrumb': [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Projects', None)],
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -1040,6 +1091,7 @@ def host_events_view(request, host_slug):
         'events': events,
         'host': host,
         'breadcrumb': [('Home', reverse('home')), (host.name, reverse('host', host_slug)), ("Events", None)],
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -1050,6 +1102,7 @@ def search_view(request, query=None):
         'main_nav': get_main_nav(),
         'dot_nav': get_dot_nav(),
         'breadcrumb': [('Home', reverse('home')), ("Search", None)],
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context), request)
 
@@ -1076,6 +1129,7 @@ def sitemap_view(request, host_slug=None):
         'projects': projects,
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -1102,6 +1156,7 @@ def donate_view(request, host_slug=None):
         'projects': projects,
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -1125,6 +1180,7 @@ def imprint_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
@@ -1147,6 +1203,7 @@ def contact_view(request, host_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'success': False,
+        'icon_links': icon_links,
     }
 
     if request.method == 'POST':
@@ -1198,5 +1255,6 @@ def sitemap_view(request):
         'dot_nav': get_dot_nav(),
         'hosts': hosts,
         'breadcrumb': [('Home', reverse('home')), ("Sitemap", None)],
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context), request)

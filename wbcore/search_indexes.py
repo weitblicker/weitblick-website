@@ -19,6 +19,7 @@ class ProjectIndex(indexes.SearchIndex, indexes.Indexable):
     model = indexes.CharField(model_attr='get_model_name', faceted=True)
     hosts_slug = indexes.MultiValueField()
     start_date = indexes.DateField(model_attr='start_date', null=True)
+    end_date = indexes.DateField(model_attr='end_date', null=True)
     country_code = indexes.CharField()
     completed = indexes.BooleanField(model_attr='completed')
 

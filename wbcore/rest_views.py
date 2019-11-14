@@ -1,17 +1,10 @@
-from wbcore.serializers import NewsPostSerializer, BlogPostSerializer, HostSerializer, EventSerializer, ProjectSerializer
-from wbcore.models import NewsPost, BlogPost, Host, Event, Project
-from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse, JsonResponse
+from wbcore.serializers import (NewsPostSerializer, BlogPostSerializer, HostSerializer, EventSerializer,
+                                ProjectSerializer, LocationSerializer)
+from wbcore.models import NewsPost, BlogPost, Host, Event, Project, Location
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.contrib.postgres.search import SearchVector
-from django.urls import reverse
-from haystack.query import SearchQuerySet
-from haystack.inputs import AutoQuery, Exact, Clean
-from rest_framework.parsers import JSONParser
-from rest_framework.renderers import JSONRenderer
-from itertools import groupby
+from .filter import filter_events, filter_projects, filter_news, filter_blog
 
 @api_view(['GET'])
 def host_list(request, format=None):
@@ -36,7 +29,7 @@ def host_detail(request, pk, format=None):
 @api_view(['GET'])
 def event_list(request, format=None):
     if request.method == 'GET':
-        events = Event.objects.all()
+        events = filter_events(request)
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data)
 
@@ -56,8 +49,8 @@ def event_detail(request, pk, format=None):
 @api_view(['GET'])
 def project_list(request, format=None):
     if request.method == 'GET':
-        projects = Project.objects.all()
-        serializer = ProjectSerializer(projects, many=True, context={'request': request})
+        projects = filter_projects(request)
+        serializer = ProjectSerializer(projects, many=True)
         return Response(serializer.data)
 
 
@@ -69,20 +62,20 @@ def project_detail(request, pk, format=None):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        serializer = ProjectSerializer(project)
+        serializer = ProjectSerializer(project, context={'request': request})
         return Response(serializer.data)
 
 
 @api_view(['GET'])
-def post_list(request, format=None):
+def news_list(request, format=None):
     if request.method == 'GET':
-        posts = NewsPost.objects.all()
-        serializer = NewsPostSerializer(posts, many=True, context={'request': request})
+        posts = filter_news(request)
+        serializer = NewsPostSerializer(posts, many=True)
         return Response(serializer.data)
 
 
 @api_view(['GET'])
-def post_detail(request, pk, format=None):
+def news_detail(request, pk, format=None):
     try:
         post = NewsPost.objects.get(pk=pk)
     except NewsPost.DoesNotExist:
@@ -90,6 +83,46 @@ def post_detail(request, pk, format=None):
 
     if request.method == 'GET':
         serializer = NewsPostSerializer(post)
+        return Response(serializer.data)
+
+
+@api_view(['GET'])
+def blog_list(request, format=None):
+    if request.method == 'GET':
+        posts = filter_blog(request)
+        serializer = BlogPostSerializer(posts, many=True)
+        return Response(serializer.data)
+
+
+@api_view(['GET'])
+def blog_detail(request, pk, format=None):
+    try:
+        post = BlogPost.objects.get(pk=pk)
+    except BlogPost.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = BlogPostSerializer(post)
+        return Response(serializer.data)
+
+
+@api_view(['GET'])
+def location_list(request, format=None):
+    if request.method == 'GET':
+        locations = Location.objects.all()
+        serializer = LocationSerializer(locations, many=True)
+        return Response(serializer.data)
+
+
+@api_view(['GET'])
+def location_detail(request, pk, format=None):
+    try:
+        location = Location.objects.get(pk=pk)
+    except Location.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = LocationSerializer(location)
         return Response(serializer.data)
 
 

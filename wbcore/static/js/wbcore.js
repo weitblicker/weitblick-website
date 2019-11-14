@@ -32,6 +32,7 @@ $(document)
         ;
 
         $('.popup-menu-btn').click(function(){
+            $('.icon', this).toggleClass("halfway flipped rotated")  ;
             $('#popup-menu').slideToggle();
         });
 

@@ -1,11 +1,20 @@
 $box-background: #ffffff;
-$light-gray: #cfdbde; //or #D6D6D6 ??
-$middle-gray: #969696;
-$dark-gray: #2c2c2c;
 $backgroundColor: #d9e2ed;
-$orange: #eb800f;
 $logo-black: #04090e;
 $logo-orange: #f3971b;
+
+$wb_bluegrey: #D8E2F0;
+$wb_blue2: #4EACE1;
+$wb_yellow: #ffd700;
+$wb_green: #CCD626;
+$wb_blue: #1E71B7;
+$wb_red: #A40B03;
+$wb_orange: #ff9900;
+$wb_bluegrey2: #A3C4E9;
+$wb_darkgrey: #2c2c2c;
+$wb_orange2: #EB800F;
+$wb_grey: #969696;
+$wb_lightgrey: #D6D6D9;
 
 #puzzles{
 
@@ -20,21 +29,21 @@ $logo-orange: #f3971b;
 		.title{
 			font-size: 40px;
 			font-family: Bree Serif;
-			fill: $middle-gray;
+			fill: $wb_grey;
 			pointer-events: none;
 		}
 
 		.desc{
 			font-size: 22px;
 			font-family: Open Sans;
-			fill: $middle-gray;
+			fill: $wb_grey;
 			pointer-events: none;
 		}
 
 		.ficon{
 			font-family: FontAwesome;
 			font-size: 40px;
-			fill: $middle-gray;
+			fill: $wb_grey;
 			content: "\f0c4";
 		}
 
@@ -49,7 +58,7 @@ $logo-orange: #f3971b;
 		.icon{
 			.path{
 				fill:none;
-				stroke:$middle-gray;
+				stroke:$wb_grey;
 				stroke-linecap:round;
 				stroke-linejoin:round;
 				stroke-width:1.92px;
@@ -121,6 +130,10 @@ $logo-orange: #f3971b;
 	padding-top: 15px;
 }
 
+.pusher.content{
+	margin-top: 1rem;
+}
+
 #mobile-menu .menu{
 	background: transparent;
 }
@@ -128,12 +141,12 @@ $logo-orange: #f3971b;
 #menu-nav > .item {
 	text-transform: uppercase;
 	font-weight: bold;
-	font-size: 1.0em;
+	font-size: 1.1em;
 
 	.icon{
 		.path{
 			fill:none;
-			stroke:$dark-gray;
+			stroke:$wb_darkgrey;
 			stroke-linecap:round;
 			stroke-linejoin:round;
 			stroke-width:5px;
@@ -145,14 +158,14 @@ $logo-orange: #f3971b;
 }
 
 .meta, .extra{
-	color: $orange;
+	color: $wb_orange2;
 	.date{
 		font-family: Open Sans;
 		font-weight: bold;
-		color: $orange;
+		color: $wb_orange2;
 	}
 	.details{
-		color: $orange !important;
+		color: $wb_orange2 !important;
 	}
 	.wb-link{
 
@@ -191,6 +204,11 @@ $logo-orange: #f3971b;
 	}
 	.item{
 		padding: 8px 0;
+		margin: 0.2rem;
+		color: white;
+		a{
+			color: white;
+		}
 		.content{
 			min-height: 65px;
 		}
@@ -202,16 +220,19 @@ $logo-orange: #f3971b;
 		}
 	}
 	.item:hover{
-		background: rgba(0, 0, 0, 0.13);
+		a{
+			color: $wb_lightgrey;
+		}
+		color: $wb_lightgrey;
 	}
 	display: none;
-	background-image: url('/media/colorbg/yellow.svg');
+	background: linear-gradient(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)), url('/media/colorbg/yellow.svg');
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
 	a{
 		font-size: 1.4em;
-		color: $dark-gray;
+		color: $wb_darkgrey;
 		font-family: 'Open Sans';
 		&.image{
 			width: 65px;
@@ -244,7 +265,33 @@ $logo-orange: #f3971b;
 	}
 }
 
-#logo{
+.label.icon{
+	position: absolute;
+	right: 1rem;
+	top: 0;
+	width: 55px;
+	height: 55px;
+	color: white;
+	font-size: 3em;
+	font-weight: normal;
+	line-height: 1.5em;
+	vertical-align: text-bottom;
+	background-color: $wb_bluegrey2;
+}
+
+.popup-menu-btn .icon{
+    -moz-transition: all 0.3s linear;
+    -webkit-transition: all 0.3s linear;
+    transition: all 0.3s linear;
+}
+
+.popup-menu-btn .icon.halfway.rotated{
+	-webkit-transform: rotate(-180deg);
+	transform: rotate(-180deg);
+}
+
+
+.logo{
 	margin-top: 0 !important;
 	margin-bottom: 0 !important;
 	margin: auto;
@@ -283,6 +330,15 @@ $logo-orange: #f3971b;
 	}
 	.city{
 
+	}
+
+	&.inverse{
+		.logo-weitblick{
+			fill: white;
+		}
+		.logo-text{
+			fill: white;
+		}
 	}
 }
 
@@ -344,13 +400,28 @@ $logo-orange: #f3971b;
 	padding-bottom: 5em;
 }
 
-.footer.segment {
+.vertical.footer.segment {
+	margin-top: 2rem;
 	padding: 5em 0em;
 }
 
 .secondary.pointing.menu .toc.item {
 	display: none;
 }
+
+#header-image{
+	.dimmer {
+		background-color: rgba(255, 255, 255, .55);
+		text-align: left;
+		justify-content: left;
+		align-items: start;
+	}
+}
+
+.highcharts-credits{
+	display: none;
+}
+
 
 #icon-links {
 	.icon{
@@ -366,6 +437,7 @@ $logo-orange: #f3971b;
 	width: 50px;
 	position: absolute;
 	right: -50px;
+	top: 0;
 	padding: 0;
 	a {
 		vertical-align: middle;
@@ -374,10 +446,10 @@ $logo-orange: #f3971b;
 		height: 50px;
 		display: flex;
 		align-items: center;
-		background: $middle-gray;
+		background: $wb_bluegrey2;
 	}
 	a:hover {
-		background: $orange;
+		background: $wb_orange2;
 	}
 
 	@media(max-width:723px) {
@@ -433,13 +505,25 @@ $logo-orange: #f3971b;
 	}
 }
 
+.ui.segment{
+	margin-top: 2rem;
+
+	.title.header{
+		text-transform: uppercase;
+		font-family: "Open Sans Condensed";
+		font-weight: normal;
+		font-size: 2rem;
+
+	}
+}
+
 a.details{
-	color: $orange;
+	color: $wb_orange2;
 }
 .ui.orange.ribbon.label{
-	background: $orange !important;
+	background: $wb_orange2 !important;
 }
 // custom override here. Did not work through input.variables nor search.variables
 .menu > .search {
-	border: 1px solid $light-gray;
+	border: 1px solid $wb_lightgrey;
 }
