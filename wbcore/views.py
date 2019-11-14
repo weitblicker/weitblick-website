@@ -537,7 +537,10 @@ def projects_view(request, host_slug=None):
 
     hosts = Host.objects.all()
 
-    template = loader.get_template('wbcore/projects.html')
+    if request.is_ajax():
+        template = loader.get_template('wbcore/list_items.html')
+    else:
+        template = loader.get_template('wbcore/projects.html')
     context = {
         'main_nav': get_main_nav(host=host, active='projects'),
         'dot_nav': get_dot_nav(host=host),
@@ -802,7 +805,7 @@ def events_view(request, host_slug=None):
         events = Event.objects.all()
         breadcrumb = [('Home', reverse('home')), ('Events', None)]
 
-    p = Period(events, datetime.now(), datetime.now() + timedelta(days=365/2))
+    p = Period(events, datetime.now(), datetime.now() + timedelta(days=365))
     occurrences = p.get_occurrences()
     hosts = Host.objects.all()
 
@@ -815,7 +818,10 @@ def events_view(request, host_slug=None):
     else:
         year_months = None
 
-    template = loader.get_template('wbcore/events.html')
+    if request.is_ajax():
+        template = loader.get_template('wbcore/list_items.html')
+    else:
+        template = loader.get_template('wbcore/events.html')
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
@@ -876,8 +882,6 @@ def event_view(request, host_slug=None, event_slug=None):
 
 
 def blog_view(request, host_slug=None):
-    template = loader.get_template('wbcore/blog.html')
-
     host_slugs = get_host_slugs(request, host_slug)
     try:
         if host_slugs:
@@ -889,7 +893,7 @@ def blog_view(request, host_slug=None):
     except Host.DoesNotExist:
         raise Http404()
 
-    posts = posts.order_by('-published')[:20]
+    posts = posts.order_by('-published')
     hosts = Host.objects.all()
 
     if BlogPost.objects.count():
@@ -907,6 +911,10 @@ def blog_view(request, host_slug=None):
     else:
         breadcrumb = [('Home', reverse('home')), ('Blog', None)]
 
+    if request.is_ajax():
+        template = loader.get_template('wbcore/list_items.html')
+    else:
+        template = loader.get_template('wbcore/blog.html')
     context = {
         'main_nav': get_main_nav(host=host, active='blog'),
         'dot_nav': get_dot_nav(host=host),
@@ -982,7 +990,7 @@ def news_view(request, host_slug=None):
     except Host.DoesNotExist:
         raise Http404()
 
-    posts = posts.order_by('-published')[:20]
+    posts = posts.order_by('-published')
     hosts = Host.objects.all()
 
     if NewsPost.objects.count():
@@ -1002,7 +1010,10 @@ def news_view(request, host_slug=None):
     else:
         breadcrumb = [('Home', reverse('home')), ('News', None)]
 
-    template = loader.get_template('wbcore/news.html')
+    if request.is_ajax():
+        template = loader.get_template('wbcore/list_items.html')
+    else:
+        template = loader.get_template('wbcore/news.html')
     context = {
         'main_nav': get_main_nav(host=host, active='news'),
         'dot_nav': get_dot_nav(host=host),
