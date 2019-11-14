@@ -3,16 +3,7 @@
 {% block content %}
 
 <div class="ui stackable grid container">
-    <div class="sixteen wide column divided items">
-        <div id="header-image" class="ui fluid image">
-            <div class="ui active bottom dimmer">
-                <div class="content">
-                    <h1 class="ui header">News</h1>
-                </div>
-            </div>
-            <img src="{% static 'images/news_header.jpg' %}">
-        </div>
-    </div>
+    {% include 'wbcore/image-header.html' with title='News' image='/static/images/news_header.jpg' %}
 
     <div class="ten wide column divided items">
         <div class="ui segment">
