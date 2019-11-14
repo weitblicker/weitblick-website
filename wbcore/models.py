@@ -597,7 +597,7 @@ class TeamUserRelation(models.Model):
         return self.team.host == host
 
     def __str__(self):
-        return self.user.name + ' in ' + self.team.name
+        return self.user.name() + ' in ' + self.team.name
 
 
 class Donation(models.Model):
