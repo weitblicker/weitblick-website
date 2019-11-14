@@ -87,6 +87,13 @@ Database migration and loading data can be achieved running the script `initaliz
 
       python manage.py makemigrations wbcore
       python manage.py migrate
+      
+#### Set up locale
+
+Enable support for german 
+
+    sudo locale-gen de_DE
+    sudo update-locale
 
 #### Loading Data
 
@@ -102,6 +109,8 @@ Database migration and loading data can be achieved running the script `initaliz
 #### Create a SuperUser for Admin Interface
 
       python3 manage.py createsuperuser
+      
+
 
 #### Start Server
 
