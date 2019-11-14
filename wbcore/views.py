@@ -388,22 +388,22 @@ def privacy_view(request, host_slug=None):
 
 def teams_view(request, host_slug=None):
     try:
-        if not host_slug:
-            host = Host.objects.get(slug='bundesverband')
-        else:
+        if host_slug:
             host = Host.objects.get(slug=host_slug)
+        else:
+            host = None
     except Host.DoesNotExist:
         raise Http404()
     if host:
         try:
             breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', None)]
+            teams = Team.objects.filter(host=host)
         except:
             raise Http404()
     else:
         host = None
         breadcrumb = [('Home', reverse('home')), ('Team', None)]
-
-    teams = Team.objects.filter(host=host)
+        teams = Team.objects.filter(host=Host.objects.get(slug='bundesverband'))
 
     template = loader.get_template('wbcore/teams.html')
     context = {
