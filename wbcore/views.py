@@ -22,8 +22,11 @@ from wbcore.forms import (
     ContactForm, UserForm, BankForm, UserRelationForm, AddressForm, User)
 
 from wbcore.models import (
-    Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation, UserRelation, JoinPage, SocialMediaLink)
+    Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
+    UserRelation, JoinPage, SocialMediaLink, Content
+)
 
+main_host_slug = 'bundesverband' ## TODO configure this?
 
 icon_links = OrderedDict([
     ('facebook',
@@ -470,19 +473,21 @@ def team_view(request, host_slug=None, team_slug=None):
 
 
 def about_view(request, host_slug=None):
-    host_slugs = get_host_slugs(request, host_slug)
 
-    if host_slugs:
-        try:
-            host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('About', None)]
-        except:
-            raise Http404()
-    else:
-        host = None
-        breadcrumb = [('Home', reverse('home')), ('About', None)]
+    if not host_slug:
+        host_slug=main_host_slug
+
+    try:
+        host = Host.objects.get(slug=host_slug) if host_slug else None
+        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('About', None)]
+    except:
+        raise Http404()
+
+    breadcrumb = [('Home', reverse('home')), ('About', None)]
 
     projects = Project.objects.all()
+
+    about = Content.objects.get(host=host)
 
     template = loader.get_template('wbcore/about.html')
     context = {
@@ -491,6 +496,7 @@ def about_view(request, host_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'about': about
     }
     return HttpResponse(template.render(context, request))
 

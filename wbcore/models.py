@@ -13,6 +13,7 @@ from django.urls import reverse
 from django_google_maps import fields as map_fields
 from schedule.models.events import Event as ScheduleEvent
 from form_designer.models import Form as EventForm
+from django.contrib import messages
 
 
 class Address(models.Model):
@@ -268,12 +269,13 @@ class Content(models.Model):
     def validate_unique(self, *args, **kwargs):
         super(Content, self).validate_unique(*args, **kwargs)
 
-        if Content.objects.filter(host=self.host, type=self.type).exists():
-            raise ValidationError(
+        if self._state.adding and Content.objects.filter(host=self.host, type=self.type).exists():
+
+            msg = 'The content for ' + dict(self.TYPE_CHOICES)[self.type] + ' already exist!'
+
+            raise ValidationError(msg,
                 {
-                    NON_FIELD_ERRORS: [
-                        'The content for ' + dict(self.TYPE_CHOICES)[self.type] + ' already exist!',
-                        ],
+                    NON_FIELD_ERRORS: [msg],
                 }
             )
 
