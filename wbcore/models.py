@@ -602,6 +602,9 @@ class Team(models.Model):
                 }
             )
 
+    class Meta:
+        ordering = ['rank', 'name']
+
 
 class TeamUserRelation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
