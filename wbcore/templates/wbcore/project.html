@@ -27,6 +27,13 @@
             </div>
         {% endif %}
 
+        {% if project.partner %}
+            <div class="ui segment">
+                {% include 'wbcore/segment_header.html' with icon='donate' title="Partner" %}
+                {{ project.partner }}
+            </div>
+        {% endif %}
+
         <div class="ui segment">
             {% include 'wbcore/segment_header.html' with icon='donate' title="Donate" url_alias='donate' %}
         </div>
