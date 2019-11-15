@@ -240,7 +240,7 @@ def home_view(request):
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id', text=False),
         'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
         'hosts': hosts,
-        'event_item_list': item_list_from_occ(occurrences, text=False),
+        'event_item_list': item_list_from_occ(occurrences, text=True),
         'breadcrumb': [('Home', None)],
         'icon_links': icon_links
     }
