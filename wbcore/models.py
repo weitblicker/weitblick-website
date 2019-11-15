@@ -566,6 +566,7 @@ class Team(models.Model):
     image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    rank = models.IntegerField(default=99)
 
     def belongs_to_host(self, host):
         return self.host == host
