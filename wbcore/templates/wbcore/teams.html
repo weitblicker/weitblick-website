@@ -22,15 +22,8 @@
 
     <div class="six wide column divided items">
         <div class="ui segment">
-            <i class="label seedling icon"></i>
-            {% if host %}
-                <a class="ui item title header" href="{% url 'teams' host_slug=host.slug %}">TBD</a>
-            {% else %}
-                <a class="ui item title header" href="{% url 'teams' %}">TBD</a>
-            {% endif %}
-            <div class="ui items">
-                tbd
-            </div>
+            {% include 'wbcore/segment_header.html' with icon='seedling' title="TBD" %}
+            tbd
         </div>
     </div>
 </div>

@@ -1,4 +1,3 @@
-<h2 class="ui header">Anmeldung</h2>
 <form class="ui form" action="{% url 'event' event_slug=event.slug %}" method="post">
     {% csrf_token %}
     {% if form.success %}

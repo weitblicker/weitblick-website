@@ -22,22 +22,8 @@
             </div>
 
             <div class="ui segment">
-                <i class="label globe africa icon"></i>
-                {% if host %}
-                    <a class="ui item title header" href="{% url 'blog' host_slug=host.slug %}">Projects</a>
-                {% else %}
-                    <a class="ui item title header" href="{% url 'blog' %}">Project Blog Posts</a>
-                {% endif %}
-                {% if posts %}
-                    <div class="ui unstackable items">
-                        {% for post in posts %}
-                            {% include 'wbcore/list_item.html' with item=post no_image=True %}
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p>No posts available.</p>
-                {% endif %}
-
+                {% include "wbcore/segment_header.html" with icon='globe africa' title='Project Blog Posts' url_alias='blog' %}
+                {% include 'wbcore/item_list.html' with item_list=posts no_image=True %}
             </div>
         </div>
     </div>

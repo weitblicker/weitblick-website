@@ -19,29 +19,22 @@
         </div>
         <div class="ten wide column divided items">
             <div class="ui segment">
-                {% include "wbcore/segment_header.html" with icon='newspaper outline' title='News' %}
+                {% include "wbcore/segment_header.html" with icon='newspaper outline' title='News' url_alias='news' %}
                 {% include 'wbcore/item_list.html' with item_list=news_item_list %}
             </div>
         </div>
 
         <div class="six wide column divided items">
             <div class="ui segment">
-                {% include "wbcore/segment_header.html" with icon='calendar alternate outline' title='Events' %}
-                <div class="ui items">
-                    {% include 'wbcore/item_list.html' with item_list=event_item_list image_size='small' %}
-                </div>
-
-
+                {% include "wbcore/segment_header.html" with icon='calendar alternate outline' title='Events' url_alias='events' %}
+                {% include 'wbcore/item_list.html' with item_list=event_item_list image_size='small' %}
             </div>
             <div class="ui segment">
-                {% include "wbcore/segment_header.html" with icon='donate' title='Donate' %}
+                {% include "wbcore/segment_header.html" with icon='donate' title='Donate' url_alias='donate' %}
             </div>
             <div class="ui segment">
-                <i class="label globe africa icon"></i>
-                <a class="ui item title header"href="{% url 'blog' %}">Blog</a>
-                <div class="ui items">
-                    {% include 'wbcore/item_list.html' with item_list=blog_item_list image_size='small' %}
-                </div>
+                {% include "wbcore/segment_header.html" with icon='globe africa' title='Blog' url_alias='blog' %}
+                {% include 'wbcore/item_list.html' with item_list=blog_item_list image_size='small' %}
             </div>
         </div>
     </div>

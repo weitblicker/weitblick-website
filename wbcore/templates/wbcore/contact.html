@@ -32,8 +32,8 @@
     </div>
     <div class="ui eight wide column">
         <form class="ui form segment" action="{% url 'contact' %}" method="post">
-            <i class="label envelope outline icon"></i>
-            <span class="ui item title header" %}">Schreib uns</span>
+            {% include "wbcore/segment_header.html" with icon='envelope outline' title='Schreib uns' %}
+
             <div class="ui items">
                 {% csrf_token %}
                 {% if success %}
