@@ -1,0 +1,66 @@
+{% load staticfiles %}
+<script src="{% static 'highmaps/proj4.js'%}"></script>
+<script src="{% static 'highmaps/highmaps.js'%}"></script>
+<script src="{% static highmaps_country_js }}.js'%}"></script>
+
+<div id="container" style="width: 100%"></div>
+<script>
+var project_list = [];
+
+project_list.push({
+name: '{{project.name|cut:"Weitblick "}}',
+ slug: '{{project.slug}}',
+  label: '{{project.location.description|cut:"None"}}',
+   lat: parseFloat('{{project.location.geolocation.lat|floatformat:11}}'.replace(",", ".")),
+    lon: parseFloat('{{project.location.geolocation.lon|floatformat:11}}'.replace(",", "."))})
+
+
+Highcharts.mapChart('container', {
+    title: {
+        text: ''
+    },
+    plotOptions:{
+        series: {
+            dataLabels: {
+                allowOverlap: true,
+                }
+            }
+        },
+    legend: {
+            enabled: false
+            },
+    tooltip: {
+        headerFormat: '',
+        pointFormat: '<b>{point.name}</b>'
+    },
+    series: [{
+            mapData: Highcharts.maps['countries/{{ highmaps_country_code }}'],
+            joinBy: ['iso-a2', 'drilldown'],
+            name: 'projects',
+            showInLegend: false,
+        },
+        {
+        // Specify points using lat/lon
+        type: 'mappoint',
+        name: 'Cities',
+        color: '#FF9900',
+        data: project_list,
+        dataLabels: {
+            align: 'center',
+            format: '{point.label}'
+        },
+        marker:{
+            symbol: 'url(/static/puzzle-icon.svg)',
+            width: 16,
+            height: 16
+            },
+            events: {
+                                    click: function (e) {
+                                        console.log(e.point.slug);
+                                    }
+                                }
+
+        },
+        ]
+})
+</script>

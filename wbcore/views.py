@@ -15,6 +15,7 @@ from collections import OrderedDict
 from datetime import date, datetime, timedelta
 from schedule.periods import Period
 import locale
+import os
 
 from wbcore.tokens import account_activation_token
 
@@ -27,6 +28,7 @@ from wbcore.models import (
 )
 
 main_host_slug = 'bundesverband' ## TODO configure this?
+highmaps_countries = ['DE', 'GH', 'LS', 'BJ', 'BI']
 
 icon_links = OrderedDict([
     ('facebook',
@@ -765,6 +767,12 @@ def project_view(request, host_slug=None, project_slug=None):
     news = NewsPost.objects.filter(project=project).order_by('-published')[:3]
     blogposts = BlogPost.objects.filter(project=project).order_by('-published')[:3]
 
+    cc = project.location.country.code
+    highmaps_country_code = f'{cc.lower()}/{cc.lower()}-all'
+    highmaps_country_js = f'highmaps/countries/{cc.lower()}-all.js'
+
+    highmaps = True if cc in highmaps_countries else False
+
     template = loader.get_template('wbcore/project.html')
     context = {
         'main_nav': get_main_nav(host=host, active='projects'),
@@ -777,6 +785,9 @@ def project_view(request, host_slug=None, project_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'highmaps': highmaps,
+        'highmaps_country_code': highmaps_country_code,
+        'highmaps_country_js': highmaps_country_js,
     }
     return HttpResponse(template.render(context, request))
 
