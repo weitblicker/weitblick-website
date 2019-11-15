@@ -188,7 +188,7 @@ def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='n
     return item_list
 
 
-def item_list_from_proj(projects, host_slug=None):
+def item_list_from_proj(projects, host_slug=None, text=True):
     item_list = []
     for project in projects:
         project.image = project.get_title_image()
@@ -202,6 +202,7 @@ def item_list_from_proj(projects, host_slug=None):
             project.link = reverse('project', args=[project.slug])
         project.title = project.name
         project.teaser = project.short_description if project.short_description else project.description
+        project.show_text = True if text else False
         item_list.append(project)
     return item_list
 
@@ -914,7 +915,7 @@ def event_view(request, host_slug=None, event_slug=None):
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
         'event': event,
-        'projects': item_list_from_proj(event.projects.all(), host_slug=host_slug),
+        'projects': item_list_from_proj(event.projects.all(), host_slug=host_slug, text=False),
         'form': form,
         'breadcrumb': breadcrumb,
         'host': host,
@@ -972,7 +973,7 @@ def blog_view(request, host_slug=None):
 
 
 def blog_post_view(request, host_slug=None, post_id=None):
-    template = loader.get_template('wbcore/blog_post.html')
+    template = loader.get_template('wbcore/post.html')
     try:
         if host_slug:
             post = BlogPost.objects.get(pk=post_id, host__slug=host_slug)
@@ -991,12 +992,16 @@ def blog_post_view(request, host_slug=None, post_id=None):
     except Host.DoesNotExist:
         raise Http404()
 
+    projects = item_list_from_proj([post.project], host_slug=host_slug) if post.project else None
+
     context = {
         'main_nav': get_main_nav(host=host, active='blog'),
         'dot_nav': get_dot_nav(host=host),
         'post': post,
+        'projects': projects,
         'breadcrumb': breadcrumb,
         'host': host,
+        'page_title': 'Blog',
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
@@ -1072,7 +1077,7 @@ def news_view(request, host_slug=None):
 
 
 def news_post_view(request, host_slug=None, post_id=None):
-    template = loader.get_template('wbcore/news_post.html')
+    template = loader.get_template('wbcore/post.html')
     try:
         if host_slug:
             post = NewsPost.objects.get(pk=post_id, host__slug=host_slug)
@@ -1091,12 +1096,16 @@ def news_post_view(request, host_slug=None, post_id=None):
     except Host.DoesNotExist:
         raise Http404()
 
+    projects = item_list_from_proj([post.project], host_slug=host_slug) if post.project else None
+
     context = {
         'main_nav': get_main_nav(host=host, active='news'),
         'dot_nav': get_dot_nav(host=host),
         'post': post,
+        'projects': projects,
         'breadcrumb': breadcrumb,
         'host': host,
+        'page_title': 'News',
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))

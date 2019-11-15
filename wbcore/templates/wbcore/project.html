@@ -20,18 +20,15 @@
             <i class="label map marker alternate icon"></i>
         </div>
 
-        <div class="ui segment">
-            <i class="label image outline icon"></i>
-            <span class="ui item title header">Gallery</span>
-        </div>
+        {% if project.gallery %}
+            <div class="ui segment">
+                {% include 'wbcore/segment_header.html' with icon='image outline' title="Gallery" %}
+                {% include 'wbcore/gallery.html' with gallery=project.gallery %}
+            </div>
+        {% endif %}
 
         <div class="ui segment">
-            <i class="label donate icon"></i>
-            {% if host %}
-                <a class="ui item title header"href="{% url 'donate' host_slug=host.slug%}">Donate</a>
-            {% else %}
-                <a class="ui item title header"href="{% url 'donate' %}">Donate</a>
-            {% endif %}
+            {% include 'wbcore/segment_header.html' with icon='donate' title="Donate" url_alias='donate' %}
         </div>
 
         {% if events %}

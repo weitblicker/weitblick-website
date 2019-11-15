@@ -33,6 +33,7 @@
                         {{ event.end | date:"D, j. M Y H:i"}}
                     </div>
                 </div>
+                <div class="ui hidden divider"></div>
                 <div class="item">
                     <i class="big map marked alternate icon"></i>
                     <div class="content">
@@ -44,6 +45,7 @@
                         {% endif %}
                     </div>
                 </div>
+                <div class="ui hidden divider"></div>
                 {% if event.cost %}
                     <div class="item">
                         <i class="big wallet icon"></i>
@@ -51,6 +53,7 @@
                             {{ event.cost }}
                         </div>
                     </div>
+                    <div class="ui hidden divider"></div>
                 {% endif %}
             </div>
         </div>
@@ -58,7 +61,7 @@
             <div class="ui segment">
                 {% include "wbcore/segment_header.html" with icon='seedling' title='Projects' url_alias='projects' %}
                 <div class="ui items">
-                    {% include 'wbcore/item_list.html' with item_list=projects %}
+                    {% include 'wbcore/item_list.html' with item_list=projects image_size='small' %}
                 </div>
             </div>
 
