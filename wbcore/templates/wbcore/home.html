@@ -19,16 +19,14 @@
         </div>
         <div class="ten wide column divided items">
             <div class="ui segment">
-                <i class="label newspaper outline icon"></i>
-                <a class="ui item title header" href="{% url 'news' %}">News</a>
+                {% include "wbcore/segment_header.html" with icon='newspaper outline' title='News' %}
                 {% include 'wbcore/item_list.html' with item_list=news_item_list %}
             </div>
         </div>
 
         <div class="six wide column divided items">
             <div class="ui segment">
-                <i class="label calendar alternate outline icon"></i>
-                <a class="ui item title header"href="{% url 'events' %}">Events</a>
+                {% include "wbcore/segment_header.html" with icon='calendar alternate outline' title='Events' %}
                 <div class="ui items">
                     {% include 'wbcore/item_list.html' with item_list=event_item_list image_size='small' %}
                 </div>
@@ -36,8 +34,7 @@
 
             </div>
             <div class="ui segment">
-                <i class="label donate icon"></i>
-                <a class="ui item title header"href="{% url 'donate' %}">Donate</a>
+                {% include "wbcore/segment_header.html" with icon='donate' title='Donate' %}
             </div>
             <div class="ui segment">
                 <i class="label globe africa icon"></i>
