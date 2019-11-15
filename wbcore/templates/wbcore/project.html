@@ -1,10 +1,72 @@
 {% extends 'wbcore/single_content.html' %}
-{% block single-content %}
-    {% if project %}
-        <h1>{{ project.name }}</h1>
-        <div>{{ project.description|safe }}</div>
+{% load staticfiles %}
+{% block content %}
+
+<div class="ui stackable grid container">
+     {% if project.image %}
+         {% include 'wbcore/image-header.html' with title=project.name %}
     {% else %}
-    	{% include 'wbcore/project_cade.html' %}
-        <p>No project available.</p>
+         {% include 'wbcore/image-header.html' with title=project.name image=project.image.get_headersize_url %}
     {% endif %}
+
+    <div class="ten wide column divided items">
+        <div class="ui segment">
+            {{ project.description | safe }}
+        </div>
+    </div>
+
+    <div class="six wide column divided items">
+        <div class="ui segment">
+            <i class="label map marker alternate icon"></i>
+        </div>
+
+        <div class="ui segment">
+            <i class="label image outline icon"></i>
+            <span class="ui item title header">Gallery</span>
+        </div>
+
+        <div class="ui segment">
+            <i class="label donate icon"></i>
+            {% if host %}
+                <a class="ui item title header"href="{% url 'donate' host_slug=host.slug%}">Donate</a>
+            {% else %}
+                <a class="ui item title header"href="{% url 'donate' %}">Donate</a>
+            {% endif %}
+        </div>
+
+        {% if not events %}
+            <div class="ui segment">
+                <i class="label calendar alternate outline icon"></i>
+                {% if host %}
+                    <a class="ui item title header"href="{% url 'events' host_slug=host.slug%}"></a>
+                {% else %}
+                    <a class="ui item title header"href="{% url 'events' %}">Events</a>
+                {% endif %}
+                <div class="ui unstackable items">
+                    {% for event in events %}
+                        {% include 'wbcore/list_item.html' with item=event no_image=True %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if not posts %}
+            <div class="ui segment">
+                <i class="label globe africa icon"></i>
+                {% if host %}
+                    <a class="ui item title header" href="{% url 'blog' host_slug=host.slug %}">Projects</a>
+                {% else %}
+                    <a class="ui item title header" href="{% url 'blog' %}">Project Blog Posts</a>
+                {% endif %}
+                <div class="ui unstackable items">
+                    {% for post in posts %}
+                        {% include 'wbcore/list_item.html' with item=post no_image=True %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+
 {% endblock %}
