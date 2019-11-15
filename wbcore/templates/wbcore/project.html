@@ -4,9 +4,9 @@
 
 <div class="ui stackable grid container">
      {% if project.image %}
-         {% include 'wbcore/image-header.html' with title=project.name %}
-    {% else %}
          {% include 'wbcore/image-header.html' with title=project.name image=project.image.get_headersize_url %}
+    {% else %}
+         {% include 'wbcore/image-header.html' with title=project.name image='/static/images/join_header.jpg' %}
     {% endif %}
 
     <div class="ten wide column divided items">
@@ -34,35 +34,24 @@
             {% endif %}
         </div>
 
-        {% if not events %}
+        {% if events %}
             <div class="ui segment">
-                <i class="label calendar alternate outline icon"></i>
-                {% if host %}
-                    <a class="ui item title header"href="{% url 'events' host_slug=host.slug%}"></a>
-                {% else %}
-                    <a class="ui item title header"href="{% url 'events' %}">Events</a>
-                {% endif %}
-                <div class="ui unstackable items">
-                    {% for event in events %}
-                        {% include 'wbcore/list_item.html' with item=event no_image=True %}
-                    {% endfor %}
-                </div>
+                {% include 'wbcore/segment_header.html' with icon='calendar alternate outline' title='Events' url_alias='events' %}
+                {% include 'wbcore/item_list.html' with item_list=news image_size='tiny' %}
             </div>
         {% endif %}
 
-        {% if not posts %}
+        {% if news %}
             <div class="ui segment">
-                <i class="label globe africa icon"></i>
-                {% if host %}
-                    <a class="ui item title header" href="{% url 'blog' host_slug=host.slug %}">Projects</a>
-                {% else %}
-                    <a class="ui item title header" href="{% url 'blog' %}">Project Blog Posts</a>
-                {% endif %}
-                <div class="ui unstackable items">
-                    {% for post in posts %}
-                        {% include 'wbcore/list_item.html' with item=post no_image=True %}
-                    {% endfor %}
-                </div>
+                {% include 'wbcore/segment_header.html' with icon='newspaper outline' title='News' url_alias='news' %}
+                {% include 'wbcore/item_list.html' with item_list=news image_size='tiny' %}
+            </div>
+        {% endif %}
+
+        {% if blogposts %}
+            <div class="ui segment">
+                {% include 'wbcore/segment_header.html' with icon='globe africa' title='Blog Posts' url_alias='blog' %}
+                {% include 'wbcore/item_list.html' with item_list=blogposts image_size='tiny' %}
             </div>
         {% endif %}
     </div>

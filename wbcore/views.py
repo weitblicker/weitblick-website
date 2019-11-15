@@ -179,7 +179,7 @@ def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='n
         if not text:
             post.teaser = ""
         current_host = Host.objects.get(slug=host_slug) if host_slug else None
-        if current_host and post.host and current_host in post.host.all():
+        if current_host and post.host and current_host is post.host:
             post.link = reverse(post_type, kwargs={id_key: post.id, 'host_slug': host_slug})
         else:
             post.link = reverse(post_type, args=[post.id])
@@ -188,24 +188,10 @@ def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='n
     return item_list
 
 
-def item_list_from_blogposts(blogposts, host_slug=None):
-    item_list = []
-    for post in blogposts:
-        if not post.teaser:
-            post.teaser = post.text
-        current_host = Host.objects.get(slug=host_slug) if host_slug else None
-        if current_host and post.host and current_host in post.host.all():
-            post.link = reverse('blog-post', kwargs={'post_id': post.id, 'host_slug': host_slug})
-        else:
-            post.link = reverse('blog-post', args=[post.id])
-        item_list.append(post)
-    return item_list
-
-
 def item_list_from_proj(projects, host_slug=None):
     item_list = []
     for project in projects:
-        project.image = project.teaser_image()
+        project.image = project.get_title_image()
         project.country = project.location.country.name
         project.published = None  # do not show published date, but rather if active or not
         project.hosts_list = project.hosts.all()
@@ -756,7 +742,7 @@ def project_view(request, host_slug=None, project_slug=None):
     try:
         if host_slug:
             project = Project.objects.get(slug=project_slug, hosts__slug=host_slug)
-            host = Host.objects.get(host_slug=host_slug)
+            host = Host.objects.get(slug=host_slug)
             breadcrumb = [('Home', reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
                           ('Projects', reverse('projects')),
@@ -770,10 +756,23 @@ def project_view(request, host_slug=None, project_slug=None):
     except Host.DoesNotExist:
         raise Http404("Host does not exist!")
 
+    project.image = project.get_title_image()
+
+    events = Event.objects.filter(projects=project)
+    period = Period(events, datetime.now(), datetime.now() + timedelta(365/2))
+    occurrences = period.get_occurrences()[:3]
+
+    news = NewsPost.objects.filter(project=project).order_by('-published')[:3]
+    blogposts = BlogPost.objects.filter(project=project).order_by('-published')[:3]
+
     template = loader.get_template('wbcore/project.html')
     context = {
         'main_nav': get_main_nav(host=host, active='projects'),
         'project': project,
+        'events': item_list_from_occ(occurrences, text=False),
+        'news': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='news_id', text=False),
+        'blogposts': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
+        'gallery': project.gallery,
         'host': host,
         'dot_nav': get_dot_nav(host=host),
         'breadcrumb': breadcrumb,
@@ -908,6 +907,8 @@ def event_view(request, host_slug=None, event_slug=None):
     else:
         form = None
 
+    event.image = event.get_title_image()
+
     template = loader.get_template('wbcore/event.html')
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
@@ -963,7 +964,7 @@ def blog_view(request, host_slug=None):
         'host': host,
         'hosts': hosts,
         'years': year_months,
-        'item_list': item_list_from_blogposts(posts, host_slug),
+        'item_list': item_list_from_posts(posts, host_slug, post_type="blog-post", id_key='post_id'),
         'ajax_endpoint': reverse('ajax-filter-blog'),
         'icon_links': icon_links,
     }

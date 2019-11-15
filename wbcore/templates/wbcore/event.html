@@ -4,7 +4,7 @@
 
 <div class="ui stackable grid container">
     {% if event.image %}
-        {% include 'wbcore/image-header.html' with title=event.title %}
+        {% include 'wbcore/image-header.html' with title=event.title image=event.image.get_headersize_url %}
     {% else %}
         {% include 'wbcore/image-header.html' with title=event.title image='/static/images/news_header.jpg' %}
     {% endif %}

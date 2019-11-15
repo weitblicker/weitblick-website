@@ -306,6 +306,7 @@ class Project(models.Model):
     hosts = models.ManyToManyField(Host)
     short_description = models.TextField()
     description = models.TextField()
+    title_image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     partner = models.ForeignKey(Partner, on_delete=models.SET_NULL, null=True, blank=True)
     donation_goal = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
@@ -332,8 +333,10 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
-    def teaser_image(self):
-        if self.gallery:
+    def get_title_image(self):
+        if self.title_image:
+            return self.title_image
+        elif self.gallery:
             return self.gallery.photos.first()
         else:
             return None
@@ -365,6 +368,14 @@ class Event(ScheduleEvent):
     @staticmethod
     def get_model_name():
         return 'Event'
+
+    def get_title_image(self):
+        if self.image:
+            return self.image
+        elif self.gallery:
+            return self.gallery.photos.first()
+        else:
+            return None
 
     class Meta:
         get_latest_by = ['start']
