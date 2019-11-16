@@ -1,4 +1,24 @@
-{% extends 'wbcore/single_content.html' %}
-{% block single-content %}
-    <p>Transparency</p>
+{% extends 'wbcore/base.html' %}
+{% load martortags %}
+{% load staticfiles %}
+{% block content %}
+
+<div class="ui stackable grid container">
+    {% include 'wbcore/image-header.html' with title="Transparency" image='/static/images/news_header.jpg' %}
+
+    <div class="ten wide column divided items">
+        <div class="ui segment">
+            {% if transparency %}
+                {{ transparency.text | safe_markdown }}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="six wide column divided items">
+            <div class="ui segment">
+                {% include 'wbcore/segment_header.html' with icon='info circle' title="Short Facts" %}
+            </div>
+    </div>
+</div>
+
 {% endblock %}

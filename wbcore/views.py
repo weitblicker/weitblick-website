@@ -331,7 +331,11 @@ def transparency_view(request, host_slug=None):
         host = None
         breadcrumb = [('Home', reverse('home')), ('Transparency', None)]
 
-    projects = Project.objects.all()
+    load_host = host if host else Host.objects.get(slug='bundesverband')
+    try:
+        transparency = Content.objects.get(host=load_host, type='transparency')
+    except Content.DoesNotExist:
+        transparency = None
 
     template = loader.get_template('wbcore/transparency.html')
     context = {
@@ -340,6 +344,7 @@ def transparency_view(request, host_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'transparency': transparency,
     }
     return HttpResponse(template.render(context, request))
 
@@ -357,7 +362,11 @@ def facts_view(request, host_slug=None):
         host = None
         breadcrumb = [('Home', reverse('home')), ('Facts', None)]
 
-    projects = Project.objects.all()
+    load_host = Host.objects.get(slug=host_slug) if host_slug else Host.objects.get(slug='bundesverband')
+    try:
+        facts = Content.objects.get(host=load_host, type='facts')
+    except Content.DoesNotExist:
+        facts = None
 
     template = loader.get_template('wbcore/facts.html')
     context = {
@@ -366,6 +375,7 @@ def facts_view(request, host_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'facts': facts,
     }
     return HttpResponse(template.render(context, request))
 
@@ -383,7 +393,11 @@ def history_view(request, host_slug=None):
         host = None
         breadcrumb = [('Home', reverse('home')), ('History', None)]
 
-    projects = Project.objects.all()
+    load_host = host if host else Host.objects.get(slug='bundesverband')
+    try:
+        history = Content.objects.get(host=load_host, type='history')
+    except Content.DoesNotExist:
+        history = None
 
     template = loader.get_template('wbcore/history.html')
     context = {
@@ -392,6 +406,7 @@ def history_view(request, host_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'history': history,
     }
     return HttpResponse(template.render(context, request))
 
@@ -409,7 +424,11 @@ def privacy_view(request, host_slug=None):
         host = None
         breadcrumb = [('Home', reverse('home')), ('Privacy', None)]
 
-    projects = Project.objects.all()
+    load_host = Host.objects.get(slug=host_slug) if host_slug else Host.objects.get(slug='bundesverband')
+    try:
+        privacy = Content.objects.get(host=load_host, type='privacy')
+    except Content.DoesNotExist:
+        privacy = None
 
     template = loader.get_template('wbcore/privacy.html')
     context = {
@@ -418,6 +437,7 @@ def privacy_view(request, host_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'privacy': privacy,
     }
     return HttpResponse(template.render(context, request))
 
@@ -482,7 +502,7 @@ def team_view(request, host_slug=None, team_slug=None):
     members = team.member.all()
     relations = []
     for member in members:
-        relations.append(TeamUserRelation.objects.get(user=member))
+        relations.append(TeamUserRelation.objects.get(team=team, user=member))
 
     members_relations = sorted(zip(members, relations), key=lambda tup: (tup[1].priority, tup[0].name().split(" ")[-1]))
 
