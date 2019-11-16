@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="ui stackable grid container">
-    {% include 'wbcore/image-header.html' with title=event.title image=event.image.get_headersize_url default='/images/events_header.jpg' %}
+    {% include 'wbcore/image-header.html' with title=event.title image=event.image default='/images/events_header.jpg' %}
 
     <div class="ten wide column divided items">
         <div class="ui segment">
