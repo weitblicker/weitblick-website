@@ -244,7 +244,7 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('is_super_admin', 'email', 'password', 'date_of_birth', 'is_active', 'first_name', 'last_name')
+        fields = ('is_super_admin', 'email', 'password', 'date_of_birth', 'is_active', 'first_name', 'last_name', 'image')
         exclude = ()
 
     def clean_password(self):
@@ -294,6 +294,7 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = (
         ('Account', {'fields': ('email', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'date_of_birth',)}),
+        ('Profile', {'fields': ('image', )}),
     )
 
     exclude = ()

@@ -161,6 +161,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=60)
     first_name = models.CharField(max_length=60)
     last_name = models.CharField(max_length=60)
+
     email = models.EmailField(
         verbose_name='email address',
         max_length=255,
@@ -250,6 +251,7 @@ class Content(models.Model):
     TYPE_CHOICES = (
         ('welcome', 'Welcome'),
         ('about', 'About'),
+        ('idea', 'Idea'),
         ('history', 'History'),
         ('teams', 'Teams'),
         ('contact', 'Contact'),
@@ -262,6 +264,7 @@ class Content(models.Model):
     type = models.CharField(max_length=20, choices=TYPE_CHOICES, null=True)
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=False)
     text = models.TextField()
+    image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
 
     def belongs_to_host(self, host):
         return host.slug == self.host.slug
@@ -306,6 +309,7 @@ class Project(models.Model):
     hosts = models.ManyToManyField(Host)
     short_description = models.TextField()
     description = models.TextField()
+    title_image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     partner = models.ForeignKey(Partner, on_delete=models.SET_NULL, null=True, blank=True)
     donation_goal = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
@@ -332,8 +336,10 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
-    def teaser_image(self):
-        if self.gallery:
+    def get_title_image(self):
+        if self.title_image:
+            return self.title_image
+        elif self.gallery:
             return self.gallery.photos.first()
         else:
             return None
@@ -365,6 +371,14 @@ class Event(ScheduleEvent):
     @staticmethod
     def get_model_name():
         return 'Event'
+
+    def get_title_image(self):
+        if self.image:
+            return self.image
+        elif self.gallery:
+            return self.gallery.photos.first()
+        else:
+            return None
 
     class Meta:
         get_latest_by = ['start']
@@ -555,6 +569,7 @@ class Team(models.Model):
     image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    rank = models.IntegerField(default=99)
 
     def belongs_to_host(self, host):
         return self.host == host
@@ -589,6 +604,9 @@ class Team(models.Model):
                     ],
                 }
             )
+
+    class Meta:
+        ordering = ['rank', 'name']
 
 
 class TeamUserRelation(models.Model):

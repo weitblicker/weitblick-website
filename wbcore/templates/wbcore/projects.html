@@ -4,7 +4,7 @@
 {% block content %}
     <div class="ui vertical stackable grid container">
 
-        {% include 'wbcore/image-header.html' with title="Projects" image='/static/images/join_header.jpg'%}
+        {% include 'wbcore/image-header.html' with title="Projects" default='/images/join_header.jpg' %}
 
         <div class="ten wide column divided items">
             <div class="ui segment">
@@ -20,18 +20,10 @@
             <div class="ui segment">
                 {% include 'wbcore/list_filter.html' %}
             </div>
-            <div class="ui segment">
-                <h3>Project Blog Posts</h3>
-                {% if posts %}
-                    <div class="ui unstackable items">
-                        {% for post in posts %}
-                            {% include 'wbcore/list_item.html' with item=post no_image=True %}
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p>No posts available.</p>
-                {% endif %}
 
+            <div class="ui segment">
+                {% include "wbcore/segment_header.html" with icon='globe africa' title='Project Blog Posts' url_alias='blog' %}
+                {% include 'wbcore/item_list.html' with item_list=posts no_image=True %}
             </div>
         </div>
     </div>

@@ -7,7 +7,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from itertools import groupby
 from .filter import filter_news, filter_projects, filter_events
-from .views import item_list_from_occ, item_list_from_blogposts, item_list_from_proj
+from .views import item_list_from_occ, item_list_from_posts, item_list_from_proj
 
 
 def remove_tags(text):
@@ -97,6 +97,6 @@ def filter_blog_view(request):
     host = None  # TODO filter if on host specific news page
     context = {
         'host': host,
-        'item_list': item_list_from_blogposts(posts, host_slug),
+        'item_list': item_list_from_posts(posts, host_slug=host_slug, post_type="blog-post", id_key='post_id'),
     }
     return HttpResponse(template.render(context, request))

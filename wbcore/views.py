@@ -23,7 +23,7 @@ from wbcore.forms import (
 
 from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
-    UserRelation, JoinPage, SocialMediaLink, Content
+    UserRelation, JoinPage, SocialMediaLink, Content, Document
 )
 
 main_host_slug = 'bundesverband' ## TODO configure this?
@@ -117,20 +117,19 @@ def get_dot_nav(host=None):
     if host:
         news = NewsPost.objects.filter(host=host).order_by('-published')[:3]
         blog = BlogPost.objects.filter(host=host).order_by('-published')[:3]
-        events = Event.objects.filter(host=host)
-        occurences = Period(events, datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
+        occurences = Period(Event.objects.filter(host=host), datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
     else:
         news = NewsPost.objects.all().order_by('-published')[:3]
         blog = BlogPost.objects.all().order_by('-published')[:3]
         occurences = Period(Event.objects.all(), datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
-        events = [occ.event for occ in occurences]
-        for event in events:
-            if event.start.day == event.end.day:
-                event.show_date = event.start.strftime('%a, %d. %b %Y')
-                event.show_date += "<br>" + event.start.strftime('%H:%M') + " - " + event.end.strftime('%H:%M')
-            else:
-                event.show_date = event.start.strftime('%a, %d. %b')
-                event.show_date += " -<br>" + event.end.strftime('%a, %d. %b %Y')
+    events = [occ.event for occ in occurences]
+    for event in events:
+        if event.start.day == event.end.day:
+            event.show_date = event.start.strftime('%a, %d. %b %Y')
+            event.show_date += "<br>" + event.start.strftime('%H:%M') + " - " + event.end.strftime('%H:%M')
+        else:
+            event.show_date = event.start.strftime('%a, %d. %b')
+            event.show_date += " -<br>" + event.end.strftime('%a, %d. %b %Y')
     return {'news': news, 'blog': blog, 'events': events}
 
 
@@ -179,7 +178,7 @@ def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='n
         if not text:
             post.teaser = ""
         current_host = Host.objects.get(slug=host_slug) if host_slug else None
-        if current_host and post.host and current_host in post.host.all():
+        if current_host and post.host and current_host is post.host:
             post.link = reverse(post_type, kwargs={id_key: post.id, 'host_slug': host_slug})
         else:
             post.link = reverse(post_type, args=[post.id])
@@ -188,24 +187,10 @@ def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='n
     return item_list
 
 
-def item_list_from_blogposts(blogposts, host_slug=None):
-    item_list = []
-    for post in blogposts:
-        if not post.teaser:
-            post.teaser = post.text
-        current_host = Host.objects.get(slug=host_slug) if host_slug else None
-        if current_host and post.host and current_host in post.host.all():
-            post.link = reverse('blog-post', kwargs={'post_id': post.id, 'host_slug': host_slug})
-        else:
-            post.link = reverse('blog-post', args=[post.id])
-        item_list.append(post)
-    return item_list
-
-
-def item_list_from_proj(projects, host_slug=None):
+def item_list_from_proj(projects, host_slug=None, text=True):
     item_list = []
     for project in projects:
-        project.image = project.teaser_image()
+        project.image = project.get_title_image()
         project.country = project.location.country.name
         project.published = None  # do not show published date, but rather if active or not
         project.hosts_list = project.hosts.all()
@@ -216,6 +201,7 @@ def item_list_from_proj(projects, host_slug=None):
             project.link = reverse('project', args=[project.slug])
         project.title = project.name
         project.teaser = project.short_description if project.short_description else project.description
+        project.show_text = True if text else False
         item_list.append(project)
     return item_list
 
@@ -239,7 +225,7 @@ def item_list_from_teams(teams, host_slug=None):
 def home_view(request):
     projects = Project.objects.all()
     hosts = Host.objects.all()
-    news = NewsPost.objects.all().order_by('-published')[:3]
+    news = NewsPost.objects.all().order_by('-published')[:5]
     blog = BlogPost.objects.all().order_by('-published')[:3]
     events = Event.objects.all().order_by('-start')
     period = Period(events, datetime.now(), datetime.now() + timedelta(365/2))
@@ -254,7 +240,7 @@ def home_view(request):
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id', text=False),
         'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
         'hosts': hosts,
-        'event_item_list': item_list_from_occ(occurrences, text=False),
+        'event_item_list': item_list_from_occ(occurrences, text=True),
         'breadcrumb': [('Home', None)],
         'icon_links': icon_links
     }
@@ -265,9 +251,7 @@ def home_view(request):
 
 
 def reports_view(request, host_slug=None):
-    host_slugs = get_host_slugs(request, host_slug)
-
-    if host_slugs:
+    if host_slug:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
             breadcrumb = [('Reports', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Reports', None)]
@@ -277,7 +261,15 @@ def reports_view(request, host_slug=None):
         host = None
         breadcrumb = [('Home', reverse('home')), ('Reports', None)]
 
-    projects = Project.objects.all()
+    load_host = host if host else Host.objects.get(slug='bundesverband')
+    try:
+        report = Content.objects.get(host=load_host, type='reports')
+    except Content.DoesNotExist:
+        report = None
+    financial_reports = Document.objects.filter(host=load_host, document_type='financial_report')
+    financial_reports = financial_reports.order_by('valid_from') if financial_reports else financial_reports
+    annual_reports = Document.objects.filter(host=load_host, document_type='annual_report')
+    annual_reports = annual_reports.order_by('valid_from') if annual_reports else annual_reports
 
     template = loader.get_template('wbcore/reports.html')
     context = {
@@ -286,14 +278,15 @@ def reports_view(request, host_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'report': report,
+        'financial_reports': financial_reports,
+        'annual_reports': annual_reports,
     }
     return HttpResponse(template.render(context, request))
 
 
 def charter_view(request, host_slug=None):
-    host_slugs = get_host_slugs(request, host_slug)
-
-    if host_slugs:
+    if host_slug:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
             breadcrumb = [('Charter', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Charter', None)]
@@ -303,7 +296,12 @@ def charter_view(request, host_slug=None):
         host = None
         breadcrumb = [('Home', reverse('home')), ('Charter', None)]
 
-    projects = Project.objects.all()
+    load_host = host if host else Host.objects.get(slug='bundesverband')
+    try:
+        charter = Content.objects.get(host=load_host, type='charter')
+    except Content.DoesNotExist:
+        charter = None
+    charter_file = Document(host=load_host, document_type='charter')
 
     template = loader.get_template('wbcore/charter.html')
     context = {
@@ -312,6 +310,8 @@ def charter_view(request, host_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'charter': charter,
+        'charter_file': charter_file,
     }
     return HttpResponse(template.render(context, request))
 
@@ -512,7 +512,7 @@ def about_view(request, host_slug=None):
 
     projects = Project.objects.all()
 
-    about = Content.objects.get(host=host)
+    about = Content.objects.get(host=host, type='about')
 
     template = loader.get_template('wbcore/about.html')
     context = {
@@ -540,12 +540,19 @@ def idea_view(request, host_slug=None):
 
     projects = Project.objects.all()
 
+    try:
+        idea = Content.objects.get(host=host, type='idea')
+    except Content.DoesNotExist as e:
+        print("Idea content page for", host, "does not exists!")
+        idea = None
+
     template = loader.get_template('wbcore/idea.html')
     context = {
         'main_nav': get_main_nav(active='idea', host=host),
         'dot_nav': get_dot_nav(host=host),
         'projects': projects,
         'host': host,
+        'idea': idea,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
     }
@@ -756,7 +763,7 @@ def project_view(request, host_slug=None, project_slug=None):
     try:
         if host_slug:
             project = Project.objects.get(slug=project_slug, hosts__slug=host_slug)
-            host = Host.objects.get(host_slug=host_slug)
+            host = Host.objects.get(slug=host_slug)
             breadcrumb = [('Home', reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
                           ('Projects', reverse('projects')),
@@ -770,10 +777,23 @@ def project_view(request, host_slug=None, project_slug=None):
     except Host.DoesNotExist:
         raise Http404("Host does not exist!")
 
+    project.image = project.get_title_image()
+
+    events = Event.objects.filter(projects=project)
+    period = Period(events, datetime.now(), datetime.now() + timedelta(365/2))
+    occurrences = period.get_occurrences()[:3]
+
+    news = NewsPost.objects.filter(project=project).order_by('-published')[:3]
+    blogposts = BlogPost.objects.filter(project=project).order_by('-published')[:3]
+
     template = loader.get_template('wbcore/project.html')
     context = {
         'main_nav': get_main_nav(host=host, active='projects'),
         'project': project,
+        'events': item_list_from_occ(occurrences, text=False),
+        'news': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='news_id', text=False),
+        'blogposts': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
+        'gallery': project.gallery,
         'host': host,
         'dot_nav': get_dot_nav(host=host),
         'breadcrumb': breadcrumb,
@@ -809,10 +829,14 @@ def host_view(request, host_slug):
     posts = NewsPost.objects.filter(host=host_slug).order_by('-published')[:5]
     events = Event.objects.filter(host=host_slug).order_by('-start')[:3]
     period = Period(events, datetime.now(), datetime.now() + timedelta(365/2))
+    try:
+        welcome = Content.objects.get(host=host, type='welcome')
+    except Content.DoesNotExist as e:
+        print("Welcome content page for", host, "does not exists!")
+        welcome = None
     occurrences = period.get_occurrences()
     hosts = Host.objects.all()
     teams = Team.objects.filter(host=host)
-
 
     template = loader.get_template('wbcore/host.html')
     context = {
@@ -824,6 +848,7 @@ def host_view(request, host_slug):
         'posts': posts,
         'occurrences': occurrences,
         'teams': teams,
+        'welcome': welcome,
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
@@ -908,12 +933,14 @@ def event_view(request, host_slug=None, event_slug=None):
     else:
         form = None
 
+    event.image = event.get_title_image()
+
     template = loader.get_template('wbcore/event.html')
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
         'event': event,
-        'projects': item_list_from_proj(event.projects.all(), host_slug=host_slug),
+        'projects': item_list_from_proj(event.projects.all(), host_slug=host_slug, text=False),
         'form': form,
         'breadcrumb': breadcrumb,
         'host': host,
@@ -963,7 +990,7 @@ def blog_view(request, host_slug=None):
         'host': host,
         'hosts': hosts,
         'years': year_months,
-        'item_list': item_list_from_blogposts(posts, host_slug),
+        'item_list': item_list_from_posts(posts, host_slug, post_type="blog-post", id_key='post_id'),
         'ajax_endpoint': reverse('ajax-filter-blog'),
         'icon_links': icon_links,
     }
@@ -971,7 +998,7 @@ def blog_view(request, host_slug=None):
 
 
 def blog_post_view(request, host_slug=None, post_id=None):
-    template = loader.get_template('wbcore/blog_post.html')
+    template = loader.get_template('wbcore/post.html')
     try:
         if host_slug:
             post = BlogPost.objects.get(pk=post_id, host__slug=host_slug)
@@ -990,12 +1017,16 @@ def blog_post_view(request, host_slug=None, post_id=None):
     except Host.DoesNotExist:
         raise Http404()
 
+    projects = item_list_from_proj([post.project], host_slug=host_slug) if post.project else None
+
     context = {
         'main_nav': get_main_nav(host=host, active='blog'),
         'dot_nav': get_dot_nav(host=host),
         'post': post,
+        'projects': projects,
         'breadcrumb': breadcrumb,
         'host': host,
+        'page_title': 'Blog',
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
@@ -1071,7 +1102,7 @@ def news_view(request, host_slug=None):
 
 
 def news_post_view(request, host_slug=None, post_id=None):
-    template = loader.get_template('wbcore/news_post.html')
+    template = loader.get_template('wbcore/post.html')
     try:
         if host_slug:
             post = NewsPost.objects.get(pk=post_id, host__slug=host_slug)
@@ -1090,12 +1121,16 @@ def news_post_view(request, host_slug=None, post_id=None):
     except Host.DoesNotExist:
         raise Http404()
 
+    projects = item_list_from_proj([post.project], host_slug=host_slug) if post.project else None
+
     context = {
         'main_nav': get_main_nav(host=host, active='news'),
         'dot_nav': get_dot_nav(host=host),
         'post': post,
+        'projects': projects,
         'breadcrumb': breadcrumb,
         'host': host,
+        'page_title': 'News',
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
@@ -1237,6 +1272,19 @@ def contact_view(request, host_slug=None):
     else:
         breadcrumb = [('Home', reverse('home')), ('Contact', None)]
 
+    load_host = host if host else Host.objects.get(slug='bundesverband')
+    contact = Content.objects.get(host=load_host, type='contact')
+    teams = Team.objects.filter(host=load_host)
+    if teams:
+        if len(teams) > 3:
+            teams = teams[:3]
+            more_teams = reverse('teams', args=[host_slug]) if host_slug else reverse('teams')
+        else:
+            more_teams = False
+        teams = item_list_from_teams(teams, host_slug=host_slug)
+    else:
+        teams = False
+
     template = loader.get_template('wbcore/contact.html')
     context = {
         'main_nav': get_main_nav(),
@@ -1245,6 +1293,9 @@ def contact_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'success': False,
         'icon_links': icon_links,
+        'contact': contact,
+        'teams': teams,
+        'more_teams': more_teams,
     }
 
     if request.method == 'POST':

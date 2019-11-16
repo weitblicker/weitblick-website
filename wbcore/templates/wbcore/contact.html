@@ -1,84 +1,31 @@
 {% extends 'wbcore/base.html' %}
+{% load martortags %}
 
 {% block content %}
 
 <div class="ui one column stackable grid container">
-    {% include 'wbcore/image-header.html' with title="Contact" image='/static/images/contact_header.jpg'%}
-    <div class="ui eight wide column">
+    {% include 'wbcore/image-header.html' with title="Contact" default='/images/contact_header.jpg' %}
+    <div class="ui ten wide column">
         <div class="ui segment">
-            <p>
-                Hast Du Fragen, Interesse oder Kritik - dann immer her damit! Gerne antworten wir Dir.
-                Sende uns einfach Deine Anfrage über das Kontaktformular.
-            </p>
-            <p>
-                Du kannst den Empfänger auswählen. Nachrichten, die sich an eine einzelne Stadt richten, sende bitte direkt an die jeweilige Weitblick-Stadt. Bei Fragen, Anregungen und Kritik die Weitblick allgemein betreffen, wähle bitte Bundesverband als Empfänger aus.
-                Du kannst Dich auch gerne auf dem Postweg an Weitblick wenden.
-                Dies ist die Postanschrift des Bundesverbandes:
-            </p>
-            <p>
-                Bundesverband Weitblick e.V.
-                Scanbox #01445
-                Ehrenbergstraße 16a
-                10245 Berlin
-
-            </p>
-            <p>
-                Die Adressen der einzelnen Weitblick-Stadtvereine findest Du unten im Footer auf der jeweiligen Seite des Stadtvereins.
-            </p>
-                Du kannst uns auch eine E-Mail schreiben an {% if host %}{{ host.email }}{% else %}kontakt@weitblicker.org{% endif %}
-
-            </p>
-        </div>
-    </div>
-    <div class="ui eight wide column">
-        <form class="ui form segment" action="{% url 'contact' %}" method="post">
-            {% csrf_token %}
-            {% if success %}
-                <div class="ui positive message">
-                    <div class="header">Your message has been delivered. Thank you.</div>
-                </div>
+            {% if contact %}
+                {{ contact.text | safe_markdown }}
             {% endif %}
+        </div>
 
-            {% for field in contact_form %}
-                {% for error in field.errors %}
-                    <div class="ui negative message">
-                        <div class="header">{{ error|escape }}</div>
-                    </div>
-                {% endfor %}
-            {% endfor %}
-
-            <div class="fields">
-                <div class="required eight wide field">
-                    {{ contact_form.host.label_tag }} {{ contact_form.host }}
-                </div>
-                <div class="required eight wide field">
-                    {{ contact_form.reason.label_tag }} {{ contact_form.reason }}
-                </div>
-            </div>
-            <div class="fields">
-                <div class="eight wide field">
-                    {{ contact_form.name.label_tag }} {{ contact_form.name }}
-                </div>
-                <div class="eight wide required field">
-                    {{ contact_form.email.label_tag }} {{ contact_form.email }}
-                </div>
-            </div>
-            <div class="fields">
-                <div class="sixteen wide required field">
-                    {{ contact_form.subject.label_tag }} {{ contact_form.subject }}
-                </div>
-            </div>
-            <div class="fields">
-                <div class="sixteen wide required field">
-                    {{ contact_form.message.label_tag }} {{ contact_form.message }}
-                </div>
-            </div>
-            <div class="fields">
-                <div class="sixteen wide field">
-                    <input class="ui submit button orange" type="submit" value="Abschicken">
-                </div>
-            </div>
-        </form>
+        {% include "wbcore/contact_form.html" %}
+    </div>
+    <div class="ui six wide column">
+        <div class="ui segment">
+            {% include "wbcore/segment_header.html" with icon="address card outline" title="Address" %}
+            {% include "wbcore/address.html" %}
+        </div>
+        <div class="ui segment">
+            {% include "wbcore/segment_header.html" with icon="users" title="Team" url_alias="events" %}
+            {% include "wbcore/item_list.html" with item_list=teams %}
+            {% if more_teams %}
+                <a href="{{ more_teams }}">More</a>
+            {% endif %}
+        </div>
     </div>
 </div>
 

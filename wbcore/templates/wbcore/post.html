@@ -1,0 +1,39 @@
+{% extends 'wbcore/single_content.html' %}
+{% load i18n %}
+{% load static %}
+
+{% load staticfiles %}
+{% block content %}
+
+<div class="ui stackable grid container">
+    {% include 'wbcore/image-header.html' with title=page_title image=post.image default='/images/news_header.jpg' %}
+
+    <div class="ten wide column divided items">
+        <div class="ui segment">
+            <h1 class="ui header">{{ post.title }}</h1>
+            <div class="ui image label">
+                <img class="ui avatar image" src='{% get_media_prefix %}kristy.png'>{{ post.author_name }}
+            </div>
+            <span>{{ post.published | date:'m. F Y' }}</span>
+            <div class="ui hidden divider"></div>
+            <div class="item">{{ post.text | safe }}</div>
+        </div>
+    </div>
+
+    <div class="six wide column divided items">
+        {% if projects %}
+            <div class="ui segment">
+                {% include 'wbcore/segment_header.html' with icon='seedling' title='Project' %}
+                {% include 'wbcore/item_list.html' with item_list=projects image_size='tiny' %}
+            </div>
+        {% endif %}
+        <div class="ui segment">
+            {% include 'wbcore/segment_header.html' with icon='image outline' title='Gallery' %}
+            {% if post.gallery %}
+                {% include 'wbcore/gallery.html' with gallery=post.gallery %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

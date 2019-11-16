@@ -1,8 +1,7 @@
-
+{% include 'wbcore/segment_header.html' with icon='filter' title='Filter' %}
 
 <div class="column-content" id="filter" data-ajax-endpoint="{{ ajax_endpoint }}">
-        <div class="ui divided unstackable items">
-            <h3>Filter</h3>
+        <div class="ui unstackable items">
             <div class="ui form">
                 <div class="ui two unstackable fields">
                     {% if hosts %}

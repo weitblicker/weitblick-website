@@ -5,7 +5,6 @@
         <div class="sixteen wide column divided items">
             <div class="ui image segment">
                 {% include 'wbcore/socialbuttons.html' %}
-                {% include 'wbcore/breadcrumb.html' %}
                 <div id="puzzles">
                     {% include 'wbcore/svgs/puzzle.svg' with id='puzzle-svg-1' title='Idee' description='Was ist Weitblick?' icon='wbcore/svgs/idea.svg' link='idea' background='colorbg/grey.svg' hover='colorbg/yellow.svg' type='up' %}
 
@@ -19,32 +18,22 @@
         </div>
         <div class="ten wide column divided items">
             <div class="ui segment">
-                <i class="label newspaper outline icon"></i>
-                <a class="ui item title header" href="{% url 'news' %}">News</a>
+                {% include "wbcore/segment_header.html" with icon='newspaper outline' title='News' url_alias='news' %}
                 {% include 'wbcore/item_list.html' with item_list=news_item_list %}
             </div>
         </div>
 
         <div class="six wide column divided items">
             <div class="ui segment">
-                <i class="label calendar alternate outline icon"></i>
-                <a class="ui item title header"href="{% url 'events' %}">Events</a>
-                <div class="ui items">
-                    {% include 'wbcore/item_list.html' with item_list=event_item_list image_size='small' %}
-                </div>
-
-
+                {% include "wbcore/segment_header.html" with icon='calendar alternate outline' title='Events' url_alias='events' %}
+                {% include 'wbcore/item_list.html' with item_list=event_item_list image_size='small' %}
             </div>
             <div class="ui segment">
-                <i class="label donate icon"></i>
-                <a class="ui item title header"href="{% url 'donate' %}">Donate</a>
+                {% include "wbcore/segment_header.html" with icon='donate' title='Donate' url_alias='donate' %}
             </div>
             <div class="ui segment">
-                <i class="label globe africa icon"></i>
-                <a class="ui item title header"href="{% url 'blog' %}">Blog</a>
-                <div class="ui items">
-                    {% include 'wbcore/item_list.html' with item_list=blog_item_list image_size='small' %}
-                </div>
+                {% include "wbcore/segment_header.html" with icon='globe africa' title='Blog' url_alias='blog' %}
+                {% include 'wbcore/item_list.html' with item_list=blog_item_list image_size='small' %}
             </div>
         </div>
     </div>

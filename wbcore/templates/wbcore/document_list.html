@@ -1,0 +1,16 @@
+{% if documents %}
+
+<table class="ui very basic table">
+    <tbody>
+        {% for document in documents %}
+            <tr>
+                <td class="one wide">{{ document.valid_from.year }}</td>
+                <td class="selectable">
+                    <a target="_blank" href="{{ document.file.url }}" > <i class="file pdf outline icon"></i>{{ document.title }} </a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endif %}
