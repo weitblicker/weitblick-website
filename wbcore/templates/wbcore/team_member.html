@@ -5,7 +5,7 @@
         {% if not member.image %}
             {% include 'wbcore/svgs/profile.svg' %}
         {% else %}
-            <img src="{{ member.image.get_listsize_url }}">
+            <img class="huhu" src="{{ member.image.url }}">
         {% endif %}
     </div>
     <div class="middle aligned content">
