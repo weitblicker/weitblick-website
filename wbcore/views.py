@@ -254,7 +254,7 @@ def reports_view(request, host_slug=None):
     if host_slug:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Reports', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Reports', None)]
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Reports', None)]
         except:
             raise Http404()
     else:
@@ -266,9 +266,9 @@ def reports_view(request, host_slug=None):
         report = Content.objects.get(host=load_host, type='reports')
     except Content.DoesNotExist:
         report = None
-    financial_reports = Document.objects.filter(host=load_host, document_type='financial_report')
+    financial_reports = Document.objects.filter(host=load_host, document_type='financial_report', public=True)
     financial_reports = financial_reports.order_by('valid_from') if financial_reports else financial_reports
-    annual_reports = Document.objects.filter(host=load_host, document_type='annual_report')
+    annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
     annual_reports = annual_reports.order_by('valid_from') if annual_reports else annual_reports
 
     template = loader.get_template('wbcore/reports.html')
@@ -289,7 +289,7 @@ def charter_view(request, host_slug=None):
     if host_slug:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Charter', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Charter', None)]
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Charter', None)]
         except:
             raise Http404()
     else:
@@ -301,7 +301,9 @@ def charter_view(request, host_slug=None):
         charter = Content.objects.get(host=load_host, type='charter')
     except Content.DoesNotExist:
         charter = None
-    charter_file = Document(host=load_host, document_type='charter')
+
+    charter_files = Document.objects.filter(host=load_host, document_type='charter', public=True)
+    charter_files = charter_files.order_by('valid_from') if charter_files else charter_files
 
     template = loader.get_template('wbcore/charter.html')
     context = {
@@ -311,7 +313,7 @@ def charter_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'charter': charter,
-        'charter_file': charter_file,
+        'charter_files': charter_files,
     }
     return HttpResponse(template.render(context, request))
 
@@ -322,7 +324,7 @@ def transparency_view(request, host_slug=None):
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Transparency', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Transparency', None)]
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Transparency', None)]
         except:
             raise Http404()
     else:
@@ -348,7 +350,7 @@ def facts_view(request, host_slug=None):
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Facts', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Facts', None)]
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Facts', None)]
         except:
             raise Http404()
     else:
@@ -374,7 +376,7 @@ def history_view(request, host_slug=None):
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('History', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('History', None)]
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('History', None)]
         except:
             raise Http404()
     else:
@@ -400,7 +402,7 @@ def privacy_view(request, host_slug=None):
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Privacy', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Privacy', None)]
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Privacy', None)]
         except:
             raise Http404()
     else:

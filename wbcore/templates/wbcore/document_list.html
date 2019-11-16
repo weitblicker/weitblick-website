@@ -4,7 +4,7 @@
     <tbody>
         {% for document in documents %}
             <tr>
-                <td class="one wide">{{ document.valid_from.year }}</td>
+                {% if show_year %}<td class="one wide">{{ document.valid_from.year }}</td>{% endif %}
                 <td class="selectable">
                     <a target="_blank" href="{{ document.file.url }}" > <i class="file pdf outline icon"></i>{{ document.title }} </a>
                 </td>
