@@ -107,7 +107,7 @@ class SocialMediaLink(models.Model):
 class JoinPage(models.Model):
     enable_form = models.BooleanField(default=False)
     text = models.TextField()
-    image = models.OneToOneField(Photo, on_delete=models.SET_NULL, null=True)
+    image = models.OneToOneField(Photo, on_delete=models.SET_NULL, null=True, blank=True)
     sepa_text = models.TextField()
     min_fee = models.IntegerField()
     max_fee = models.IntegerField()
