@@ -23,7 +23,7 @@ from wbcore.forms import (
 
 from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
-    UserRelation, JoinPage, SocialMediaLink, Content
+    UserRelation, JoinPage, SocialMediaLink, Content, Document
 )
 
 main_host_slug = 'bundesverband' ## TODO configure this?
@@ -252,9 +252,7 @@ def home_view(request):
 
 
 def reports_view(request, host_slug=None):
-    host_slugs = get_host_slugs(request, host_slug)
-
-    if host_slugs:
+    if host_slug:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
             breadcrumb = [('Reports', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Reports', None)]
@@ -264,7 +262,15 @@ def reports_view(request, host_slug=None):
         host = None
         breadcrumb = [('Home', reverse('home')), ('Reports', None)]
 
-    projects = Project.objects.all()
+    load_host = host if host else Host.objects.get(slug='bundesverband')
+    try:
+        report = Content.objects.get(host=load_host, type='reports')
+    except Content.DoesNotExist:
+        report = None
+    financial_reports = Document.objects.filter(host=load_host, document_type='financial_report')
+    financial_reports = financial_reports.order_by('valid_from') if financial_reports else financial_reports
+    annual_reports = Document.objects.filter(host=load_host, document_type='annual_report')
+    annual_reports = annual_reports.order_by('valid_from') if annual_reports else annual_reports
 
     template = loader.get_template('wbcore/reports.html')
     context = {
@@ -273,6 +279,9 @@ def reports_view(request, host_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'report': report,
+        'financial_reports': financial_reports,
+        'annual_reports': annual_reports,
     }
     return HttpResponse(template.render(context, request))
 
