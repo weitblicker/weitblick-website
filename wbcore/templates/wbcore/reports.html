@@ -22,7 +22,7 @@
                 <div class="ui segment">
 
                     {% include 'wbcore/segment_header.html' with icon='file alternate outline' title='Annual Report' %}
-                    {% include 'wbcore/document_list.html' with documents=annual_reports %}
+                    {% include 'wbcore/document_list.html' with documents=annual_reports show_year=True%}
 
                 </div>
         </div>
@@ -32,7 +32,7 @@
         {% if financial_reports %}
             <div class="ui segment">
                 {% include 'wbcore/segment_header.html' with icon='coins' title="Financial Report" %}
-                {% include 'wbcore/document_list.html' with documents=financial_reports %}
+                {% include 'wbcore/document_list.html' with documents=financial_reports show_year=True %}
             </div>
         {% endif %}
     </div>

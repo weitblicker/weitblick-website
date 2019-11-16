@@ -546,7 +546,8 @@ class Document(models.Model):
         ('other', 'Other')
     )
     document_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='financial_report', null=True)
-    valid_from = models.DateField(null=True, blank=True)
+    valid_from = models.DateField(auto_now_add=True, blank=False)
+    public = models.BooleanField(default=True)
 
     def belongs_to_host(self, host):
         return self.host == host

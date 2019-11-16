@@ -1,4 +1,24 @@
-{% extends 'wbcore/single_content.html' %}
-{% block single-content %}
-    <p>Privacy</p>
+{% extends 'wbcore/base.html' %}
+{% load martortags %}
+{% load staticfiles %}
+{% block content %}
+
+<div class="ui stackable grid container">
+    {% include 'wbcore/image-header.html' with title="Privacy" image='/static/images/news_header.jpg' %}
+
+    <div class="ten wide column divided items">
+        <div class="ui segment">
+            {% if privacy %}
+                {{ privacy.text | safe_markdown }}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="six wide column divided items">
+            <div class="ui segment">
+                {% include 'wbcore/segment_header.html' with icon='info circle' title="..." %}
+            </div>
+    </div>
+</div>
+
 {% endblock %}
