@@ -508,7 +508,7 @@ def about_view(request, host_slug=None):
 
     projects = Project.objects.all()
 
-    about = Content.objects.get(host=host)
+    about = Content.objects.get(host=host, type='about')
 
     template = loader.get_template('wbcore/about.html')
     context = {
@@ -818,6 +818,11 @@ def host_view(request, host_slug):
     posts = NewsPost.objects.filter(host=host_slug).order_by('-published')[:5]
     events = Event.objects.filter(host=host_slug).order_by('-start')[:3]
     period = Period(events, datetime.now(), datetime.now() + timedelta(365/2))
+    try:
+        welcome = Content.objects.get(host=host, type='welcome')
+    except Content.DoesNotExist as e:
+        print("Welcome content page for", host, "does not exists!")
+        welcome = None
     occurrences = period.get_occurrences()
     hosts = Host.objects.all()
     teams = Team.objects.filter(host=host)
@@ -833,6 +838,7 @@ def host_view(request, host_slug):
         'posts': posts,
         'occurrences': occurrences,
         'teams': teams,
+        'welcome': welcome,
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
