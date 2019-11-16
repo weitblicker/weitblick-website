@@ -4,7 +4,7 @@
 {% block content %}
 
 <div class="ui one column stackable grid container">
-    {% include 'wbcore/image-header.html' with title=team.name image=team.image.get_headersize_url %}
+    {% include 'wbcore/image-header.html' with title=team.name image=team.image default='/images/team_header.jpg' %}
 
     <div class="six wide column divided items">
         <div class="ui segment">

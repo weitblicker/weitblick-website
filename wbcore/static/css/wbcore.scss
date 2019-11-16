@@ -420,6 +420,12 @@ $wb_lightgrey: #D6D6D9;
 		justify-content: left;
 		align-items: start;
 	}
+
+	.ui.fluid.image {
+		padding-top: 350/959*100%;
+		background-position: center;
+		background-size: cover;
+	}
 }
 
 .highcharts-credits{

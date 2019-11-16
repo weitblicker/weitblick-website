@@ -2,9 +2,7 @@
 {% block content %}
 
     <div class="ui stackable grid container">
-        {% if image %}
-        {% include 'wbcore/image-header.html' with image=image.get_display_url img_alt=image.title title='Mitgleid werden' %}
-        {% endif %}
+        {% include 'wbcore/image-header.html' with title='Mitgleid werden' image=image default='/images/join_header.jpg' %}
         <div class="eight wide column">
             <div class="ui segment">
                 {{ text | safe }}

@@ -5,11 +5,8 @@
 {% block content %}
     <div class="ui stackable grid container">
 
-        {% if welcome.image %}
-        {% include 'wbcore/image-header.html' with image=welcome.image.get_headersize_url title=host.name%}
-        {% else %}
-        {% include 'wbcore/image-header.html' with image='/static/images/host_header.jpg' title=host.name%}
-        {% endif %}
+        {% include 'wbcore/image-header.html' with image=welcome.image default="/images/host_header.jpg" title=host.name%}
+
         <div class="ten wide column divided items">
 
             {% if welcome %}
