@@ -7,7 +7,6 @@ django-localflavor
 django-filter
 django-google-maps
 django-allauth
-django-el-pagination
 elasticsearch>=2,<3
 django-haystack
 pytidylib
