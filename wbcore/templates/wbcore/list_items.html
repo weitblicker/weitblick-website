@@ -1,6 +1,15 @@
 {%  load el_pagination_tags %}
 
-{% lazy_paginate item_list %}
+{% if paginate_number %}
+    {% if paginate_first %}
+        {% lazy_paginate paginate_first,paginate_number item_list %}
+    {% else %}
+        {% lazy_paginate paginate_number item_list  %}
+    {% endif %}
+{% else %}
+    {% lazy_paginate item_list %}
+{% endif %}
+
 {% for item in item_list %}
     {% include 'wbcore/list_item.html' with item=item %}
 {% endfor %}

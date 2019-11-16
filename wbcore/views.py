@@ -117,20 +117,19 @@ def get_dot_nav(host=None):
     if host:
         news = NewsPost.objects.filter(host=host).order_by('-published')[:3]
         blog = BlogPost.objects.filter(host=host).order_by('-published')[:3]
-        events = Event.objects.filter(host=host)
-        occurences = Period(events, datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
+        occurences = Period(Event.objects.filter(host=host), datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
     else:
         news = NewsPost.objects.all().order_by('-published')[:3]
         blog = BlogPost.objects.all().order_by('-published')[:3]
         occurences = Period(Event.objects.all(), datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
-        events = [occ.event for occ in occurences]
-        for event in events:
-            if event.start.day == event.end.day:
-                event.show_date = event.start.strftime('%a, %d. %b %Y')
-                event.show_date += "<br>" + event.start.strftime('%H:%M') + " - " + event.end.strftime('%H:%M')
-            else:
-                event.show_date = event.start.strftime('%a, %d. %b')
-                event.show_date += " -<br>" + event.end.strftime('%a, %d. %b %Y')
+    events = [occ.event for occ in occurences]
+    for event in events:
+        if event.start.day == event.end.day:
+            event.show_date = event.start.strftime('%a, %d. %b %Y')
+            event.show_date += "<br>" + event.start.strftime('%H:%M') + " - " + event.end.strftime('%H:%M')
+        else:
+            event.show_date = event.start.strftime('%a, %d. %b')
+            event.show_date += " -<br>" + event.end.strftime('%a, %d. %b %Y')
     return {'news': news, 'blog': blog, 'events': events}
 
 
@@ -287,9 +286,7 @@ def reports_view(request, host_slug=None):
 
 
 def charter_view(request, host_slug=None):
-    host_slugs = get_host_slugs(request, host_slug)
-
-    if host_slugs:
+    if host_slug:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
             breadcrumb = [('Charter', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Charter', None)]
@@ -299,7 +296,12 @@ def charter_view(request, host_slug=None):
         host = None
         breadcrumb = [('Home', reverse('home')), ('Charter', None)]
 
-    projects = Project.objects.all()
+    load_host = host if host else Host.objects.get(slug='bundesverband')
+    try:
+        charter = Content.objects.get(host=load_host, type='charter')
+    except Content.DoesNotExist:
+        charter = None
+    charter_file = Document(host=load_host, document_type='charter')
 
     template = loader.get_template('wbcore/charter.html')
     context = {
@@ -308,6 +310,8 @@ def charter_view(request, host_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'charter': charter,
+        'charter_file': charter_file,
     }
     return HttpResponse(template.render(context, request))
 
@@ -834,7 +838,6 @@ def host_view(request, host_slug):
     hosts = Host.objects.all()
     teams = Team.objects.filter(host=host)
 
-
     template = loader.get_template('wbcore/host.html')
     context = {
         'host': host,
@@ -1269,6 +1272,19 @@ def contact_view(request, host_slug=None):
     else:
         breadcrumb = [('Home', reverse('home')), ('Contact', None)]
 
+    load_host = host if host else Host.objects.get(slug='bundesverband')
+    contact = Content.objects.get(host=load_host, type='contact')
+    teams = Team.objects.filter(host=load_host)
+    if teams:
+        if len(teams) > 3:
+            teams = teams[:3]
+            more_teams = reverse('teams', args=[host_slug]) if host_slug else reverse('teams')
+        else:
+            more_teams = False
+        teams = item_list_from_teams(teams, host_slug=host_slug)
+    else:
+        teams = False
+
     template = loader.get_template('wbcore/contact.html')
     context = {
         'main_nav': get_main_nav(),
@@ -1277,6 +1293,9 @@ def contact_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'success': False,
         'icon_links': icon_links,
+        'contact': contact,
+        'teams': teams,
+        'more_teams': more_teams,
     }
 
     if request.method == 'POST':

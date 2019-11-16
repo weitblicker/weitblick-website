@@ -1,19 +1,33 @@
 {% load static %}
 <div class="item">
     {% if image %}
-        <a href="{% url type post_id=id %}" class="ui top aligned image">
-            <img src="{{ image.get_menusize_url }}" class="thumbnail" alt="{{ image.title }}">
-        </a>
+        {% if host %}
+            <a href="{% url type post_id=id host_slug=host.slug %}" class="ui top aligned image">
+                <img src="{{ image.get_menusize_url }}" class="thumbnail" alt="{{ image.title }}">
+            </a>
+        {% else %}
+            <a href="{% url type post_id=id %}" class="ui top aligned image">
+                <img src="{{ image.get_menusize_url }}" class="thumbnail" alt="{{ image.title }}">
+            </a>
+        {% endif %}
     {% elif type == 'event' %}
         <i class="clock outline icon"></i>
     {% endif %}
 
     <div class="content">
         {% if type == 'event'%}
-            <a href="{% url type event_slug=slug %}">{{ title }}</a>
+            {% if host %}
+                <a href="{% url type event_slug=slug host_slug=host.slug %}">{{ title }}</a>
+            {% else %}
+                <a href="{% url type event_slug=slug %}">{{ title }}</a>
+            {% endif %}
             <p>{{ show_date | safe }}</p>
         {% else %}
-            <a href="{% url type post_id=id %}">{{ title }}</a>
+            {% if host %}
+                <a href="{% url type post_id=id host_slug=host.slug %}">{{ title }}</a>
+            {% else %}
+                <a href="{% url type post_id=id %}">{{ title }}</a>
+            {% endif %}
             <p>{{ desc }}</p>
         {% endif %}
     </div>

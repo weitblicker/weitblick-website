@@ -94,7 +94,7 @@
             {% endif %}
         </div>
         <div class="ui five wide column unstackable items">
-            {% if host %} <a class="ui item header href="{% url 'events' host.slug %}">Events</a>
+            {% if host %} <a class="ui item header" href="{% url 'events' host.slug %}">Events</a>
             {% else %} <a class="ui item header" href="{% url 'events' %}">Events</a>
             {% endif %}
             {% for event in dot_nav.events %}
