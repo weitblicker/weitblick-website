@@ -3,9 +3,18 @@ from django.core.management.commands.dumpdata import Command as DumpDataCommand
 
 class Command(DumpDataCommand):
 
-    data = [('wbcore.location', 'locations.json'),
+    data = [('wbcore.address', 'address.json'),
+            ('wbcore.location', 'locations.json'),
+            ('wbcore.host', 'hosts.json'),
+            ('photologue', 'images.json'),
+            ('wbcore.newspost', 'news.json'),
+            ('wbcore.blogpost', 'blog.json'),
+            ('wbcore.partner', 'partner.json'),
+            ('schedule', 'schedule.json'),
+            ('form_designer.form', 'forms.json'),
             ('wbcore.event', 'events.json'),
-            ('schedule', 'schedule.json')]
+            ('wbcore.project', 'projects.json'),
+            ]
 
     def handle(self, *app_labels, **options):
 
