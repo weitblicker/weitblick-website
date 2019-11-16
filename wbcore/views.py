@@ -827,7 +827,6 @@ def host_view(request, host_slug):
     hosts = Host.objects.all()
     teams = Team.objects.filter(host=host)
 
-
     template = loader.get_template('wbcore/host.html')
     context = {
         'host': host,
@@ -1262,6 +1261,19 @@ def contact_view(request, host_slug=None):
     else:
         breadcrumb = [('Home', reverse('home')), ('Contact', None)]
 
+    load_host = host if host else Host.objects.get(slug='bundesverband')
+    contact = Content.objects.get(host=load_host, type='contact')
+    teams = Team.objects.filter(host=load_host)
+    if teams:
+        if len(teams) > 3:
+            teams = teams[:3]
+            more_teams = reverse('teams', args=[host_slug]) if host_slug else reverse('teams')
+        else:
+            more_teams = False
+        teams = item_list_from_teams(teams, host_slug=host_slug)
+    else:
+        teams = False
+
     template = loader.get_template('wbcore/contact.html')
     context = {
         'main_nav': get_main_nav(),
@@ -1270,6 +1282,9 @@ def contact_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'success': False,
         'icon_links': icon_links,
+        'contact': contact,
+        'teams': teams,
+        'more_teams': more_teams,
     }
 
     if request.method == 'POST':
