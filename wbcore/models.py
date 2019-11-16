@@ -263,6 +263,7 @@ class Content(models.Model):
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=False)
     text = models.TextField()
 
+
     def belongs_to_host(self, host):
         return host.slug == self.host.slug
 

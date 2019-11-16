@@ -17,7 +17,7 @@ django-rest-auth[with_social]
 Pillow
 libsass
 num2words
-markdown
+markdown>=3.0
 martor
 django-modeltranslation
 django-tinymce4-lite
