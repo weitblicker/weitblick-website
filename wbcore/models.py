@@ -262,7 +262,7 @@ class Content(models.Model):
     type = models.CharField(max_length=20, choices=TYPE_CHOICES, null=True)
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=False)
     text = models.TextField()
-
+    image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
 
     def belongs_to_host(self, host):
         return host.slug == self.host.slug
