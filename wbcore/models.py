@@ -161,6 +161,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=60)
     first_name = models.CharField(max_length=60)
     last_name = models.CharField(max_length=60)
+
     email = models.EmailField(
         verbose_name='email address',
         max_length=255,
@@ -250,6 +251,7 @@ class Content(models.Model):
     TYPE_CHOICES = (
         ('welcome', 'Welcome'),
         ('about', 'About'),
+        ('idea', 'Idea'),
         ('history', 'History'),
         ('teams', 'Teams'),
         ('contact', 'Contact'),

@@ -1,4 +1,6 @@
+
 {% load staticfiles %}
+{% load static %}
 <div class="sixteen wide column divided items">
     <div id="header-image" class="ui fluid image">
         {% include 'wbcore/socialbuttons.html' %}
@@ -8,9 +10,9 @@
             </div>
         </div>
         {% if image %}
-            <img class="ui fluid image" src="{{ image.get_headersize_url }}" alt="{{ img_alt }}">
+            <img class="ui fluid image" src="{{ image.get_headersize_url }}" alt="{{ image.title }}">
         {% elif default %}
-            <div class="ui fluid image" style='background-image: url("{% static default %}");'></div>
+            <div class="ui fluid default image" style='background-image: url("{% static default %}");'></div>
         {% else %}
             <div class="image">{% include 'wbcore/svgs/placeholder.svg' with text=title %}</div>
         {% endif %}
