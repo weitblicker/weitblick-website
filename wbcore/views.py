@@ -540,12 +540,19 @@ def idea_view(request, host_slug=None):
 
     projects = Project.objects.all()
 
+    try:
+        idea = Content.objects.get(host=host, type='idea')
+    except Content.DoesNotExist as e:
+        print("Idea content page for", host, "does not exists!")
+        idea = None
+
     template = loader.get_template('wbcore/idea.html')
     context = {
         'main_nav': get_main_nav(active='idea', host=host),
         'dot_nav': get_dot_nav(host=host),
         'projects': projects,
         'host': host,
+        'idea': idea,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
     }
