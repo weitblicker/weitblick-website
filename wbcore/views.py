@@ -1266,7 +1266,10 @@ def contact_view(request, host_slug=None):
         breadcrumb = [('Home', reverse('home')), ('Contact', None)]
 
     load_host = host if host else Host.objects.get(slug='bundesverband')
-    contact = Content.objects.get(host=load_host, type='contact')
+    try:
+        contact = Content.objects.get(host=load_host, type='contact')
+    except Content.DoesNotExist:
+        contact = None
     teams = Team.objects.filter(host=load_host)
     if teams:
         if len(teams) > 3:
@@ -1277,6 +1280,7 @@ def contact_view(request, host_slug=None):
         teams = item_list_from_teams(teams, host_slug=host_slug)
     else:
         teams = False
+        more_teams = False
 
     template = loader.get_template('wbcore/contact.html')
     context = {

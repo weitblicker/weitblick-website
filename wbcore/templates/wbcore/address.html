@@ -5,7 +5,8 @@
         <div class="item">
             <i class="large envelope open text icon"></i>
             <div class="content">
-                {{ host.address.street }}
+                {{ host.name }}
+                <br>{{ host.address.street }}
                 <br>{{ host.address.postal_code }} {{ host.address.city }}
                 <br>{{ host.address.country.name }}
             </div>
