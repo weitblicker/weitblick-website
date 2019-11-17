@@ -183,6 +183,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_admin_of_host(self, host):
         return host in self.get_maintaining_hosts()
 
+    def has_role(self, role):
+        return role in [member.member_type for member in self.userrelation_set.all()]
+
     def role(self):
         roles =dict(UserRelation.TYPE_CHOICES)
         return [roles[member.member_type] for member in self.userrelation_set.all()]
@@ -195,16 +198,21 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['first_name', 'last_name', 'date_of_birth']
 
     def has_perm(self, perm, obj=None):
+
+        print(self.role())
+
         # Does the user have a specific permission?
         if obj:
             print("has perm:", perm, obj)
+        else:
+            print("has perm:", perm)
 
         # admins have all rights
         if self.is_super_admin:
             return True
 
         if not obj:
-            return True
+            return self.has_role('admin')
 
         if perm.startswith("wbcore.view"):
             return True
@@ -212,11 +220,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         # Get all host objects where the user is an admin
         # If the object belongs to any of these hosts the
         # user has the right to access it
-        for host in self.userrelation_set.filter(member_type='admin'):
+        for relation in self.userrelation_set.filter(member_type='admin'):
 
-            print("test", obj, self)
+            print("Object:", obj, "User:", self, "Host:", relation.host)
 
-            if obj.belongs_to_host(host):
+            if obj.belongs_to_host(relation.host):
                 if isinstance(obj, User):
                     if obj.is_super_admin:
                         return False
@@ -228,7 +236,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         return False
 
     def has_module_perms(self, app_label):
-        return True
+        if self.is_super_admin:
+            return True
+
+        if app_label is 'wbcore':
+            return True
+
+        print("app label", app_label)
+
+        return False
 
     def name(self):
         return self.first_name + " " + self.last_name
