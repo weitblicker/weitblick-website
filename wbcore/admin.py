@@ -171,8 +171,7 @@ class MyAdmin(TabbedTranslationAdmin):
             return queryset.filter(hosts__in=request.user.hosts.all())
         except:
             # if field host exists filter using it
-            try:
-                return queryset.filter(host__in=request.user.hosts.all())
+            try:                return queryset.filter(host__in=request.user.hosts.all())
             except:
                 return queryset
 
@@ -316,8 +315,10 @@ class UserAdmin(BaseUserAdmin):
         fieldset = super().get_fieldsets(request, obj)
         if request.user.is_super_admin:
             fieldset_dict = dict(fieldset)
-            if 'is_super_admin' not in fieldset_dict['Account']['fields']:
-                fieldset_dict['Account']['fields'] += ('is_super_admin',)
+            print(fieldset_dict)
+            if 'Account' in fieldset_dict:
+                if 'is_super_admin' not in fieldset_dict['Account']['fields']:
+                    fieldset_dict['Account']['fields'] += ('is_super_admin',)
         else:
             fieldset_dict = dict(fieldset)
             fieldset_sublist = list(fieldset_dict['Account']['fields'])
