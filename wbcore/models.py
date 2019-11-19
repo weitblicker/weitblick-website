@@ -13,7 +13,9 @@ from django.urls import reverse
 from django_google_maps import fields as map_fields
 from schedule.models.events import Event as ScheduleEvent
 from form_designer.models import Form as EventForm
-from django.contrib import messages
+import rules
+from wbcore import predicates as pred
+from rules.contrib.models import RulesModel, RulesModelBase, RulesModelMixin
 
 
 class Address(models.Model):
@@ -25,13 +27,21 @@ class Address(models.Model):
     street = models.CharField(max_length=30)
 
     def belongs_to_host(self, host):
-        return True
+        return
 
     def __str__(self):
         return ", ".join(filter(None, [self.name, self.street, self.postal_code, self.city, self.country.name]))
 
 
-class Location(models.Model):
+class Location(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "view": rules.always_allow,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "delete": pred.is_super_admin | pred.is_admin,
+        }
+
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(blank=True, null=True,max_length=300 )
     country = CountryField()
@@ -55,7 +65,15 @@ class Location(models.Model):
         return self.name + " (" + self.country.name + ")"
 
 
-class Host(models.Model):
+class Host(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin,
+            "view": rules.always_allow,
+            "change": pred.is_super_admin | pred.is_admin,
+            "delete": pred.is_super_admin,
+        }
+
     slug = models.SlugField(primary_key=True, max_length=50, unique=True)
     name = models.CharField(max_length=100, unique=True)
     city = models.CharField(max_length=50)
@@ -84,8 +102,19 @@ class Host(models.Model):
     def __str__(self):
         return self.name
 
+    def get_hosts(self):
+        return [self]
 
-class SocialMediaLink(models.Model):
+
+class SocialMediaLink(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin,
+            "view": rules.always_allow,
+            "change": pred.is_super_admin | pred.is_admin,
+            "delete": pred.is_super_admin | pred.is_admin,
+        }
+
     CHOICES = (
         ('facebook', 'Facebook'),
         ('instagram', 'Instagram'),
@@ -103,8 +132,19 @@ class SocialMediaLink(models.Model):
     def __str__(self):
         return dict(self.CHOICES)[self.type]
 
+    def get_hosts(self):
+        return [self.host]
 
-class JoinPage(models.Model):
+
+class JoinPage(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin,
+            "view": pred.is_super_admin | pred.is_admin,
+            "change": pred.is_super_admin | pred.is_admin,
+            "delete": pred.is_super_admin,
+        }
+
     enable_form = models.BooleanField(default=False)
     text = models.TextField()
     image = models.OneToOneField(Photo, on_delete=models.SET_NULL, null=True, blank=True)
@@ -112,6 +152,9 @@ class JoinPage(models.Model):
     min_fee = models.IntegerField()
     max_fee = models.IntegerField()
     host = models.OneToOneField(Host, on_delete=models.CASCADE, null=True)
+
+    def get_hosts(self):
+        return [self.host]
 
 
 class UserManager(BaseUserManager):
@@ -158,6 +201,8 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    ## TODO permissions for user with rules module
+
     username = models.CharField(max_length=60)
     first_name = models.CharField(max_length=60)
     last_name = models.CharField(max_length=60)
@@ -176,18 +221,48 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     is_super_admin = models.BooleanField(default=False)
 
-    def get_maintaining_hosts(self):
-        admin_relations = self.userrelation_set.filter(member_type='admin').all()
+    def get_hosts_for_role(self, role):
+        admin_relations = self.userrelation_set.filter(member_type=role).all()
         return [relation.host for relation in admin_relations]
 
+    def get_maintaining_hosts(self):
+        return self.get_hosts_for_role('admin')
+
+    def get_hosts_for_admin(self):
+        return self.get_hosts_for_role('admin')
+
+    def get_hosts_for_editor(self):
+        return self.get_hosts_for_role('editor')
+
+    def get_hosts_for_author(self):
+        return self.get_hosts_for_role('author')
+
+    def get_hosts_for_member(self):
+        return self.get_hosts_for_role('member')
+
+    def has_role_for_host(self, member_type, host):
+        if isinstance(host, list):
+            return self.userrelation_set.filter(member_type=member_type, host__in=host).count() > 0
+        else:
+            return self.userrelation_set.filter(member_type=member_type, host=host).count() > 0
+
     def is_admin_of_host(self, host):
-        return host in self.get_maintaining_hosts()
+        return self.has_role_for_host('admin', host)
+
+    def is_editor_of_host(self, host):
+        return self.has_role_for_host('editor', host)
+
+    def is_author_of_host(self, host):
+        return self.has_role_for_host('author', host)
+
+    def is_member_of_host(self, host):
+        return self.has_role_for_host('member', host)
 
     def has_role(self, role):
         return role in [member.member_type for member in self.userrelation_set.all()]
 
     def role(self):
-        roles =dict(UserRelation.TYPE_CHOICES)
+        roles = dict(UserRelation.TYPE_CHOICES)
         return [roles[member.member_type] for member in self.userrelation_set.all()]
 
     hosts = models.ManyToManyField(Host, through='UserRelation')
@@ -197,15 +272,20 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'date_of_birth']
 
+    def get_hosts(self):
+        return self.hosts
+
     def has_perm(self, perm, obj=None):
 
-        print(self.role())
+        return super(User, self).has_perm(perm, obj)
+        #print("out:", out)
+        #print(self.role())
 
         # Does the user have a specific permission?
-        if obj:
-            print("has perm:", perm, obj)
-        else:
-            print("has perm:", perm)
+        #if obj:
+            #print("has perm:", perm, obj)
+        #else:
+            #print("has perm:", perm)
 
         # admins have all rights
         if self.is_super_admin:
@@ -236,6 +316,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return False
 
     def has_module_perms(self, app_label):
+        #return super(User, self).has_module_perms(app_label)
+
         if self.is_super_admin:
             return True
 
@@ -263,7 +345,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         return host in self.hosts.all()
 
 
-class Content(models.Model):
+class Content(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin,
+            "view": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "delete": pred.is_super_admin,
+        }
+
     TYPE_CHOICES = (
         ('welcome', 'Welcome'),
         ('about', 'About'),
@@ -301,12 +391,23 @@ class Content(models.Model):
     def __str__(self):
         return dict(self.TYPE_CHOICES)[self.type] + " (" + self.host.name + ")"
 
+    def get_hosts(self):
+        return [self.host]
+
 
 def save_partner_logo(instance, filename):
     return "partners/" + instance.name.lower().replace(' ', '_') + splitext(filename)[1].lower()
 
 
-class Partner(models.Model):
+class Partner(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "view": rules.always_allow,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "delete": pred.is_super_admin | pred.is_admin | pred.is_editor,
+        }
+
     name = models.CharField(max_length=200, unique=True)
     description = models.TextField()
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, blank=True, null=True)
@@ -318,11 +419,23 @@ class Partner(models.Model):
     def __str__(self):
         return self.name
 
+    @staticmethod
+    def get_hosts(self):
+        return Host.objects.all()
 
-class Project(models.Model):
+
+class Project(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "view": rules.always_allow,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "delete": pred.is_super_admin | pred.is_admin,
+        }
+
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=50, unique=True, null=True)
-    hosts = models.ManyToManyField(Host)
+    hosts = models.ManyToManyField(Host, related_name="projects")
     short_description = models.TextField()
     description = models.TextField()
     title_image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
@@ -360,8 +473,20 @@ class Project(models.Model):
         else:
             return None
 
+    def get_hosts(self):
+        return self.hosts
 
-class Event(ScheduleEvent):
+
+class Event(RulesModelMixin, ScheduleEvent, metaclass=RulesModelBase):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "view": rules.always_allow,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "delete": pred.is_super_admin | pred.is_admin | pred.is_editor,
+        }
+        get_latest_by = ['start']
+
     slug = models.SlugField(max_length=50, unique=True, null=True)
     teaser = models.TextField(max_length=120, blank=True)
     projects = models.ManyToManyField(Project, blank=True)
@@ -396,14 +521,22 @@ class Event(ScheduleEvent):
         else:
             return None
 
-    class Meta:
-        get_latest_by = ['start']
-
     def belongs_to_host(self, host):
         return self.host == host
 
+    def get_hosts(self):
+        return [self.host]
 
-class UserRelation(models.Model):
+
+class UserRelation(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin,
+            "view": pred.is_super_admin | pred.is_admin,
+            "change": pred.is_super_admin | pred.is_admin,
+            "delete": pred.is_super_admin | pred.is_admin,
+        }
+
     host = models.ForeignKey(Host, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     TYPE_CHOICES = (
@@ -425,8 +558,20 @@ class UserRelation(models.Model):
     def belongs_to_host(self, host):
         return self.host == host
 
+    def get_hosts(self):
+        return [self.host]
 
-class NewsPost(models.Model):
+
+class NewsPost(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin | pred.is_editor | pred.is_author,
+            "view": rules.always_allow,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_editor | pred.is_author,
+            "delete": pred.is_super_admin | pred.is_admin | pred.is_editor | pred.is_author,
+        }
+        get_latest_by = 'published'
+
     title = models.CharField(max_length=200)
     text = models.TextField()
     image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
@@ -451,7 +596,7 @@ class NewsPost(models.Model):
 
     current_host = None
 
-    def hosts(self):
+    def get_hosts(self):
         return [self.host]
 
     def belongs_to_host(self, host):
@@ -480,15 +625,24 @@ class NewsPost(models.Model):
             name = self.author.first_name + " " + self.author.last_name
         return name
 
-    class Meta:
-        get_latest_by = 'published'
-
     def __str__(self):
         city = (" (" + self.host.name + ")") if self.host else ''
         return self.title + city
 
+    def get_hosts(self):
+        return [self.host]
 
-class BlogPost(models.Model):
+
+class BlogPost(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin | pred.is_editor | pred.is_author,
+            "view": rules.always_allow,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_editor | pred.is_author,
+            "delete": pred.is_super_admin | pred.is_admin | pred.is_editor | pred.is_author,
+        }
+        get_latest_by = 'published'
+
     title = models.CharField(max_length=200)
     text = models.TextField()
     image = models.ForeignKey(Photo, null=True, blank =True, on_delete=models.SET_NULL)
@@ -536,19 +690,28 @@ class BlogPost(models.Model):
             name = self.author.first_name + " " + self.author.last_name
         return name
 
-    class Meta:
-        get_latest_by = 'published'
-
     def __str__(self):
         city = ("(" + self.host.city + ")") if self.host else ''
         return self.title + " " + city
+
+    def get_hosts(self):
+        return [self.host]
 
 
 def save_document(instance, filename):
     return "documents/"+ instance.host.slug +"/" + instance.title.lower().replace(' ', '_') + splitext(filename)[1].lower()
 
 
-class Document(models.Model):
+class Document(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "view": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "delete": pred.is_super_admin | pred.is_admin | pred.is_editor,
+        }
+        get_latest_by = 'published'
+
     title = models.CharField(max_length=50)
     description = models.TextField(null=True, blank=True)
     file = models.FileField(upload_to=save_document)
@@ -568,15 +731,24 @@ class Document(models.Model):
     def belongs_to_host(self, host):
         return self.host == host
 
-    class Meta:
-        get_latest_by = 'published'
-
     def __str__(self):
         city = ("(" + self.host.city + ")") if self.host else ''
         return self.title + " " + city
 
+    def get_hosts(self):
+        return [self.host]
 
-class Team(models.Model):
+
+class Team(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin,
+            "view": rules.always_allow,
+            "change": pred.is_super_admin | pred.is_admin,
+            "delete": pred.is_super_admin | pred.is_admin,
+        }
+        ordering = ['rank', 'name']
+
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=50, null=False, blank=False)
     teaser = models.TextField(blank=True, default="")
@@ -622,11 +794,19 @@ class Team(models.Model):
                 }
             )
 
+    def get_hosts(self):
+        return [self.host]
+
+
+class TeamUserRelation(RulesModel):
     class Meta:
-        ordering = ['rank', 'name']
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin,
+            "view": pred.is_super_admin | pred.is_admin,
+            "change": pred.is_super_admin | pred.is_admin,
+            "delete": pred.is_super_admin | pred.is_admin,
+        }
 
-
-class TeamUserRelation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     text = models.TextField()
@@ -640,8 +820,19 @@ class TeamUserRelation(models.Model):
     def __str__(self):
         return self.user.name() + ' in ' + self.team.name
 
+    def get_hosts(self):
+        return self.team.get_hosts() if self.team else []
 
-class Donation(models.Model):
+
+class Donation(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin,
+            "view": pred.is_super_admin | pred.is_admin,
+            "change": pred.is_super_admin | pred.is_admin,
+            "delete": pred.is_super_admin | pred.is_admin,
+        }
+
     host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
     amount = models.DecimalField(max_digits=11, decimal_places=2)
@@ -654,8 +845,19 @@ class Donation(models.Model):
         project = ("(" + self.project.name + ")") if self.project else ''
         return str(self.amount) + "€ für " + self.host.city + project
 
+    def get_hosts(self):
+        return [self.host]
 
-class Milestone(models.Model):
+
+class Milestone(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "view": rules.always_allow,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "delete": pred.is_super_admin | pred.is_admin | pred.is_editor,
+        }
+
     project = models.OneToOneField(Project, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
@@ -664,8 +866,19 @@ class Milestone(models.Model):
     def belongs_to_host(self, host):
         return self.project.belongs_to_host(host)
 
+    def get_hosts(self):
+        return self.project.get_hosts() if self.project else []
 
-class Milestep(models.Model):
+
+class Milestep(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "view": rules.always_allow,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "delete": pred.is_super_admin | pred.is_admin | pred.is_editor,
+        }
+
     name = models.CharField(max_length=50)
     description = models.TextField()
     milestone = models.ForeignKey(Milestone, on_delete = models.CASCADE)
@@ -678,25 +891,47 @@ class Milestep(models.Model):
     def __str__(self):
         return self.name + ' (' + self.milestone.project.name + ')'
 
+    def get_hosts(self):
+        return self.milestone.get_hosts() if self.milestone else []
 
-class BankAccount(models.Model):
+
+class BankAccount(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin,
+            "view": pred.is_super_admin | pred.is_admin | pred.is_user_of_bank_account,
+            "change": pred.is_super_admin | pred.is_user_of_bank_account,
+            "delete": pred.is_super_admin,
+        }
+
     account_holder = models.CharField(max_length=100)
-    profile = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     iban = IBANField(include_countries=IBAN_SEPA_COUNTRIES)
     bic = BICField()
 
     def belongs_to_host(self, host):
-        return self.profile.belongs_to_host(host)
+        return self.user.belongs_to_host(host)
 
     def __str__(self):
         return 'Bankdaten von '+self.profile.name()
 
+    def get_hosts(self):
+        return self.user.hosts
 
-class ContactMessage(models.Model):
+
+class ContactMessage(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin,
+            "view": pred.is_super_admin | pred.is_admin,
+            "change": pred.is_super_admin,
+            "delete": pred.is_super_admin | pred.is_admin,
+        }
+
     REASON_CHOICES = (
-        ('spende', 'Spende'),
-        ('austritt', 'Austritt'),
-        ('other', 'Sonstiges')
+        ('donation', 'Donation'),
+        ('exit', 'Exit'),
+        ('other', 'Other')
     )
     host = models.ForeignKey(Host, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, blank=True)
@@ -708,5 +943,8 @@ class ContactMessage(models.Model):
 
     def belongs_to_host(self, host):
         return host == self.host
+
+    def get_hosts(self):
+        return [self.host]
 
 

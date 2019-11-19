@@ -12,6 +12,7 @@ from martor.widgets import AdminMartorWidget
 from django_google_maps import widgets as map_widgets
 from django_google_maps import fields as map_fields
 from copy import copy
+from rules.contrib.admin import ObjectPermissionsModelAdmin
 
 from itertools import chain
 
@@ -157,7 +158,7 @@ class MyAdmin(TabbedTranslationAdmin):
 
     def get_queryset(self, request):
         queryset = super(MyAdmin, self).get_queryset(request)
-
+        return queryset
         # super user can see everything
         if request.user.is_super_admin:
             return queryset
@@ -168,10 +169,13 @@ class MyAdmin(TabbedTranslationAdmin):
 
         # if many to many field hosts exists filter using it
         try:
+            print("Try this...")
             return queryset.filter(hosts__in=request.user.hosts.all())
         except:
             # if field host exists filter using it
-            try:                return queryset.filter(host__in=request.user.hosts.all())
+            try:
+                print("and that...")
+                return queryset.filter(host__in=request.user.hosts.all())
             except:
                 return queryset
 
