@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'allauth',
     'allauth.account',
+    'allauth.socialaccount',
     'rest_auth',
     'rest_auth.registration',
     'localflavor',
@@ -224,7 +225,7 @@ LANGUAGES = (
     ('fr', _('French')),
     ('es', _('Spanish')),
 )
-MODELTRANSLATION_LANGUAGES = ('de', 'en', 'fr')
+MODELTRANSLATION_LANGUAGES = ('de', 'en', 'fr', 'es')
 MODELTRANSLATION_DEFAULT_LANGUAGE = 'de'
 
 # Static files (CSS, JavaScript, Images)
