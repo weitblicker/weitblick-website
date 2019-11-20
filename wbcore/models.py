@@ -259,7 +259,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.has_role_for_host('member', host)
 
     def has_role(self, role):
-        return role in [member.member_type for member in self.userrelation_set.all()]
+        return self.userrelation_set.filter(role=role).count() > 0
 
     def role(self):
         roles = dict(UserRelation.TYPE_CHOICES)
