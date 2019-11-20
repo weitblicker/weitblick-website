@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'form_designer',
     'admin_ordering',
     'el_pagination',
+    'rules'
 ]
 
 AUTH_USER_MODEL = 'wbcore.User'
@@ -165,10 +166,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 AUTHENTICATION_BACKENDS = [
+    'rules.permissions.ObjectPermissionBackend',
     'microsoft_auth.backends.MicrosoftAuthenticationBackend',
-    'django.contrib.auth.backends.ModelBackend'
+    'django.contrib.auth.backends.ModelBackend',
 ]
-
 
 MICROSOFT_AUTH_CLIENT_ID = '461a1fd8-9c6d-42b1-a74f-5dcdb912d89d'
 MICROSOFT_AUTH_CLIENT_SECRET = '-Klk0zF]9EIxDG6@s7gMwM/v:ha.cB2]'

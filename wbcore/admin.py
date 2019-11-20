@@ -5,7 +5,6 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth import get_permission_codename
 from django import forms
-
 from django.db import models
 from modeltranslation.admin import TabbedTranslationAdmin
 from martor.widgets import AdminMartorWidget
@@ -130,6 +129,7 @@ class UserRelationInlineModel(admin.StackedInline):
 
 class TeamUserRelationInlineModel(admin.TabularInline):
     model = Team.member.through
+    extra = 1
 
 
 class JoinPageInlineModel(admin.StackedInline):

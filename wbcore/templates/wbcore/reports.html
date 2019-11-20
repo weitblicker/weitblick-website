@@ -5,7 +5,7 @@
 {% load i18n %}
 
 <div class="ui stackable grid container">
-    {% include 'wbcore/image-header.html' with title="Reports" image='/static/images/news_header.jpg' %}
+    {% include 'wbcore/image-header.html' with title="Reports" image=report.image default='/images/reports_header.jpg' %}
 
     <div class="{% if annual_reports %}eight{% else %}ten{% endif %} wide column divided items">
         <div class="ui segment">
