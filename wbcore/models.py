@@ -282,10 +282,7 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
     REQUIRED_FIELDS = ['first_name', 'last_name', 'date_of_birth']
 
     def has_perm(self, perm, obj=None):
-        ret = super(User, self).has_perm(perm, obj)
-        print("perm:", perm, obj, ret)
-        print("-----")
-        return ret
+        return super(User, self).has_perm(perm, obj)
         #print("out:", out)
         #print(self.role())
 

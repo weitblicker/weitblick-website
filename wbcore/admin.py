@@ -57,9 +57,19 @@ class UserRelationInlineModel(admin.StackedInline):
 
         return queryset | request_user_relations
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if request.user.is_super_admin:
+            return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+        if db_field.name == 'host':
+            hosts = request.user.get_hosts_for_admin()
+            kwargs["queryset"] = Host.objects.filter(pk__in=[host.pk for host in hosts])
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     def formfield_for_choice_field(self, db_field, request=None, **kwargs):
         formfield = super().formfield_for_choice_field(db_field, request, **kwargs)
 
+        print("db_field:",db_field)
         if request and request.user.is_super_admin:
             return formfield
         if db_field.name == 'member_type':
@@ -74,6 +84,7 @@ class UserRelationInlineModel(admin.StackedInline):
 
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = super().get_readonly_fields(request, obj)
+        return readonly_fields
         if request.user.is_super_admin:
             return readonly_fields
 
@@ -86,6 +97,15 @@ class UserRelationInlineModel(admin.StackedInline):
 
 
 class PermissionInlineModel(admin.TabularInline):
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if request.user.is_super_admin:
+            return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+        if db_field.name == 'host':
+            hosts = request.user.get_hosts_for_admin()
+            kwargs["queryset"] = Host.objects.filter(pk__in=[host.pk for host in hosts])
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def has_add_permission(self, request, obj=None):
         opts = self.opts
@@ -146,6 +166,15 @@ class MyAdmin(TabbedTranslationAdmin):
         models.TextField: {'widget': AdminMartorWidget},
         map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget(attrs={'data-map-type': 'roadmap'})},
     }
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if request.user.is_super_admin:
+            return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+        if db_field.name == 'host':
+            hosts = request.user.get_hosts_for_admin()
+            kwargs["queryset"] = Host.objects.filter(pk__in=[host.pk for host in hosts])
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_queryset(self, request):
         queryset = super(MyAdmin, self).get_queryset(request)
@@ -318,10 +347,11 @@ class UserAdmin(BaseUserAdmin):
                     fieldset_dict['Account']['fields'] += ('is_super_admin',)
         else:
             fieldset_dict = dict(fieldset)
-            fieldset_sublist = list(fieldset_dict['Account']['fields'])
-            if 'is_super_admin' in fieldset_sublist:
-                fieldset_sublist.remove('is_super_admin')
-                fieldset_dict['Account']['fields'] = tuple(fieldset_sublist)
+            if 'Account' in fieldset_dict:
+                fieldset_sublist = list(fieldset_dict['Account']['fields'])
+                if 'is_super_admin' in fieldset_sublist:
+                    fieldset_sublist.remove('is_super_admin')
+                    fieldset_dict['Account']['fields'] = tuple(fieldset_sublist)
 
         return fieldset
 
@@ -403,6 +433,7 @@ class UserAdmin(BaseUserAdmin):
     def has_module_permission(self, request):
         return request.user.has_module_perms(self.opts.app_label)
 
+
 class TeamAdmin(MyAdmin):
     inlines = (TeamUserRelationInlineModel,)
 
@@ -410,10 +441,15 @@ class TeamAdmin(MyAdmin):
 class HostAdmin(MyAdmin):
     inlines = (JoinPageInlineModel, SocialMediaLinkInlineModel)
 
+
 # since we're not using Django's built-in permissions,
 # register our own user model and unregister the Group model from admin.
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
+try:
+    admin.site.register(User, UserAdmin)
+except admin.sites.AlreadyRegistered:
+    admin.site.unregister(User)
+    admin.site.register(User, UserAdmin)
+
 admin.site.unregister(Group)
 admin.site.register(Address, MyAdmin)
 admin.site.register(Content, MyAdmin)
