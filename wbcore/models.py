@@ -201,8 +201,14 @@ class UserManager(BaseUserManager):
         return user
 
 
-class User(AbstractBaseUser, PermissionsMixin):
-    ## TODO permissions for user with rules module
+class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesModelBase):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin,
+            "view": pred.is_super_admin | pred.is_admin | pred.is_self,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_self,
+            "delete": pred.is_super_admin,
+        }
 
     username = models.CharField(max_length=60)
     first_name = models.CharField(max_length=60)

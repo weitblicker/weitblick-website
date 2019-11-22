@@ -32,6 +32,7 @@ class MyTranslatedAdmin(TabbedTranslationAdmin):
 
 class UserRelationInlineModel(admin.StackedInline):
     model = User.hosts.through
+    extra = 0
 
     def get_formset(self, request, obj=None, **kwargs):
         formset = super().get_formset(request, obj, **kwargs)
@@ -42,7 +43,6 @@ class UserRelationInlineModel(admin.StackedInline):
         return fields
 
     def get_queryset(self, request):
-        admin_hosts = request.user.get_maintaining_hosts()
         queryset = super().get_queryset(request)
         if request.user.is_super_admin:
             return queryset
@@ -84,48 +84,6 @@ class UserRelationInlineModel(admin.StackedInline):
 
         return readonly_fields
 
-    def has_add_permission(self, request):
-        if request.user.is_super_admin:
-            return True
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        if request.user.is_super_admin:
-            return True
-
-        # allow host admins to change some details, see readonly fields
-        if UserAdmin.is_admin_of(request, obj):
-            return True
-
-        # all others are not allows to change their profile
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        if request.user == obj:
-            return False
-        return UserAdmin.is_admin_of(request, obj)
-
-    def has_view_permission(self, request, obj=None):
-        # user is allowed to see his / her own profile
-        if obj is None:
-            return True
-
-        if request.user == obj:
-            print("user has view permission!")
-            return True
-
-        # host admins can see all users and relations ships of the host they are admins in.
-        return UserAdmin.is_admin_of(request, obj)
-
-    def has_view_or_change_permission(self, request, obj=None):
-        return self.has_view_permission(request, obj) or self.has_change_permission(request, obj)
-
-    def has_module_permission(self, request):
-        if request.user.is_authenticated:
-            return True
-        else:
-            return False
-
 
 class PermissionInlineModel(admin.TabularInline):
 
@@ -135,12 +93,9 @@ class PermissionInlineModel(admin.TabularInline):
         return request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
 
     def has_change_permission(self, request, obj=None):
-        print ("Permission inline model, has change permission...")
         opts = self.opts
         codename = get_permission_codename('change', opts)
-        ret = request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
-        print("perm", ret, obj)
-        return ret
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
 
     def has_delete_permission(self, request, obj=None):
         opts = self.opts
@@ -394,7 +349,7 @@ class UserAdmin(BaseUserAdmin):
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-
+        return queryset
         # super user can see everything
         if request.user.is_super_admin:
             return queryset.distinct()
@@ -418,33 +373,35 @@ class UserAdmin(BaseUserAdmin):
             return True
         return False
 
-    def has_add_permission(self, request):
-        if request.user.is_super_admin:
-            return True
-        return False
+    def has_add_permission(self, request, obj=None):
+        opts = self.opts
+        codename = get_permission_codename('add', opts)
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
 
     def has_change_permission(self, request, obj=None):
-        return any((UserAdmin.is_admin_of(request, obj), request.user == obj))
+        opts = self.opts
+        codename = get_permission_codename('change', opts)
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
 
     def has_delete_permission(self, request, obj=None):
-        if request.user.is_super_admin:
-            return True
-        if request.user == obj:
-            return False
-        return UserAdmin.is_admin_of(request, obj)
+        opts = self.opts
+        codename = get_permission_codename('delete', opts)
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
 
     def has_view_permission(self, request, obj=None):
-        return any((obj is None, UserAdmin.is_admin_of(request, obj), request.user == obj))
+        opts = self.opts
+        codename_view = get_permission_codename('view', opts)
+        codename_change = get_permission_codename('change', opts)
+        return (
+                request.user.has_perm('%s.%s' % (opts.app_label, codename_view), obj) or
+                request.user.has_perm('%s.%s' % (opts.app_label, codename_change), obj)
+        )
 
     def has_view_or_change_permission(self, request, obj=None):
         return self.has_view_permission(request, obj) or self.has_change_permission(request, obj)
 
     def has_module_permission(self, request):
-        if request.user.is_authenticated:
-            return True
-        else:
-            return False
-
+        return request.user.has_module_perms(self.opts.app_label)
 
 class TeamAdmin(MyAdmin):
     inlines = (TeamUserRelationInlineModel,)

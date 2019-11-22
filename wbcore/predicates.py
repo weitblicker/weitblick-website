@@ -190,4 +190,9 @@ def is_user_of_bank_account(user, account):
     return user == account.user
 
 
+@rules.predicate
+def is_self(user, user_obj):
+    return user == user_obj
+
+
 
