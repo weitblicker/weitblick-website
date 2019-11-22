@@ -150,7 +150,6 @@ def is_super_admin(user):
 
 @rules.predicate
 def is_admin(user, obj):
-    print("check is admin...")
     from wbcore.models import Address, Location
     if isinstance(obj, Address):
         return is_admin_for_address(user, obj)
@@ -159,10 +158,7 @@ def is_admin(user, obj):
         return is_admin_for_location(user, obj)
 
     if not obj:
-        admin = user.has_role('admin')
-        print("is admin", admin)
-        return admin
-
+        return user.has_role('admin')
     return user.is_admin_of_host(obj.get_hosts())
 
 

@@ -127,12 +127,48 @@ class UserRelationInlineModel(admin.StackedInline):
             return False
 
 
-class TeamUserRelationInlineModel(admin.TabularInline):
+class PermissionInlineModel(admin.TabularInline):
+
+    def has_add_permission(self, request, obj=None):
+        opts = self.opts
+        codename = get_permission_codename('add', opts)
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
+
+    def has_change_permission(self, request, obj=None):
+        print ("Permission inline model, has change permission...")
+        opts = self.opts
+        codename = get_permission_codename('change', opts)
+        ret = request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
+        print("perm", ret, obj)
+        return ret
+
+    def has_delete_permission(self, request, obj=None):
+        opts = self.opts
+        codename = get_permission_codename('delete', opts)
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
+
+    def has_view_permission(self, request, obj=None):
+        opts = self.opts
+        codename_view = get_permission_codename('view', opts)
+        codename_change = get_permission_codename('change', opts)
+        return (
+                request.user.has_perm('%s.%s' % (opts.app_label, codename_view), obj) or
+                request.user.has_perm('%s.%s' % (opts.app_label, codename_change), obj)
+        )
+
+    def has_view_or_change_permission(self, request, obj=None):
+        return self.has_view_permission(request, obj) or self.has_change_permission(request, obj)
+
+    def has_module_permission(self, request):
+        return request.user.has_module_perms(self.opts.app_label)
+
+
+class TeamUserRelationInlineModel(PermissionInlineModel):
     model = Team.member.through
     extra = 1
 
 
-class JoinPageInlineModel(admin.StackedInline):
+class JoinPageInlineModel(PermissionInlineModel):
     model = JoinPage
 
     formfield_overrides = {
@@ -141,7 +177,7 @@ class JoinPageInlineModel(admin.StackedInline):
     }
 
 
-class SocialMediaLinkInlineModel(admin.TabularInline):
+class SocialMediaLinkInlineModel(PermissionInlineModel):
     model = SocialMediaLink
     extra = 1
     show_change_link = True
@@ -187,7 +223,9 @@ class MyAdmin(TabbedTranslationAdmin):
     def has_change_permission(self, request, obj=None):
         opts = self.opts
         codename = get_permission_codename('change', opts)
-        return request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
+        ret = request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
+        print("%s.%s" % (opts.app_label, codename), obj, ret)
+        return ret
 
     def has_delete_permission(self, request, obj=None):
         opts = self.opts

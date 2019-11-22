@@ -16,7 +16,8 @@ from form_designer.models import Form as EventForm
 import rules
 from wbcore import predicates as pred
 from rules.contrib.models import RulesModel, RulesModelBase, RulesModelMixin
-
+from modeltranslation.manager import MultilingualQuerySet
+from django.db.models.query import QuerySet
 
 class Address(models.Model):
     name = models.CharField(max_length=200)
@@ -241,8 +242,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.get_hosts_for_role('member')
 
     def has_role_for_host(self, member_type, host):
-        if isinstance(host, list):
-            return self.userrelation_set.filter(member_type=member_type, host__in=host).count() > 0
+        if isinstance(host, (list, QuerySet)):
+            has_role = self.userrelation_set.filter(member_type=member_type, host__in=host).count() > 0
+            print("member_type:", member_type, "host:", host, "has role:", has_role)
+            return has_role
         else:
             return self.userrelation_set.filter(member_type=member_type, host=host).count() > 0
 
@@ -259,7 +262,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.has_role_for_host('member', host)
 
     def has_role(self, role):
-        return self.userrelation_set.filter(role=role).count() > 0
+        return self.userrelation_set.filter(member_type=role).count() > 0
 
     def role(self):
         roles = dict(UserRelation.TYPE_CHOICES)
@@ -272,12 +275,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'date_of_birth']
 
-    def get_hosts(self):
-        return self.hosts
-
     def has_perm(self, perm, obj=None):
-
-        return super(User, self).has_perm(perm, obj)
+        ret = super(User, self).has_perm(perm, obj)
+        print("perm:", perm, obj, ret)
+        print("-----")
+        return ret
         #print("out:", out)
         #print(self.role())
 
@@ -343,6 +345,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def belongs_to_host(self, host):
         return host in self.hosts.all()
+
+    def get_hosts(self):
+        return self.hosts.all()
 
 
 class Content(RulesModel):
@@ -419,7 +424,6 @@ class Partner(RulesModel):
     def __str__(self):
         return self.name
 
-    @staticmethod
     def get_hosts(self):
         return Host.objects.all()
 
@@ -474,7 +478,7 @@ class Project(RulesModel):
             return None
 
     def get_hosts(self):
-        return self.hosts
+        return self.hosts.all()
 
 
 class Event(RulesModelMixin, ScheduleEvent, metaclass=RulesModelBase):
@@ -802,7 +806,7 @@ class TeamUserRelation(RulesModel):
     class Meta:
         rules_permissions = {
             "add": pred.is_super_admin | pred.is_admin,
-            "view": pred.is_super_admin | pred.is_admin,
+            "view": rules.always_allow,
             "change": pred.is_super_admin | pred.is_admin,
             "delete": pred.is_super_admin | pred.is_admin,
         }
