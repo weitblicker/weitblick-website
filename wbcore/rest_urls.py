@@ -22,8 +22,10 @@ rest_patterns = [
     path('blog/<int:pk>/', rest_views.location_detail, name="rest-blog-post"),
 
     path('auth/', include('rest_auth.urls')),
-    path('auth/registration/', include('rest_auth.registration.urls'))
+    path('auth/registration/', include('rest_auth.registration.urls')),
     #path('users', include('users.', )
+
+    path('upload/', rest_views.markdown_uploader, name='markdown_uploader_page'),
 ]
 
 rest_patterns = format_suffix_patterns(rest_patterns)

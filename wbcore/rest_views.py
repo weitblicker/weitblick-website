@@ -1,10 +1,79 @@
+import json
+import os
+import uuid
+
+from django.contrib.auth.decorators import login_required
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+from django.http import HttpResponse
+from martor.utils import LazyEncoder
+from django.utils.translation import ugettext_lazy as _
+
 from wbcore.serializers import (NewsPostSerializer, BlogPostSerializer, HostSerializer, EventSerializer,
                                 ProjectSerializer, LocationSerializer)
-from wbcore.models import NewsPost, BlogPost, Host, Event, Project, Location
+from wbcore.models import NewsPost, BlogPost, Host, Event, Project, Location, Photo
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+from weitblick import settings
 from .filter import filter_events, filter_projects, filter_news, filter_blog
+
+
+@login_required
+def markdown_uploader(request):
+    """
+    Makdown image upload for locale storage
+    and represent as json to markdown editor.
+    """
+    if request.method == 'POST' and request.is_ajax():
+        print(request.POST, request.path, request.META.get('HTTP_REFERER'))
+        if 'markdown-image-upload' in request.FILES:
+            image = request.FILES['markdown-image-upload']
+            image_types = [
+                'image/png', 'image/jpg',
+                'image/jpeg', 'image/pjpeg', 'image/gif'
+            ]
+            if image.content_type not in image_types:
+                data = json.dumps({
+                    'status': 405,
+                    'error': _('Bad image format.')
+                }, cls=LazyEncoder)
+                return HttpResponse(
+                    data, content_type='application/json', status=405)
+
+            if image.size > settings.MAX_IMAGE_UPLOAD_SIZE:
+                to_MB = settings.MAX_IMAGE_UPLOAD_SIZE / (1024 * 1024)
+                data = json.dumps({
+                    'status': 405,
+                    'error': _('Maximum image file is %(size) MB.') % {'size': to_MB}
+                }, cls=LazyEncoder)
+                return HttpResponse(
+                    data, content_type='application/json', status=405)
+
+            post = NewsPost.objects.get(slug=request.POST['slug'])
+            num_photos = post.photos.count()
+            title = request.POST['title_de']+"-"+str(num_photos+11)
+            slug = request.POST['slug']+"-"+str(num_photos+11)
+            type = 'news'
+            photo = Photo(title=title, slug=slug, type=type)
+            photo.image.save(slug+".jpg", ContentFile(image.read()))
+            photo.save()
+
+            post.photos.add(photo)
+            post.save()
+            data = json.dumps({
+                'status': 200,
+                'link': photo.get_absolute_url(),
+                'name': title
+            })
+
+            print(data)
+            return HttpResponse(data, content_type='application/json')
+
+        return HttpResponse(_('Invalid request!'))
+    return HttpResponse(_('Invalid request!'))
+
 
 @api_view(['GET'])
 def host_list(request, format=None):
@@ -124,5 +193,3 @@ def location_detail(request, pk, format=None):
     if request.method == 'GET':
         serializer = LocationSerializer(location)
         return Response(serializer.data)
-
-
