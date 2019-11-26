@@ -1,0 +1,23 @@
+{% extends 'wbcore/base.html' %}
+{% load martortags %}
+{% load staticfiles %}
+{% block content %}
+
+    <div class="ui one column stackable grid container">
+        {% include 'wbcore/image-header.html' with title='About' default='/images/about_header.jpg'%}
+
+        <div class="ten wide column divided items">
+            <div class="ui segment">
+                {{ about.text | safe_markdown }}
+            </div>
+        </div>
+        <div class="six wide column divided items">
+            <div class="ui segment">
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+
