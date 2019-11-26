@@ -53,6 +53,4 @@ def safe_markdown(field_name):
     Example:
         {{ post.description|safe_markdown }}
     """
-    ret = mark_safe(insert_ui_elems(markdownify(field_name)))
-    print(ret)
-    return ret
+    return mark_safe(insert_ui_elems(markdownify(field_name)))

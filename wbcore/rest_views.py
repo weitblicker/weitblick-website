@@ -27,7 +27,7 @@ def markdown_uploader(request):
     and represent as json to markdown editor.
     """
     if request.method == 'POST' and request.is_ajax():
-        print(request.POST, request.path, request.META.get('HTTP_REFERER'))
+        print(request.POST, request.path)
         if 'markdown-image-upload' in request.FILES:
             image = request.FILES['markdown-image-upload']
             image_types = [
@@ -51,26 +51,17 @@ def markdown_uploader(request):
                 return HttpResponse(
                     data, content_type='application/json', status=405)
 
-            post = NewsPost.objects.get(slug=request.POST['slug'])
-            num_photos = post.photos.count()
-            title = request.POST['title_de']+"-"+str(num_photos+11)
-            slug = request.POST['slug']+"-"+str(num_photos+11)
-            type = 'news'
-            photo = Photo(title=title, slug=slug, type=type)
-            photo.image.save(slug+".jpg", ContentFile(image.read()))
-            photo.save()
+            img_uuid = "{0}-{1}".format(uuid.uuid4().hex[:10], image.name.replace(' ', '-'))
+            tmp_file = os.path.join(settings.MARTOR_UPLOAD_PATH, img_uuid)
+            def_path = default_storage.save(tmp_file, ContentFile(image.read()))
+            img_url = os.path.join(settings.MEDIA_URL, def_path)
 
-            post.photos.add(photo)
-            post.save()
             data = json.dumps({
                 'status': 200,
-                'link': photo.get_absolute_url(),
-                'name': title
+                'link': img_url,
+                'name': image.name
             })
-
-            print(data)
             return HttpResponse(data, content_type='application/json')
-
         return HttpResponse(_('Invalid request!'))
     return HttpResponse(_('Invalid request!'))
 

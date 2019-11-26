@@ -23,6 +23,7 @@ class Photo(PhotologuePhoto):
     TYPE_CHOICES = (
         ('header', 'Header'),
         ('project', 'Project'),
+        ('event', 'Event'),
         ('blog', 'Blog'),
         ('news', 'News'),
     )
@@ -208,6 +209,7 @@ class UserManager(BaseUserManager):
             password=password,
             date_of_birth=date_of_birth,
         )
+        user.is_superuser = True
         user.is_super_admin = True
         user.save(using=self._db)
         return user
