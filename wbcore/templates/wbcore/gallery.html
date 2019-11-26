@@ -2,11 +2,8 @@
 {% load static %}
 {% include 'wbcore/photoswipe.html' %}
 
-<h3 itemprop="headline" class="ui dividing header">Gallery: {{ gallery.title }}</h3>
-<p class="sub header"><small>{% trans "Published" %} <span itemprop="datePublished">{{ gallery.date_added }}</span></small></p>
-{% if gallery.description %}<p itemprop="description" class="ui description">{{ gallery.description|safe }}</p>{% endif %}
 <div itemscope itemtype="http://schema.org/ImageGallery" class="gallery ui images">
-	{% for photo in gallery.public %}
+	{% for photo in photos %}
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject" class="ui image">
         <a href="{{ photo.image.url }}" itemprop="contentUrl" data-size="{{ photo.image.width }}x{{ photo.image.height }}">
             <img src="{{ photo.get_thumbnail_url }}" itemprop="thumbnail" class="thumbnail" alt="{{ photo.title }}" />

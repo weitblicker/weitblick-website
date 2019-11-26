@@ -1,8 +1,8 @@
 {% extends 'wbcore/single_content.html' %}
 {% load i18n %}
 {% load static %}
-
 {% load staticfiles %}
+{% load wbcoretags %}
 {% block content %}
 
 <div class="ui stackable grid container">
@@ -20,7 +20,10 @@
             </div>
             <span>{{ post.published | date:'m. F Y' }}</span>
             <div class="ui hidden divider"></div>
-            <div class="item">{{ post.text | safe }}</div>
+            <div class="item">
+                {{ post.text | safe_markdown }}
+                <div style="clear:both;"></div>
+            </div>
         </div>
     </div>
 
@@ -34,7 +37,7 @@
         <div class="ui segment">
             {% include 'wbcore/segment_header.html' with icon='image outline' title='Gallery' %}
             {% if post.gallery %}
-                {% include 'wbcore/gallery.html' with gallery=post.gallery %}
+                {% include 'wbcore/gallery.html' with photos=post.photos %}
             {% endif %}
         </div>
     </div>
