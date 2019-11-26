@@ -586,9 +586,9 @@ class NewsPost(RulesModel):
     slug = models.SlugField(max_length=100, null=False, blank=False, unique=True)
     text = models.TextField()
     image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
-    added = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    updated = models.DateTimeField(auto_now=True, blank=True, null=True)
-    published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    added = models.DateTimeField(blank=True, null=True)
+    updated = models.DateTimeField(blank=True, null=True)
+    published = models.DateTimeField(blank=True, null=True)
     priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5)
     RANGE_CHOICES = (
         ('preview', 'Preview'),
@@ -606,6 +606,9 @@ class NewsPost(RulesModel):
     photos = SortedManyToManyField(Photo, related_name='news_posts', verbose_name=_('photos'), blank=True)
 
     current_host = None
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
 
     def get_hosts(self):
         return [self.host]
