@@ -159,9 +159,6 @@ class SocialMediaLinkInlineModel(PermissionInlineModel):
 
 
 class MyAdmin(TabbedTranslationAdmin):
-    '''
-    Implements a wysiwyg editor.
-    '''
     formfield_overrides = {
         models.TextField: {'widget': AdminMartorWidget},
         map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget(attrs={'data-map-type': 'roadmap'})},
