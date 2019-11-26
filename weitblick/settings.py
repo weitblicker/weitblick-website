@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'localflavor',
     'django_google_maps',
-    'microsoft_auth',
+    #'microsoft_auth',
     'wbcore.apps.WbcoreConfig',
     'form_designer',
     'admin_ordering',
@@ -76,6 +76,17 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_USE_TLS = True
 
 PHOTOLOGUE_DIR = 'images'
+
+def get_storage_path(instance, filename):
+    fn = filename.lower()
+    if hasattr(instance, 'type'):
+        dir = instance.type
+        return os.path.join(PHOTOLOGUE_DIR, dir, fn)
+
+    return os.path.join(PHOTOLOGUE_DIR, 'photos', fn)
+
+
+PHOTOLOGUE_PATH = get_storage_path
 
 SUMMERNOTE_THEME = 'bs4'
 
@@ -108,7 +119,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'microsoft_auth.context_processors.microsoft',
+                #'microsoft_auth.context_processors.microsoft',
                 'django.template.context_processors.request',  # for el-pagination
             ],
             'loaders': [
@@ -167,7 +178,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTHENTICATION_BACKENDS = [
     'rules.permissions.ObjectPermissionBackend',
-    'microsoft_auth.backends.MicrosoftAuthenticationBackend',
+    #'microsoft_auth.backends.MicrosoftAuthenticationBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -176,7 +187,7 @@ MICROSOFT_AUTH_CLIENT_SECRET = '-Klk0zF]9EIxDG6@s7gMwM/v:ha.cB2]'
 MICROSOFT_AUTH_LOGIN_TYPE = 'ma'
 
 MARTOR_ENABLE_CONFIGS = {
-    'imgur': 'false',     # to enable/disable imgur/custom uploader.
+    'imgur': 'true',     # to enable/disable imgur/custom uploader.
     'mention': 'false',  # to enable/disable mention
     'jquery': 'true',    # to include/revoke jquery (require for admin default django)
     'living': 'true',   # to enable/disable live updates in preview
@@ -188,8 +199,9 @@ MARTOR_MARKDOWN_EXTENSIONS = [
     'markdown.extensions.nl2br',
     'markdown.extensions.smarty',
     'markdown.extensions.fenced_code',
-    'markdown_fenced_code_tabs',
     # Custom markdown extensions.
+    'wbcore.markdown.content_image',
+    'wbcore.markdown.content_tabs',
     'martor.extensions.urlize',
     'martor.extensions.del_ins',    # ~~strikethrough~~ and ++underscores++
     'martor.extensions.mention',    # to parse markdown mention
@@ -206,18 +218,17 @@ MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
     }
 }
 
+import time
+MARTOR_UPLOAD_PATH = 'images/uploads/{}'.format(time.strftime("%Y/%m/%d/"))
+MARTOR_UPLOAD_URL = '/rest/upload/'  # change to local uploader
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
 LANGUAGE_CODE = 'de-de'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 LANGUAGES = (
@@ -236,6 +247,17 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 ENV_PATH = os.path.abspath(os.path.dirname(__file__))
 MEDIA_ROOT = os.path.join(ENV_PATH, 'media/')
+
+# Maximum Upload Image
+# 2.5MB - 2621440
+# 5MB - 5242880
+# 10MB - 10485760
+# 20MB - 20971520
+# 50MB - 5242880
+# 100MB 104857600
+# 250MB - 214958080
+# 500MB - 429916160
+MAX_IMAGE_UPLOAD_SIZE = 5242880  # 5MB
 
 LOCAL_STATIC_ROOT = os.path.join(ENV_PATH, 'static/')
 SERVER_STATIC_ROOT = '/var/www/weitblick-new/static/'
