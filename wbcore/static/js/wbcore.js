@@ -1,6 +1,8 @@
 $(document)
     .ready(function() {
 
+        $('.menu .item').tab();
+
         $('.ui.calendar')
             .calendar({
                 type: 'date',
