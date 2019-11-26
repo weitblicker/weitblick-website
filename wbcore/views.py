@@ -563,7 +563,7 @@ def idea_view(request, host_slug=None):
     projects = Project.objects.all()
 
     try:
-        idea = Content.objects.get(host=host, type='idea')
+        idea = Content.objects.get(host=Host.objects.get(slug='bundesverband'), type='idea')
     except Content.DoesNotExist as e:
         print("Idea content page for", host, "does not exists!")
         idea = None
