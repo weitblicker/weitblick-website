@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('photologue', '0012_auto_20190719_0926'),
+        ('photologue', '0011_auto_20190223_2138'),
         ('auth', '0011_update_proxy_permissions'),
         ('form_designer', '0001_initial'),
     ]
