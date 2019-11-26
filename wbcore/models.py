@@ -2,10 +2,8 @@ from django.db import models
 from django_countries.fields import CountryField
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
-from django.contrib.auth.models import (
-    PermissionsMixin, BaseUserManager, AbstractBaseUser
-)
-from photologue.models import Gallery, Photo
+from django.contrib.auth.models import PermissionsMixin, BaseUserManager, AbstractBaseUser
+from photologue.models import Gallery as PhotologueGallery, Photo as PhotologuePhoto
 from os.path import splitext
 from localflavor.generic.models import IBANField, BICField
 from localflavor.generic.countries.sepa import IBAN_SEPA_COUNTRIES
@@ -13,11 +11,25 @@ from django.urls import reverse
 from django_google_maps import fields as map_fields
 from schedule.models.events import Event as ScheduleEvent
 from form_designer.models import Form as EventForm
-import rules
 from wbcore import predicates as pred
 from rules.contrib.models import RulesModel, RulesModelBase, RulesModelMixin
-from modeltranslation.manager import MultilingualQuerySet
+from sortedm2m.fields import SortedManyToManyField
 from django.db.models.query import QuerySet
+from django.utils.translation import ugettext_lazy as _
+import rules
+
+
+class Photo(PhotologuePhoto):
+    TYPE_CHOICES = (
+        ('header', 'Header'),
+        ('project', 'Project'),
+        ('blog', 'Blog'),
+        ('news', 'News'),
+    )
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, null=True)
+    uploader = models.ForeignKey('User', on_delete=models.SET_NULL, null=True)
+    host = models.ForeignKey('Host', on_delete=models.SET_NULL, null=True)
+
 
 class Address(models.Model):
     name = models.CharField(max_length=200)
@@ -445,12 +457,12 @@ class Project(RulesModel):
     hosts = models.ManyToManyField(Host, related_name="projects")
     short_description = models.TextField()
     description = models.TextField()
-    title_image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
+    image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     partner = models.ForeignKey(Partner, on_delete=models.SET_NULL, null=True, blank=True)
     donation_goal = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
     donation_current = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
-    gallery = models.ForeignKey(Gallery, blank=True, null=True, on_delete=models.SET_NULL)
+    photos = SortedManyToManyField(Photo, related_name='projects', verbose_name=_('photos'), blank=True)
     completed = models.BooleanField(default=False)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
@@ -473,12 +485,7 @@ class Project(RulesModel):
         return self.name
 
     def get_title_image(self):
-        if self.title_image:
-            return self.title_image
-        elif self.gallery:
-            return self.gallery.photos.first()
-        else:
-            return None
+        return self.image if self.image else self.photos.all()[0]
 
     def get_hosts(self):
         return self.hosts.all()
@@ -502,9 +509,12 @@ class Event(RulesModelMixin, ScheduleEvent, metaclass=RulesModelBase):
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
-    gallery = models.ForeignKey(Gallery, null=True, blank=True,on_delete=models.SET_NULL)
+    photos = SortedManyToManyField(Photo, related_name='events', verbose_name=_('photos'), blank=True)
     form = models.OneToOneField(EventForm, null=True, blank=True, on_delete=models.SET_NULL)
     cost = models.CharField(max_length=50, blank=True, default="")
+
+    def get_title_image(self):
+        return self.image if self.image else self.photos.all()[0]
 
     def search_title(self):
         return self.title
@@ -513,20 +523,11 @@ class Event(RulesModelMixin, ScheduleEvent, metaclass=RulesModelBase):
         return reverse('event', args=[self.slug])
 
     def search_image(self):
-        # TODO: return first image of gallery instead, if no image is set
-        return self.image.get_search_mini_url() if self.image else ""
+        return self.get_title_image().get_search_mini_url()
 
     @staticmethod
     def get_model_name():
         return 'Event'
-
-    def get_title_image(self):
-        if self.image:
-            return self.image
-        elif self.gallery:
-            return self.gallery.photos.first()
-        else:
-            return None
 
     def belongs_to_host(self, host):
         return self.host == host
@@ -580,6 +581,7 @@ class NewsPost(RulesModel):
         get_latest_by = 'published'
 
     title = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=100, null=False, blank=False, unique=True)
     text = models.TextField()
     image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     added = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -599,7 +601,7 @@ class NewsPost(RulesModel):
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     author_str = models.CharField(max_length=200, null=True, blank=True)
-    gallery = models.ForeignKey(Gallery, null=True, blank =True, on_delete=models.SET_NULL)
+    photos = SortedManyToManyField(Photo, related_name='news_posts', verbose_name=_('photos'), blank=True)
 
     current_host = None
 
@@ -613,6 +615,9 @@ class NewsPost(RulesModel):
         args = [self.current_host.slug, self.pk] if self.current_host else [self.pk]
         return reverse('news-post', args=args)
 
+    def get_title_image(self):
+        return self.image if self.image else self.photos.all()[0]
+
     def search_title(self):
         return self.title
 
@@ -620,7 +625,7 @@ class NewsPost(RulesModel):
         return reverse('news-post', args=[self.pk])
 
     def search_image(self):
-        return self.image.get_search_mini_url() if self.image else ""
+        return self.get_title_image().get_search_mini_url()
 
     @staticmethod
     def get_model_name():
@@ -670,7 +675,7 @@ class BlogPost(RulesModel):
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     author_str = models.CharField(max_length=200, null=True, blank=True)
-    gallery = models.ForeignKey(Gallery, null=True, blank =True, on_delete=models.SET_NULL)
+    photos = SortedManyToManyField(Photo, related_name='blog_posts', verbose_name=_('photos'), blank=True)
 
     def belongs_to_host(self, host):
         return self.host == host
@@ -681,8 +686,11 @@ class BlogPost(RulesModel):
     def search_url(self):
         return reverse('blog-post', args=[self.pk])
 
+    def get_title_image(self):
+        return self.image if self.image else self.photos.all()[0]
+
     def search_image(self):
-        return self.image.get_search_mini_url() if self.image else ""
+        return self.get_title_image().get_search_mini_url()
 
     def placeholder(self):
         return 'Post'
@@ -757,7 +765,7 @@ class Team(RulesModel):
         ordering = ['rank', 'name']
 
     name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=50, null=False, blank=False)
+    slug = models.SlugField(max_length=50, null=False, blank=False, unique=True)
     teaser = models.TextField(blank=True, default="")
     description = models.TextField(blank=True, default="")
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=True)
