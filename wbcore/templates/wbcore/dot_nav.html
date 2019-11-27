@@ -23,7 +23,7 @@
             {% else %} <a class="ui item header" href="{% url 'news' %}">News</a>
             {% endif %}
             {% for entry in dot_nav.news %}
-                {% include 'wbcore/dot_nav_item.html' with photo=entry.get_title_image type='news-post' id=entry.pk title=entry.title image=entry.image %}
+                {% include 'wbcore/dot_nav_item.html' with image=entry.get_title_image type='news-post' id=entry.pk title=entry.title %}
             {% endfor %}
         </div>
         <div class="ui four wide column unstackable items">
@@ -31,7 +31,7 @@
             {% else %} <a class="ui item header"href="{% url 'blog' %}" >Blog</a>
             {% endif %}
             {% for entry in dot_nav.blog %}
-                {% include 'wbcore/dot_nav_item.html' with photo=entry.get_title_image type='blog-post' id=entry.pk title=entry.title image=entry.image desc=entry.text|truncatewords:7 %}
+                {% include 'wbcore/dot_nav_item.html' with image=entry.get_title_image type='blog-post' id=entry.pk title=entry.title desc=entry.text|truncatewords:7 %}
             {% endfor %}
         </div>
         <div class="ui three wide column unstackable items">
@@ -77,7 +77,7 @@
             {% else %} <a class="ui item header" href="{% url 'news' %}">News</a>
             {% endif %}
             {% for entry in dot_nav.news %}
-                {% include 'wbcore/dot_nav_item.html' with photo=entry.image type='news-post' id=entry.pk title=entry.title image=entry.image %}
+                {% include 'wbcore/dot_nav_item.html' with image=entry.get_title_image type='news-post' id=entry.pk title=entry.title %}
             {% endfor %}
         </div>
         <div class="ui three wide column unstackable items">
