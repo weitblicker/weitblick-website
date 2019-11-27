@@ -621,7 +621,10 @@ class NewsPost(RulesModel):
         return reverse('news-post', args=args)
 
     def get_title_image(self):
-        return self.image if self.image else self.photos.all()[0]
+        if self.image:
+            return self.image
+        elif self.photos.all():
+            return self.photos.all()[0]
 
     def search_title(self):
         return self.title
