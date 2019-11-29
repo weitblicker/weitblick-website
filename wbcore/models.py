@@ -95,7 +95,8 @@ class Host(RulesModel):
     founding_date = models.DateField()
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True)
-    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
+    location = models.OneToOneField(Location, on_delete=models.SET_NULL, null=True)
+    partners = SortedManyToManyField('Partner', blank=True, related_name='hosts')
 
     def belongs_to_host(self, host):
         return host == self
@@ -108,6 +109,9 @@ class Host(RulesModel):
 
     def search_image(self):
         return ""
+
+    def get_short_name(self):
+        return self.name.replace("Weitblick ", "").replace(" e.V.", "")
 
     @staticmethod
     def get_model_name():
@@ -172,7 +176,7 @@ class JoinPage(RulesModel):
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, first_name, last_name, email, date_of_birth, password=None):
+    def create_user(self, first_name, last_name, username, email, date_of_birth, password=None):
         """
         Creates and saves a User with the given email, date of
         birth and password.
@@ -186,9 +190,13 @@ class UserManager(BaseUserManager):
         if not last_name:
             raise ValueError('Users must have a last name')
 
+        if not username:
+            raise ValueError('Users must have a user name')
+
         user = self.model(
             first_name=first_name,
             last_name=last_name,
+            username=username,
             email=self.normalize_email(email),
             date_of_birth=date_of_birth,
             is_active=True
@@ -197,7 +205,7 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, first_name, last_name, email, date_of_birth, password):
+    def create_superuser(self, first_name, last_name, username, email, date_of_birth, password):
         """
         Creates and saves a superuser with the given email, date of
         birth and password.
@@ -205,6 +213,7 @@ class UserManager(BaseUserManager):
         user = self.create_user(
             first_name=first_name,
             last_name=last_name,
+            username=username,
             email=email,
             password=password,
             date_of_birth=date_of_birth,
@@ -293,7 +302,7 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'date_of_birth']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'date_of_birth']
 
     def has_perm(self, perm, obj=None):
         return super(User, self).has_perm(perm, obj)
@@ -321,7 +330,7 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
         # user has the right to access it
         for relation in self.userrelation_set.filter(member_type='admin'):
 
-            print("Object:", obj, "User:", self, "Host:", relation.host)
+            print("Object", obj, "User:", self, "Host:", relation.host)
 
             if obj.belongs_to_host(relation.host):
                 if isinstance(obj, User):
@@ -358,7 +367,7 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
     until = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return self.name()
+        return self.name() + ", " + self.email
 
     def belongs_to_host(self, host):
         return host in self.hosts.all()
@@ -461,7 +470,7 @@ class Project(RulesModel):
     description = models.TextField()
     image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
-    partner = models.ForeignKey(Partner, on_delete=models.SET_NULL, null=True, blank=True)
+    partners = SortedManyToManyField(Partner, blank=True, related_name='projects')
     donation_goal = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
     donation_current = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
     photos = SortedManyToManyField(Photo, related_name='projects', verbose_name=_('photos'), blank=True)
@@ -487,7 +496,11 @@ class Project(RulesModel):
         return self.name
 
     def get_title_image(self):
-        return self.image if self.image else self.photos.all()[0]
+        if self.image:
+            return self.image
+        elif self.photos.all():
+            return self.photos.all()[0]
+        return None
 
     def get_hosts(self):
         return self.hosts.all()
@@ -516,7 +529,11 @@ class Event(RulesModelMixin, ScheduleEvent, metaclass=RulesModelBase):
     cost = models.CharField(max_length=50, blank=True, default="")
 
     def get_title_image(self):
-        return self.image if self.image else self.photos.all()[0]
+        if self.image:
+            return self.image
+        elif self.photos.all():
+            return self.photos.all()[0]
+        return None
 
     def search_title(self):
         return self.title
@@ -625,6 +642,7 @@ class NewsPost(RulesModel):
             return self.image
         elif self.photos.all():
             return self.photos.all()[0]
+        return None
 
     def search_title(self):
         return self.title
@@ -664,6 +682,7 @@ class BlogPost(RulesModel):
         get_latest_by = 'published'
 
     title = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=100, null=False, blank=False, unique=True)
     text = models.TextField()
     image = models.ForeignKey(Photo, null=True, blank =True, on_delete=models.SET_NULL)
     added = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -695,7 +714,11 @@ class BlogPost(RulesModel):
         return reverse('blog-post', args=[self.pk])
 
     def get_title_image(self):
-        return self.image if self.image else self.photos.all()[0]
+        if self.image:
+            return self.image
+        elif self.photos.all():
+            return self.photos.all()[0]
+        return None
 
     def search_image(self):
         return self.get_title_image().get_search_mini_url()

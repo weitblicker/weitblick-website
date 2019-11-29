@@ -11,6 +11,7 @@ from martor.widgets import AdminMartorWidget
 from django_google_maps import widgets as map_widgets
 from django_google_maps import fields as map_fields
 from copy import copy
+from django_reverse_admin import ReverseModelAdmin
 from rules.contrib.admin import ObjectPermissionsModelAdmin
 
 from itertools import chain
@@ -96,7 +97,7 @@ class UserRelationInlineModel(admin.StackedInline):
         return readonly_fields
 
 
-class PermissionInlineModel(admin.TabularInline):
+class PermissionInlineModel(admin.StackedInline):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if request.user.is_super_admin:
@@ -156,6 +157,11 @@ class SocialMediaLinkInlineModel(PermissionInlineModel):
     model = SocialMediaLink
     extra = 1
     show_change_link = True
+
+
+class AddressInlineModel(PermissionInlineModel):
+    model = Address
+    can_delete = False
 
 
 class MyAdmin(TabbedTranslationAdmin):
@@ -237,7 +243,7 @@ class UserCreationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'date_of_birth')
+        fields = ('first_name', 'last_name', 'username', 'email', 'date_of_birth')
         exclude = ()
 
     def clean_password2(self):
@@ -266,7 +272,8 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('is_super_admin', 'email', 'password', 'date_of_birth', 'is_active', 'first_name', 'last_name', 'image')
+        fields = ('is_super_admin', 'email', 'username', 'password',
+                  'date_of_birth', 'is_active', 'first_name', 'last_name', 'image')
         exclude = ()
 
     def clean_password(self):
@@ -282,12 +289,22 @@ class UserAdmin(BaseUserAdmin):
         parameter_name = 'role'
 
         def lookups(self, request, model_admin):
-            return UserRelation.TYPE_CHOICES
+            choices = ()
+            if request.user.is_superuser:
+                choices += (('is_superuser', 'Super User'),)
+            choices += (('no_relation', 'No Relation'),)
+            choices += UserRelation.TYPE_CHOICES
+            return choices
 
         def queryset(self, request, queryset):
             if self.value():
-                queryset = queryset.filter(userrelation__member_type=self.value())
-            return queryset
+                if self.value() == 'is_superuser':
+                    queryset = queryset.filter(is_super_admin=True).exclude(is_super_admin=False)
+                elif self.value() == 'no_relation':
+                    queryset = queryset.filter(userrelation=None)
+                else:
+                    queryset = queryset.filter(userrelation__member_type=self.value())
+            return queryset.distinct()
 
     class HostListFilter(admin.SimpleListFilter):
         title = 'Host'
@@ -302,7 +319,7 @@ class UserAdmin(BaseUserAdmin):
         def queryset(self, request, queryset):
             if self.value():
                 queryset = queryset.filter(userrelation__host__slug=self.value())
-            return queryset
+            return queryset.distinct()
 
     # The forms to add and change user instances
     form = UserChangeForm
@@ -311,13 +328,26 @@ class UserAdmin(BaseUserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ('name', 'email', 'date_of_birth', 'role')
+    list_display = ('username', 'name', 'email', 'date_of_birth', 'get_hosts', 'get_roles',)
     list_filter = (HostListFilter, RoleListFilter,)
     fieldsets = (
-        ('Account', {'fields': ('email', 'password')}),
+        ('Account', {'fields': ('username', 'email', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'date_of_birth',)}),
         ('Profile', {'fields': ('image', )}),
     )
+
+    def get_roles(self, user):
+        role_name = dict(UserRelation.TYPE_CHOICES)
+        roles = [role_name[relation.member_type] for relation in user.userrelation_set.all()]
+        if user.is_superuser:
+            roles = ['Super User'] + roles
+        return roles
+    get_roles.short_description = "Role"
+
+
+    def get_hosts(self, user):
+        return ", ".join([host.get_short_name() for host in user.hosts.all()])
+    get_hosts.short_description = "Host"
 
     exclude = ()
     inlines = (UserRelationInlineModel,)
@@ -327,12 +357,13 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('first_name', 'last_name', 'email', 'date_of_birth', 'password1', 'password2'),
+            'fields': ('first_name', 'last_name', 'username', 'email', 'date_of_birth', 'password1', 'password2'),
         },),
     )
-    search_fields = ('email',)
+    search_fields = ('email', 'username', 'first_name', 'last_name')
     ordering = ('email', 'hosts')
-    filter_horizontal = ()
+
+    filter_horizontal = ('hosts',)
 
     def get_fieldsets(self, request, obj=None):
         fieldset = super().get_fieldsets(request, obj)
@@ -375,8 +406,9 @@ class UserAdmin(BaseUserAdmin):
         return fields
 
     def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        return queryset
+        queryset = super().get_queryset(request).distinct().order_by('email')
+        print("users:", queryset.count())
+
         # super user can see everything
         if request.user.is_super_admin:
             return queryset.distinct()
@@ -435,8 +467,15 @@ class TeamAdmin(MyAdmin):
     inlines = (TeamUserRelationInlineModel,)
 
 
-class HostAdmin(MyAdmin):
+class HostAdmin(MyAdmin, ReverseModelAdmin):
     inlines = (JoinPageInlineModel, SocialMediaLinkInlineModel)
+    inline_type = 'stacked'
+    inline_reverse = ['address', ]
+
+
+class PartnerAdmin(MyAdmin, ReverseModelAdmin):
+    inline_type = 'stacked'
+    inline_reverse = ['address', ]
 
 
 # since we're not using Django's built-in permissions,
@@ -447,12 +486,16 @@ except admin.sites.AlreadyRegistered:
     admin.site.unregister(User)
     admin.site.register(User, UserAdmin)
 
+
+
+
+
 admin.site.unregister(Group)
 admin.site.register(Address, MyAdmin)
 admin.site.register(Content, MyAdmin)
 admin.site.register(Location, MyAdmin)
 admin.site.register(Host, HostAdmin)
-admin.site.register(Partner, MyAdmin)
+admin.site.register(Partner, PartnerAdmin)
 admin.site.register(Project, MyAdmin)
 admin.site.register(Event, MyAdmin)
 admin.site.register(NewsPost, MyAdmin)
