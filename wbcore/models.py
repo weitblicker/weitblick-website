@@ -994,3 +994,36 @@ class ContactMessage(RulesModel):
         return [self.host]
 
 
+class CycleDonationRelation(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin,
+            "view": pred.is_super_admin | pred.is_admin,
+            "change": pred.is_super_admin,
+            "delete": pred.is_super_admin | pred.is_admin,
+        }
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    cycle_donation = models.ForeignKey('CycleDonation', on_delete=models.CASCADE)
+    current_amount = models.FloatField(default=0)
+    goal_amount = models.FloatField(null=True, blank=True, default=None)
+
+
+class CycleDonation(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin,
+            "view": pred.is_super_admin | pred.is_admin,
+            "change": pred.is_super_admin,
+            "delete": pred.is_super_admin | pred.is_admin,
+        }
+
+    projects = models.ManyToManyField(Project, through=CycleDonationRelation)
+    partner = models.ForeignKey(Partner, on_delete=models.SET_NULL, null=True)
+    logo = models.ImageField()
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(unique=True)
+    description = models.TextField(null=True, blank=True)
+    goal_amount = models.FloatField(null=False, blank=False)
+    rate_euro_km = models.FloatField() # euro per km, e.g. 0.1 per km (10 cents per km)
+

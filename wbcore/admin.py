@@ -19,7 +19,7 @@ from itertools import chain
 from .models import (
     Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, ContactMessage, UserRelation,
     Document, Team, Milestone, Donation, Milestep, BankAccount, TeamUserRelation, Content, User, JoinPage,
-    SocialMediaLink
+    SocialMediaLink, CycleDonation, CycleDonationRelation
 )
 
 
@@ -478,6 +478,15 @@ class PartnerAdmin(MyAdmin, ReverseModelAdmin):
     inline_reverse = ['address', ]
 
 
+class CycleDonationRelationInlineModel(PermissionInlineModel):
+    model = CycleDonation.projects.through
+    extra = 1
+
+
+class CycleDonationAdmin(MyAdmin):
+    inlines = (CycleDonationRelationInlineModel, )
+
+
 # since we're not using Django's built-in permissions,
 # register our own user model and unregister the Group model from admin.
 try:
@@ -485,9 +494,6 @@ try:
 except admin.sites.AlreadyRegistered:
     admin.site.unregister(User)
     admin.site.register(User, UserAdmin)
-
-
-
 
 
 admin.site.unregister(Group)
@@ -507,3 +513,4 @@ admin.site.register(Milestep, MyAdmin)
 admin.site.register(BlogPost, MyAdmin)
 admin.site.register(BankAccount, MyAdmin)
 admin.site.register(ContactMessage, MyAdmin)
+admin.site.register(CycleDonation, CycleDonationAdmin)

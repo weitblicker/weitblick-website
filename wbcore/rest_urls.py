@@ -22,6 +22,8 @@ rest_patterns = [
     path('locations/', rest_views.location_list, name="rest-blog-posts"),
     path('blog/<int:pk>/', rest_views.location_detail, name="rest-blog-post"),
 
+    path('cycle/donations/', rest_views.cycle_donatoins_list, name="rest-cycle-donations"),
+
     path('auth/', include('rest_auth.urls')),
     path('auth/registration/', RegisterView.as_view(), name='rest_register'),
     path('auth/registration/verify-email/', VerifyEmailView.as_view(), name='rest_verify_email'),
