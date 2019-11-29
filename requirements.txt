@@ -28,3 +28,4 @@ form_designer
 django-el-pagination
 markdown-fenced-code-tabs
 rules
+django_reverse_admin
