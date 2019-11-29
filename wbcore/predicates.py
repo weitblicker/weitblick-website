@@ -121,7 +121,7 @@ def has_role_for_location(role, user, location):
     if hosts and not location:
         return True
 
-    if user.userrelation_set.filter(member_type=role, host__location=location) > 0:
+    if user.userrelation_set.filter(member_type=role, host__location=location).count() > 0:
         return True
 
     if Project.objects.filter(hosts__in=hosts, location=location).count() > 0:
@@ -164,6 +164,9 @@ def is_admin(user, obj):
 
 @rules.predicate
 def is_editor(user, obj):
+    if not obj:
+        return False
+
     from wbcore.models import Address, Location
     if isinstance(obj, Address):
         return is_editor_for_address(user, obj)
