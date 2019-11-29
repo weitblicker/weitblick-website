@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'localflavor',
     'django_google_maps',
-    #'microsoft_auth',
+    'microsoft_auth',
     'wbcore.apps.WbcoreConfig',
     'form_designer',
     'admin_ordering',
@@ -119,7 +119,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                #'microsoft_auth.context_processors.microsoft',
+                'microsoft_auth.context_processors.microsoft',
                 'django.template.context_processors.request',  # for el-pagination
             ],
             'loaders': [
@@ -178,7 +178,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTHENTICATION_BACKENDS = [
     'rules.permissions.ObjectPermissionBackend',
-    #'microsoft_auth.backends.MicrosoftAuthenticationBackend',
+    'microsoft_auth.backends.MicrosoftAuthenticationBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -209,6 +209,10 @@ MARTOR_MARKDOWN_EXTENSIONS = [
     'martor.extensions.mdx_video',  # to parse embed/iframe video
 ]
 
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
 
 MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
     'markdown_fenced_code_tabs': {
@@ -278,6 +282,10 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny'
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ]
 }
 
