@@ -27,12 +27,6 @@ class LocationTranslationOptions(TranslationOptions):
     fields = ('name','city','description',)
 
 
-@register(Address)
-class AddressTranslationOptions(TranslationOptions):
-    fields = ('name','city',)
-    prepopulated_fields={'name':'all'}
-
-
 @register(Host)
 class HostTranslationOptions(TranslationOptions):
     fields = ('city',)
@@ -78,7 +72,7 @@ class MilestepTranslationOptions(TranslationOptions):
     fields = ('name','description')
 
 
-@register([BankAccount, Donation, Milestone, ContactMessage])
+@register([BankAccount, Donation, Milestone, ContactMessage, Address])
 class BankAccountTranslationOptions(TranslationOptions):
     pass
 
