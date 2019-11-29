@@ -2,10 +2,11 @@ import json
 import os
 import uuid
 
+from allauth.account.models import EmailConfirmation, EmailConfirmationHMAC
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from martor.utils import LazyEncoder
 from django.utils.translation import ugettext_lazy as _
 
@@ -15,6 +16,7 @@ from wbcore.models import NewsPost, BlogPost, Host, Event, Project, Location, Ph
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from allauth.account.views import ConfirmEmailView
 
 from weitblick import settings
 from .filter import filter_events, filter_projects, filter_news, filter_blog
@@ -144,6 +146,24 @@ def news_detail(request, pk, format=None):
     if request.method == 'GET':
         serializer = NewsPostSerializer(post)
         return Response(serializer.data)
+
+
+@api_view(['GET'])
+def account_confirm_email(request, key):
+
+    emailconfirmation = EmailConfirmationHMAC.from_key(key)
+    if not emailconfirmation:
+        queryset = EmailConfirmation.objects.all_valid()
+        queryset = queryset.select_related("email_address__user")
+        try:
+            emailconfirmation = queryset.get(key=key.lower())
+        except EmailConfirmation.DoesNotExist:
+            raise Http404()
+
+    print("confirmation:", emailconfirmation.confirm(request), emailconfirmation.email_address.verified)
+
+
+    return Response("Test")
 
 
 @api_view(['GET'])

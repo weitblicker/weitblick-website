@@ -1,4 +1,5 @@
 from django.urls import path, include
+from rest_auth.registration.views import VerifyEmailView, RegisterView
 from rest_framework.urlpatterns import format_suffix_patterns
 from wbcore import rest_views
 
@@ -22,7 +23,9 @@ rest_patterns = [
     path('blog/<int:pk>/', rest_views.location_detail, name="rest-blog-post"),
 
     path('auth/', include('rest_auth.urls')),
-    path('auth/registration/', include('rest_auth.registration.urls')),
+    path('auth/registration/', RegisterView.as_view(), name='rest_register'),
+    path('auth/registration/verify-email/', VerifyEmailView.as_view(), name='rest_verify_email'),
+    path('auth/registration/account-confirm-email/<str:key>/', rest_views.account_confirm_email, name='account_confirm_email'),
     #path('users', include('users.', )
 
     path('upload/', rest_views.markdown_uploader, name='markdown_uploader_page'),
