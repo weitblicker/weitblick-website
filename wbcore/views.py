@@ -522,7 +522,7 @@ def team_view(request, host_slug=None, team_slug=None):
 def about_view(request, host_slug=None):
 
     if not host_slug:
-        host_slug=main_host_slug
+        host_slug = main_host_slug
 
     try:
         host = Host.objects.get(slug=host_slug) if host_slug else None
@@ -701,14 +701,18 @@ def join_view(request, host_slug=None):
     if host:
         breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
         submit_url = reverse('join', args=[host_slug])
-        try:
-            join_page = host.joinpage
-            print("Join Page", join_page)
-        except JoinPage.DoesNotExist:
-            pass
     else:
         submit_url = reverse('join')
         breadcrumb = [('Home', reverse('home')), ('Contact', None)]
+        try:
+            host = Host.objects.get(slug=main_host_slug)
+        except Host.DoesNotExist:
+            host = None
+    try:
+        join_page = host.joinpage
+        print("Join Page", join_page)
+    except JoinPage.DoesNotExist:
+        pass
 
     success = False
 

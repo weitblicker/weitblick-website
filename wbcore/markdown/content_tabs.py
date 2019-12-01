@@ -23,7 +23,7 @@ class ContentTabProcessor(BlockProcessor):
         menu = util.etree.Element("div")
         menu.set("class", "ui top attached tabular menu")
         container.append(menu)
-        container.tail('<script type="text/javascript">$(".menu .item").tab();</script>')
+        container.tail = '<script type="text/javascript">$(".menu .item").tab();</script>'
 
         first = None
 
