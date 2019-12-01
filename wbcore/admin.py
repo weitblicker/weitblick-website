@@ -344,7 +344,6 @@ class UserAdmin(BaseUserAdmin):
         return roles
     get_roles.short_description = "Role"
 
-
     def get_hosts(self, user):
         return ", ".join([host.get_short_name() for host in user.hosts.all()])
     get_hosts.short_description = "Host"
@@ -406,7 +405,7 @@ class UserAdmin(BaseUserAdmin):
         return fields
 
     def get_queryset(self, request):
-        queryset = super().get_queryset(request).distinct().order_by('email')
+        queryset = super().get_queryset(request).distinct()
         print("users:", queryset.count())
 
         # super user can see everything

@@ -344,15 +344,13 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
         return False
 
     def has_module_perms(self, app_label):
-        #return super(User, self).has_module_perms(app_label)
+        # only allow super admins to see the modules beside wbcore.
 
         if self.is_super_admin:
             return True
 
         if app_label is 'wbcore':
             return True
-
-        print("app label", app_label)
 
         return False
 

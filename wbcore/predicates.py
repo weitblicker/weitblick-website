@@ -195,6 +195,8 @@ def is_user_of_bank_account(user, account):
 
 @rules.predicate
 def is_self(user, user_obj):
+    if not user_obj:
+        return True
     return user == user_obj
 
 
