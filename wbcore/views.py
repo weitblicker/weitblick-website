@@ -532,9 +532,10 @@ def about_view(request, host_slug=None):
 
     breadcrumb = [('Home', reverse('home')), ('About', None)]
 
-    projects = Project.objects.all()
-
-    about = Content.objects.get(host=host, type='about')
+    try:
+        about = Content.objects.get(host=host, type='about')
+    except Content.DoesNotExist:
+        about = None
 
     template = loader.get_template('wbcore/about.html')
     context = {
