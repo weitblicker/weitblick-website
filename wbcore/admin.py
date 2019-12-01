@@ -31,72 +31,6 @@ class MyTranslatedAdmin(TabbedTranslationAdmin):
     pass
 
 
-class UserRelationInlineModel(admin.StackedInline):
-    model = User.hosts.through
-    extra = 0
-
-    def get_formset(self, request, obj=None, **kwargs):
-        formset = super().get_formset(request, obj, **kwargs)
-        return formset
-
-    def get_fields(self, request, obj=None):
-        fields = super().get_fields(request, obj)
-        return fields
-
-    def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        if request.user.is_super_admin:
-            return queryset
-
-        queryset = queryset.exclude(user__is_super_admin=True)
-
-        request_user_relations = queryset.filter(user=request.user)
-
-        admin_hosts = request.user.get_maintaining_hosts()
-        if admin_hosts:
-            queryset = queryset.filter(host__in=admin_hosts)
-
-        return queryset | request_user_relations
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if request.user.is_super_admin:
-            return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-        if db_field.name == 'host':
-            hosts = request.user.get_hosts_for_admin()
-            kwargs["queryset"] = Host.objects.filter(pk__in=[host.pk for host in hosts])
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-    def formfield_for_choice_field(self, db_field, request=None, **kwargs):
-        formfield = super().formfield_for_choice_field(db_field, request, **kwargs)
-
-        print("db_field:",db_field)
-        if request and request.user.is_super_admin:
-            return formfield
-        if db_field.name == 'member_type':
-
-            print(kwargs)
-            choices = dict(db_field.get_choices())
-            del choices['admin']
-            del choices['']
-            kwargs['choices'] = tuple(choices.items())
-
-        return db_field.formfield(**kwargs)
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = super().get_readonly_fields(request, obj)
-        return readonly_fields
-        if request.user.is_super_admin:
-            return readonly_fields
-
-        if not UserAdmin.is_admin_of(request, obj) or obj == request.user:
-            readonly_fields += ('member_type',)
-
-        readonly_fields += ('host', 'membership_fee')
-
-        return readonly_fields
-
-
 class PermissionInlineModel(admin.StackedInline):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -137,6 +71,62 @@ class PermissionInlineModel(admin.StackedInline):
 
     def has_module_permission(self, request):
         return request.user.has_module_perms(self.opts.app_label)
+
+
+class UserRelationInlineModel(PermissionInlineModel):
+    model = User.hosts.through
+    extra = 0
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        return formset
+
+    def get_fields(self, request, obj=None):
+        fields = super().get_fields(request, obj)
+        return fields
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        if request.user.is_super_admin:
+            return queryset
+
+        queryset = queryset.exclude(user__is_super_admin=True)
+
+        request_user_relations = queryset.filter(user=request.user)
+
+        admin_hosts = request.user.get_maintaining_hosts()
+        if admin_hosts:
+            queryset = queryset.filter(host__in=admin_hosts)
+
+        return queryset | request_user_relations
+
+    def formfield_for_choice_field(self, db_field, request=None, **kwargs):
+        formfield = super().formfield_for_choice_field(db_field, request, **kwargs)
+
+        print("db_field:", db_field)
+        if request and request.user.is_super_admin:
+            return formfield
+        if db_field.name == 'member_type':
+
+            print(kwargs)
+            choices = dict(db_field.get_choices())
+            del choices['admin']
+            del choices['']
+            kwargs['choices'] = tuple(choices.items())
+
+        return db_field.formfield(**kwargs)
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = super().get_readonly_fields(request, obj)
+        if request.user.is_super_admin or not obj:
+            return readonly_fields
+
+        if not UserAdmin.is_admin_of(request, obj) or obj == request.user:
+            readonly_fields += ('member_type',)
+
+        readonly_fields += ('host', 'membership_fee')
+
+        return readonly_fields
 
 
 class TeamUserRelationInlineModel(PermissionInlineModel):
