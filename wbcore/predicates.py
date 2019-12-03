@@ -148,45 +148,33 @@ def is_super_admin(user):
     return user.is_super_admin
 
 
-@rules.predicate
-def is_admin(user, obj):
+def has_role_for_host(role, user, obj):
     from wbcore.models import Address, Location
     if isinstance(obj, Address):
-        return is_admin_for_address(user, obj)
+        return has_role_for_address(role, user, obj)
 
     if isinstance(obj, Location):
-        return is_admin_for_location(user, obj)
+        return has_role_for_location(role, user, obj)
 
     if not obj:
-        return user.has_role('admin')
-    return user.is_admin_of_host(obj.get_hosts())
+        return user.has_role(role)
+
+    return user.has_role_for_host(role, obj.get_hosts())
+
+
+@rules.predicate
+def is_admin(user, obj):
+    return has_role_for_host('admin', user, obj)
 
 
 @rules.predicate
 def is_editor(user, obj):
-    if not obj:
-        return True
-
-    from wbcore.models import Address, Location
-    if isinstance(obj, Address):
-        return is_editor_for_address(user, obj)
-
-    if isinstance(obj, Location):
-        return is_editor_for_location(user, obj)
-
-    return user.is_editor_of_host(obj.get_hosts())
+    return has_role_for_host('editor', user, obj)
 
 
 @rules.predicate
 def is_author(user, obj):
-    if not obj:
-        return True
-
-    from wbcore.models import NewsPost, BlogPost
-    if isinstance(obj, (NewsPost, BlogPost)):
-        return user.is_author_of_host(obj.get_hosts())
-    else:
-        return False
+    return has_role_for_host('author', user, obj)
 
 
 @rules.predicate
