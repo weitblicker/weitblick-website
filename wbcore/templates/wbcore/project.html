@@ -16,10 +16,10 @@
             <i class="label map marker alternate icon"></i>
         </div>
 
-        {% if project.gallery %}
+        {% if project.photos %}
             <div class="ui segment">
                 {% include 'wbcore/segment_header.html' with icon='image outline' title="Gallery" %}
-                {% include 'wbcore/gallery.html' with gallery=project.gallery %}
+                {% include 'wbcore/gallery.html' with photos=project.photos.all %}
             </div>
         {% endif %}
 
