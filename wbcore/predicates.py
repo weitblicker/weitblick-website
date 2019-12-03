@@ -165,7 +165,7 @@ def is_admin(user, obj):
 @rules.predicate
 def is_editor(user, obj):
     if not obj:
-        return False
+        return True
 
     from wbcore.models import Address, Location
     if isinstance(obj, Address):
@@ -178,10 +178,13 @@ def is_editor(user, obj):
 
 
 @rules.predicate
-def is_author(user, post):
+def is_author(user, obj):
+    if not obj:
+        return True
+
     from wbcore.models import NewsPost, BlogPost
-    if isinstance(post, (NewsPost, BlogPost)):
-        return user.is_author_of_host(post.get_hosts())
+    if isinstance(obj, (NewsPost, BlogPost)):
+        return user.is_author_of_host(obj.get_hosts())
     else:
         return False
 

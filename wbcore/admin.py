@@ -171,7 +171,6 @@ class MyAdmin(TabbedTranslationAdmin):
 
     def get_queryset(self, request):
         queryset = super(MyAdmin, self).get_queryset(request)
-        return queryset
         # super user can see everything
         if request.user.is_super_admin:
             return queryset
@@ -182,12 +181,10 @@ class MyAdmin(TabbedTranslationAdmin):
 
         # if many to many field hosts exists filter using it
         try:
-            print("Try this...")
             return queryset.filter(hosts__in=request.user.hosts.all())
         except:
             # if field host exists filter using it
             try:
-                print("and that...")
                 return queryset.filter(host__in=request.user.hosts.all())
             except:
                 return queryset
