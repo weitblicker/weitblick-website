@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django_countries.fields import CountryField
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
@@ -227,7 +227,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesModelBase):
     class Meta:
         rules_permissions = {
-            "add": pred.is_super_admin | pred.is_admin,
+            "add": pred.is_super_admin,
             "view": pred.is_super_admin | pred.is_admin | pred.is_self,
             "change": pred.is_super_admin | pred.is_admin | pred.is_self,
             "delete": pred.is_super_admin,
@@ -1005,6 +1005,23 @@ class CycleDonationRelation(RulesModel):
     cycle_donation = models.ForeignKey('CycleDonation', on_delete=models.CASCADE)
     current_amount = models.FloatField(default=0)
     goal_amount = models.FloatField(null=True, blank=True, default=None)
+    finished = models.BooleanField(default=False)
+
+    @classmethod
+    def add_segment(cls, id, amount):
+        with transaction.atomic():
+            donation_relation = cls.objects.select_for_update().get(id=id)
+
+            new_amount = donation_relation.current_amount + amount
+            if new_amount >= donation_relation.goal_amount:
+                donation_relation.current_amount = donation_relation.goal_amount
+                donation_relation.finished = True
+            else:
+                donation_relation.current_amount = new_amount
+                donation_relation.finished = False
+
+            donation_relation.save()
+            return donation_relation
 
 
 class CycleDonation(RulesModel):
@@ -1024,4 +1041,10 @@ class CycleDonation(RulesModel):
     description = models.TextField(null=True, blank=True)
     goal_amount = models.FloatField(null=False, blank=False)
     rate_euro_km = models.FloatField() # euro per km, e.g. 0.1 per km (10 cents per km)
+
+    def current_amount(self):
+        current_amount = 0
+        for relation in self.cycledonationrelation_set:
+            current_amount += relation.current_amount
+        return current_amount
 
