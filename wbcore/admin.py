@@ -281,14 +281,14 @@ class UserAdmin(BaseUserAdmin):
         def lookups(self, request, model_admin):
             choices = ()
             if request.user.is_superuser:
-                choices += (('is_superuser', 'Super User'),)
+                choices += (('is_super_admin', 'Super Admin'),)
             choices += (('no_relation', 'No Relation'),)
             choices += UserRelation.TYPE_CHOICES
             return choices
 
         def queryset(self, request, queryset):
             if self.value():
-                if self.value() == 'is_superuser':
+                if self.value() == 'is_super_admin':
                     queryset = queryset.filter(is_super_admin=True).exclude(is_super_admin=False)
                 elif self.value() == 'no_relation':
                     queryset = queryset.filter(userrelation=None)
@@ -330,7 +330,9 @@ class UserAdmin(BaseUserAdmin):
         role_name = dict(UserRelation.TYPE_CHOICES)
         roles = [role_name[relation.member_type] for relation in user.userrelation_set.all()]
         if user.is_superuser:
-            roles = ['Super User'] + roles
+            roles = ['System Admin'] + roles
+        elif user.is_super_admin:
+            roles = ['Super Admin'] + roles
         return roles
     get_roles.short_description = "Role"
 
