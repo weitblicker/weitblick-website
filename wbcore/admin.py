@@ -19,7 +19,7 @@ from itertools import chain
 from .models import (
     Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, ContactMessage, UserRelation,
     Document, Team, Milestone, Donation, Milestep, BankAccount, TeamUserRelation, Content, User, JoinPage,
-    SocialMediaLink, CycleDonation, CycleDonationRelation
+    SocialMediaLink, CycleDonation, CycleDonationRelation, Segment
 )
 
 
@@ -502,3 +502,4 @@ admin.site.register(BlogPost, MyAdmin)
 admin.site.register(BankAccount, MyAdmin)
 admin.site.register(ContactMessage, MyAdmin)
 admin.site.register(CycleDonation, CycleDonationAdmin)
+admin.site.register(Segment, MyAdmin)
