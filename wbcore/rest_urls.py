@@ -23,6 +23,7 @@ rest_patterns = [
     path('blog/<int:pk>/', rest_views.location_detail, name="rest-blog-post"),
 
     path('cycle/donations/', rest_views.cycle_donatoins_list, name="rest-cycle-donations"),
+    path('cycle/segment/', rest_views.cycle_add_segment, name="rest-cycle-add-segment"),
 
     path('auth/', include('rest_auth.urls')),
     path('auth/registration/', RegisterView.as_view(), name='rest_register'),

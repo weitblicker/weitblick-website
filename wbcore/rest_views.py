@@ -11,7 +11,8 @@ from martor.utils import LazyEncoder
 from django.utils.translation import ugettext_lazy as _
 
 from wbcore.serializers import (NewsPostSerializer, BlogPostSerializer, HostSerializer, EventSerializer,
-                                ProjectSerializer, LocationSerializer, CycleDonationSerializer)
+                                ProjectSerializer, LocationSerializer, CycleDonationSerializer,
+                                CycleDonationRelationSerializer)
 from wbcore.models import NewsPost, BlogPost, Host, Event, Project, Location, Photo, CycleDonation
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -212,3 +213,12 @@ def cycle_donatoins_list(request):
         cycle_donations = CycleDonation.objects.all()
         serializer = CycleDonationSerializer(cycle_donations, many=True)
         return Response(serializer.data)
+
+
+@api_view(['POST'])
+def cycle_add_segment(request):
+    if request.method == 'POST':
+        serializer = CycleDonationRelationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+    return Response(serializer.data)

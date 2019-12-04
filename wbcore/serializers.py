@@ -60,7 +60,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         depth = 0
         fields = ('id', 'start_date', 'end_date', 'published', 'name', 'slug', 'hosts', 'description', 'location',
-                  'partner', 'gallery')
+                  'partners', 'gallery')
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -86,6 +86,8 @@ class CycleDonationRelationSerializer(serializers.ModelSerializer):
         fields = ('project', 'cycle_donation', 'current_amount', 'goal_amount')
 
 
+
+
 class CycleDonationSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
 
@@ -99,4 +101,20 @@ class CycleDonationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CycleDonation
         fields = ('id', 'projects', 'partner', 'logo', 'name', 'description', 'goal_amount', 'rate_euro_km')
+
+
+class CycleSegmentSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='pk')
+
+    projects = serializers.SerializerMethodField()
+
+    def get_projects(self, donation):
+        qs = donation.cycledonationrelation_set.all()
+        serializer = CycleDonationRelationSerializer(read_only=True, many=True, instance=qs)
+        return serializer.data
+
+    class Meta:
+        model = CycleDonation
+        fields = ('id', 'projects', 'partner', 'logo', 'name', 'description', 'goal_amount', 'rate_euro_km')
+
 
