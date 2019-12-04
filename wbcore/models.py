@@ -1048,3 +1048,22 @@ class CycleDonation(RulesModel):
             current_amount += relation.current_amount
         return current_amount
 
+
+class Segment(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": rules.is_superuser,
+            "view": rules.is_superuser,
+            "change": rules.is_superuser,
+            "delete": rules.is_superuser,
+        }
+
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+    distance = models.FloatField()
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    tour = models.IntegerField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+

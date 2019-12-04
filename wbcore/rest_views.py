@@ -12,7 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from wbcore.serializers import (NewsPostSerializer, BlogPostSerializer, HostSerializer, EventSerializer,
                                 ProjectSerializer, LocationSerializer, CycleDonationSerializer,
-                                CycleDonationRelationSerializer)
+                                CycleDonationRelationSerializer, SegmentSerializer)
 from wbcore.models import NewsPost, BlogPost, Host, Event, Project, Location, Photo, CycleDonation
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -218,7 +218,8 @@ def cycle_donatoins_list(request):
 @api_view(['POST'])
 def cycle_add_segment(request):
     if request.method == 'POST':
-        serializer = CycleDonationRelationSerializer(data=request.data)
+        serializer = SegmentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-    return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

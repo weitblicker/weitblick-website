@@ -1,7 +1,12 @@
-from wbcore.models import NewsPost, BlogPost, Host, Event, Project, Location, CycleDonation, CycleDonationRelation
+from allauth.account.forms import default_token_generator
+from rest_framework.exceptions import ValidationError
+
+from wbcore.models import (
+    NewsPost, BlogPost, Host, Event, Project, Location, CycleDonation, CycleDonationRelation, Segment, User)
 from rest_framework import serializers
 from photologue.models import Gallery, Photo
-
+from django.utils.dateparse import parse_datetime
+from rest_auth.models import TokenModel
 
 class PhotoSerializer(serializers.ModelSerializer):
     url = serializers.ImageField(source='image')
@@ -86,6 +91,32 @@ class CycleDonationRelationSerializer(serializers.ModelSerializer):
         fields = ('project', 'cycle_donation', 'current_amount', 'goal_amount')
 
 
+class SegmentSerializer(serializers.ModelSerializer):
+    token = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = Segment
+        fields = ('start', 'end', 'distance', 'project', 'tour', 'token')
+
+    def create(self, validated_data):
+        seg = Segment(start=validated_data['start'], end=validated_data['end'],
+                       distance=validated_data['distance'], project=validated_data['project'],
+                       tour=validated_data['tour'], user=validated_data['user'])
+        print("Segment:", seg)
+        return seg
+
+    def validate(self, data):
+        try:
+            print("validate...", data)
+            token = TokenModel.objects.get(key=data['token'])
+            print("Token:", token)
+            data['user'] = token.user.pk
+        except TokenModel.DoesNotExist:
+            print("Token does not exist!")
+            # raise serializers.ValidationError("Token is invalid:%s" % data['token'])
+            data['user'] = User.objects.get(email="spuetz@uos.de")
+
+        return data
 
 
 class CycleDonationSerializer(serializers.ModelSerializer):
@@ -116,5 +147,4 @@ class CycleSegmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = CycleDonation
         fields = ('id', 'projects', 'partner', 'logo', 'name', 'description', 'goal_amount', 'rate_euro_km')
-
 
