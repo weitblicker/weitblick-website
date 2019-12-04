@@ -1064,7 +1064,15 @@ class Segment(RulesModel):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     tour = models.IntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+        for cycle_relation in self.project.cycledonationrelation_set.all():
+            cycle_relation.add_segment(cycle_relation.pk, self.distance)
+
+    def get_cycle_donations(self):
+        return self.project.cycledonation_set.all()
+
     def __str__(self):
         return "Segment of project %s of user %s" % (self.project.name, self.user.name())
 

@@ -88,7 +88,7 @@ class LocationSerializer(serializers.ModelSerializer):
 class CycleDonationRelationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CycleDonationRelation
-        fields = ('project', 'cycle_donation', 'current_amount', 'goal_amount')
+        fields = ('project', 'cycle_donation', 'current_amount', 'goal_amount', 'finished')
 
 
 class SegmentSerializer(serializers.ModelSerializer):
@@ -131,7 +131,7 @@ class CycleDonationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CycleDonation
-        fields = ('id', 'projects', 'partner', 'logo', 'name', 'description', 'goal_amount', 'rate_euro_km')
+        fields = ('id', 'projects', 'partner', 'logo', 'name', 'description', 'goal_amount', 'rate_euro_km',)
 
 
 class CycleSegmentSerializer(serializers.ModelSerializer):
@@ -146,5 +146,5 @@ class CycleSegmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CycleDonation
-        fields = ('id', 'projects', 'partner', 'logo', 'name', 'description', 'goal_amount', 'rate_euro_km')
+        fields = ('id', 'projects', 'partner', 'logo', 'name', 'description', 'goal_amount', 'rate_euro_km',)
 

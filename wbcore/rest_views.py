@@ -220,7 +220,9 @@ def cycle_add_segment(request):
     if request.method == 'POST':
         serializer = SegmentSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            segment = serializer.save()
+            cycle_donatoins_serializer = CycleDonationSerializer(segment.get_cycle_donations(), many=True)
+
+            return Response(cycle_donatoins_serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
