@@ -102,7 +102,7 @@ class SegmentSerializer(serializers.ModelSerializer):
         seg = Segment(start=validated_data['start'], end=validated_data['end'],
                        distance=validated_data['distance'], project=validated_data['project'],
                        tour=validated_data['tour'], user=validated_data['user'])
-        print("Segment:", seg)
+        seg.save()
         return seg
 
     def validate(self, data):
