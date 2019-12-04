@@ -60,12 +60,19 @@ class HostSerializer(serializers.ModelSerializer):
 class ProjectSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     gallery = GallerySerializer(read_only=True)
+    cycle = serializers.SerializerMethodField()
+
+    def get_cycle(self, project):
+        qs = project.cycledonationrelation_set.all()
+        serializer = CycleDonationRelationSerializer(many=True, instance=qs)
+        return serializer.data
 
     class Meta:
         model = Project
+
         depth = 0
         fields = ('id', 'start_date', 'end_date', 'published', 'name', 'slug', 'hosts', 'description', 'location',
-                  'partners', 'gallery')
+                  'partners', 'gallery', 'cycle')
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -99,11 +106,9 @@ class SegmentSerializer(serializers.ModelSerializer):
         fields = ('start', 'end', 'distance', 'project', 'tour', 'token')
 
     def create(self, validated_data):
-        seg = Segment(start=validated_data['start'], end=validated_data['end'],
+        return Segment(start=validated_data['start'], end=validated_data['end'],
                        distance=validated_data['distance'], project=validated_data['project'],
                        tour=validated_data['tour'], user=validated_data['user'])
-        seg.save()
-        return seg
 
     def validate(self, data):
         try:
@@ -121,7 +126,6 @@ class SegmentSerializer(serializers.ModelSerializer):
 
 class CycleDonationSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
-
     projects = serializers.SerializerMethodField()
 
     def get_projects(self, donation):

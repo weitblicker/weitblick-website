@@ -1006,16 +1006,18 @@ class CycleDonationRelation(RulesModel):
     current_amount = models.FloatField(default=0)
     goal_amount = models.FloatField(null=True, blank=True, default=None)
     finished = models.BooleanField(default=False)
+    users = models.ManyToManyField(User)
 
     @classmethod
-    def add_segment(cls, id, amount):
+    def add_segment(cls, id, distance):
         with transaction.atomic():
             donation_relation = cls.objects.select_for_update().get(id=id)
-
+            amount = distance * donation_relation.cycle_donation.rate_euro_km
             new_amount = donation_relation.current_amount + amount
             if new_amount >= donation_relation.goal_amount:
                 donation_relation.current_amount = donation_relation.goal_amount
                 donation_relation.finished = True
+
             else:
                 donation_relation.current_amount = new_amount
                 donation_relation.finished = False
@@ -1065,10 +1067,10 @@ class Segment(RulesModel):
     tour = models.IntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    def save(self, **kwargs):
-        super().save(**kwargs)
+    def register(self):
+        distance_fraction = self.distance / self.project.cycledonationrelation_set.count()
         for cycle_relation in self.project.cycledonationrelation_set.all():
-            cycle_relation.add_segment(cycle_relation.pk, self.distance)
+            cycle_relation.add_segment(cycle_relation.pk, distance_fraction)
 
     def get_cycle_donations(self):
         return self.project.cycledonation_set.all()

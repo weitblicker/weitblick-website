@@ -73,7 +73,7 @@ class MilestepTranslationOptions(TranslationOptions):
     fields = ('name','description')
 
 
-@register([BankAccount, Donation, Milestone, ContactMessage, Address, CycleDonation, Segment])
+@register([BankAccount, Donation, Milestone, ContactMessage, Address, CycleDonation])
 class BankAccountTranslationOptions(TranslationOptions):
     pass
 

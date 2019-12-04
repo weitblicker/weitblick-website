@@ -208,7 +208,7 @@ def location_detail(request, pk, format=None):
 
 
 @api_view(['GET'])
-def cycle_donatoins_list(request):
+def cycle_donations_list(request):
     if request.method == 'GET':
         cycle_donations = CycleDonation.objects.all()
         serializer = CycleDonationSerializer(cycle_donations, many=True)
@@ -221,8 +221,9 @@ def cycle_add_segment(request):
         serializer = SegmentSerializer(data=request.data)
         if serializer.is_valid():
             segment = serializer.save()
-            cycle_donatoins_serializer = CycleDonationSerializer(segment.get_cycle_donations(), many=True)
+            segment.register()
+            cycle_donations_serializer = CycleDonationSerializer(segment.get_cycle_donations(), many=True)
 
-            return Response(cycle_donatoins_serializer.data, status=status.HTTP_201_CREATED)
+            return Response(cycle_donations_serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
