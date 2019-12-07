@@ -331,10 +331,12 @@ class UserAdmin(BaseUserAdmin):
         elif user.is_super_admin:
             roles = ['Super Admin'] + roles
         return roles
+
     get_roles.short_description = "Role"
 
     def get_hosts(self, user):
-        return ", ".join([host.get_short_name() for host in user.hosts.all()])
+        return [host.get_short_name() for host in user.hosts.all()]
+
     get_hosts.short_description = "Host"
 
     exclude = ()
@@ -349,7 +351,7 @@ class UserAdmin(BaseUserAdmin):
         },),
     )
     search_fields = ('email', 'username', 'first_name', 'last_name')
-    ordering = ('email', 'hosts')
+    ordering = ('email',)
 
     filter_horizontal = ('hosts',)
 
