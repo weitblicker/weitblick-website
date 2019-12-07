@@ -1070,6 +1070,9 @@ class CycleTour(RulesModel):
     km = models.FloatField(default=0)
     euro = models.FloatField(default=0)
 
+    def __str__(self):
+        return "Tour %s of user %s" % (self.index, self.user.name())
+
 
 class CycleSegment(RulesModel):
     class Meta:
@@ -1102,7 +1105,7 @@ class CycleSegment(RulesModel):
         return self.tour.project.cycledonation_set.all()
 
     def __str__(self):
-        return "Segment of project %s of user %s" % (self.project.name, self.user.name())
+        return "Cycle segment of tour %s of user %s" % (self.tour.index, self.user.name())
 
 
 
