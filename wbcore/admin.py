@@ -19,7 +19,7 @@ from itertools import chain
 from .models import (
     Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, ContactMessage, UserRelation,
     Document, Team, Milestone, Donation, Milestep, BankAccount, TeamUserRelation, Content, User, JoinPage,
-    SocialMediaLink, CycleDonation, CycleDonationRelation, Segment
+    SocialMediaLink, CycleDonation
 )
 
 

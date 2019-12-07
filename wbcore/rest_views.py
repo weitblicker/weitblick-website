@@ -6,15 +6,18 @@ from allauth.account.models import EmailConfirmation, EmailConfirmationHMAC
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+from django.db.models import Sum
 from django.http import HttpResponse, Http404
 from martor.utils import LazyEncoder
 from django.utils.translation import ugettext_lazy as _
+from rest_auth.models import TokenModel
 
 from wbcore.serializers import (NewsPostSerializer, BlogPostSerializer, HostSerializer, EventSerializer,
                                 ProjectSerializer, LocationSerializer, CycleDonationSerializer,
-                                CycleDonationRelationSerializer, SegmentSerializer)
-from wbcore.models import NewsPost, BlogPost, Host, Event, Project, Location, Photo, CycleDonation
-from rest_framework import status
+                                CycleDonationRelationSerializer, CycleSegmentSerializer, CycleTourSerializer,
+                                TokenSerializer, UserCycleSerializer)
+from wbcore.models import NewsPost, BlogPost, Host, Event, Project, Location, Photo, CycleDonation, CycleTour, User
+from rest_framework import status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from allauth.account.views import ConfirmEmailView
@@ -151,7 +154,6 @@ def news_detail(request, pk, format=None):
 
 @api_view(['GET'])
 def account_confirm_email(request, key):
-
     emailconfirmation = EmailConfirmationHMAC.from_key(key)
     if not emailconfirmation:
         queryset = EmailConfirmation.objects.all_valid()
@@ -162,7 +164,6 @@ def account_confirm_email(request, key):
             raise Http404()
 
     print("confirmation:", emailconfirmation.confirm(request), emailconfirmation.email_address.verified)
-
 
     return Response("Test")
 
@@ -218,12 +219,42 @@ def cycle_donations_list(request):
 @api_view(['POST'])
 def cycle_add_segment(request):
     if request.method == 'POST':
-        serializer = SegmentSerializer(data=request.data)
+        serializer = CycleSegmentSerializer(data=request.data)
         if serializer.is_valid():
             segment = serializer.save()
-            segment.register()
-            cycle_donations_serializer = CycleDonationSerializer(segment.get_cycle_donations(), many=True)
-
-            return Response(cycle_donations_serializer.data, status=status.HTTP_201_CREATED)
+            tour_serializer = CycleTourSerializer(segment.tour)
+            return Response(tour_serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def cycle_user_tours(request):
+    if request.method == 'POST':
+        try:
+            token_serializer = TokenSerializer(data=request.data)
+            if token_serializer.is_valid():
+                token = token_serializer.instance
+                serializer = CycleTourSerializer(instance=token.user.cycletour_set.all(), many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(token_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except TokenModel.DoesNotExist:
+            print("Token %s does not exist!" % token_str)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def cycle_ranking(request):
+    return Response(serializer.data)
+
+
+class RankingViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.exclude(cycletour=None)
+    serializer_class = UserCycleSerializer
+
+    def get_queryset(self):
+        return self.queryset.annotate(
+            euro=Sum('cycletour__euro'),
+            km=Sum('cycletour__km')
+        ).order_by('km')

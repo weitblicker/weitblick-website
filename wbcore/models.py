@@ -1006,7 +1006,7 @@ class CycleDonationRelation(RulesModel):
     current_amount = models.FloatField(default=0)
     goal_amount = models.FloatField(null=True, blank=True, default=None)
     finished = models.BooleanField(default=False)
-    users = models.ManyToManyField(User)
+    users = models.ManyToManyField(User, null=True)
 
     @classmethod
     def add_segment(cls, id, distance, user):
@@ -1024,7 +1024,8 @@ class CycleDonationRelation(RulesModel):
 
             donation_relation.users.add(user)
             donation_relation.save()
-            return donation_relation
+            return amount, (new_amount - donation_relation.goal_amount) / donation_relation.cycle_donation.rate_euro_km
+
 
 
 class CycleDonation(RulesModel):
@@ -1052,7 +1053,25 @@ class CycleDonation(RulesModel):
         return current_amount
 
 
-class Segment(RulesModel):
+class CycleTour(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": rules.is_superuser,
+            "view": rules.is_superuser,
+            "change": rules.is_superuser,
+            "delete": rules.is_superuser,
+        }
+
+    index = models.IntegerField(default=-1)
+    donations = models.ManyToManyField(CycleDonation)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    finished = models.BooleanField(default=False)
+    km = models.FloatField(default=0)
+    euro = models.FloatField(default=0)
+
+
+class CycleSegment(RulesModel):
     class Meta:
         rules_permissions = {
             "add": rules.is_superuser,
@@ -1064,20 +1083,29 @@ class Segment(RulesModel):
     start = models.DateTimeField()
     end = models.DateTimeField()
     distance = models.FloatField()
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    tour = models.IntegerField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    tour = models.ForeignKey(CycleTour, on_delete=models.CASCADE)
 
-    def register(self):
-        distance_fraction = self.distance / self.project.cycledonationrelation_set.count()
-        for cycle_relation in self.project.cycledonationrelation_set.all():
-            cycle_relation.add_segment(cycle_relation.pk, distance_fraction, self.user)
+    def save(self, **kwargs):
+        super().save(**kwargs)
+        project = self.tour.project
+        user = self.tour.user
+        self.tour.km += self.distance
+
+        distance_fraction = self.distance / project.cycledonationrelation_set.count()
+        for cycle_relation in project.cycledonationrelation_set.all():
+            euro, rest = cycle_relation.add_segment(cycle_relation.pk, distance_fraction, user)
+            self.tour.euro += euro
+
+        self.tour.save()
 
     def get_cycle_donations(self):
-        return self.project.cycledonation_set.all()
+        return self.tour.project.cycledonation_set.all()
 
     def __str__(self):
         return "Segment of project %s of user %s" % (self.project.name, self.user.name())
+
+
+
 
 
 

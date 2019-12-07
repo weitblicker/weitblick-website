@@ -8,7 +8,7 @@ from modeltranslation.translator import register, TranslationOptions
 from .models import (
     Project, Location, Address, Host, Partner, NewsPost, BlogPost,
     Document, Team, Milestep, Content, Event, Milestone, Donation,
-    BankAccount, ContactMessage, CycleDonation, CycleDonationRelation, Segment
+    BankAccount, ContactMessage, CycleDonation
 )
 from schedule.models.events import Event as ScheduleEvent
 
