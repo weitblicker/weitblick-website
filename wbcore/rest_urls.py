@@ -20,7 +20,7 @@ rest_patterns = [
     path('blog/<int:pk>/', rest_views.blog_detail, name="rest-blog-post"),
 
     path('locations/', rest_views.location_list, name="rest-blog-posts"),
-    path('blog/<int:pk>/', rest_views.location_detail, name="rest-blog-post"),
+    path('locations/<int:pk>/', rest_views.location_detail, name="rest-blog-post"),
 
     path('cycle/donations/', rest_views.cycle_donations_list, name="rest-cycle-donations"),
     path('cycle/segment/', rest_views.cycle_add_segment, name="rest-cycle-add-segment"),
