@@ -1105,7 +1105,7 @@ class CycleSegment(RulesModel):
         return self.tour.project.cycledonation_set.all()
 
     def __str__(self):
-        return "Cycle segment of tour %s of user %s" % (self.tour.index, self.user.name())
+        return "Cycle segment %s of tour %s of user %s" % (self.pk, self.tour.index, self.tour.user.name())
 
 
 
