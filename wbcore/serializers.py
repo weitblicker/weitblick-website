@@ -30,6 +30,14 @@ class GallerySerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'description', 'images')
 
 
+class LocationSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='pk')
+
+    class Meta:
+        model = Location
+        fields = ('id', 'name', 'description', 'country', 'postal_code', 'city', 'state', 'street', 'address', 'lat', 'lng')
+
+
 class BlogPostSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     gallery = GallerySerializer(read_only=True)
@@ -61,7 +69,8 @@ class ProjectSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     gallery = GallerySerializer(read_only=True)
     cycle = serializers.SerializerMethodField()
-
+    location = LocationSerializer()
+    
     def get_cycle(self, project):
         qs = project.cycledonationrelation_set.all()
         serializer = CycleDonationRelationSerializer(many=True, instance=qs)
@@ -82,14 +91,6 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ('id', 'name', 'projects', 'host', 'gallery')
-
-
-class LocationSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(source='pk')
-
-    class Meta:
-        model = Location
-        fields = ('id', 'name', 'description', 'country', 'postal_code', 'city', 'state', 'street', 'address', 'lat', 'lng')
 
 
 class CycleDonationRelationSerializer(serializers.ModelSerializer):
