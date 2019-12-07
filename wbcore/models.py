@@ -1009,7 +1009,7 @@ class CycleDonationRelation(RulesModel):
     users = models.ManyToManyField(User)
 
     @classmethod
-    def add_segment(cls, id, distance):
+    def add_segment(cls, id, distance, user):
         with transaction.atomic():
             donation_relation = cls.objects.select_for_update().get(id=id)
             amount = distance * donation_relation.cycle_donation.rate_euro_km
@@ -1022,6 +1022,7 @@ class CycleDonationRelation(RulesModel):
                 donation_relation.current_amount = new_amount
                 donation_relation.finished = False
 
+            donation_relation.users.add(user)
             donation_relation.save()
             return donation_relation
 
@@ -1070,7 +1071,7 @@ class Segment(RulesModel):
     def register(self):
         distance_fraction = self.distance / self.project.cycledonationrelation_set.count()
         for cycle_relation in self.project.cycledonationrelation_set.all():
-            cycle_relation.add_segment(cycle_relation.pk, distance_fraction)
+            cycle_relation.add_segment(cycle_relation.pk, distance_fraction, self.user)
 
     def get_cycle_donations(self):
         return self.project.cycledonation_set.all()

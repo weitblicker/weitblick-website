@@ -64,6 +64,7 @@ class BlogPostIndex(indexes.SearchIndex, indexes.Indexable):
     def index_queryset(self, using=None):
         return self.get_model().objects.all()
 
+
 class EventsIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     model = indexes.CharField(model_attr='get_model_name', faceted=True)
