@@ -10,6 +10,7 @@ from modeltranslation.admin import TabbedTranslationAdmin
 from martor.widgets import AdminMartorWidget
 from django_google_maps import widgets as map_widgets
 from django_google_maps import fields as map_fields
+from schedule.models import Calendar
 from copy import copy
 from django_reverse_admin import ReverseModelAdmin
 from rules.contrib.admin import ObjectPermissionsModelAdmin
@@ -160,13 +161,42 @@ class MyAdmin(TabbedTranslationAdmin):
         map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget(attrs={'data-map-type': 'roadmap'})},
     }
 
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == 'hosts':
+            if request.user.hosts.count() == 1:
+                # setting the user from the request object
+                kwargs['initial'] = request.user.hosts.all()
+                # making the field readonly
+                kwargs['disabled'] = True
+            kwargs["queryset"] = request.user.hosts
+
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
+
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if request.user.is_super_admin:
             return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+        if db_field.name == 'author':
+            # setting the user from the request object
+            kwargs['initial'] = request.user.pk
+            # making the field readonly
+            kwargs['disabled'] = True
+
         if db_field.name == 'host':
-            hosts = request.user.get_hosts_for_admin()
-            kwargs["queryset"] = Host.objects.filter(pk__in=[host.pk for host in hosts])
+            if request.user.hosts.count() == 1:
+                # setting the hosts the user belongs to from the request object
+                kwargs['initial'] = request.user.hosts.all()[0].pk
+                # making the field readonly
+                kwargs['disabled'] = True
+            else:
+                hosts = request.user.get_hosts_for_admin()
+                kwargs["queryset"] = Host.objects.filter(pk__in=[host.pk for host in hosts])
+
+        if db_field.name == 'project':
+                hosts = request.user.hosts.all()
+                kwargs["queryset"] = Project.objects.filter(hosts__in=hosts).all()
+                print(kwargs['queryset'])
+
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_queryset(self, request):
@@ -477,6 +507,11 @@ class CycleDonationAdmin(MyAdmin):
     inlines = (CycleDonationRelationInlineModel, )
 
 
+class EventsAdmin(MyAdmin):
+    def save_model(self, request, obj, form, change):
+        super().save(request, obj, form, change)
+
+
 # since we're not using Django's built-in permissions,
 # register our own user model and unregister the Group model from admin.
 try:
@@ -493,7 +528,7 @@ admin.site.register(Location, MyAdmin)
 admin.site.register(Host, HostAdmin)
 admin.site.register(Partner, PartnerAdmin)
 admin.site.register(Project, MyAdmin)
-admin.site.register(Event, MyAdmin)
+admin.site.register(Event, EventsAdmin)
 admin.site.register(NewsPost, MyAdmin)
 admin.site.register(Document, MyAdmin)
 admin.site.register(Team, TeamAdmin)

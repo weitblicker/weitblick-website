@@ -9,7 +9,7 @@ from localflavor.generic.models import IBANField, BICField
 from localflavor.generic.countries.sepa import IBAN_SEPA_COUNTRIES
 from django.urls import reverse
 from django_google_maps import fields as map_fields
-from schedule.models.events import Event as ScheduleEvent
+from schedule.models.events import Event as ScheduleEvent, Calendar
 from form_designer.models import Form as EventForm
 from wbcore import predicates as pred
 from rules.contrib.models import RulesModel, RulesModelBase, RulesModelMixin
@@ -517,7 +517,7 @@ class Event(RulesModelMixin, ScheduleEvent, metaclass=RulesModelBase):
     slug = models.SlugField(max_length=50, unique=True, null=True)
     teaser = models.TextField(max_length=120, blank=True)
     projects = models.ManyToManyField(Project, blank=True)
-    host = models.ManyToManyField(Host)
+    host = models.ForeignKey(Host, on_delete=models.CASCADE)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
