@@ -1070,6 +1070,28 @@ class CycleTour(RulesModel):
     km = models.FloatField(default=0)
     euro = models.FloatField(default=0)
 
+    @property
+    def start(self):
+        seg = self.cyclesegment_set.first()
+        if seg:
+            return seg.start
+        return None
+
+    @property
+    def end(self):
+        seg = self.cyclesegment_set.last()
+        if seg:
+            return seg.end
+        return None
+
+    @property
+    def duration(self):
+        start = self.start
+        end = self.end
+        if start and end:
+            return self.end - self.start
+        return False
+
     def __str__(self):
         return "Tour %s of user %s" % (self.index, self.user.name())
 

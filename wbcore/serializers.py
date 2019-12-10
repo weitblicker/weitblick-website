@@ -227,7 +227,7 @@ class CycleTourSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CycleTour
-        fields = ('tour', 'project', 'finished', 'euro', 'km')
+        fields = ('tour', 'project', 'finished', 'euro', 'km', 'start', 'end', 'duration')
 
 
 class UserCycleSerializer(serializers.ModelSerializer):
