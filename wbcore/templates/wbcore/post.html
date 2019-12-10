@@ -12,7 +12,7 @@
         <div class="ui segment">
             <h1 class="ui header">{{ post.title }}</h1>
             <div class="ui image label">
-                {% if post.author %}
+                {% if post.author and post.author.image %}
                     <img class="ui avatar image" src='{{ post.author.image.url }}'>{{ post.author.name }}
                 {% elif post.author_name %}
                     <img class="ui avatar image" src='{% get_media_prefix %}kristy.png'>{{ post.author_name }}
