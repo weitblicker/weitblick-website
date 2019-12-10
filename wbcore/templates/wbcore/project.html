@@ -1,5 +1,6 @@
 {% extends 'wbcore/single_content.html' %}
 {% load staticfiles %}
+{% load wbcoretags %}
 {% block content %}
 
 <div class="ui stackable grid container">
@@ -7,7 +8,7 @@
 
     <div class="ten wide column divided items">
         <div class="ui segment">
-            {{ project.description | safe }}
+            {{ project.description | safe_markdown }}
         </div>
     </div>
 
