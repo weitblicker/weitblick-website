@@ -275,13 +275,17 @@ class Command(BaseCommand):
                     req.get_method = lambda: 'HEAD'
                     request.urlopen(new_url)
                     return new_url, filename, ext
-                except error.HTTPError:
+                except error.HTTPError as http_error:
+                    print("HTTPError:", http_error)
                     continue
-            except error.HTTPError:
+            except error.HTTPError as http_error:
+                print("HTTPError:", http_error)
                 continue
-            except error.URLError:
+            except error.URLError as url_error:
+                print("URLError:", url_error)
                 return None, None, None
-            except ValueError:
+            except ValueError as value_error:
+                print("ValueError:", value_error)
                 return None, None, None
 
         return None, None, None
