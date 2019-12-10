@@ -15,8 +15,8 @@ from rest_auth.models import TokenModel
 from wbcore.serializers import (NewsPostSerializer, BlogPostSerializer, HostSerializer, EventSerializer,
                                 ProjectSerializer, LocationSerializer, CycleDonationSerializer,
                                 CycleDonationRelationSerializer, CycleSegmentSerializer, CycleTourSerializer,
-                                TokenSerializer, UserCycleSerializer)
-from wbcore.models import NewsPost, BlogPost, Host, Event, Project, Location, Photo, CycleDonation, CycleTour, User
+                                TokenSerializer, UserCycleSerializer, FAQSerializer)
+from wbcore.models import NewsPost, BlogPost, Host, Event, Project, Location, Photo, CycleDonation, CycleTour, User, FAQ
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -260,6 +260,6 @@ class RankingViewSet(viewsets.ModelViewSet):
         ).order_by('km')
 
 
-@api_view(['GET'])
-def faq(request):
-    return None
+class FAQViewSet(viewsets.ModelViewSet):
+    queryset = FAQ.objects.all()
+    serializer_class = FAQSerializer

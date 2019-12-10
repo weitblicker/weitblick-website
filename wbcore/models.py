@@ -1141,6 +1141,9 @@ class FAQ(RulesModel):
 
     title = models.CharField(max_length=200)
 
+    def __str__(self):
+        return self.title
+
 
 class QuestionAndAnswer(RulesModel):
     class Meta:
@@ -1155,4 +1158,5 @@ class QuestionAndAnswer(RulesModel):
     answer = models.TextField()
     faq = models.ForeignKey(FAQ, on_delete=models.CASCADE)
 
-
+    def __str__(self):
+        return self.question

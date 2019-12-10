@@ -5,7 +5,7 @@ from rest_framework.exceptions import ValidationError
 
 from wbcore.models import (
     NewsPost, BlogPost, Host, Event, Project, Location, CycleDonation, CycleDonationRelation, CycleSegment,
-    CycleTour, User)
+    CycleTour, User, FAQ, QuestionAndAnswer)
 from rest_framework import serializers
 from photologue.models import Gallery, Photo
 from django.utils.dateparse import parse_datetime
@@ -247,3 +247,19 @@ class UserCycleSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'image', 'km', 'euro')
 
+
+class QuestionAndAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuestionAndAnswer
+        fields = ('question', 'answer',)
+
+
+class FAQSerializer(serializers.ModelSerializer):
+    faqs = serializers.SerializerMethodField()
+
+    def get_faqs(self, faq):
+        return QuestionAndAnswerSerializer(many=True, instance=faq.questionandanswer_set.all()).data
+
+    class Meta:
+        model = FAQ
+        fields = ('title', 'faqs',)

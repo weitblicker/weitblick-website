@@ -33,7 +33,7 @@ rest_patterns = [
     path('auth/registration/account-confirm-email/<str:key>/', rest_views.account_confirm_email, name='account_confirm_email'),
 
     path('upload/', rest_views.markdown_uploader, name='markdown_uploader_page'),
-    path('faq/', rest_views.faq, name='rest-faq'),
+    path('faq/', rest_views.FAQViewSet.as_view({'get': 'list'}), name='rest-faq'),
 ]
 
 rest_patterns = format_suffix_patterns(rest_patterns)
