@@ -23,8 +23,8 @@ from wbcore.forms import (
 
 from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
-    UserRelation, JoinPage, SocialMediaLink, Content, Document
-)
+    UserRelation, JoinPage, SocialMediaLink, Content, Document,
+    FAQ)
 
 main_host_slug = 'bundesverband' ## TODO configure this?
 
@@ -1380,3 +1380,20 @@ def sitemap_view(request):
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context), request)
+
+
+def faq_view(request):
+    template = loader.get_template('wbcore/faq.html')
+    faq = FAQ.objects.all()
+    for f in faq:
+        f.questionandanswer_set
+    context = {
+        'main_nav': get_main_nav(),
+        'dot_nav': get_dot_nav(),
+        'faq': faq,
+        'breadcrumb': [('Home', reverse('home')), ("Sitemap", None)],
+        'icon_links': icon_links,
+    }
+    return HttpResponse(template.render(context), request)
+
+    return None

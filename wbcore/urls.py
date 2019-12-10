@@ -48,6 +48,7 @@ urlpatterns = [
     path('', views.home_view, name='home'),
     path('rest/', include(rest_urls.rest_patterns)),
     path('ajax/', include(ajax_urls.ajax_patterns)),
+    path('faq/', views.faq_view, name='faq'),
     path('union/', views.hosts_view, name='hosts'),
     path('search/', views.search_view, name='search'),
     path('sitemap/', views.sitemap_view, name='sitemap'),

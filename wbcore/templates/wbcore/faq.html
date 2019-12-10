@@ -1,0 +1,36 @@
+{% extends 'wbcore/base.html' %}
+{% load staticfiles %}
+{% block content %}
+    <div class="ui one column stackable grid container">
+        {% include 'wbcore/image-header.html' with title="Fragen & Antworten" default='/images/faq_header.jpg'%}
+
+        <div class="ten wide column divided items">
+            <div class="ui segment">
+                {% if faq %}
+                    <div class="ui one column grid list">
+                        {% for elem in faq %}
+                            <h2>{{ elem.title }}</h2>
+                            <div class="ui items">
+                            {% for qa in elem.questionandanswer_set.all %}
+                                <div class="item">
+                                    <div class="content">
+                                        <a class="header">{{ qa.question }}</a>
+                                        <div class="description">{{ qa.answer | safe }}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="six wide column divided items">
+            <div class="ui segment">
+                TBA
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
