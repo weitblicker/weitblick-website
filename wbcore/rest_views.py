@@ -258,3 +258,8 @@ class RankingViewSet(viewsets.ModelViewSet):
             euro=Sum('cycletour__euro'),
             km=Sum('cycletour__km')
         ).order_by('km')
+
+
+@api_view(['GET'])
+def faq(request):
+    return None

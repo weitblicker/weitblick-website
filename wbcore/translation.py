@@ -8,8 +8,8 @@ from modeltranslation.translator import register, TranslationOptions
 from .models import (
     Project, Location, Address, Host, Partner, NewsPost, BlogPost,
     Document, Team, Milestep, Content, Event, Milestone, Donation,
-    BankAccount, ContactMessage, CycleDonation
-)
+    BankAccount, ContactMessage, CycleDonation,
+    FAQ, QuestionAndAnswer, UserRelation, JoinPage, SocialMediaLink, TeamUserRelation, CycleDonationRelation)
 from schedule.models.events import Event as ScheduleEvent
 
 
@@ -73,7 +73,18 @@ class MilestepTranslationOptions(TranslationOptions):
     fields = ('name','description')
 
 
-@register([BankAccount, Donation, Milestone, ContactMessage, Address, CycleDonation])
+@register(QuestionAndAnswer)
+class QuestionAndAnswerTranslationOptions(TranslationOptions):
+    fields = ('question', 'answer')
+
+
+@register(FAQ)
+class FAQTranslationOptions(TranslationOptions):
+    fields = ('title',)
+
+
+@register([BankAccount, Donation, Milestone, ContactMessage, Address, CycleDonation,
+           UserRelation, JoinPage, SocialMediaLink, TeamUserRelation, CycleDonationRelation])
 class BankAccountTranslationOptions(TranslationOptions):
     pass
 

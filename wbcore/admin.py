@@ -6,7 +6,7 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth import get_permission_codename
 from django import forms
 from django.db import models
-from modeltranslation.admin import TabbedTranslationAdmin
+from modeltranslation.admin import TabbedTranslationAdmin, TranslationTabularInline
 from martor.widgets import AdminMartorWidget
 from django_google_maps import widgets as map_widgets
 from django_google_maps import fields as map_fields
@@ -20,8 +20,8 @@ from itertools import chain
 from .models import (
     Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, ContactMessage, UserRelation,
     Document, Team, Milestone, Donation, Milestep, BankAccount, TeamUserRelation, Content, User, JoinPage,
-    SocialMediaLink, CycleDonation
-)
+    SocialMediaLink, CycleDonation,
+    QuestionAndAnswer, FAQ)
 
 
 class MyTranslatedAdmin(TabbedTranslationAdmin):
@@ -32,7 +32,7 @@ class MyTranslatedAdmin(TabbedTranslationAdmin):
     pass
 
 
-class PermissionInlineModel(admin.StackedInline):
+class PermissionInlineModel(TranslationTabularInline):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if request.user.is_super_admin:
@@ -153,6 +153,11 @@ class SocialMediaLinkInlineModel(PermissionInlineModel):
 class AddressInlineModel(PermissionInlineModel):
     model = Address
     can_delete = False
+
+
+class QuestionAndAnswerInlineModel(PermissionInlineModel):
+    model = QuestionAndAnswer
+    show_change_link = True
 
 
 class MyAdmin(TabbedTranslationAdmin):
@@ -487,6 +492,10 @@ class TeamAdmin(MyAdmin):
     inlines = (TeamUserRelationInlineModel,)
 
 
+class FAQAdmin(MyAdmin):
+    inlines = (QuestionAndAnswerInlineModel,)
+
+
 class HostAdmin(MyAdmin, ReverseModelAdmin):
     inlines = (JoinPageInlineModel, SocialMediaLinkInlineModel)
     inline_type = 'stacked'
@@ -538,4 +547,5 @@ admin.site.register(Milestep, MyAdmin)
 admin.site.register(BlogPost, MyAdmin)
 admin.site.register(BankAccount, MyAdmin)
 admin.site.register(ContactMessage, MyAdmin)
+admin.site.register(FAQ, FAQAdmin)
 admin.site.register(CycleDonation, CycleDonationAdmin)

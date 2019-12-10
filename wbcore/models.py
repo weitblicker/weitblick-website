@@ -1130,7 +1130,29 @@ class CycleSegment(RulesModel):
         return "Cycle segment %s of tour %s of user %s" % (self.pk, self.tour.index, self.tour.user.name())
 
 
+class FAQ(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": rules.is_superuser | pred.is_super_admin,
+            "view": rules.is_superuser | pred.is_super_admin,
+            "change": rules.is_superuser | pred.is_super_admin,
+            "delete": rules.is_superuser | pred.is_super_admin
+        }
+
+    title = models.CharField(max_length=200)
 
 
+class QuestionAndAnswer(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": rules.is_superuser | pred.is_super_admin,
+            "view": rules.is_superuser | pred.is_super_admin,
+            "change": rules.is_superuser | pred.is_super_admin,
+            "delete": rules.is_superuser | pred.is_super_admin
+        }
+
+    question = models.CharField(max_length=300)
+    answer = models.TextField()
+    faq = models.ForeignKey(FAQ, on_delete=models.CASCADE)
 
 
