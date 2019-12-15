@@ -55,12 +55,12 @@ class BlogPostSerializer(serializers.ModelSerializer):
 
 class NewsPostSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
-    gallery = GallerySerializer(read_only=True)
-    image = PhotoSerializer()
+    photos = PhotoSerializer(many=True)
+    image = PhotoSerializer(source='get_title_image')
 
     class Meta:
         model = NewsPost
-        fields = ('id', 'title', 'text', 'image', 'added', 'updated', 'published', 'range', 'teaser', 'gallery')
+        fields = ('id', 'title', 'text', 'image', 'added', 'updated', 'published', 'range', 'teaser', 'photos')
 
 
 class HostSerializer(serializers.ModelSerializer):
