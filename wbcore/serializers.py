@@ -72,7 +72,8 @@ class HostSerializer(serializers.ModelSerializer):
 
 class ProjectSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
-    gallery = GallerySerializer(read_only=True)
+    photos = PhotoSerializer(many=True)
+    image = PhotoSerializer(source='get_title_image')
     cycle = serializers.SerializerMethodField()
     location = LocationSerializer()
 
@@ -85,8 +86,8 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
 
         depth = 0
-        fields = ('id', 'start_date', 'end_date', 'published', 'name', 'slug', 'hosts', 'description', 'location',
-                  'partners', 'gallery', 'cycle')
+        fields = ('id', 'start_date', 'end_date', 'image', 'published', 'name', 'slug', 'hosts', 'description', 'location',
+                  'partners', 'photos', 'cycle')
 
 
 class EventSerializer(serializers.ModelSerializer):
