@@ -2,6 +2,7 @@ from abc import ABC
 
 from allauth.account.forms import default_token_generator
 from rest_framework.exceptions import ValidationError
+from rest_framework.fields import empty
 
 from wbcore.models import (
     NewsPost, BlogPost, Host, Event, Project, Location, CycleDonation, CycleDonationRelation, CycleSegment,
@@ -191,15 +192,16 @@ class CycleProjectSerializer(serializers.ModelSerializer):
 
 
 class TokenSerializer(serializers.ModelSerializer):
-    token = serializers.CharField(source='key')
+    token = serializers.CharField(write_only=True)
 
     class Meta:
         model = TokenModel
         fields = ('token',)
 
     def validate(self, data):
+        print(data)
         try:
-            self.instance = TokenModel.objects.get(key=data['key'])
+            self.instance = TokenModel.objects.get(key=data['token'])
         except TokenModel.DoesNotExist:
             print("Token %s is invalid!" % data['token'])
             raise serializers.ValidationError("Token is invalid:%s" % data['token'])
@@ -235,13 +237,19 @@ class UserCycleSerializer(serializers.ModelSerializer):
     km = serializers.FloatField()
     euro = serializers.FloatField()
 
-   # def get_km(self, user):
-   #     user_tours = CycleTour.objects.filter(user=user)
-   #     return user_tours.aggregate(Sum('km'))
+    def get_queryset(self):
+        return self.queryset.annotate(
+            euro=Sum('cycletour__euro'),
+            km=Sum('cycletour__km')
+        )
 
-   # def get_euro(self, user):
-   #     user_tours = CycleTour.objects.filter(user=user)
-   #     return user_tours.aggregate(Sum('euro'))
+    def get_km(self, user):
+        user_tours = CycleTour.objects.filter(user=user)
+        return user_tours.aggregate(Sum('km'))
+
+    def get_euro(self, user):
+        user_tours = CycleTour.objects.filter(user=user)
+        return user_tours.aggregate(Sum('euro'))
 
     class Meta:
         model = User

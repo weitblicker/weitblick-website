@@ -17,7 +17,7 @@ from wbcore.serializers import (NewsPostSerializer, BlogPostSerializer, HostSeri
                                 CycleDonationRelationSerializer, CycleSegmentSerializer, CycleTourSerializer,
                                 TokenSerializer, UserCycleSerializer, FAQSerializer)
 from wbcore.models import NewsPost, BlogPost, Host, Event, Project, Location, Photo, CycleDonation, CycleTour, User, FAQ
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, filters
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from allauth.account.views import ConfirmEmailView
@@ -244,22 +244,84 @@ def cycle_user_tours(request):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
+def get_best_users():
+    users = User.objects.annotate(
+        euro=Sum('cycletour__euro'),
+        km=Sum('cycletour__km')
+    ).exclude(cycletour=None)
+
+    return users
+
+
+def get_user_field(user):
+    users = User.objects.annotate(
+        euro=Sum('cycletour__euro'),
+        km=Sum('cycletour__km')
+    ).exclude(cycletour=None)
+    return users
+
+
+@api_view(['GET', 'POST'])
 def cycle_ranking(request):
-    return Response(serializer.data)
+
+    best_users = get_best_users()
+    if 'ordering' in request.GET and request.GET['ordering'] == 'euro':
+        best_users = best_users.order_by('-euro')
+    else:
+        best_users = best_users.order_by('-km')
+
+    token_serializer = TokenSerializer(data=request.data, many=False)
+
+    if token_serializer.is_valid():
+        user = token_serializer.instance.user
+        user_field = get_user_field(user)
+        if 'ordering' in request.GET and request.GET['ordering'] == 'euro':
+            user_field = user_field.order_by('-euro')
+        else:
+            user_field = user_field.order_by('-km')
+
+        user_field = UserCycleSerializer(user_field, many=True).data
+
+    else:
+        user_field = None
+
+    best_field = UserCycleSerializer(best_users, many=True).data
+
+    return Response({
+            'user_field': user_field,
+            'best_field': best_field
+        })
 
 
 class RankingViewSet(viewsets.ModelViewSet):
     queryset = User.objects.exclude(cycletour=None)
     serializer_class = UserCycleSerializer
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['km', 'euro']
+    ordering = ['km']
 
     def get_queryset(self):
         return self.queryset.annotate(
             euro=Sum('cycletour__euro'),
             km=Sum('cycletour__km')
-        ).order_by('km')
+        )
 
 
 class FAQViewSet(viewsets.ModelViewSet):
     queryset = FAQ.objects.all()
     serializer_class = FAQSerializer
+
+
+class UserrankingViewSet(object):
+    queryset = User.objects.exclude(cycletour=None)
+    serializer_class = UserCycleSerializer
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['km', 'euro']
+    ordering = ['km']
+
+    def get_queryset(self):
+        return self.queryset.annotate(
+            euro=Sum('cycletour__euro'),
+            km=Sum('cycletour__km')
+        )
+

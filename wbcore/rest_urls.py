@@ -25,7 +25,8 @@ rest_patterns = [
     path('cycle/donations/', rest_views.cycle_donations_list, name="rest-cycle-donations"),
     path('cycle/segment/', rest_views.cycle_add_segment, name="rest-cycle-add-segment"),
     path('cycle/tours/', rest_views.cycle_user_tours, name="rest-cycle-user-tours"),
-    path('cycle/ranking/', rest_views.RankingViewSet.as_view({'get': 'list'}), name="rest-cycle-ranking"),
+    path('cycle/ranking/', rest_views.cycle_ranking, name="rest-cycle-ranking"),
+    #path('cycle//', rest_views.UserrankingViewSet.as_view({'get': 'list'}), name="rest-cycle-userrank"),
 
     path('auth/', include('rest_auth.urls')),
     path('auth/registration/', RegisterView.as_view(), name='rest_register'),
