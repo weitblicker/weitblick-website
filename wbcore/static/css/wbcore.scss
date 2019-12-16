@@ -124,6 +124,16 @@ $wb_lightgrey: #D6D6D9;
 	position: relative;
 }
 
+.container:after {
+	clear:both;
+	content:".";
+	display:block;
+	height:0;
+	visibility:hidden;
+}
+
+.clear { clear:both; }
+
 #main-menu{
 	background-color: $box-background;
 	margin-top: 0px;
