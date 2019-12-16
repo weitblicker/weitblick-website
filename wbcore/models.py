@@ -540,7 +540,8 @@ class Event(RulesModelMixin, ScheduleEvent, metaclass=RulesModelBase):
         return reverse('event', args=[self.slug])
 
     def search_image(self):
-        return self.get_title_image().get_search_mini_url()
+        image = self.get_title_image()
+        return image.get_search_mini_url() if image else None
 
     @staticmethod
     def get_model_name():
@@ -649,7 +650,8 @@ class NewsPost(RulesModel):
         return reverse('news-post', args=[self.pk])
 
     def search_image(self):
-        return self.get_title_image().get_search_mini_url()
+        image = self.get_title_image()
+        return image.get_search_mini_url() if image else None
 
     @staticmethod
     def get_model_name():
@@ -719,7 +721,8 @@ class BlogPost(RulesModel):
         return None
 
     def search_image(self):
-        return self.get_title_image().get_search_mini_url()
+        image = self.get_title_image()
+        return image.get_search_mini_url() if image else None
 
     def placeholder(self):
         return 'Post'
@@ -814,7 +817,8 @@ class Team(RulesModel):
         return reverse('team', args=[self.slug])
 
     def search_image(self):
-        return "" # TODO
+        image = self.image
+        return image.get_search_mini_url() if image else None
 
     @staticmethod
     def get_model_name():
