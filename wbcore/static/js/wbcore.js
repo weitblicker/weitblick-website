@@ -1,6 +1,10 @@
 $(document)
     .ready(function() {
 
+        $("body").on('DOMSubtreeModified', ".martor-preview", function() {
+            $('.menu .item').tab();
+        });
+
         $('.menu .item').tab();
 
         $('.ui.calendar')

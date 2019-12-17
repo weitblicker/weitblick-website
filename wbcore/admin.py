@@ -161,6 +161,9 @@ class QuestionAndAnswerInlineModel(PermissionInlineModel):
 
 
 class MyAdmin(TabbedTranslationAdmin):
+    class Media:
+        js=('semantic/dist/semantic.min.js', 'js/wbcore.js')
+        
     formfield_overrides = {
         models.TextField: {'widget': AdminMartorWidget},
         map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget(attrs={'data-map-type': 'roadmap'})},

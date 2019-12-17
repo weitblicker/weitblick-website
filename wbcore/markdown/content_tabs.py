@@ -18,12 +18,12 @@ class ContentTabProcessor(BlockProcessor):
     def run(self, parent, blocks):
         collection = []
 
-        container = util.etree.Element("ui container")
+        container = util.etree.Element("div")
+        container.set("class", "ui container")
         parent.append(container)
         menu = util.etree.Element("div")
         menu.set("class", "ui top attached tabular menu")
         container.append(menu)
-        container.tail = '<script type="text/javascript">$(".menu .item").tab();</script>'
 
         first = None
 
