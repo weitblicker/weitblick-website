@@ -62,6 +62,9 @@ class ContentTabProcessor(BlockProcessor):
                     break
                 else:
                     self.parser.parseChunk(content_div, block)
+                clear_div = util.etree.Element("div")
+                clear_div.set("class", "clear")
+                content_div.append(clear_div)
             else:
                 break
 
