@@ -1,17 +1,22 @@
 {% load staticfiles %}
 <script src="{% static 'highmaps/proj4.js'%}"></script>
+<script src="https://code.highcharts.com/maps/highmaps.js"></script>
 <script src="{% static 'highmaps/highmaps.js'%}"></script>
 <script src="{% static 'highmaps/drilldown.js'%}"></script>
-<script src="{% static 'highmaps/world-robinson-highres.js'%}"></script>
+<script src="{% static 'highmaps/marker-clusters.js'%}"></script>
+<script src="{% static 'highmaps/world-robinson-lowres.js'%}"></script>
 <link href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+
+
+
 
 <div id="container" style="width: 100%"></div>
 <script>
 
     var mydata = {{project_list|safe}};
 
-    var data = Highcharts.geojson(Highcharts.maps['custom/world-robinson-highres']),
-        separators = Highcharts.geojson(Highcharts.maps['custom/world-robinson-highres'], 'mapline'),
+    var data = Highcharts.geojson(Highcharts.maps['custom/world-robinson-lowres']),
+        separators = Highcharts.geojson(Highcharts.maps['custom/world-robinson-lowres'], 'mapline'),
         // Some responsiveness
         small = $('#container').width() < 400;
 
@@ -69,24 +74,42 @@
                                 showInLegend: false,
                                 mapData: Highcharts.maps[mapKey],
                                 dataLabels: {
-                                    enabled: true,
+                                    enabled: false,
                                     format: '{point.name}'
                                 }
                             });
                             var filtered_projects = [];
-                            {% for project in projects %}
+                            var p_number = 0; // the coordinates are adjusted by some meters to avoid identical coordiantes
+                            {% for project in item_list %}
                                 if ('{{project.location.country.code}}'==e.point.drilldown){
-                                    filtered_projects.push({name: '{{project.name}}', slug: '{{project.slug}}', lat: parseFloat('{{project.location.geolocation.lat|floatformat:11}}'.replace(",", ".")), lon: parseFloat('{{project.location.geolocation.lon|floatformat:11}}'.replace(",", "."))})
-                                }
+                                    filtered_projects.push({name: '{{project.name}}', slug: '{{project.slug}}', lat: parseFloat('{{project.location.geolocation.lat|floatformat:11}}'.replace(",", ".")), lon: parseFloat('{{project.location.geolocation.lon|floatformat:11}}'.replace(",", "."))+p_number*0.03})
+                                ; p_number =p_number+1;}
                             {% endfor %}
+                              
                             chart.addSingleSeriesAsDrilldown(e.point, {
                                 type: 'mappoint',
+                                cluster: {
+                                    enabled: true,
+                                    allowOverlap: false,
+                                    layoutAlgorithm: {
+                                        type: 'grid',
+                                        gridSize: 5
+                                    },
+                                    zones: [{
+                                        from: 0,
+                                        to: 20,
+                                        marker: {
+                                            fillColor: '#FF9900',
+                                            radius: 12
+                                            }}]
+                                },
                                 name: 'Projekte',
-                                color: '#FF9900',
+                                marker: {
+                                            fillColor: '#FF9900'},
                                 data: filtered_projects,
                                 tooltip: {
                                     headerFormat: '',
-                                    pointFormat: '<b>{point.name}</b><br>Lat: {point.lat}, Lon: {point.lon}'
+                                    pointFormat: '<b>{point.name}</b><br>'
                                 },
                                 events: {
                                     click: function (e) {
@@ -160,7 +183,7 @@
         },
 
         series: [{
-            mapData: Highcharts.maps['custom/world-robinson-highres'],
+            mapData: Highcharts.maps['custom/world-robinson-lowres'],
             data: data,
             joinBy: ['iso-a2', 'drilldown'],
             name: 'projects',
