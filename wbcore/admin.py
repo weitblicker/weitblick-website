@@ -520,8 +520,18 @@ class CycleDonationAdmin(MyAdmin):
 
 
 class EventsAdmin(MyAdmin):
+
+    exclude = ('calendar',)
+
     def save_model(self, request, obj, form, change):
-        super().save(request, obj, form, change)
+        try:
+            calendar = Calendar.objects.get(slug=obj.host.slug)
+        except Calendar.DoesNotExist:
+            calendar = Calendar(name=obj.host.name, slug=obj.host.slug)
+            calendar.save()
+        obj.calendar = calendar
+        print("Save calendar", obj)
+        super().save_model(request, obj, form, change)
 
 
 # since we're not using Django's built-in permissions,
