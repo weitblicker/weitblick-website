@@ -15,8 +15,16 @@ from sshtunnel import SSHTunnelForwarder
 from urllib import request, error
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
+import ssl
 
 
+#Create new ssl context
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
+httpsHandler = urllib.request.HTTPSHandler(context = ctx)
+
+sslcontext = ssl.create_default_context()
 class Command(BaseCommand):
     help = 'Closes the specified poll for voting'
 
@@ -239,7 +247,7 @@ class Command(BaseCommand):
             print("image name:", new_name)
 
             img_temp = NamedTemporaryFile(delete=True)
-            img_temp.write(urllib.request.urlopen(image_url).read())
+            img_temp.write(urllib.request.urlopen(image_url, context=ctx).read())
             img_temp.flush()
 
             try:
@@ -266,14 +274,14 @@ class Command(BaseCommand):
             try:
                 req = urllib.request.Request(new_url)
                 req.get_method = lambda: 'HEAD'
-                request.urlopen(new_url)
+                request.urlopen(new_url, context=ctx)
                 return new_url, filename, ext
             except UnicodeEncodeError:
                 try:
                     new_url = path + "/" + request.quote(filename) + "." + ext
                     req = urllib.request.Request(new_url)
                     req.get_method = lambda: 'HEAD'
-                    request.urlopen(new_url)
+                    request.urlopen(new_url, context=ctx)
                     return new_url, filename, ext
                 except error.HTTPError as http_error:
                     print("HTTPError:", http_error)
