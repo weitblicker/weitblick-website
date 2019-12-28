@@ -21,8 +21,14 @@ $(document)
                         return day + '.' + month + '.' + year;
                     }
                 }
-        })
-;
+        });
+
+        $('.sticky').sticky(
+            {
+                context:'#main',
+                offset: 24,
+            }
+        );
 
         // fix menu when passed
         $('.masthead')

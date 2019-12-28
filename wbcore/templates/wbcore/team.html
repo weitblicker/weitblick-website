@@ -1,25 +1,15 @@
-{% extends 'wbcore/single_content.html' %}
+{% extends 'wbcore/basic.html' %}
 {% load staticfiles %}
-
-{% block content %}
-
-<div class="ui one column stackable grid container">
+{% block main %}
     {% include 'wbcore/image-header.html' with title=team.name image=team.image default='/images/team_header.jpg' %}
-
-    <div class="six wide column divided items">
-        <div class="ui segment">
-            <p>{{ team.description | safe }}</p>
-        </div>
+    <div class="ui segment">
+        <p>{{ team.description | safe }}</p>
     </div>
-    <div class="ten wide column divided items">
-        <div class="ui segment">
-            <div class="ui divided items">
+    <div class="ui segment">
+        <div class="ui divided items">
             {% for member_relation in members_relations %}
                 {% include 'wbcore/team_member.html' with member=member_relation.0 relation=member_relation.1%}
             {% endfor %}
-            </div>
         </div>
     </div>
-</div>
-
 {% endblock %}

@@ -60,9 +60,14 @@
         <a class="ui medium header" href="{{ item.link }}">{{ item.title }}</a>
 
         <div class="description">
-            <p>{{ item.teaser | striptags | safe | truncatewords:"40"}}</p>
+            {% if show_text|default_if_none:True %}
+                {% with tw=truncate_words|default:"20" %}
+                    <p>{{ item.teaser | striptags | safe | truncatewords:tw}}</p>
+                {% endwith %}
+            {% endif %}
         </div>
         <div class="extra">
+            {% if show_author|default_if_none:True %}
             {% if item.author %}
                 <img class="ui avatar image" src="{% get_media_prefix %}{% if item.author.image %}{{ item.author.image }}{% else %}kristy.png{% endif %}">
                 {{ item.author.name }}
@@ -70,7 +75,8 @@
                 <img class="ui avatar image" src="{% get_media_prefix %}kristy.png">
                 {{ item.author_str }}
             {% endif %}
-            {% if item.show_text %}
+            {% endif %}
+            {% if item.show_text and not no_read_more %}
                 <a class="details right floated" href="{{ item.link }}"> › Weiterlesen </a>
             {% endif %}
         </div>

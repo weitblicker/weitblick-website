@@ -61,7 +61,8 @@ INSTALLED_APPS = [
     'form_designer',
     'admin_ordering',
     'el_pagination',
-    'rules'
+    'rules',
+    'django_instagram'
 ]
 
 AUTH_USER_MODEL = 'wbcore.User'
@@ -298,8 +299,8 @@ HAYSTACK_CONNECTIONS = {
     },
 }
 
-
-
-
 GOOGLE_MAPS_API_KEY = 'AIzaSyCtEff9Z-Kl_nRc5GU28LvwzXFlz-6ltHc'
 
+REST_AUTH_SERIALIZERS = {
+  'USER_DETAILS_SERIALIZER': 'wbcore.serializers.UserSerializer',
+}

@@ -1,10 +1,56 @@
-<!-- Sidebar Menu -->
-<div class="ui vertical sidebar menu">
-    {% for key, elem in main_nav.items %}
-        {% if elem.link %}
-            <a class="item" href="{{ elem.link }}">{{ elem.name }}</a>
-        {% else %}
-            <a class="item active" href="#">{{ elem.name }}</a>
-        {% endif %}
-    {% endfor %}
+<div class="ui sticky">
+
+    {% if address %}
+    <div class="ui segment">
+        {% include "wbcore/address.html" %}
+    </div>
+    {% endif %}
+
+    {% if host and host.instagram%}
+    <div class="ui segment">
+        {% include 'wbcore/instagram.html' with account_id=host.instagram %}
+    </div>
+    {% endif %}
+
+    <!--div class="ui segment">
+        {% include "wbcore/segment_header.html" with icon='donate' title='Donate' url_alias='donate' %}
+    </div-->
+
+    {% if hosts %}
+    <div class="ui segment">
+        {% include 'wbcore/hosts_map.html' %}
+    </div>
+    {% endif %}
+
+    {% if ajax_endpoint %}
+    <div class="ui segment">
+        {% include 'wbcore/list_filter.html' %}
+    </div>
+    {% endif %}
+
+    {% if event_item_list %}
+    <div class="ui segment">
+        {% include "wbcore/segment_header.html" with icon='calendar alternate outline' title='Events' url_alias='events' %}
+        {% include 'wbcore/item_list.html' with item_list=event_item_list image_size='small' no_image=True %}
+    </div>
+    {% endif %}
+
+    {% if teams %}
+    <div class="ui segment">
+        {% include "wbcore/segment_header.html" with icon='user' title='Teams' url_alias='teams' %}
+        <div class="ui divided unstackable items">
+            {% for team in teams %}
+                {% include 'wbcore/team_list.html' with team=team %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% comment %}
+    <div class="ui segment">
+        {% include "wbcore/segment_header.html" with icon='globe africa' title='Project Blog Posts' url_alias='blog' %}
+        {% include 'wbcore/item_list.html' with item_list=posts no_image=True %}
+    </div>
+    {% endcomment %}
+
 </div>

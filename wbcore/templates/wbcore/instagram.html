@@ -1,0 +1,12 @@
+{% load instagram_client %}
+{% include 'wbcore/segment_header.html' with icon='instagram' title='Instagram' %}
+<div class="ui relaxed padded three column grid instagram">
+    {% instagram_user_recent_media account_id %}
+    {% for media in recent_media|slice:":6" %}
+        <a href="//instagram.com/p/{{ media.shortcode }}" target="_blank"
+           class="ui column fluid image">
+            <img class="ui fluid rounded image" src="{{ media.thumbnail_src }}"/>
+            <!--span>{{ media.edge_media_to_caption.edges.0.node.text | truncatewords:10 }}</span-->
+        </a>
+    {% endfor %}
+</div>

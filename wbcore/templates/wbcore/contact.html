@@ -1,35 +1,11 @@
-{% extends 'wbcore/base.html' %}
+{% extends 'wbcore/basic.html' %}
 {% load martortags %}
-
-{% block content %}
-
-<div class="ui one column stackable grid container">
+{% block main %}
     {% include 'wbcore/image-header.html' with title="Contact" default='/images/contact_header.jpg' %}
-    <div class="ui ten wide column">
-        <div class="ui segment">
-            {% if contact %}
-                {{ contact.text | safe_markdown }}
-            {% endif %}
-        </div>
-
-        {% include "wbcore/contact_form.html" %}
-    </div>
-    <div class="ui six wide column">
-        <div class="ui segment">
-            {% include "wbcore/segment_header.html" with icon="address card outline" title="Address" %}
-            {% include "wbcore/address.html" %}
-        </div>
-        {% if teams %}
-            <div class="ui segment">
-                {% include "wbcore/segment_header.html" with icon="users" title="Team" url_alias="events" %}
-                {% include "wbcore/item_list.html" with item_list=teams %}
-                {% if more_teams %}
-                    <a href="{{ more_teams }}">More</a>
-                {% endif %}
-            </div>
+    <div class="ui segment">
+        {% if contact %}
+            {{ contact.text | safe_markdown }}
         {% endif %}
-
     </div>
-</div>
-
+    {% include "wbcore/contact_form.html" %}
 {% endblock %}

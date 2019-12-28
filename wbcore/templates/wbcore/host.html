@@ -1,59 +1,16 @@
-{% extends 'wbcore/base.html' %}
+{% extends 'wbcore/basic.html' %}
 {% load martortags %}
 {% load staticfiles %}
 
-{% block content %}
-    <div class="ui stackable grid container">
-
-        {% include 'wbcore/image-header.html' with image=welcome.image default="/images/host_header.jpg" title=host.name%}
-
-        <div class="ten wide column divided items">
-
-            {% if welcome %}
-            <div class="ui segment">
-                {{ welcome.text | safe_markdown }}
-            </div>
-            {% endif %}
-            <div id="news-list" class="ui segment">
-                <i class="label newspaper outline icon"></i>
-                <a class="ui item title header" href="{% url 'news' %}">News</a>
-                {% include 'wbcore/item_list.html' with item_list=posts %}
-            </div>
+{% block main %}
+    {% if welcome %}
+        <div class="ui segment">
+            {{ welcome.text | safe_markdown }}
         </div>
-
-        <div class="six wide column divided items">
-            <div class="ui segment">
-                <i class="label map outline icon"></i>
-                <a class="ui item title header"href="{% url 'hosts' %}">Weitblick Vereine</a>
-                {% include 'wbcore/hosts_map.html' %}
-            </div>
-            <div class="ui segment">
-                <i class="label calendar alternate outline icon"></i>
-                <a class="ui item title header"href="{% url 'events' %}">Events</a>
-                {% if occurrences %}
-                    <div class="ui divided unstackable items">
-                        {% for occ in occurrences %}
-                            {% include 'wbcore/event_feed_side.html' with occ=occ host_slug=host.slug %}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-            <div class="ui segment">
-                <i class="label users icon"></i>
-                <a class="ui item title header"href="{% url 'teams' %}">Teams</a>
-                <div class="ui divided unstackable items">
-                    {% if teams %}
-                        {% for team in teams %}
-                            {% include 'wbcore/team_list.html' with team=team %}
-                        {% endfor %}
-                    {% else %}
-                        <p>Keine Teams vorhanden!</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+    {% endif %}
+    <div id="news-list" class="ui segment">
+        <i class="label newspaper outline icon"></i>
+        <a class="ui item title header" href="{% url 'news' %}">News</a>
+        {% include 'wbcore/item_list.html' with item_list=posts %}
     </div>
-
-    </div>
-
 {% endblock %}
