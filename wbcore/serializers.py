@@ -1,6 +1,7 @@
 from abc import ABC
 
 from allauth.account.forms import default_token_generator
+from rest_auth.serializers import UserDetailsSerializer, UserModel
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import empty
 
@@ -231,6 +232,16 @@ class CycleTourSerializer(serializers.ModelSerializer):
     class Meta:
         model = CycleTour
         fields = ('tour', 'project', 'finished', 'euro', 'km', 'start', 'end', 'duration')
+
+
+class UserSerializer(UserDetailsSerializer):
+    """
+    User model w/o password
+    """
+    class Meta:
+        model = User
+        fields = ('pk', 'username', 'email', 'first_name', 'last_name', 'image')
+        read_only_fields = ('email', )
 
 
 class UserCycleSerializer(serializers.ModelSerializer):

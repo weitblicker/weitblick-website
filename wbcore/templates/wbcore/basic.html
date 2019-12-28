@@ -1,0 +1,23 @@
+{% extends 'wbcore/base.html' %}
+{% load martortags %}
+{% load staticfiles %}
+{% block content %}
+    <div class="ui one column stackable grid container">
+        {% block header %}{% endblock %}
+        <div class="ten wide column divided items" id="main">
+            {% block main %}{% endblock %}
+        </div>
+        <div class="six wide column divided items">
+            <div class="sticky">
+            {% block side_bar %}
+                {% with image_size='tiny' no_image=True show_text=True show_author=False no_read_more=True truncate_words="15"%}
+                    {% include 'wbcore/sidebar.html' %}
+                {% endwith %}
+            {% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+

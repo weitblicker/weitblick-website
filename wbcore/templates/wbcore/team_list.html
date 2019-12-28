@@ -1,9 +1,6 @@
 {% load static %}
-
 <div class="item">
-
-
-  <a class="image" href="{% url 'team' host.slug team.slug %}">
+  <a class="image" href="{% url 'team' team.host.slug team.slug %}">
     <div class="image">
       {% if not team.image %}
         <div class="image">{% include 'wbcore/svgs/placeholder.svg' with text="Team"%}</div>
@@ -12,16 +9,15 @@
       {% endif %}
     </div>
   </a>
-
   <div class="content">
-    <a class="ui medium header" href="{% url 'team' host.slug team.slug %}">{{ team.name }}</a>
+    <a class="ui medium header" href="{% url 'team' team.host.slug team.slug %}">{{ team.name }}</a>
     <div class="description">
-      {{ team.description | truncatewords:10 | safe}}
+      {{ team.teaser | truncatewords:10 | safe}}
     </div>
     <div class="extra">
-      <a class="details right floated" href="{% url 'team' host.slug team.slug %}">› Details</a>
+      <a class="details right floated" href="{% url 'team' team.host.slug team.slug %}">› Details</a>
       <span>
-        <i class="user icon"></i>{{ team.members.count }}
+        <i class="user icon"></i>{{ team.member.count }}
       </span>
     </div>
   </div>

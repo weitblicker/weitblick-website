@@ -1,24 +1,11 @@
-{% extends 'wbcore/base.html' %}
+{% extends 'wbcore/basic.html' %}
 {% load martortags %}
 {% load staticfiles %}
-{% block content %}
-
-<div class="ui stackable grid container">
-    {% include 'wbcore/image-header.html' with title="Facts" image='/static/images/news_header.jpg' %}
-
-    <div class="ten wide column divided items">
-        <div class="ui segment">
-            {% if facts %}
-                {{ facts.text | safe_markdown }}
-            {% endif %}
-        </div>
+{% block main %}
+    {% include 'wbcore/image-header.html' with title="Facts" default='/images/news_header.jpg' %}
+    <div class="ui segment">
+        {% if facts %}
+            {{ facts.text | safe_markdown }}
+        {% endif %}
     </div>
-
-    <div class="six wide column divided items">
-            <div class="ui segment">
-                {% include 'wbcore/segment_header.html' with icon='info circle' title="Short Facts" %}
-            </div>
-    </div>
-</div>
-
 {% endblock %}

@@ -1,31 +1,8 @@
-{% extends 'wbcore/single_content.html' %}
+{% extends 'wbcore/basic.html' %}
 {% load staticfiles %}
-{% block content %}
-
-<div class="ui stackable grid container">
-    <div class="sixteen wide column divided items">
-        <div id="header-image" class="ui fluid image">
-            <div class="ui active bottom dimmer">
-                <div class="content">
-                    <h1 class="ui header">Teams</h1>
-                </div>
-            </div>
-            <img src="{% static 'images/idea_header.jpg' %}">
-        </div>
+{% block main %}
+    {% include 'wbcore/image-header.html' with title="Teams" default='/images/team_header.jpg' %}
+    <div class="ui segment">
+        {% include 'wbcore/item_list.html' %}
     </div>
-
-    <div class="ten wide column divided items">
-        <div class="ui segment">
-            {% include 'wbcore/item_list.html' %}
-        </div>
-    </div>
-
-    <div class="six wide column divided items">
-        <div class="ui segment">
-            {% include 'wbcore/segment_header.html' with icon='seedling' title="TBD" %}
-            tbd
-        </div>
-    </div>
-</div>
-
 {% endblock %}

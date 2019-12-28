@@ -1,30 +1,12 @@
-{% extends 'wbcore/base.html' %}
+{% extends 'wbcore/basic.html' %}
 {% load staticfiles %}
 
-{% block content %}
-    <div class="ui vertical stackable grid container">
-
-        {% include 'wbcore/image-header.html' with title="Projects" default='/images/join_header.jpg' %}
-
-        <div class="ten wide column divided items">
-            <div class="ui segment">
-                {% include 'wbcore/projects_map.html' %}
-            </div>
-
-            <div class="ui segment">
-                {% include 'wbcore/item_list.html'%}
-            </div>
-        </div>
-
-        <div class="six wide column divided items">
-            <div class="ui segment">
-                {% include 'wbcore/list_filter.html' %}
-            </div>
-
-            <div class="ui segment">
-                {% include "wbcore/segment_header.html" with icon='globe africa' title='Project Blog Posts' url_alias='blog' %}
-                {% include 'wbcore/item_list.html' with item_list=posts no_image=True %}
-            </div>
-        </div>
+{% block main %}
+    <div class="ui segment">
+        {% include "wbcore/segment_header.html" with icon='map marker alternate' title='Project Map' url_alias='projects' %}
+        {% include 'wbcore/projects_map.html' %}
+    </div>
+    <div class="ui segment">
+        {% include 'wbcore/item_list.html'%}
     </div>
 {% endblock %}

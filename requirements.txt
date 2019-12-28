@@ -29,3 +29,9 @@ django-el-pagination
 markdown-fenced-code-tabs
 rules
 django_reverse_admin
+# load blog posts
+pandas
+pymysql
+sshtunnel
+django-instagram
+

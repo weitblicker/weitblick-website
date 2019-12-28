@@ -1,16 +1,9 @@
-{% extends 'wbcore/base.html' %}
+{% extends 'wbcore/basic.html' %}
 {% load martortags %}
-{% block content %}
+{% block main %}
 
-    <div class="ui middle aligned stackable grid container">
-        {% include 'wbcore/image-header.html' with title='Idea' image=idea.image default='/images/idea_header.jpg'%}
-
-        <div class="ui ten wide column">
-            <div class="ui segment">
-                {{ idea.text | safe_markdown }}
-            </div>
-        </div>
+    <div class="ui segment">
+        {{ idea.text | safe_markdown }}
     </div>
-
 
 {% endblock %}

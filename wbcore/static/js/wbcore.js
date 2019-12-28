@@ -1,6 +1,10 @@
 $(document)
     .ready(function() {
 
+        $("body").on('DOMSubtreeModified', ".martor-preview", function() {
+            $('.menu .item').tab();
+        });
+
         $('.menu .item').tab();
 
         $('.ui.calendar')
@@ -17,8 +21,14 @@ $(document)
                         return day + '.' + month + '.' + year;
                     }
                 }
-        })
-;
+        });
+
+        $('.sticky').sticky(
+            {
+                context:'#main',
+                offset: 24,
+            }
+        );
 
         // fix menu when passed
         $('.masthead')
