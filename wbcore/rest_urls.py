@@ -1,5 +1,7 @@
 from django.urls import path, include
 from rest_auth.registration.views import VerifyEmailView, RegisterView
+from rest_auth.views import (UserDetailsView, PasswordResetView, PasswordResetConfirmView, LoginView, LogoutView,
+                             PasswordChangeView)
 from rest_framework.urlpatterns import format_suffix_patterns
 from wbcore import rest_views
 
@@ -28,7 +30,15 @@ rest_patterns = [
     path('cycle/ranking/', rest_views.cycle_ranking, name="rest-cycle-ranking"),
     #path('cycle//', rest_views.UserrankingViewSet.as_view({'get': 'list'}), name="rest-cycle-userrank"),
 
-    path('auth/', include('rest_auth.urls')),
+    # URLs that do not require a session or valid token
+    path('auth/password/reset/', PasswordResetView.as_view(), name='rest_password_reset'),
+    path('auth/password/reset/confirm/', PasswordResetConfirmView.as_view(), name='rest_password_reset_confirm'),
+    path('auth/login/', LoginView.as_view(), name='rest_login'),
+    # URLs that require a user to be logged in with a valid session / token.
+    path('auth/logout/', LogoutView.as_view(), name='rest_logout'),
+    #path('auth/user/', UserDetailsView.as_view(), name='rest_user_details'),
+    path('auth/user/', rest_views.UsersView.as_view(), name='rest_user_details'),
+    path('auth/password/change/', PasswordChangeView.as_view(), name='rest_password_change'),
     path('auth/registration/', RegisterView.as_view(), name='rest_register'),
     path('auth/registration/verify-email/', VerifyEmailView.as_view(), name='rest_verify_email'),
     path('auth/registration/account-confirm-email/<str:key>/', rest_views.account_confirm_email, name='account_confirm_email'),

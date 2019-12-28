@@ -33,3 +33,5 @@ django_reverse_admin
 pandas
 pymysql
 sshtunnel
+django-instagram
+

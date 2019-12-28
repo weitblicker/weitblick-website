@@ -3,65 +3,79 @@
 <script src="{% static 'highmaps/highmaps.js'%}"></script>
 <script src="{% static 'highmaps/de-all.js'%}"></script>
 
-<div id="container" style="width: 100%"></div>
-<script>
-var host_list = [];
-{% for host in hosts %}
-    host_list.push({
-    name: '{{host.name|cut:"Weitblick "}}',
-     slug: '{{host.slug}}',
-      label: '{{host.location.description|cut:"None"}}',
-       lat: parseFloat('{{host.location.geolocation.lat|floatformat:11}}'.replace(",", ".")),
-        lon: parseFloat('{{host.location.geolocation.lon|floatformat:11}}'.replace(",", "."))})
-{% endfor %}
+{% include "wbcore/segment_header.html" with icon='map' title='Vereine' %}
+<div id="container" style="width: 100%">
 
-Highcharts.mapChart('container', {
-    title: {
-        text: ''
-    },
-    plotOptions:{
-        series: {
-            dataLabels: {
-                allowOverlap: true,
+</div>
+<script>
+    var host_list = [];
+    {% for host in hosts %}
+        host_list.push({
+            name: '{{host.name|cut:"Weitblick "}}',
+            slug: '{{host.slug}}',
+            label: '{{host.location.description|cut:"None"}}',
+            lat: parseFloat('{{host.location.geolocation.lat|floatformat:11}}'.replace(",", ".")),
+            lon: parseFloat('{{host.location.geolocation.lon|floatformat:11}}'.replace(",", "."))})
+    {% endfor %}
+
+    var map = Highcharts.mapChart('container', {
+        title: {
+            text: ''
+        },
+        plotOptions:{
+            series: {
+                dataLabels: {
+                    allowOverlap: true,
                 }
             }
         },
-    legend: {
+        legend: {
             enabled: false
-            },
-    tooltip: {
-        headerFormat: '',
-        pointFormat: '<b>{point.name}</b>'
-    },
-    series: [{
+        },
+        tooltip: {
+            headerFormat: '',
+            pointFormat: '<b>{point.name}</b>'
+        },
+        chart: {
+            spacingRight: 0,
+            spacingLeft: 0,
+            spacingTop: "2rem",
+            spacingBottom: "2rem",
+            marginTop:0,
+            marginLeft:0,
+            marginRight:0,
+            marginBottom:0,
+        },
+        series: [{
             mapData: Highcharts.maps['countries/de/de-all'],
             joinBy: ['iso-a2', 'drilldown'],
             name: 'hosts',
             showInLegend: false,
         },
-        {
-        // Specify points using lat/lon
-        type: 'mappoint',
-        name: 'Cities',
-        color: '#FF9900',
-        data: host_list,
-        dataLabels: {
-            align: 'center',
-            format: '{point.label}'
-        },
-        marker:{
-            symbol: 'url(/static/puzzle-icon.svg)',
-            width: 16,
-            height: 16
-            },
-            events: {
-                                    click: function (e) {
-                                        console.log(e.point.slug);
-                                        window.location.href = '/' + e.point.slug;
-                                    }
-                                }
+            {
+                // Specify points using lat/lon
+                type: 'mappoint',
+                name: 'Cities',
+                color: '#FF9900',
+                data: host_list,
+                dataLabels: {
+                    align: 'center',
+                    format: '{point.label}'
+                },
+                marker:{
+                    symbol: 'url(/static/puzzle-icon.svg)',
+                    width: 16,
+                    height: 16
+                },
+                events: {
+                    click: function (e) {
+                        console.log(e.point.slug);
+                        window.location.href = '/' + e.point.slug;
+                    }
+                }
 
-        },
+            },
         ]
-})
+    });
+    map.mapZoom(0.9);
 </script>

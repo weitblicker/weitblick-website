@@ -1,21 +1,10 @@
-{% extends 'wbcore/single_content.html' %}
-{% load staticfiles %}
-{% block content %}
-
-<div class="ui stackable grid container">
+{% extends 'wbcore/basic.html' %}
+{% block main %}
     {% include 'wbcore/image-header.html' with title='News' default='/images/news_header.jpg' %}
-
-    <div class="ten wide column divided items">
-        <div class="ui segment">
-            {% include 'wbcore/item_list.html' %}
-        </div>
+    <div class="ui segment">
+        {% include 'wbcore/item_list.html' %}
     </div>
-
-    <div class="six wide column divided items">
-        <div class="ui segment">
-            {% include 'wbcore/list_filter.html' %}
-        </div>
-    </div>
-</div>
-
+{% endblock %}
+{% block side_bar %}
+    {% include 'wbcore/sidebar.html' %}
 {% endblock %}

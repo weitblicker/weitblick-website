@@ -154,9 +154,9 @@ def item_list_from_occ(occurrences, host_slug=None, text=True):
             occ.show_date = occ.start.strftime('%a, %d. %b %Y')
         else:
             occ.show_date = occ.start.strftime('%d. %b') + " - " + occ.end.strftime('%d. %b %Y')
-        occ.hosts = occ.event.host.all()
+        occ.host = occ.event.host
         current_host = Host.objects.get(slug=host_slug) if host_slug else None
-        if current_host and current_host in occ.event.host.all():
+        if current_host and current_host == occ.event.host:
             occ.link = reverse('event', kwargs={'event_slug': occ.event.slug, 'host_slug': host_slug})
         else:
             occ.link = reverse('event', args=[occ.event.slug])
@@ -537,6 +537,12 @@ def about_view(request, host_slug=None):
     except Content.DoesNotExist:
         about = None
 
+    news = NewsPost.objects.all().order_by('-published')[:3]
+    blog = BlogPost.objects.all().order_by('-published')[:3]
+    events = Event.objects.all().order_by('-start')
+    period = Period(events, datetime.now() - timedelta(hours=2), datetime.now() + timedelta(365/2))
+    occurrences = period.get_occurrences()[:3]
+
     template = loader.get_template('wbcore/about.html')
     context = {
         'main_nav': get_main_nav(),
@@ -544,7 +550,10 @@ def about_view(request, host_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
-        'about': about
+        'about': about,
+        'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id'),
+        'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
+        'event_item_list': item_list_from_occ(occurrences, text=True),
     }
     return HttpResponse(template.render(context, request))
 
@@ -560,6 +569,12 @@ def idea_view(request, host_slug=None):
     else:
         host = None
         breadcrumb = [('Home', reverse('home')), ('Idea', None)]
+
+    news = NewsPost.objects.all().order_by('-published')[:3]
+    blog = BlogPost.objects.all().order_by('-published')[:3]
+    events = Event.objects.all().order_by('-start')
+    period = Period(events, datetime.now() - timedelta(hours=2), datetime.now() + timedelta(365/2))
+    occurrences = period.get_occurrences()[:3]
 
     projects = Project.objects.all()
 
@@ -578,6 +593,9 @@ def idea_view(request, host_slug=None):
         'idea': idea,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id'),
+        'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
+        'event_item_list': item_list_from_occ(occurrences, text=True),
     }
     return HttpResponse(template.render(context, request))
 
@@ -1304,6 +1322,8 @@ def contact_view(request, host_slug=None):
     except Content.DoesNotExist:
         contact = None
     teams = Team.objects.filter(host=load_host)
+
+
     if teams:
         if len(teams) > 3:
             teams = teams[:3]
@@ -1319,12 +1339,13 @@ def contact_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(),
         'dot_nav': get_dot_nav(host=host),
-        'host': host,
+        'host': load_host,
         'breadcrumb': breadcrumb,
         'success': False,
         'icon_links': icon_links,
         'contact': contact,
         'teams': teams,
+        'address': load_host.address,
         'more_teams': more_teams,
     }
 
@@ -1391,8 +1412,9 @@ def faq_view(request):
         'main_nav': get_main_nav(),
         'dot_nav': get_dot_nav(),
         'faq': faq,
-        'breadcrumb': [('Home', reverse('home')), ("Sitemap", None)],
+        'breadcrumb': [('Home', reverse('home')), ("FAQ", None)],
         'icon_links': icon_links,
+        'hosts': Host.objects.all(),
     }
     return HttpResponse(template.render(context), request)
 

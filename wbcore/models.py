@@ -123,6 +123,19 @@ class Host(RulesModel):
     def get_hosts(self):
         return [self]
 
+    def instagram(self):
+        sm = self.socialmedialink_set.filter(type='instagram').all()
+        link = None
+        if len(sm):
+            link = sm[0].link
+        
+        if link:
+            name = link.replace("https://www.instagram.com/", "")
+            name = name.replace("/", "")
+            print("Instagram:", name)
+            return name
+        return None
+
 
 class SocialMediaLink(RulesModel):
     class Meta:

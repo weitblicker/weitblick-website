@@ -170,6 +170,9 @@ class MyAdmin(TabbedTranslationAdmin):
     }
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if request.user.is_super_admin:
+            return super().formfield_for_manytomany(db_field, request, **kwargs)
+
         if db_field.name == 'hosts':
             if request.user.hosts.count() == 1:
                 # setting the user from the request object
@@ -179,6 +182,30 @@ class MyAdmin(TabbedTranslationAdmin):
             kwargs["queryset"] = request.user.hosts
 
         return super().formfield_for_manytomany(db_field, request, **kwargs)
+
+    def get_exclude(self, request, obj=None):
+        exclude = super().get_exclude(request, obj)
+        exclude = exclude if exclude else ()
+        if request.user.is_super_admin:
+            return exclude
+        if request.user.hosts.count() == 1:
+            exclude += ('hosts', 'host')
+
+        return exclude
+
+    def save_model(self, request, obj, form, change):
+        if request.user.is_super_admin:
+            super().save_model(request, obj, form, change)
+            return
+
+        if request.user.hosts.count() == 1:
+            super().save_model(request, obj, form, change)
+            if hasattr(obj, 'host'):
+                obj.host = request.user.hosts.all()[0]
+            elif hasattr(obj, 'hosts'):
+                obj.hosts.set(request.user.hosts.all())
+
+        super().save_model(request, obj, form, change)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if request.user.is_super_admin:
@@ -520,8 +547,19 @@ class CycleDonationAdmin(MyAdmin):
 
 
 class EventsAdmin(MyAdmin):
+
+    exclude = ('calendar', 'creator')
+
     def save_model(self, request, obj, form, change):
-        super().save(request, obj, form, change)
+        try:
+            calendar = Calendar.objects.get(slug=obj.host.slug)
+        except Calendar.DoesNotExist:
+            calendar = Calendar(name=obj.host.name, slug=obj.host.slug)
+            calendar.save()
+        obj.calendar = calendar
+        if not obj.creator:
+            obj.creator = request.user
+        super().save_model(request, obj, form, change)
 
 
 # since we're not using Django's built-in permissions,

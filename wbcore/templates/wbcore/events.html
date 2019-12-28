@@ -1,19 +1,9 @@
-{% extends 'wbcore/base.html' %}
+{% extends 'wbcore/basic.html' %}
 {% load staticfiles %}
-{% block content %}
-    <div class="ui one column stackable grid container">
-        {% include 'wbcore/image-header.html' with title="Events" default='/images/events_header.jpg'%}
+{% block main %}
+    {% include 'wbcore/image-header.html' with title="Events" default='/images/events_header.jpg'%}
 
-        <div class="ten wide column divided items">
-            <div class="ui segment">
-                {% include 'wbcore/item_list.html' %}
-            </div>
-        </div>
-
-        <div class="six wide column divided items">
-            <div class="ui segment">
-                {% include 'wbcore/list_filter.html' %}
-            </div>
-        </div>
+    <div class="ui segment">
+        {% include 'wbcore/item_list.html' %}
     </div>
 {% endblock %}

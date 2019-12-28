@@ -1,20 +1,18 @@
-{% if host %}
-
+{% include "wbcore/segment_header.html" with icon="address card outline" title="Address" %}
 <div class="ui list">
-    {% if host.address %}
-        <div class="item">
+    <div class="item">
             <i class="large envelope open text icon"></i>
             <div class="content">
-                {{ host.name }}
-                <br>{{ host.address.street }}
-                <br>{{ host.address.postal_code }} {{ host.address.city }}
-                <br>{{ host.address.country.name }}
+                {% if host %}{{ host.name }}<br>{% endif %}
+                {{ address.name }}
+                <br>{{ address.street }}
+                <br>{{ address.postal_code }} {{ address.city }}
+                <br>{{ address.country.name }}
             </div>
         </div>
-    {% endif %}
     <div class="ui hidden divider"></div>
 
-    {% if host.email %}
+    {% if host and host.email %}
         <div class="item">
             <i class="large at icon"></i>
             <div class="content">
@@ -23,6 +21,4 @@
         </div>
     {% endif %}
 </div>
-
-{% endif %}
 

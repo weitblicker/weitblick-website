@@ -141,7 +141,7 @@ $wb_lightgrey: #D6D6D9;
 }
 
 .pusher.content{
-	margin-top: 1rem;
+	margin-top: 2rem;
 }
 
 #mobile-menu .menu{
@@ -279,10 +279,17 @@ $wb_lightgrey: #D6D6D9;
 	height: 15px;
 }
 
+.instagram{
+	.column{
+		padding-left: 0.5rem !important;
+		padding-right: 0.5rem !important;
+	}
+}
+
 .label.icon{
 	position: absolute;
 	right: 1rem;
-	top: 0;
+	top: 0rem;
 	width: 55px;
 	height: 55px;
 	color: white;

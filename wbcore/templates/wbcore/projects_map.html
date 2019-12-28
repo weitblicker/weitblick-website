@@ -5,7 +5,7 @@
 <script src="{% static 'highmaps/world-robinson-highres.js'%}"></script>
 <link href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
 
-<div id="container" style="width: 100%"></div>
+<div id="project-map" style="width: 100%"></div>
 <script>
 
     var mydata = {{project_list|safe}};
@@ -13,7 +13,7 @@
     var data = Highcharts.geojson(Highcharts.maps['custom/world-robinson-highres']),
         separators = Highcharts.geojson(Highcharts.maps['custom/world-robinson-highres'], 'mapline'),
         // Some responsiveness
-        small = $('#container').width() < 400;
+        small = $('#project-map').width() < 400;
 
     var filtered_countries = [];
     // Set drilldown pointers
@@ -31,7 +31,7 @@
     });
 
     // Instantiate the map
-    Highcharts.mapChart('container', {
+    Highcharts.mapChart('project-map', {
         chart: {
             events: {
                 drilldown: function(e) {

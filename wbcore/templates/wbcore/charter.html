@@ -1,25 +1,15 @@
-{% extends 'wbcore/base.html' %}
+{% extends 'wbcore/basic.html' %}
 {% load martortags %}
 {% load staticfiles %}
-{% block content %}
-
-<div class="ui stackable grid container">
-    {% include 'wbcore/image-header.html' with title="Charter" image='/static/images/news_header.jpg' %}
-
-    <div class="ten wide column divided items">
-        <div class="ui segment">
-            {% if charter %}
-                {{ charter.text | safe_markdown }}
-            {% endif %}
-        </div>
+{% block main %}
+    {% include 'wbcore/image-header.html' with title="Charter" default='/images/charter_header.jpg' %}
+    <div class="ui segment">
+        {% if charter %}
+            {{ charter.text | safe_markdown }}
+        {% endif %}
     </div>
-
-    <div class="six wide column divided items">
-            <div class="ui segment">
-                {% include 'wbcore/segment_header.html' with icon='file alternate outline' title='Charter' %}
-                {% include 'wbcore/document_list.html' with documents=charter_files hide_year=True %}
-            </div>
+    <div class="ui segment">
+        {% include 'wbcore/segment_header.html' with icon='file alternate outline' title='Charter' %}
+        {% include 'wbcore/document_list.html' with documents=charter_files hide_year=True %}
     </div>
-</div>
-
 {% endblock %}

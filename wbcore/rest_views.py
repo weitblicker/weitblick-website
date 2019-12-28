@@ -7,15 +7,17 @@ from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db.models import Sum
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, JsonResponse
 from martor.utils import LazyEncoder
 from django.utils.translation import ugettext_lazy as _
 from rest_auth.models import TokenModel
+from rest_auth.views import UserDetailsView
+from rest_framework.parsers import MultiPartParser
 
 from wbcore.serializers import (NewsPostSerializer, BlogPostSerializer, HostSerializer, EventSerializer,
                                 ProjectSerializer, LocationSerializer, CycleDonationSerializer,
                                 CycleDonationRelationSerializer, CycleSegmentSerializer, CycleTourSerializer,
-                                TokenSerializer, UserCycleSerializer, FAQSerializer)
+                                TokenSerializer, UserCycleSerializer, FAQSerializer, UserSerializer)
 from wbcore.models import NewsPost, BlogPost, Host, Event, Project, Location, Photo, CycleDonation, CycleTour, User, FAQ
 from rest_framework import status, viewsets, filters
 from rest_framework.decorators import api_view
@@ -324,4 +326,38 @@ class UserrankingViewSet(object):
             euro=Sum('cycletour__euro'),
             km=Sum('cycletour__km')
         )
+
+
+class UsersView(UserDetailsView):
+    """
+    Reads and updates UserModel fields
+    Accepts GET, PUT, PATCH methods.
+
+    Default accepted fields: username, first_name, last_name
+    Default display fields: pk, username, email, first_name, last_name
+    Read-only fields: pk, email
+
+    Returns UserModel fields.
+    """
+    parser_classes = (MultiPartParser, )
+
+    def post(self, request, format=None):
+        print(request.FILES)
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors, status=400)
+
+    def get_object(self):
+        return self.request.user
+
+    def get_queryset(self):
+        """
+        Adding this method since it is sometimes called when using
+        django-rest-swagger
+        https://github.com/Tivix/django-rest-auth/issues/275
+        """
+        return get_user_model().objects.none()
+
 
