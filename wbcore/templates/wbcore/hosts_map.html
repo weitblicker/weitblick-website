@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load l10n %}
 <script src="{% static 'highmaps/proj4.js'%}"></script>
 <script src="{% static 'highmaps/highmaps.js'%}"></script>
 <script src="{% static 'highmaps/de-all.js'%}"></script>
@@ -10,12 +11,15 @@
 <script>
     var host_list = [];
     {% for host in hosts %}
+        {% if host.location and host.location.geolocation %}
         host_list.push({
             name: '{{host.name|cut:"Weitblick "}}',
             slug: '{{host.slug}}',
             label: '{{host.location.description|cut:"None"}}',
-            lat: parseFloat('{{host.location.geolocation.lat|floatformat:11}}'.replace(",", ".")),
-            lon: parseFloat('{{host.location.geolocation.lon|floatformat:11}}'.replace(",", "."))})
+            lat: {{host.location.geolocation.lat|stringformat:".11f"}},
+            lon: {{host.location.geolocation.lon|stringformat:".11f"}}
+        });
+        {% endif %}
     {% endfor %}
 
     var map = Highcharts.mapChart('container', {
