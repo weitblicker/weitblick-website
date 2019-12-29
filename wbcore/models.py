@@ -1008,6 +1008,8 @@ class ContactMessage(RulesModel):
     def get_hosts(self):
         return [self.host]
 
+    def __str__(self):
+        return "%s (%s)" % (self.subject, self.name)
 
 class CycleDonationRelation(RulesModel):
     class Meta:

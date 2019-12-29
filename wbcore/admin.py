@@ -545,8 +545,38 @@ class CycleDonationRelationInlineModel(PermissionInlineModel):
 class CycleDonationAdmin(MyAdmin):
     inlines = (CycleDonationRelationInlineModel, )
 
+class PostAdmin(MyAdmin):
+    list_display = ('title', 'get_author', 'host', 'published',)
+
+    ordering = ('-published', 'title',)
+
+    def get_author(self, post):
+        if post.author:
+            return post.author
+        else:
+            return post.author_str
+
+    get_author.short_description = 'Author'
+
+
+class ContactMessageAdmin(MyAdmin):
+    list_display = ('subject', 'name', 'email', 'reason', 'host', )
+
+
+class ProjectAdmin(MyAdmin):
+    list_display = ('name', 'get_hosts', 'start_date', 'end_date', 'completed', 'published')
+
+    def get_hosts(self, project):
+        return ", ".join([host.name for host in project.hosts.all()])
+
+    get_hosts.short_description = 'Hosts'
+
 
 class EventsAdmin(MyAdmin):
+
+    list_display = ('title', 'start', 'end', 'host')
+
+    ordering = ('-start',)
 
     exclude = ('calendar', 'creator')
 
@@ -577,16 +607,16 @@ admin.site.register(Content, MyAdmin)
 admin.site.register(Location, MyAdmin)
 admin.site.register(Host, HostAdmin)
 admin.site.register(Partner, PartnerAdmin)
-admin.site.register(Project, MyAdmin)
+admin.site.register(Project, ProjectAdmin)
 admin.site.register(Event, EventsAdmin)
-admin.site.register(NewsPost, MyAdmin)
+admin.site.register(NewsPost, PostAdmin)
 admin.site.register(Document, MyAdmin)
 admin.site.register(Team, TeamAdmin)
 admin.site.register(Milestone, MyAdmin)
 admin.site.register(Donation, MyAdmin)
 admin.site.register(Milestep, MyAdmin)
-admin.site.register(BlogPost, MyAdmin)
+admin.site.register(BlogPost, PostAdmin)
 admin.site.register(BankAccount, MyAdmin)
-admin.site.register(ContactMessage, MyAdmin)
+admin.site.register(ContactMessage, ContactMessageAdmin)
 admin.site.register(FAQ, FAQAdmin)
 admin.site.register(CycleDonation, CycleDonationAdmin)
