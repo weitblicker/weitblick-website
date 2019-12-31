@@ -42,6 +42,13 @@
     </div>
     {% endif %}
 
+    {% if charter_files %}
+    <div class="ui segment">
+        {% include "wbcore/segment_header.html" with icon='file alternate outline' title='Charter' url_alias='reports' %}
+        {% include 'wbcore/document_list.html' with documents=charter_files hide_year=True %}
+    </div>
+    {% endif %}
+
     {% if event_item_list %}
     <div class="ui segment">
         {% include "wbcore/segment_header.html" with icon='calendar alternate outline' title='Events' url_alias='events' %}

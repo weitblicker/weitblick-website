@@ -313,6 +313,7 @@ def charter_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'charter': charter,
+        'hosts': Host.objects.all(),
         'charter_files': charter_files,
     }
     return HttpResponse(template.render(context, request))
