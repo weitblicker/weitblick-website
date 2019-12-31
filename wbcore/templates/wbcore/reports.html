@@ -1,36 +1,15 @@
-{% extends 'wbcore/base.html' %}
+{% extends 'wbcore/basic.html' %}
 {% load martortags %}
 {% load staticfiles %}
-{% block content %}
 {% load i18n %}
 
-<div class="ui stackable grid container">
-    <div class="{% if annual_reports %}eight{% else %}ten{% endif %} wide column divided items">
-        {% include 'wbcore/image-header.html' with title="Reports" image=report.image default='/images/reports_header.jpg' %}
-        <div class="ui segment">
-            {% if report %}
-                {{ report.text | safe_markdown }}
-            {% endif %}
-        </div>
-    </div>
-
-    {% if annual_reports %}
-        <div class="four wide column divided items">
-                <div class="ui segment">
-                    {% include 'wbcore/segment_header.html' with icon='file alternate outline' title='Annual Report' %}
-                    {% include 'wbcore/document_list.html' with documents=annual_reports show_year=True%}
-                </div>
-        </div>
-    {% endif %}
-
-    <div class="{% if annual_reports %}four{% else %}six{% endif %} wide column divided items">
-        {% if financial_reports %}
-            <div class="ui segment">
-                {% include 'wbcore/segment_header.html' with icon='coins' title="Financial Report" %}
-                {% include 'wbcore/document_list.html' with documents=financial_reports show_year=True %}
-            </div>
+{% block main %}
+    
+    {% include 'wbcore/image-header.html' with title="Reports" image=report.image default='/images/reports_header.jpg' %}
+    <div class="ui segment">
+        {% if report %}
+            {{ report.text | safe_markdown }}
         {% endif %}
     </div>
-</div>
 
 {% endblock %}
