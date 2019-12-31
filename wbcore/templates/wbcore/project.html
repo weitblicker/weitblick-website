@@ -1,27 +1,25 @@
-{% extends 'wbcore/single_content.html' %}
+{% extends 'wbcore/basic.html' %}
 {% load staticfiles %}
 {% load wbcoretags %}
-{% block content %}
+{% block main %}
 
-<div class="ui stackable grid container">
-         {% include 'wbcore/image-header.html' with title=project.name image=project.image default='/images/project_header.jpg' %}
+    {% include 'wbcore/image-header.html' with title=project.name image=project.image default='/images/project_header.jpg' %}
 
-    <div class="ten wide column divided items">
-        <div class="ui segment">
-            {{ project.description | safe_markdown }}
-        </div>
+    <div class="ui segment">
+        {{ project.description | safe_markdown }}
     </div>
 
-    <div class="six wide column divided items">
+{% endblock %}
+{% block side_bar %}
         <div class="ui segment">
-            <i class="label map marker alternate icon"></i>
+            {% include 'wbcore/segment_header.html' with icon='map marker alternate' title="Map" %}
         </div>
 
         {% if project.photos %}
-            <div class="ui segment">
-                {% include 'wbcore/segment_header.html' with icon='image outline' title="Gallery" %}
-                {% include 'wbcore/gallery.html' with photos=project.photos.all %}
-            </div>
+        <div class="ui segment">
+            {% include 'wbcore/segment_header.html' with icon='image outline' title="Gallery" %}
+            {% include 'wbcore/gallery.html' with photos=project.photos.all %}
+        </div>
         {% endif %}
 
         {% if project.partner %}
@@ -31,32 +29,6 @@
             </div>
         {% endif %}
 
-        <div class="ui segment">
-            {% include 'wbcore/segment_header.html' with icon='donate' title="Donate" url_alias='donate' %}
-        </div>
-
-        {% if events %}
-            <div class="ui segment">
-                {% include 'wbcore/segment_header.html' with icon='calendar alternate outline' title='Events' url_alias='events' %}
-                {% include 'wbcore/item_list.html' with item_list=events image_size='tiny' %}
-            </div>
-        {% endif %}
-
-        {% if news %}
-            <div class="ui segment">
-                {% include 'wbcore/segment_header.html' with icon='newspaper outline' title='News' url_alias='news' %}
-                {% include 'wbcore/item_list.html' with item_list=news image_size='tiny' %}
-            </div>
-        {% endif %}
-
-        {% if blogposts %}
-            <div class="ui segment">
-                {% include 'wbcore/segment_header.html' with icon='globe africa' title='Blog Posts' url_alias='blog' %}
-                {% include 'wbcore/item_list.html' with item_list=blogposts image_size='tiny' %}
-            </div>
-        {% endif %}
-    </div>
-</div>
-
+        {% include 'wbcore/sidebar.html' %}
 
 {% endblock %}
