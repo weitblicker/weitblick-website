@@ -28,6 +28,20 @@
     </div>
     {% endif %}
 
+    {% if annual_reports %}
+    <div class="ui segment">
+        {% include "wbcore/segment_header.html" with icon='file alternate outline' title='Annual Reports' url_alias='reports' %}
+        {% include 'wbcore/document_list.html' with documents=annual_reports show_year=True %}
+    </div>
+    {% endif %}
+
+    {% if financial_reports %}
+    <div class="ui segment">
+        {% include "wbcore/segment_header.html" with icon='coins' title='Financial Reports' url_alias='reports' %}
+        {% include 'wbcore/document_list.html' with documents=financial_reports show_year=True %}
+    </div>
+    {% endif %}
+
     {% if event_item_list %}
     <div class="ui segment">
         {% include "wbcore/segment_header.html" with icon='calendar alternate outline' title='Events' url_alias='events' %}

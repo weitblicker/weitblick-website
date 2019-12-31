@@ -337,6 +337,13 @@ def transparency_view(request, host_slug=None):
     except Content.DoesNotExist:
         transparency = None
 
+    financial_reports = Document.objects.filter(host=load_host, document_type='financial_report', public=True)
+    financial_reports = financial_reports.order_by('valid_from') if financial_reports else financial_reports
+    annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports = annual_reports.order_by('valid_from') if annual_reports else annual_reports
+
+    print("***", annual_reports)
+
     template = loader.get_template('wbcore/transparency.html')
     context = {
         'main_nav': get_main_nav(),
@@ -345,6 +352,9 @@ def transparency_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'transparency': transparency,
+        'hosts': Host.objects.all(),
+        'financial_reports': financial_reports,
+        'annual_reports': annual_reports,
     }
     return HttpResponse(template.render(context, request))
 
@@ -399,6 +409,11 @@ def history_view(request, host_slug=None):
     except Content.DoesNotExist:
         history = None
 
+    if host_slug:
+        projects = Project.objects.filter(hosts__slug=host_slug)[:3]
+    else:
+        projects = Project.objects.all()[:3]
+
     template = loader.get_template('wbcore/history.html')
     context = {
         'main_nav': get_main_nav(),
@@ -407,6 +422,8 @@ def history_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'history': history,
+        'hosts': Host.objects.all(),
+        'project_item_list': item_list_from_proj(projects, host_slug),
     }
     return HttpResponse(template.render(context, request))
 
@@ -909,8 +926,6 @@ def events_view(request, host_slug=None):
     p = Period(events, datetime.now(), datetime.now() + timedelta(days=365))
     occurrences = p.get_occurrences()
     hosts = Host.objects.all()
-
-    print(occurrences)
 
     if Event.objects.count():
         latest = Event.objects.latest('start')
