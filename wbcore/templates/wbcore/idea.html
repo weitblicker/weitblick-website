@@ -1,6 +1,7 @@
 {% extends 'wbcore/basic.html' %}
 {% load martortags %}
 {% block main %}
+    {% include "wbcore/image-header.html" with title="Idea" default='/images/idea_header.jpg' %}
 
     <div class="ui segment">
         {{ idea.text | safe_markdown }}

@@ -570,13 +570,8 @@ def idea_view(request, host_slug=None):
         host = None
         breadcrumb = [('Home', reverse('home')), ('Idea', None)]
 
-    news = NewsPost.objects.all().order_by('-published')[:3]
-    blog = BlogPost.objects.all().order_by('-published')[:3]
-    events = Event.objects.all().order_by('-start')
-    period = Period(events, datetime.now() - timedelta(hours=2), datetime.now() + timedelta(365/2))
-    occurrences = period.get_occurrences()[:3]
-
     projects = Project.objects.all()
+    project_item_list = item_list_from_proj(projects, host_slug)[:3]
 
     try:
         idea = Content.objects.get(host=Host.objects.get(slug='bundesverband'), type='idea')
@@ -588,14 +583,11 @@ def idea_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(active='idea', host=host),
         'dot_nav': get_dot_nav(host=host),
-        'projects': projects,
         'host': host,
         'idea': idea,
         'breadcrumb': breadcrumb,
-        'icon_links': icon_links,
-        'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id'),
-        'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
-        'event_item_list': item_list_from_occ(occurrences, text=True),
+        'hosts': Host.objects.all(),
+        'project_item_list': project_item_list,
     }
     return HttpResponse(template.render(context, request))
 
@@ -917,6 +909,8 @@ def events_view(request, host_slug=None):
     p = Period(events, datetime.now(), datetime.now() + timedelta(days=365))
     occurrences = p.get_occurrences()
     hosts = Host.objects.all()
+
+    print(occurrences)
 
     if Event.objects.count():
         latest = Event.objects.latest('start')

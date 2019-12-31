@@ -35,6 +35,13 @@
     </div>
     {% endif %}
 
+    {% if project_item_list %}
+    <div class="ui segment">
+        {% include "wbcore/segment_header.html" with icon='seedling' title='Projects' url_alias='projects' %}
+        {% include 'wbcore/item_list.html' with item_list=project_item_list image_size='small' no_image=False %}
+    </div>
+    {% endif %}
+
     {% if teams %}
     <div class="ui segment">
         {% include "wbcore/segment_header.html" with icon='user' title='Teams' url_alias='teams' %}
