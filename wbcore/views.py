@@ -727,11 +727,11 @@ def join_view(request, host_slug=None):
     join_page = None
 
     if host:
-        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
+        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Mitmachen', None)]
         submit_url = reverse('join', args=[host_slug])
     else:
         submit_url = reverse('join')
-        breadcrumb = [('Home', reverse('home')), ('Contact', None)]
+        breadcrumb = [('Home', reverse('home')), ('Mitmachen', None)]
         try:
             host = Host.objects.get(slug=main_host_slug)
         except Host.DoesNotExist:
@@ -789,13 +789,24 @@ def join_view(request, host_slug=None):
         user_form = UserForm()
         bank_form = BankForm()
 
+    load_host = host if host else Host.objects.get(host_slug='bundesverband')
+    projects = Project.objects.filter(hosts=load_host)[:3]
+
+    print("***")
+    print(host)
+    print(Host.objects.get(slug='bundesverband'))
+    print(host is Host.objects.get(slug='bundesverband'))
+    print(host == Host.objects.get(slug='bundesverband'))
+
     context = {
         'main_nav': get_main_nav(active='join'),
         'dot_nav': get_dot_nav(host=host),
         'host': host,
-        'breadcrumb': [('Home', reverse('home')), ('Join in', None)],
+        'breadcrumb': breadcrumb,
         'success': success,
         'icon_links': icon_links,
+        'hosts': Host.objects.all() if host == Host.objects.get(slug='bundesverband') else None,
+        'project_item_list': item_list_from_proj(projects, host_slug),
     }
 
     if join_page:
@@ -809,6 +820,12 @@ def join_view(request, host_slug=None):
         context['addr_form'] = addr_form
         context['submit_url'] = submit_url
         context['enable_form'] = join_page.enable_form
+    else:  # join Content text if form disabled
+        load_host = host if host else Host.objects.get(slug='bundesverband')
+        try:
+            context['text'] = Content.objects.get(host=load_host, type="join").text
+        except Content.DoesNotExist:
+            pass
 
     return HttpResponse(template.render(context, request))
 
