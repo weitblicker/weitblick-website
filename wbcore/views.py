@@ -1304,16 +1304,18 @@ def donate_view(request, host_slug=None):
         host = None
         breadcrumb = [('Home', reverse('home')), ('donate', None)]
 
-    projects = Project.objects.all()
+    projects = Project.objects.filter(hosts=host) if host else Project.objects.all()
+    projects = projects[:3]
 
     template = loader.get_template('wbcore/donate.html')
     context = {
         'main_nav': get_main_nav(active='donate'),
         'dot_nav': get_dot_nav(host=host),
-        'projects': projects,
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'hosts': Host.objects.all(),
+        'project_item_list': item_list_from_proj(projects, host_slug),
     }
     return HttpResponse(template.render(context, request))
 

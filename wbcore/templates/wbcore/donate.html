@@ -1,4 +1,10 @@
-{% extends 'wbcore/single_content.html' %}
-{% block single-content %}
-    <p>donate</p>
+{% extends 'wbcore/basic.html' %}
+{% load martortags %}
+{% load staticfiles %}
+
+{% block main %}
+    {% include 'wbcore/image-header.html' with title='Spenden' default='/images/donate_header.jpg' %}
+    <div class="ui segment">
+        <p>donate</p>
+    </div>
 {% endblock %}
