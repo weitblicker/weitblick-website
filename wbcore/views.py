@@ -456,6 +456,7 @@ def privacy_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'privacy': privacy,
+        'hosts': Host.objects.all(),
     }
     return HttpResponse(template.render(context, request))
 
@@ -1325,7 +1326,7 @@ def imprint_view(request, host_slug=None):
         host = None
         breadcrumb = [('Home', reverse('home')), ('Impressum', None)]
 
-    teams = Team.objects.filter(host__slug='bundesverband')
+    teams = Team.objects.filter(host__slug='bundesverband')[:3]
 
     template = loader.get_template('wbcore/imprint.html')
     context = {
