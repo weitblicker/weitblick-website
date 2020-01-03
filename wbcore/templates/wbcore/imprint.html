@@ -1,0 +1,10 @@
+{% extends 'wbcore/basic.html' %}
+{% load martortags %}
+{% load staticfiles %}
+
+{% block main %}
+    {% include 'wbcore/image-header.html' with title="Impressum" default="/images/imprint_header.jpg" %}
+    <div class="ui segment">
+        {% include 'wbcore/imprint_text.html' %}
+    </div>
+{% endblock %}

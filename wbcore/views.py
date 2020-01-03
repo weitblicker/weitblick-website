@@ -1318,12 +1318,14 @@ def imprint_view(request, host_slug=None):
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Imprint', None)]
+            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Impressum', None)]
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('Imprint', None)]
+        breadcrumb = [('Home', reverse('home')), ('Impressum', None)]
+
+    teams = Team.objects.filter(host__slug='bundesverband')
 
     template = loader.get_template('wbcore/imprint.html')
     context = {
@@ -1332,6 +1334,8 @@ def imprint_view(request, host_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'hosts': Host.objects.all(),
+        'teams': item_list_from_teams(teams),
     }
     return HttpResponse(template.render(context, request))
 
