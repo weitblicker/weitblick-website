@@ -480,6 +480,9 @@ def teams_view(request, host_slug=None):
         breadcrumb = [('Home', reverse('home')), ('Team', None)]
         teams = Team.objects.filter(host=Host.objects.get(slug='bundesverband'))
 
+    projects = Project.objects.filter(host=host) if host else Project.objects.all()
+    projects = projects[:3]
+
     template = loader.get_template('wbcore/teams.html')
     context = {
         'main_nav': get_main_nav(),
@@ -488,6 +491,8 @@ def teams_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'item_list': item_list_from_teams(teams, host_slug),
         'icon_links': icon_links,
+        'hosts': Host.objects.all(),
+        'project_item_list': item_list_from_proj(projects, host_slug),
     }
     return HttpResponse(template.render(context, request))
 
