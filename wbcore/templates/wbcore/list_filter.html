@@ -1,44 +1,72 @@
 {% include 'wbcore/segment_header.html' with icon='filter' title='Filter' %}
 
 <div class="column-content" id="filter" data-ajax-endpoint="{{ ajax_endpoint }}">
-        <div class="ui unstackable items">
-            <div class="ui form">
-                <div class="ui two unstackable fields">
-                    {% if hosts %}
-                        <div class="field twelve wide">
-                            <label>Hosts</label>
-                            <div id="filter-hosts" class="ui multiple search selection dropdown">
-                                <input name="tags" type="hidden">
-                                <i class="dropdown icon"></i>
-                                <div class="default text">Union</div>
-                                <div class="menu">
-                                    {% for host in hosts %}
-                                        <div class="item" data-value="{{ host.slug }}">{{ host.name|cut:"Weitblick " }}</div>
-                                    {% endfor %}
-                                </div>
+    <div class="ui unstackable items">
+        <div class="ui form">
+            <div class="ui two unstackable fields">
+                {% if hosts %}
+                    <div class="field twelve wide">
+                        <label>Hosts</label>
+                        <div id="filter-hosts" class="ui multiple search selection dropdown">
+                            <input name="tags" type="hidden">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Union</div>
+                            <div class="menu">
+                                {% for host in hosts %}
+                                    <div class="item" data-value="{{ host.slug }}">{{ host.name|cut:"Weitblick " }}</div>
+                                {% endfor %}
                             </div>
                         </div>
+                    </div>
 
-                        <div class="field four wide">
-                            <label>Clear Filter</label>
-                            <div id="filter-clear" class="ui fluid teal button">Clear</div>
-                        </div>
-                    {% else %}
-                        <div class="field">
-                            <label>Clear Filter</label>
-                            <div id="filter-clear" class="ui fluid teal button">Clear</div>
-                        </div>
-                    {% endif %}
-                </div>
-
-                {% if years %}
+                    <div class="field four wide">
+                        <label>Clear Filter</label>
+                        <div id="filter-clear" class="ui fluid teal button">Clear</div>
+                    </div>
+                {% else %}
                     <div class="field">
-                        <label>Archive</label>
-                        <div id="filter-archive" class="ui fluid basic dropdown button">
+                        <label>Clear Filter</label>
+                        <div id="filter-clear" class="ui fluid teal button">Clear</div>
+                    </div>
+                {% endif %}
+            </div>
+            {% if filter_preset.host %}
+                <script>
+                    $('.ui.multiple.search.selection.dropdown').dropdown('set selected', [{% for host_preset in filter_preset.host %} '{{ host_preset }}', {% endfor %}])
+                </script>
+            {% endif %}
+
+
+            {% if years %}
+                <div class="field">
+                    <label>Archive</label>
+                    <div id="filter-archive" class="ui fluid basic dropdown button">
+                        <span class="text">year or month</span>
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            {% for year, months in years.items %}
+                                <div class="item" data-value="{{ year|date:'Y' }}">
+                                    <i class="dropdown icon"></i>
+                                    <span class="text">{{ year|date:'Y' }}</span>
+                                    <div class="menu">
+                                        {% for month in months %}
+                                            <div class="item" data-value="{{ month|date:'Y-m' }}">{{ month|date:'F Y' }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% elif from_to %}
+                <div class="ui two unstackable fields">
+                    <div class="field">
+                        <label>From</label>
+                        <div id="filter-from" class="ui fluid basic dropdown button">
                             <span class="text">year or month</span>
                             <i class="dropdown icon"></i>
                             <div class="menu">
-                                {% for year, months in years.items %}
+                                {% for year, months in from_to.items %}
                                     <div class="item" data-value="{{ year|date:'Y' }}">
                                         <i class="dropdown icon"></i>
                                         <span class="text">{{ year|date:'Y' }}</span>
@@ -46,94 +74,72 @@
                                             {% for month in months %}
                                                 <div class="item" data-value="{{ month|date:'Y-m' }}">{{ month|date:'F Y' }}</div>
                                             {% endfor %}
-                                        </div>
+                                         </div>
                                     </div>
                                 {% endfor %}
                             </div>
                         </div>
                     </div>
-                {% elif from_to %}
-                    <div class="ui two unstackable fields">
-                        <div class="field">
-                            <label>From</label>
-                            <div id="filter-from" class="ui fluid basic dropdown button">
-                                <span class="text">year or month</span>
-                                <i class="dropdown icon"></i>
-                                <div class="menu">
-                                    {% for year, months in from_to.items %}
-                                        <div class="item" data-value="{{ year|date:'Y' }}">
-                                            <i class="dropdown icon"></i>
-                                            <span class="text">{{ year|date:'Y' }}</span>
-                                            <div class="menu">
-                                                {% for month in months %}
-                                                    <div class="item" data-value="{{ month|date:'Y-m' }}">{{ month|date:'F Y' }}</div>
-                                                {% endfor %}
-                                             </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
+                    <div class="field">
+                        <label>To</label>
+                        <div id="filter-to" class="ui fluid basic dropdown button">
+                            <span class="text">year or month</span>
+                            <i class="dropdown icon"></i>
+                            <div class="menu">
+                                {% for year, months in from_to.items %}
+                                    <div class="item" data-value="{{ year|date:'Y' }}">
+                                        <i class="dropdown icon"></i>
+                                        <span class="text">{{ year|date:'Y' }}</span>
+                                        <div class="menu">
+                                            {% for month in months %}
+                                                <div class="item" data-value="{{ month|date:'Y-m' }}">{{ month|date:'F Y' }}</div>
+                                            {% endfor %}
+                                         </div>
+                                    </div>
+                                {% endfor %}
                             </div>
                         </div>
-                        <div class="field">
-                            <label>To</label>
-                            <div id="filter-to" class="ui fluid basic dropdown button">
-                                <span class="text">year or month</span>
-                                <i class="dropdown icon"></i>
-                                <div class="menu">
-                                    {% for year, months in from_to.items %}
-                                        <div class="item" data-value="{{ year|date:'Y' }}">
-                                            <i class="dropdown icon"></i>
-                                            <span class="text">{{ year|date:'Y' }}</span>
-                                            <div class="menu">
-                                                {% for month in months %}
-                                                    <div class="item" data-value="{{ month|date:'Y-m' }}">{{ month|date:'F Y' }}</div>
-                                                {% endfor %}
-                                             </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="ui two unstackable fields">
+                {% if countries %}
+                    <div class="field eleven wide">
+                        <label>Country</label>
+                        <div id="filter-country" class="ui multiple search selection dropdown">
+                            <input name="tags" type="hidden">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Country</div>
+                            <div class="menu">
+                                {% for country in countries %}
+                                    <div class="item" data-value="{{ country.code }}">{{ country.name }}</div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
                 {% endif %}
-
-                <div class="ui two unstackable fields">
-                    {% if countries %}
-                        <div class="field eleven wide">
-                            <label>Country</label>
-                            <div id="filter-country" class="ui multiple search selection dropdown">
-                                <input name="tags" type="hidden">
-                                <i class="dropdown icon"></i>
-                                <div class="default text">Country</div>
-                                <div class="menu">
-                                    {% for country in countries %}
-                                        <div class="item" data-value="{{ country.code }}">{{ country.name }}</div>
-                                    {% endfor %}
-                                </div>
+                {% if filter_visibility %}
+                    <div class="field five wide">
+                        <label>Visibility</label>
+                        <div id="filter-visibility" class="ui selection dropdown">
+                            <input type="hidden" name="gender">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Visibility</div>
+                            <div class="menu">
+                                <div class="item" data-value="all">All</div>
+                                <div class="item" data-value="current">Current</div>
+                                <div class="item" data-value="completed">Completed</div>
                             </div>
                         </div>
-                    {% endif %}
-                    {% if filter_visibility %}
-                        <div class="field five wide">
-                            <label>Visibility</label>
-                            <div id="filter-visibility" class="ui selection dropdown">
-                                <input type="hidden" name="gender">
-                                <i class="dropdown icon"></i>
-                                <div class="default text">Visibility</div>
-                                <div class="menu">
-                                    <div class="item" data-value="all">All</div>
-                                    <div class="item" data-value="current">Current</div>
-                                    <div class="item" data-value="completed">Completed</div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
+                    </div>
+                {% endif %}
+            </div>
 
-                <div class="field">
-                    <label>Search</label>
-                    <input id="filter-search" type="text" placeholder="Search in News">
-                </div>
+            <div class="field">
+                <label>Search</label>
+                <input id="filter-search" type="text" placeholder="Search in News">
             </div>
         </div>
+    </div>
 </div>
