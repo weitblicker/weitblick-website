@@ -5,6 +5,6 @@
 {% block main %}
     {% include 'wbcore/image-header.html' with title='Spenden' default='/images/donate_header.jpg' %}
     <div class="ui segment">
-        <p>donate</p>
+        {{ donate.text | safe_markdown }}
     </div>
 {% endblock %}

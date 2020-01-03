@@ -1304,6 +1304,9 @@ def donate_view(request, host_slug=None):
         host = None
         breadcrumb = [('Home', reverse('home')), ('donate', None)]
 
+    load_host = host if host else Host.objects.get(slug='bundesverband')
+    donate = Content.objects.get(host=load_host, type='donate')
+
     projects = Project.objects.filter(hosts=host) if host else Project.objects.all()
     projects = projects[:3]
 
@@ -1314,6 +1317,7 @@ def donate_view(request, host_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'donate': donate,
         'hosts': Host.objects.all(),
         'project_item_list': item_list_from_proj(projects, host_slug),
     }
