@@ -511,16 +511,9 @@ def team_view(request, host_slug=None, team_slug=None):
     except Team.DoesNotExist:
         raise Http404()
 
-    if not team:    # TODO check if this is reachable, I think this is useless here.
-        raise Http404()
-
     if host:
-        try:
-            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', reverse('teams')), (team.name, None)]
-        except:
-            raise Http404()
+        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', reverse('teams')), (team.name, None)]
     else:
-        host = None
         breadcrumb = [('Home', reverse('home')), ('Team', reverse('teams')), (team.name, None)]
 
     members = team.member.all()
@@ -529,6 +522,10 @@ def team_view(request, host_slug=None, team_slug=None):
         relations.append(TeamUserRelation.objects.get(team=team, user=member))
 
     members_relations = sorted(zip(members, relations), key=lambda tup: (tup[1].priority, tup[0].name().split(" ")[-1]))
+
+    teams = Team.objects.filter(host=host) if host else Team.objects.filter(host__slug='bundesverband')
+    projects = Project.objects.filter(hosts=host) if host else Project.objects.all()
+    teams, projects = teams[:3], projects[:3]
 
     template = loader.get_template('wbcore/team.html')
     context = {
@@ -539,6 +536,9 @@ def team_view(request, host_slug=None, team_slug=None):
         'team': team,
         'members_relations': members_relations,
         'icon_links': icon_links,
+        'hosts': Host.objects.all() if host_slug in [None, 'bundesverband'] else None,
+        'teams': item_list_from_teams(teams, host_slug),
+        'project_item_list': item_list_from_proj(projects, host_slug)
     }
     return HttpResponse(template.render(context, request))
 

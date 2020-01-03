@@ -1,9 +1,11 @@
 {% extends 'wbcore/basic.html' %}
+{% load martortags %}
 {% load staticfiles %}
+
 {% block main %}
     {% include 'wbcore/image-header.html' with title=team.name image=team.image default='/images/team_header.jpg' %}
     <div class="ui segment">
-        <p>{{ team.description | safe }}</p>
+        <p>{{ team.description | safe_markdown }}</p>
     </div>
     <div class="ui segment">
         <div class="ui divided items">
