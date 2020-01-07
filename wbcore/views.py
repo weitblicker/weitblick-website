@@ -858,7 +858,10 @@ def project_view(request, host_slug=None, project_slug=None):
 
     project.image = project.get_title_image()
 
-    events = Event.objects.filter(projects=project)
+    if Event.objects.filter(projects=project).exists():
+        events = Event.objects.filter(projects=project)
+    else:
+        events = Event.objects.filter(host=host if host else Host.objects.get(slug='bundesverband'))
     period = Period(events, datetime.now(), datetime.now() + timedelta(365/2))
     occurrences = period.get_occurrences()[:3]
 
@@ -869,7 +872,7 @@ def project_view(request, host_slug=None, project_slug=None):
     context = {
         'main_nav': get_main_nav(host=host, active='projects'),
         'project': project,
-        'events': item_list_from_occ(occurrences, text=False),
+        'event_item_list': item_list_from_occ(occurrences, text=False),
         'news': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='news_id', text=False),
         'blogposts': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
         'host': host,
