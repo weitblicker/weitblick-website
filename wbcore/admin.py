@@ -564,13 +564,20 @@ class ContactMessageAdmin(MyAdmin):
 
 
 class ProjectAdmin(MyAdmin):
-    list_display = ('name', 'get_hosts', 'start_date', 'end_date', 'completed', 'published')
+    list_display = ('name', 'get_hosts', 'get_country', 'start_date', 'end_date', 'completed', 'published')
 
     def get_hosts(self, project):
-        return ", ".join([host.name for host in project.hosts.all()])
+        return ", ".join([host.name.replace("Weitblick ", "") for host in project.hosts.all()])
 
+    def get_country(self, project):
+        if project.location and project.location.country:
+            return project.location.country.name
+        else:
+            return "-"
+
+    get_country.short_description = 'Country'
+    get_country.admin_order_field = 'location'
     get_hosts.short_description = 'Hosts'
-
 
 class EventsAdmin(MyAdmin):
 
