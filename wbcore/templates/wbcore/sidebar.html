@@ -6,6 +6,12 @@
     </div>
     {% endif %}
 
+    {% if event %}
+    <div class="ui segment">
+        {% include "wbcore/event_details.html" %}
+    </div>
+    {% endif %}
+
     {% if host and host.instagram%}
     <div class="ui segment">
         {% include 'wbcore/instagram.html' with account_id=host.instagram %}

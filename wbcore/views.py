@@ -1014,12 +1014,18 @@ def event_view(request, host_slug=None, event_slug=None):
 
     event.image = event.get_title_image()
 
+    if event.projects.exists():
+        project_list = item_list_from_proj(event.projects.all(), host_slug=host_slug, text=False)[:3]
+    else:
+        projects = Project.objects.filter(hosts__slug=host_slug if host_slug else 'bundesverband')
+        project_list = item_list_from_proj(projects, host_slug=host_slug)[:3]
+
     template = loader.get_template('wbcore/event.html')
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
         'event': event,
-        'projects': item_list_from_proj(event.projects.all(), host_slug=host_slug, text=False),
+        'project_item_list': project_list,
         'form': form,
         'breadcrumb': breadcrumb,
         'host': host,
