@@ -4,7 +4,10 @@
     {% load static %}
     {% include "wbcore/head.html" %}
 <body>
-
+    {% load cookielaw_tags %}
+    <div class="ui container">
+        {% cookielaw_banner %}
+    </div>
     {% include 'wbcore/main_nav.html' %}
 
     <!-- Page Contents -->

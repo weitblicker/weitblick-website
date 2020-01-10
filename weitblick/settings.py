@@ -62,7 +62,8 @@ INSTALLED_APPS = [
     'admin_ordering',
     'el_pagination',
     'rules',
-    'django_instagram'
+    'django_instagram',
+    'cookielaw',
 ]
 
 AUTH_USER_MODEL = 'wbcore.User'
@@ -121,7 +122,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'microsoft_auth.context_processors.microsoft',
-                'django.template.context_processors.request',  # for el-pagination
+                'django.template.context_processors.request',
             ],
             'loaders': [
                 'django.template.loaders.filesystem.Loader',
