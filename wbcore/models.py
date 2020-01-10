@@ -778,7 +778,7 @@ class Document(RulesModel):
     host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     TYPE_CHOICES = (
-        ('financial_report', 'Finanical Report'),
+        ('financial_report', 'Financial Report'),
         ('annual_report', 'Annual Report'),
         ('charter', 'Charter'),
         ('membership_declaration', 'Membership Declaration'),
@@ -1011,6 +1011,7 @@ class ContactMessage(RulesModel):
     def __str__(self):
         return "%s (%s)" % (self.subject, self.name)
 
+
 class CycleDonationRelation(RulesModel):
     class Meta:
         rules_permissions = {
@@ -1045,6 +1046,8 @@ class CycleDonationRelation(RulesModel):
             donation_relation.save()
             return amount, (new_amount - donation_relation.goal_amount) / donation_relation.cycle_donation.rate_euro_km
 
+    def __str__(self):
+        return self.project.name
 
 
 class CycleDonation(RulesModel):
@@ -1070,6 +1073,9 @@ class CycleDonation(RulesModel):
         for relation in self.cycledonationrelation_set:
             current_amount += relation.current_amount
         return current_amount
+
+    def __str__(self):
+        return self.name
 
 
 class CycleTour(RulesModel):

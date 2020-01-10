@@ -521,9 +521,23 @@ class UserAdmin(BaseUserAdmin):
 class TeamAdmin(MyAdmin):
     inlines = (TeamUserRelationInlineModel,)
 
+    list_display = ('name', 'slug', 'host', 'get_member', 'rank')
+
+    def get_member(self, team):
+        return ", ".join([user.name() for user in team.member.all()])
+
+    get_member.short_description = 'Team Member'
+
 
 class FAQAdmin(MyAdmin):
     inlines = (QuestionAndAnswerInlineModel,)
+
+    list_display = ('title', 'get_num_faq')
+
+    def get_num_faq(self, faq):
+        return faq.questionandanswer_set.count()
+
+    get_num_faq.short_description = "Number of FAQs"
 
 
 class HostAdmin(MyAdmin, ReverseModelAdmin):
@@ -531,10 +545,14 @@ class HostAdmin(MyAdmin, ReverseModelAdmin):
     inline_type = 'stacked'
     inline_reverse = ['address', ]
 
+    list_display = ('name', 'slug', 'email', 'founding_date', 'address')
+
 
 class PartnerAdmin(MyAdmin, ReverseModelAdmin):
     inline_type = 'stacked'
     inline_reverse = ['address', ]
+
+    list_display = ('name', 'address', 'logo')
 
 
 class CycleDonationRelationInlineModel(PermissionInlineModel):
@@ -579,6 +597,7 @@ class ProjectAdmin(MyAdmin):
     get_country.admin_order_field = 'location'
     get_hosts.short_description = 'Hosts'
 
+
 class EventsAdmin(MyAdmin):
 
     list_display = ('title', 'start', 'end', 'host')
@@ -599,6 +618,51 @@ class EventsAdmin(MyAdmin):
         super().save_model(request, obj, form, change)
 
 
+class AddressAdmin(MyAdmin):
+
+    list_display = ('name', 'street', 'city', 'postal_code', 'get_country', )
+
+    def get_country(self, address):
+        return address.country.name
+    get_country.short_description = 'Country'
+    get_country.admin_order_field = 'country'
+
+
+class CycleDonationAdmin(MyAdmin):
+
+    list_display = ('name', 'get_projects', 'partner', 'slug', 'goal_amount')
+
+    def get_projects(self, cycle_donation):
+        return ", ".join([project.name for project in cycle_donation.projects.all()])
+
+    get_projects.short_description = 'Projects'
+
+
+class DocumentAdmin(MyAdmin):
+
+    list_display = ('title', 'host', 'document_type', 'published', 'public', 'valid_from')
+
+
+class DonationAdmin(MyAdmin):
+
+    list_display = ('host', 'project', 'amount', 'note')
+
+
+class ContentAdmin(MyAdmin):
+
+    list_display = ('type', 'host', )
+
+
+class LocationAdmin(MyAdmin):
+
+    list_display = ('name', 'street', 'postal_code', 'city', 'get_country', 'geolocation')
+
+    def get_country(self, address):
+        return address.country.name
+    get_country.short_description = 'Country'
+    get_country.admin_order_field = 'country'
+
+
 # since we're not using Django's built-in permissions,
 # register our own user model and unregister the Group model from admin.
 try:
@@ -609,21 +673,21 @@ except admin.sites.AlreadyRegistered:
 
 
 admin.site.unregister(Group)
-admin.site.register(Address, MyAdmin)
-admin.site.register(Content, MyAdmin)
-admin.site.register(Location, MyAdmin)
-admin.site.register(Host, HostAdmin)
-admin.site.register(Partner, PartnerAdmin)
-admin.site.register(Project, ProjectAdmin)
-admin.site.register(Event, EventsAdmin)
-admin.site.register(NewsPost, PostAdmin)
-admin.site.register(Document, MyAdmin)
-admin.site.register(Team, TeamAdmin)
-admin.site.register(Milestone, MyAdmin)
-admin.site.register(Donation, MyAdmin)
-admin.site.register(Milestep, MyAdmin)
+admin.site.register(Address, AddressAdmin)
 admin.site.register(BlogPost, PostAdmin)
 admin.site.register(BankAccount, MyAdmin)
 admin.site.register(ContactMessage, ContactMessageAdmin)
-admin.site.register(FAQ, FAQAdmin)
+admin.site.register(Content, ContentAdmin)
 admin.site.register(CycleDonation, CycleDonationAdmin)
+admin.site.register(Document, DocumentAdmin)
+admin.site.register(Donation, DonationAdmin)
+admin.site.register(Event, EventsAdmin)
+admin.site.register(FAQ, FAQAdmin)
+admin.site.register(Host, HostAdmin)
+admin.site.register(Location, LocationAdmin)
+admin.site.register(Milestep, MyAdmin)
+admin.site.register(Milestone, MyAdmin)
+admin.site.register(NewsPost, PostAdmin)
+admin.site.register(Partner, PartnerAdmin)
+admin.site.register(Project, ProjectAdmin)
+admin.site.register(Team, TeamAdmin)
