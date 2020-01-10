@@ -1,15 +1,17 @@
 {% load i18n %}
 
-<div class="ui orange inverted segment stackable grid" id="CookielawBanner">
-    <div class="ui sixteen wide column">
-        <h3><i class="cookie icon"></i> {% trans "COOKIE_INFO_HEADER" %}</h3>
-    </div>
-    <div class="ui twelve wide column">
-        {% trans "COOKIE_INFO_PARA" %}
-    </div>
-    <div class="ui four wide column">
-        <div class="ui rounded yellow fluid button" onclick="Cookielaw.createCookielawCookie();">
-            {% trans "COOKIE_INFO_OK" %}
+<div id="CookielawBanner">
+    <div class="ui orange inverted segment stackable grid">
+        <div class="ui sixteen wide column">
+            <h3><i class="cookie icon"></i> {% trans "COOKIE_INFO_HEADER" %}</h3>
+        </div>
+        <div class="ui twelve wide column">
+            {% trans "COOKIE_INFO_PARA" %}
+        </div>
+        <div class="ui four wide column">
+            <div class="ui rounded yellow fluid button" onclick="Cookielaw.createCookielawCookie();">
+                {% trans "COOKIE_INFO_OK" %}
+            </div>
         </div>
     </div>
 </div>
