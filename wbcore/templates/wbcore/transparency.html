@@ -3,9 +3,22 @@
 {% load staticfiles %}
 {% block main %}
     {% include 'wbcore/image-header.html' with title="Transparency" image=transparency.image default='/images/transparency_header.jpg' %}
+
+    <div class="ui segment">
+        {% if transparency_data %}
+            {{ transparency_data.host_name }} <br>
+            {{ transparency_data.founding_date }} <br>
+            {{ transparency_data.tax_exemption_notice_date }} <br>
+            {% for donation in transparency_data.major_donations %}
+                {{ donation.donator_name }} {{ donation.amount }} <br>
+            {% endfor %}
+        {% endif %}
+    </div>
+
     <div class="ui segment">
         {% if transparency %}
             {{ transparency.text | safe_markdown }}
         {% endif %}
     </div>
+
 {% endblock %}

@@ -915,8 +915,9 @@ class Donation(RulesModel):
     host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
     amount = models.DecimalField(max_digits=11, decimal_places=2)
+    date = models.DateField(null=True, blank=False)
     major_donation = models.BooleanField(default=False, null=False, blank=False)
-    name = models.CharField(max_length=100, null=True, blank=True)
+    donator_name = models.CharField(max_length=100, null=True, blank=True)
     note = models.TextField(null=True, blank=True)
 
     def belongs_to_host(self, host):
