@@ -42,6 +42,9 @@ class Photo(RulesModelMixin, PhotologuePhoto, metaclass=RulesModelBase):
     uploader = models.ForeignKey('User', on_delete=models.SET_NULL, null=True)
     host = models.ForeignKey('Host', on_delete=models.SET_NULL, null=True)
 
+    def get_hosts(self):
+        return self.host
+
 
 class Address(models.Model):
     name = models.CharField(max_length=200)
@@ -801,7 +804,7 @@ class Document(RulesModel):
         ('membership_declaration', 'Membership Declaration'),
         ('other', 'Other')
     )
-    document_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='financial_report', null=True)
+    document_type = models.CharField(max_length=40, choices=TYPE_CHOICES, default='financial_report', null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     valid_from = models.DateField(blank=False, default=datetime.date.today)
     public = models.BooleanField(default=True)
