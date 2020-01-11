@@ -341,10 +341,8 @@ def transparency_view(request, host_slug=None):
         "host_name": load_host.charter_name if load_host.charter_name else load_host.name,
         "founding_date": load_host.founding_date,
         "tax_exemption_notice_date": load_host.tax_exemption_notice_date,
-        "major_donations": Donation.objects.filter(host=load_host, major_donation=True, date__year='2019').order_by("-amount"),
+        "major_donations": Donation.objects.filter(host=load_host, major_donation=True).order_by("-amount"),  # for last calendar year date__year=datetime.now().year - 1
     }
-
-    print(datetime.now().year)
 
     financial_reports = Document.objects.filter(host=load_host, document_type='financial_report', public=True)
     financial_reports = financial_reports.order_by('valid_from') if financial_reports else financial_reports
