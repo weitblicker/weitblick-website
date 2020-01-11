@@ -1,4 +1,7 @@
+import os
+
 from django.db import models, transaction
+from django.dispatch import receiver
 from django_countries.fields import CountryField
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
@@ -19,7 +22,15 @@ from django.utils.translation import ugettext_lazy as _
 import rules
 
 
-class Photo(PhotologuePhoto):
+class Photo(RulesModelMixin, PhotologuePhoto, metaclass=RulesModelBase):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "view": rules.always_allow,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "delete": pred.is_super_admin | pred.is_admin,
+        }
+
     TYPE_CHOICES = (
         ('header', 'Header'),
         ('project', 'Project'),
@@ -318,6 +329,10 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'date_of_birth']
 
     def has_perm(self, perm, obj=None):
+
+        if "wbcore.photo" in perm:
+            print("has perm:", self, perm, obj)
+
         return super(User, self).has_perm(perm, obj)
         #print("out:", out)
         #print(self.role())
@@ -1185,3 +1200,15 @@ class QuestionAndAnswer(RulesModel):
 
     def __str__(self):
         return self.question
+    
+    
+@receiver(models.signals.post_delete, sender=Photo)
+def auto_delete_photo_file_on_delete(sender, instance, **kwargs):
+    """
+    Deletes image file from filesystem
+    when corresponding `Photo` object is deleted.
+    """
+    if instance.image:
+        if os.path.isfile(instance.image.path):
+            os.remove(instance.image.path)
+
