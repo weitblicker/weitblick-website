@@ -103,7 +103,9 @@ class Host(RulesModel):
     name = models.CharField(max_length=100, unique=True)
     city = models.CharField(max_length=50)
     email = models.EmailField(max_length=100, unique=True)
+    charter_name = models.CharField(max_length=100, blank=True, null=True)
     founding_date = models.DateField()
+    tax_exemption_notice_date = models.DateField(null=True, blank=False)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True)
     location = models.OneToOneField(Location, on_delete=models.SET_NULL, null=True)
@@ -912,6 +914,8 @@ class Donation(RulesModel):
     host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
     amount = models.DecimalField(max_digits=11, decimal_places=2)
+    major_donation = models.BooleanField(default=False, null=False, blank=False)
+    name = models.CharField(max_length=100, null=True, blank=True)
     note = models.TextField(null=True, blank=True)
 
     def belongs_to_host(self, host):
