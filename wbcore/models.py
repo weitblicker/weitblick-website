@@ -42,6 +42,9 @@ class Photo(RulesModelMixin, PhotologuePhoto, metaclass=RulesModelBase):
     uploader = models.ForeignKey('User', on_delete=models.SET_NULL, null=True)
     host = models.ForeignKey('Host', on_delete=models.SET_NULL, null=True)
 
+    def get_hosts(self):
+        return self.host
+
 
 class Address(models.Model):
     name = models.CharField(max_length=200)
