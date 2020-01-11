@@ -19,7 +19,7 @@ from rules.contrib.models import RulesModel, RulesModelBase, RulesModelMixin
 from sortedm2m.fields import SortedManyToManyField
 from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
-import rules
+import rules, datetime
 
 
 class Photo(RulesModelMixin, PhotologuePhoto, metaclass=RulesModelBase):
@@ -785,7 +785,7 @@ class Document(RulesModel):
             "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
             "delete": pred.is_super_admin | pred.is_admin | pred.is_editor,
         }
-        get_latest_by = 'published'
+        get_latest_by = 'valid_from'
 
     title = models.CharField(max_length=50)
     description = models.TextField(null=True, blank=True)
@@ -800,7 +800,8 @@ class Document(RulesModel):
         ('other', 'Other')
     )
     document_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='financial_report', null=True)
-    valid_from = models.DateField(auto_now_add=True, blank=False)
+    updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+    valid_from = models.DateField(blank=False, default=datetime.date.today)
     public = models.BooleanField(default=True)
 
     def belongs_to_host(self, host):
