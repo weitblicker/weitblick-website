@@ -802,7 +802,7 @@ class Document(RulesModel):
         ('membership_declaration', 'Membership Declaration'),
         ('other', 'Other')
     )
-    document_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='financial_report', null=True)
+    document_type = models.CharField(max_length=40, choices=TYPE_CHOICES, default='financial_report', null=True)
     valid_from = models.DateField(auto_now_add=True, blank=False)
     public = models.BooleanField(default=True)
 
