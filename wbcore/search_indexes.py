@@ -78,4 +78,4 @@ class EventsIndex(indexes.SearchIndex, indexes.Indexable):
         return self.get_model().objects.all()
 
     def prepare_hosts_slug(self, event):
-        return [host.slug for host in event.host.all()]
+        return [event.host.slug]
