@@ -1,15 +1,14 @@
 {% load static %}
-
 <div class="item">
     <div class="ui circular small image">
-        {% if not member.image %}
+        {% if not relation.user.image %}
             {% include 'wbcore/svgs/profile.svg' %}
         {% else %}
-            <img class="huhu" src="{{ member.image.url }}">
+            <img class="huhu" src="{{ relation.user.image.url }}">
         {% endif %}
     </div>
     <div class="middle aligned content">
-        <a class="header" href="#"><h2>{{ member.name }}</h2></a>
+        <a class="header" href="#"><h2>{{ relation.user.name }}</h2></a>
         <div class="meta">
             {{ relation.role }}
         </div>
