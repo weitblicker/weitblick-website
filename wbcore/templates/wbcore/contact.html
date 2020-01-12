@@ -1,7 +1,9 @@
 {% extends 'wbcore/basic.html' %}
 {% load martortags %}
+{% load i18n %}
 {% block main %}
-    {% include 'wbcore/image-header.html' with title="Contact" default='/images/contact_header.jpg' %}
+    {% trans "Contact" as title %}
+    {% include 'wbcore/image-header.html' with default='/images/contact_header.jpg' %}
     <div class="ui segment">
         {% if contact %}
             {{ contact.text | safe_markdown }}

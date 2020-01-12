@@ -1,12 +1,14 @@
+{% load i18n %}
 {% extends 'wbcore/basic.html' %}
 {% block main %}
 
-    {% include 'wbcore/image-header.html' with title='Blog' default='/images/blog_header.jpg' %}
+    {% trans "Blog" %}
+    {% include 'wbcore/image-header.html' with default='/images/blog_header.jpg' %}
     <div class="ui segment">
         {% if item_list %}
             {% include 'wbcore/item_list.html' %}
         {% else %}
-            <p>No posts available.</p>
+            <p>{% trans "No posts available." %}</p>
         {% endif %}
     </div>
 

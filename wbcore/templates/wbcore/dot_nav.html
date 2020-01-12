@@ -1,34 +1,34 @@
 {% load static %}
-
+{% load i18n %}
 <div class="ui five column stackable grid tablet only computer only">
     {% if dot_nav.blog %}
         <div class="ui two wide column unstackable items">
             {% if host %}
-                <a class="ui item header" href="{% url 'about' host.slug %}">About</a>
-                <div class="ui item"><a href="{% url 'idea' host.slug %}"><i class="lightbulb outline icon"></i> Idea</a></div>
-                <div class="ui item"><a href="{% url 'history' host.slug %}"><i class="history icon"></i> History</a></div>
-                <div class="ui item"><a href="{% url 'teams' host.slug %}"><i class="users icon"></i> Team</a></div>
-                <div class="ui item"><a href="{% url 'contact' host.slug %}"><i class="address book outline icon"></i> Contact</a></div>
+                <a class="ui item header" href="{% url 'about' host.slug %}">{% trans "About" %}</a>
+                <div class="ui item"><a href="{% url 'idea' host.slug %}"><i class="lightbulb outline icon"></i> {% trans "Idea" %}</a></div>
+                <div class="ui item"><a href="{% url 'history' host.slug %}"><i class="history icon"></i> {% trans "History" %}</a></div>
+                <div class="ui item"><a href="{% url 'teams' host.slug %}"><i class="users icon"></i> {% trans "Team" %}</a></div>
+                <div class="ui item"><a href="{% url 'contact' host.slug %}"><i class="address book outline icon"></i> {% trans "Contact" %}</a></div>
             {% else %}
-                <a class="ui item header" href="{% url 'about' %}">About</a>
-                <div class="ui item"><a href="{% url 'idea' %}"><i class="lightbulb outline icon"></i> Idea</a></div>
-                <div class="ui item"><a href="{% url 'history' %}"><i class="history icon"></i> History</a></div>
-                <div class="ui item"><a href="{% url 'teams' %}"><i class="users icon"></i> Team</a></div>
-                <div class="ui item"><a href="{% url 'contact' %}"><i class="address book outline icon"></i> Contact</a></div>
+                <a class="ui item header" href="{% url 'about' %}">{% trans "About" %}</a>
+                <div class="ui item"><a href="{% url 'idea' %}"><i class="lightbulb outline icon"></i> {% trans "Idea" %}</a></div>
+                <div class="ui item"><a href="{% url 'history' %}"><i class="history icon"></i> {% trans "History" %}</a></div>
+                <div class="ui item"><a href="{% url 'teams' %}"><i class="users icon"></i> {% trans "Team" %}</a></div>
+                <div class="ui item"><a href="{% url 'contact' %}"><i class="address book outline icon"></i> {% trans "Contact" %}</a></div>
             {% endif %}
 
         </div>
         <div class="ui four wide column unstackable items">
-            {% if host %} <a class="ui item header" href="{% url 'news' host.slug %}">News</a>
-            {% else %} <a class="ui item header" href="{% url 'news' %}">News</a>
+            {% if host %} <a class="ui item header" href="{% url 'news' host.slug %}">{% trans "News" %}</a>
+            {% else %} <a class="ui item header" href="{% url 'news' %}">{% trans "News" %}</a>
             {% endif %}
             {% for entry in dot_nav.news %}
                 {% include 'wbcore/dot_nav_item.html' with image=entry.get_title_image type='news-post' id=entry.pk title=entry.title %}
             {% endfor %}
         </div>
         <div class="ui four wide column unstackable items">
-            {% if host %} <a class="ui item header"href="{% url 'blog' host.slug %}" >Blog</a>
-            {% else %} <a class="ui item header"href="{% url 'blog' %}" >Blog</a>
+            {% if host %} <a class="ui item header"href="{% url 'blog' host.slug %}" >{% trans "Blog" %}</a>
+            {% else %} <a class="ui item header"href="{% url 'blog' %}" >{% trans "Blog" %}</a>
             {% endif %}
             {% for entry in dot_nav.blog %}
                 {% include 'wbcore/dot_nav_item.html' with image=entry.get_title_image type='blog-post' id=entry.pk title=entry.title desc=entry.text|truncatewords:7 %}
@@ -36,22 +36,22 @@
         </div>
         <div class="ui three wide column unstackable items">
             {% if host %}
-                <a class="ui item header" href="{% url 'facts' host.slug %}">Facts</a>
-                <div class="ui item"><a href="{% url 'transparency' host.slug %}"><i class="eye outline icon"></i> Transparency</a></div>
-                <div class="ui item"><a href="{% url 'charter' host.slug %}"><i class="file alternate outline icon"></i> Charter</a></div>
-                <div class="ui item"><a href="{% url 'reports' host.slug %}"><i class="chart line icon"></i> Reports</a></div>
-                <div class="ui item"><a href="{% url 'faq' %}"><i class="question icon"></i> Fragen & Antworten</a></div>
+                <a class="ui item header" href="{% url 'facts' host.slug %}">{% trans "Facts" %}</a>
+                <div class="ui item"><a href="{% url 'transparency' host.slug %}"><i class="eye outline icon"></i> {% trans "Transparency" %}</a></div>
+                <div class="ui item"><a href="{% url 'charter' host.slug %}"><i class="file alternate outline icon"></i> {% trans "Charter" %}</a></div>
+                <div class="ui item"><a href="{% url 'reports' host.slug %}"><i class="chart line icon"></i> {% trans "Reports" %}</a></div>
+                <div class="ui item"><a href="{% url 'faq' %}"><i class="question icon"></i> {% trans "FAQ" %}</a></div>
             {% else %}
-                <a class="ui item header" href="{% url 'facts' %}">Facts</a>
-                <div class="ui item"><a href="{% url 'transparency' %}"><i class="eye outline icon"></i> Transparency</a></div>
-                <div class="ui item"><a href="{% url 'charter' %}"><i class="file alternate outline icon"></i> Charter</a></div>
-                <div class="ui item"><a href="{% url 'reports' %}"><i class="chart line icon"></i> Reports</a></div>
-                <div class="ui item"><a href="{% url 'faq' %}"><i class="question icon"></i> Fragen & Antworten</a></div>
+                <a class="ui item header" href="{% url 'facts' %}">{% trans "Facts" %}</a>
+                <div class="ui item"><a href="{% url 'transparency' %}"><i class="eye outline icon"></i> {%  trans "Transparency" %}</a></div>
+                <div class="ui item"><a href="{% url 'charter' %}"><i class="file alternate outline icon"></i> {% trans "Charter" %}</a></div>
+                <div class="ui item"><a href="{% url 'reports' %}"><i class="chart line icon"></i> {% trans "Reports" %}</a></div>
+                <div class="ui item"><a href="{% url 'faq' %}"><i class="question icon"></i> {% trans "FAQ" %}</a></div>
             {% endif %}
         </div>
         <div class="ui three wide column unstackable items">
-            {% if host %} <a class="ui item header href="{% url 'events' host.slug %}">Events</a>
-            {% else %} <a class="ui item header" href="{% url 'events' %}">Events</a>
+            {% if host %} <a class="ui item header href="{% url 'events' host.slug %}">{% trans "Events" %}</a>
+            {% else %} <a class="ui item header" href="{% url 'events' %}">{% trans "Events" %}</a>
             {% endif %}
             {% for event in dot_nav.events %}
                 {% include 'wbcore/dot_nav_item.html' with type='event' slug=event.slug title=event.title desc=event.description|truncatewords:7 show_date=event.show_date %}
@@ -60,17 +60,17 @@
     {% else %}
         <div class="ui three wide column unstackable items">
             {% if host %}
-                <a class="ui item header" href="{% url 'about' host.slug %}">About</a>
-                <div class="ui item"><a href="{% url 'idea' host.slug %}"><i class="lightbulb outline icon"></i> Idea</a></div>
-                <div class="ui item"><a href="{% url 'history' host.slug %}"><i class="history icon"></i> History</a></div>
-                <div class="ui item"><a href="{% url 'teams' host.slug %}"><i class="users icon"></i> Team</a></div>
-                <div class="ui item"><a href="{% url 'contact' host.slug %}"><i class="address book outline icon"></i> Contact</a></div>
+                <a class="ui item header" href="{% url 'about' host.slug %}">{% trans "About" %}</a>
+                <div class="ui item"><a href="{% url 'idea' host.slug %}"><i class="lightbulb outline icon"></i> {% trans "Idea" %}</a></div>
+                <div class="ui item"><a href="{% url 'history' host.slug %}"><i class="history icon"></i> {% trans "History" %}</a></div>
+                <div class="ui item"><a href="{% url 'teams' host.slug %}"><i class="users icon"></i> {% trans "Team" %}</a></div>
+                <div class="ui item"><a href="{% url 'contact' host.slug %}"><i class="address book outline icon"></i> {% trans "Contact" %}</a></div>
             {% else %}
-                <a class="ui item header" href="{% url 'about' %}">About</a>
-                <div class="ui item"><a href="{% url 'idea' %}"><i class="lightbulb outline icon"></i> Idea</a></div>
-                <div class="ui item"><a href="{% url 'history' %}"><i class="history icon"></i> History</a></div>
-                <div class="ui item"><a href="{% url 'teams' %}"><i class="users icon"></i> Team</a></div>
-                <div class="ui item"><a href="{% url 'contact' %}"><i class="address book outline icon"></i> Contact</a></div>
+                <a class="ui item header" href="{% url 'about' %}">{% trans "About" %}</a>
+                <div class="ui item"><a href="{% url 'idea' %}"><i class="lightbulb outline icon"></i> {% trans "Idea" %}</a></div>
+                <div class="ui item"><a href="{% url 'history' %}"><i class="history icon"></i> {% trans "History" %}</a></div>
+                <div class="ui item"><a href="{% url 'teams' %}"><i class="users icon"></i> {% trans "Team" %}</a></div>
+                <div class="ui item"><a href="{% url 'contact' %}"><i class="address book outline icon"></i> {% trans "Contact" %}</a></div>
             {% endif %}
 
         </div>
@@ -85,20 +85,20 @@
         <div class="ui three wide column unstackable items">
             {% if host %}
                 <a class="ui item header" href="{% url 'facts' host.slug %}">Facts</a>
-                <div class="ui item"><a href="{% url 'transparency' host.slug %}"><i class="eye outline icon"></i> Transparency</a></div>
-                <div class="ui item"><a href="{% url 'charter' host.slug %}"><i class="file alternate outline icon"></i> Charter</a></div>
-                <div class="ui item"><a href="{% url 'reports' host.slug %}"><i class="chart line icon"></i> Reports</a></div>
-                <div class="ui item"><a href="{% url 'faq' %}"><i class="question icon"></i> Fragen & Antworten</a></div>
+                <div class="ui item"><a href="{% url 'transparency' host.slug %}"><i class="eye outline icon"></i> {% trans "Transparency" %}</a></div>
+                <div class="ui item"><a href="{% url 'charter' host.slug %}"><i class="file alternate outline icon"></i> {% trans "Charter" %}</a></div>
+                <div class="ui item"><a href="{% url 'reports' host.slug %}"><i class="chart line icon"></i> {% trans "Reports" %}</a></div>
+                <div class="ui item"><a href="{% url 'faq' %}"><i class="question icon"></i> {% trans "Fragen & Antworten" %}</a></div>
             {% else %}
-                <a class="ui item header" href="{% url 'facts' %}">Facts</a>
-                <div class="ui item"><a href="{% url 'transparency' %}"><i class="eye outline icon"></i> Transparency</a></div>
-                <div class="ui item"><a href="{% url 'charter' %}"><i class="file alternate outline icon"></i> Charter</a></div>
-                <div class="ui item"><a href="{% url 'faq' %}"><i class="question icon"></i> Fragen & Antworten</a></div>
+                <a class="ui item header" href="{% url 'facts' %}">{% trans "Facts" %}</a>
+                <div class="ui item"><a href="{% url 'transparency' %}"><i class="eye outline icon"></i> {% trans "Transparency" %}</a></div>
+                <div class="ui item"><a href="{% url 'charter' %}"><i class="file alternate outline icon"></i> {% trans "Charter" %}</a></div>
+                <div class="ui item"><a href="{% url 'faq' %}"><i class="question icon"></i> {% trans "Fragen & Antworten" %}</a></div>
             {% endif %}
         </div>
         <div class="ui five wide column unstackable items">
-            {% if host %} <a class="ui item header" href="{% url 'events' host.slug %}">Events</a>
-            {% else %} <a class="ui item header" href="{% url 'events' %}">Events</a>
+            {% if host %} <a class="ui item header" href="{% url 'events' host.slug %}">{% trans "Events" %}</a>
+            {% else %} <a class="ui item header" href="{% url 'events' %}">{% trans "Events" %}</a>
             {% endif %}
             {% for event in dot_nav.events %}
                 {% include 'wbcore/dot_nav_item.html' with type='event' slug=event.slug title=event.title desc=event.description|truncatewords:7 show_date=event.show_date %}
@@ -111,29 +111,29 @@
     <div class="five wide column">
         <div class="ui fluid vertical menu">
           {% if host %}
-            <a class="item" href="{% url 'news' host.slug %}">News</a>
-            <a class="item" href="{% url 'blog' host.slug %}" >Blog</a>
+            <a class="item" href="{% url 'news' host.slug %}">{% trans "News" %}</a>
+            <a class="item" href="{% url 'blog' host.slug %}">{% trans "Blog" %}</a>
           {% else %}
-            <a class="item" href="{% url 'news' %}">News</a>
-            <a class="item" href="{% url 'blog' %}" >Blog</a>
+            <a class="item" href="{% url 'news' %}">{% trans "News" %}</a>
+            <a class="item" href="{% url 'blog' %}">{% trans "Blog" %}</a>
           {% endif %}
         </div>
     </div>
     <div class="five wide column">
         <div class="ui fluid vertical menu">
             {% if host %}
-                <a class="item" href="{% url 'about' host.slug %}">About</a>
+                <a class="item" href="{% url 'about' host.slug %}">{% trans "About" %}</a>
                 <div class="ui vertical fluid menu">
-                    <a class="item" href="{% url 'history' host.slug %}">History</a>
-                    <a class="item" href="{% url 'teams' host.slug %}">Team</a>
-                    <a class="item" href="{% url 'contact' host.slug %}">Contact</a>
+                    <a class="item" href="{% url 'history' host.slug %}">{% trans "History" %}</a>
+                    <a class="item" href="{% url 'teams' host.slug %}">{% trans "Team" %}</a>
+                    <a class="item" href="{% url 'contact' host.slug %}">{% trans "Contact" %}</a>
                 </div>
             {% else %}
-                <a class="item" href="{% url 'about' %}">About</a>
+                <a class="item" href="{% url 'about' %}">{% trans "About" %}</a>
                 <div class="ui vertical fluid menu">
-                    <a class="item" href="{% url 'history' %}">History</a>
-                    <a class="item" href="{% url 'teams' %}">Team</a>
-                    <a class="item" href="{% url 'contact' %}">Contact</a>
+                    <a class="item" href="{% url 'history' %}">{% trans "History" %}</a>
+                    <a class="item" href="{% url 'teams' %}">{% trans "Team" %}</a>
+                    <a class="item" href="{% url 'contact' %}">{% trans "Contact" %}</a>
                 </div>
             {% endif %}
         </div>
@@ -141,20 +141,20 @@
     <div class="five wide column">
         <div class="ui fluid vertical menu">
             {% if host %}
-                <a class="item" href="{% url 'facts' host.slug %}">Facts</a>
+                <a class="item" href="{% url 'facts' host.slug %}">{% trans "Facts" %}</a>
                 <div class="ui vertical fluid menu">
-                    <a class="item" href="{% url 'transparency' host.slug %}">Transparency</a>
-                    <a class="item" href="{% url 'charter' host.slug %}">Charter</a>
-                    <a class="item" href="{% url 'reports' host.slug %}">Reports</a>
-                    <a class="item" href="{% url 'faq' %}">FAQ</a>
+                    <a class="item" href="{% url 'transparency' host.slug %}">{% trans "Transparency" %}</a>
+                    <a class="item" href="{% url 'charter' host.slug %}">{% trans "Charter" %}</a>
+                    <a class="item" href="{% url 'reports' host.slug %}">{% trans "Reports" %}</a>
+                    <a class="item" href="{% url 'faq' %}">{% trans "FAQ" %}</a>
                 </div>
             {% else %}
-                <a class="item" href="{% url 'facts' %}">Facts</a>
+                <a class="item" href="{% url 'facts' %}">{% trans "Facts" %}</a>
                 <div class="ui vertical fluid menu">
-                    <a class="item" href="{% url 'transparency' %}">Transparency</a>
-                    <a class="item" href="{% url 'charter' %}">Charter</a>
-                    <a class="item" href="{% url 'reports' %}">Reports</a>
-                    <a class="item" href="{% url 'faq' %}">FAQ</a>
+                    <a class="item" href="{% url 'transparency' %}">{% trans "Transparency" %}</a>
+                    <a class="item" href="{% url 'charter' %}">{% trans "Charter" %}</a>
+                    <a class="item" href="{% url 'reports' %}">{% trans "Reports" %}</a>
+                    <a class="item" href="{% url 'faq' %}">{% trans "FAQ" %}</a>
                 </div>
             {% endif %}
 

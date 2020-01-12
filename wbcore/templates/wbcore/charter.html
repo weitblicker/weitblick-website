@@ -1,15 +1,15 @@
 {% extends 'wbcore/basic.html' %}
 {% load martortags %}
 {% load staticfiles %}
+{% load i18n %}
 {% block main %}
-    {% include 'wbcore/image-header.html' with title="Charter" default='/images/charter_header.jpg' %}
+    {% trans "Charter" as title %}
+    {% include 'wbcore/image-header.html' with default='/images/charter_header.jpg' %}
     <div class="ui segment">
         {% if charter %}
             {{ charter.text | safe_markdown }}
         {% endif %}
     </div>
-    <!--div class="ui segment">
-        {% include 'wbcore/segment_header.html' with icon='file alternate outline' title='Charter' %}
-        {% include 'wbcore/document_list.html' with documents=charter_files hide_year=True %}
-    </div-->
+    {% include 'wbcore/segment_header.html' with icon='file alternate outline'%}
+    {% include 'wbcore/document_list.html' with documents=charter_files hide_year=True %}
 {% endblock %}
