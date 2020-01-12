@@ -23,8 +23,7 @@ from wbcore.forms import (
 
 from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
-    UserRelation, JoinPage, SocialMediaLink, Content, Document,
-    FAQ)
+    UserRelation, JoinPage, SocialMediaLink, Content, Document, Donation, FAQ)
 
 main_host_slug = 'bundesverband' ## TODO configure this?
 
@@ -338,12 +337,18 @@ def transparency_view(request, host_slug=None):
     except Content.DoesNotExist:
         transparency = None
 
+    transparency_data = {
+        "host_name": load_host.charter_name if load_host.charter_name else load_host.name,
+        "founding_date": load_host.founding_date,
+        "tax_exemption_notice_date": load_host.tax_exemption_notice_date,
+        "major_donations": Donation.objects.filter(host=load_host, major_donation=True).order_by("-amount"),  # for last calendar year date__year=datetime.now().year - 1
+    }
+
     financial_reports = Document.objects.filter(host=load_host, document_type='financial_report', public=True)
     financial_reports = financial_reports.order_by('valid_from') if financial_reports else financial_reports
     annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
     annual_reports = annual_reports.order_by('valid_from') if annual_reports else annual_reports
 
-    print("***", annual_reports)
 
     template = loader.get_template('wbcore/transparency.html')
     context = {
@@ -353,6 +358,7 @@ def transparency_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'transparency': transparency,
+        'transparency_data': transparency_data,
         'hosts': Host.objects.all(),
         'financial_reports': financial_reports,
         'annual_reports': annual_reports,

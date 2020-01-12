@@ -106,7 +106,9 @@ class Host(RulesModel):
     name = models.CharField(max_length=100, unique=True)
     city = models.CharField(max_length=50)
     email = models.EmailField(max_length=100, unique=True)
-    founding_date = models.DateField()
+    charter_name = models.CharField(max_length=100, blank=False, null=True, help_text="Name des Vereins laut Satzung")
+    founding_date = models.DateField(help_text="Gründungsdatum des Vereins")
+    tax_exemption_notice_date = models.DateField(null=True, blank=False, help_text="Datum des letzten gültigen Freistellungsbescheid")
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True)
     location = models.OneToOneField(Location, on_delete=models.SET_NULL, null=True)
@@ -421,7 +423,6 @@ class Content(RulesModel):
         ('history', 'History'),
         ('teams', 'Teams'),
         ('contact', 'Contact'),
-        ('transparency', 'Transparency'),
         ('charter', 'Charter'),
         ('reports', 'Reports'),
         ('donate', 'Donate'),
@@ -916,6 +917,9 @@ class Donation(RulesModel):
     host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
     amount = models.DecimalField(max_digits=11, decimal_places=2)
+    date = models.DateField(null=True, blank=False)
+    major_donation = models.BooleanField(default=False, null=False, blank=False)
+    donator_name = models.CharField(max_length=100, null=True, blank=True)
     note = models.TextField(null=True, blank=True)
 
     def belongs_to_host(self, host):
