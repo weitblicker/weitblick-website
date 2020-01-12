@@ -480,7 +480,7 @@ def teams_view(request, host_slug=None):
         breadcrumb = [('Home', reverse('home')), ('Team', None)]
         teams = Team.objects.filter(host=Host.objects.get(slug='bundesverband'))
 
-    projects = Project.objects.filter(hosts=host) if host else Project.objects.all()
+    projects = Project.objects.filter(hosts=host).order_by('-published') if host else Project.objects.all().order_by('-published')
     projects = projects[:3]
 
     template = loader.get_template('wbcore/teams.html')
