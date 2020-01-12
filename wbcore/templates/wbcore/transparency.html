@@ -1,11 +1,11 @@
 {% extends 'wbcore/basic.html' %}
 {% load martortags %}
 {% load staticfiles %}
+
 {% block main %}
     {% include 'wbcore/image-header.html' with title="Transparency" image=transparency.image default='/images/transparency_header.jpg' %}
+
     <div class="ui segment">
-        {% if transparency %}
-            {{ transparency.text | safe_markdown }}
-        {% endif %}
+        {% include "wbcore/transparency_fillin.html" %}
     </div>
 {% endblock %}
