@@ -423,7 +423,6 @@ class Content(RulesModel):
         ('history', 'History'),
         ('teams', 'Teams'),
         ('contact', 'Contact'),
-        ('transparency', 'Transparency'),
         ('charter', 'Charter'),
         ('reports', 'Reports'),
         ('donate', 'Donate'),
