@@ -9,7 +9,7 @@ Gegründet am {{ transparency_data.founding_date }}
 Anschrift findet sich [hier](/contact/)
 
 ## 2.	Vollständige Satzung sowie Angaben zu den Organisationszielen
-Unsere gültige Satzung findet [hier](/bundesverband/charter/)
+Unsere gültige Satzung findet [hier](/{{ host_slug }}/charter/)
 Was wir mit unserer Arbeit erreichen wollen steht auf unserer [Idee](/idea)
 
 ## 3.	Angaben zur Steuerbegünstigung
@@ -19,28 +19,32 @@ Wir sind nach § 5 Abs. 1 Nr. 9 KStG von der Körperschaftssteuer und nach § 3 
 Informationen über den aktuellen Vorstand findest du auf der Teamseite des Vorstandes [hier](/team/bundesvorstand-team/)
 
 ## 5.	Tätigkeitsbericht
-Über unsere Homepage kannst du dir jederzeit ein aktuelles Bild von unserer Arbeit machen. Darüber hinaus geben die Berichte [hier](/bundesverband/reports/) Aufschluss über unsere Tätigkeiten.
+Über unsere Homepage kannst du dir jederzeit ein aktuelles Bild von unserer Arbeit machen. Darüber hinaus geben die Berichte [hier](/{{ host_slug }}/reports/) Aufschluss über unsere Tätigkeiten.
 
 ## 6.	Organisationsstruktur
 Als Dachverband hat der Bundesverband Weitblick e.V. 17 Stadtvereine und 1 Alumniverein als Mitglieder. Diese sind [hier](/union/) einzusehen.
 
 ## 7.	Angaben zur Mittelherkunft
-Zu den Finanzberichten geht es [hier](/bundesverband/reports) entlang.
+Zu den Finanzberichten geht es [hier](/{{ host_slug }}/reports) entlang.
 
 ## 8.	Angaben zur Mittelverwendung
-Zu den Finanzberichten [hier](bundesverband/reports) entlang.
+Zu den Finanzberichten [hier](/{{ host_slug }}/reports) entlang.
 
 ## 9.	Gesellschaftsrechtliche Verbundenheit mit Dritten
 Der Bundesverband Weitblick e.V ist der Dachverband der Weitblick Stadtvereine und  des Alumnivereins.
-Zur Erfüllung der Ziele ist der Bundesverband Weitblick e.V. Mitglied im Verband deutscher Studierendeninitiativen e.V. (VDSI). Ziel des VDSI ist die Stärkung des studentischen Ehrenamtes. Informationen über den VDSI gibt es [hier](http://www.vdsi.org)
+Zur Erfüllung der Ziele ist der Bundesverband Weitblick e.V. Mitglied im Verband deutscher Studierendeninitiativen e.V. (VDSI). Ziel des VDSI ist die Stärkung des studentischen Ehrenamtes. Informationen über den VDSI gibt es [hier](https://www.vdsi.org)
 Durch diese Mitgliedschaft wird Weitblick in keiner Weise in seiner Unabhängigkeit beschränkt.
 
 ## 10.	Namen von juristischen Personen, deren jährliche Zahlungen mehr als 10 % des Gesamtjahresbudgets ausmachen.
 Im Finanzbericht sind Angaben zu allen Spenden über 1.000 € namentlich vermerkt. Einzelspenden, die über 10 % der gesamten Jahreseinnahmen ausmachen:
 
+{% if transparency_data.major_donations %}
 {% for donation in transparency_data.major_donations  %}
 1. {{ donation.donator_name }}: {{ donation.amount }}
 {% endfor %}
+{% else %}
+--
+{% endif %}
 
 ## Hast du noch Fragen?
 Es ist nicht immer ganz einfach alle Fakten so aufzubereiten, dass sie von Ausenstehenden umgehend verstanden werden können. Wenn wir aus deiner Sicht Fehler gemacht haben oder zukünftig etwas besser machen können, dann melde dich gerne bei uns! Nutze dafür einfach das [Kontaktformular](/contact/).

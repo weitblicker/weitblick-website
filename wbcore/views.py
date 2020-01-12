@@ -355,6 +355,7 @@ def transparency_view(request, host_slug=None):
         'main_nav': get_main_nav(),
         'dot_nav': get_dot_nav(host=host),
         'host': host,
+        'host_slug': load_host.slug,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'transparency': transparency,
