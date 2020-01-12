@@ -3,7 +3,8 @@
 {% load staticfiles %}
 
 {% block main %}
-    {% include 'wbcore/image-header.html' with title="Transparency" image=transparency.image default='/images/transparency_header.jpg' %}
+    {% trans "Transparency" as title %}
+    {% include 'wbcore/image-header.html' with title=title image=transparency.image default='/images/transparency_header.jpg' %}
 
     <div class="ui segment">
         {% include "wbcore/transparency_fillin.html" %}
