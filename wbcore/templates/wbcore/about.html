@@ -1,14 +1,13 @@
 {% extends 'wbcore/basic.html' %}
 {% load martortags %}
 {% load staticfiles %}
+{% load i18n %}
 {% block main %}
-
-    {% include 'wbcore/image-header.html' with title='About' default='/images/about_header.jpg'%}
-
+    {% trans "About" as title %}
+    {% include 'wbcore/image-header.html' with default='/images/about_header.jpg'%}
     <div class="ui segment">
         {{ about.text | safe_markdown }}
     </div>
-
 {% endblock %}
 
 

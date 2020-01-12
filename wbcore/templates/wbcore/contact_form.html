@@ -1,11 +1,13 @@
+{% load i18n %}
 <form class="ui form segment" action="{% url 'contact' %}" method="post">
-    {% include "wbcore/segment_header.html" with icon='envelope outline' title='Schreib uns' %}
+    {% trans "Write us!" %}
+    {% include "wbcore/segment_header.html" with icon='envelope outline' %}
 
     <div class="ui items">
         {% csrf_token %}
         {% if success %}
             <div class="ui positive message">
-                <div class="header">Your message has been delivered. Thank you.</div>
+                <div class="header">{% trans "Your message has been delivered. Thank you." %}</div>
             </div>
         {% endif %}
 
@@ -45,7 +47,7 @@
         </div>
         <div class="fields">
             <div class="sixteen wide field">
-                <input class="ui submit button orange" type="submit" value="Abschicken">
+                <input class="ui submit button orange" type="submit" value="{% trans "Submit" %}">
             </div>
         </div>
     </div>

@@ -1,5 +1,6 @@
 import csv
 
+from django.utils.translation import gettext as _
 from django.db.models import Count
 from django.http import HttpResponse, Http404
 from django.template import loader
@@ -64,42 +65,42 @@ def get_main_nav(host=None, active=None):
     nav = OrderedDict([
             ('home',
                 {
-                    'name': 'Home',
+                    'name': _('Home'),
                     'link': reverse('home'),
                     'icon': 'wbcore/svgs/home.svg',
                     'mobile': False,
                 }),
             ('idea',
                 {
-                    'name': 'Idee',
+                    'name': _('Idea'),
                     'link': reverse('idea', args=args),
                     'icon': 'wbcore/svgs/idea.svg',
                     'mobile': True,
                 }),
             ('projects',
                 {
-                    'name': 'Projekte',
+                    'name': _('Projects'),
                     'link': reverse('projects', args=args),
                     'icon': 'wbcore/svgs/leaf.svg',
                     'mobile': True,
                 }),
             ('events',
                 {
-                    'name': 'Events',
+                    'name': _('Events'),
                     'link': reverse('events', args=args),
                     'icon': 'wbcore/svgs/hand.svg',
                     'mobile': True,
                 }),
             ('join',
                 {
-                    'name': 'Mitmachen',
+                    'name': _('Participate'),
                     'link': reverse('join', args=args),
                     'icon': 'wbcore/svgs/people.svg',
                     'mobile': True,
                 }),
             ('hosts',
                 {
-                    'name': 'Vereine',
+                    'name': _('Associations'),
                     'link': reverse('hosts'),
                     'icon': 'wbcore/svgs/unions.svg',
                     'mobile': True,
