@@ -9,8 +9,8 @@
     </div>
     <div class="ui segment">
         <div class="ui divided items">
-            {% for member_relation in members_relations %}
-                {% include 'wbcore/team_member.html' with member=member_relation.0 relation=member_relation.1%}
+            {% for relation in members_relations %}
+                {% include 'wbcore/team_member.html'%}
             {% endfor %}
         </div>
     </div>
