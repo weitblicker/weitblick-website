@@ -176,12 +176,12 @@ msgstr "Komm vorbei!"
 
 #: templates/wbcore/main_nav.html:11
 msgid "Search"
-msgstr ""
+msgstr "Suche"
 
 #: views.py:68
 msgid "Home"
-msgstr ""
+msgstr "Home"
 
 #: views.py:103
 msgid "Associations"
-msgstr ""
+msgstr "Vereine"
