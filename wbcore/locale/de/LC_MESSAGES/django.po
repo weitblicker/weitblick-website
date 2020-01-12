@@ -168,7 +168,7 @@ msgstr "Was machen wir?"
 
 #: templates/wbcore/home.html:21 views.py:96
 msgid "Participate"
-msgstr "Mitmachen!"
+msgstr "Mitmachen"
 
 #: templates/wbcore/home.html:22
 msgid "Come over!"
