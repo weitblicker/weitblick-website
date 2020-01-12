@@ -1,5 +1,7 @@
 {% load martortags %}
 
+{{ host_url_prefix }}
+
 {% filter safe_markdown %}
 In Deutschland gibt es keine einheitlichen Veröffentlichungspflichten für gemeinnützige Organisationen. Um unseren [Grundsatz](/idea/) nach Transparenz nachzukommen, orientiert sich Weitblick an der Initiative Transparente Zivilgesellschaft. Wir stellen hier zentrale Informationen über unseren Verein übersichtlich bereit.
 
@@ -9,38 +11,42 @@ Gegründet am {{ transparency_data.founding_date }}
 Anschrift findet sich [hier](/contact/)
 
 ## 2.	Vollständige Satzung sowie Angaben zu den Organisationszielen
-Unsere gültige Satzung findet [hier](/bundesverband/charter/)
+Unsere gültige Satzung findet [hier]({{ host_url_prefix }}charter/)
 Was wir mit unserer Arbeit erreichen wollen steht auf unserer [Idee](/idea)
 
 ## 3.	Angaben zur Steuerbegünstigung
 Wir sind nach § 5 Abs. 1 Nr. 9 KStG von der Körperschaftssteuer und nach § 3 Nr. 6 GewStG von der Gewerbesteuer befreit, weil sie ausschließlich und unmittelbar steuerbegünstigten gemeinnützigen Zwecken im Sinne der §§ 51 ff. AO dient“ (Auszug aus dem letzten Freistellungsbescheid vom {{ transparency_data.tax_exemption_notice_date }})
 
 ## 4.	Name und Funktion wesentlicher Entscheidungsträger
-Informationen über den aktuellen Vorstand findest du auf der Teamseite des Vorstandes [hier](/team/bundesvorstand-team/)
+Informationen über den aktuellen Vorstand findest du auf der Teamseite des Vorstandes [hier]({{ host_url_prefix }}team/)
 
 ## 5.	Tätigkeitsbericht
-Über unsere Homepage kannst du dir jederzeit ein aktuelles Bild von unserer Arbeit machen. Darüber hinaus geben die Berichte [hier](/bundesverband/reports/) Aufschluss über unsere Tätigkeiten.
+Über unsere Homepage kannst du dir jederzeit ein aktuelles Bild von unserer Arbeit machen. Darüber hinaus geben die Berichte [hier]({{ host_url_prefix }}reports/) Aufschluss über unsere Tätigkeiten.
 
 ## 6.	Organisationsstruktur
 Als Dachverband hat der Bundesverband Weitblick e.V. 17 Stadtvereine und 1 Alumniverein als Mitglieder. Diese sind [hier](/union/) einzusehen.
 
 ## 7.	Angaben zur Mittelherkunft
-Zu den Finanzberichten geht es [hier](/bundesverband/reports) entlang.
+Zu den Finanzberichten geht es [hier]({{ host_url_prefix }}reports) entlang.
 
 ## 8.	Angaben zur Mittelverwendung
-Zu den Finanzberichten [hier](bundesverband/reports) entlang.
+Zu den Finanzberichten [hier]({{ host_url_prefix }}reports) entlang.
 
 ## 9.	Gesellschaftsrechtliche Verbundenheit mit Dritten
 Der Bundesverband Weitblick e.V ist der Dachverband der Weitblick Stadtvereine und  des Alumnivereins.
-Zur Erfüllung der Ziele ist der Bundesverband Weitblick e.V. Mitglied im Verband deutscher Studierendeninitiativen e.V. (VDSI). Ziel des VDSI ist die Stärkung des studentischen Ehrenamtes. Informationen über den VDSI gibt es [hier](http://www.vdsi.org)
+Zur Erfüllung der Ziele ist der Bundesverband Weitblick e.V. Mitglied im Verband deutscher Studierendeninitiativen e.V. (VDSI). Ziel des VDSI ist die Stärkung des studentischen Ehrenamtes. Informationen über den VDSI gibt es [hier](https://www.vdsi.org)
 Durch diese Mitgliedschaft wird Weitblick in keiner Weise in seiner Unabhängigkeit beschränkt.
 
 ## 10.	Namen von juristischen Personen, deren jährliche Zahlungen mehr als 10 % des Gesamtjahresbudgets ausmachen.
 Im Finanzbericht sind Angaben zu allen Spenden über 1.000 € namentlich vermerkt. Einzelspenden, die über 10 % der gesamten Jahreseinnahmen ausmachen:
 
+{% if transparency_data.major_donations %}
 {% for donation in transparency_data.major_donations  %}
 1. {{ donation.donator_name }}: {{ donation.amount }}
 {% endfor %}
+{% else %}
+--
+{% endif %}
 
 ## Hast du noch Fragen?
 Es ist nicht immer ganz einfach alle Fakten so aufzubereiten, dass sie von Ausenstehenden umgehend verstanden werden können. Wenn wir aus deiner Sicht Fehler gemacht haben oder zukünftig etwas besser machen können, dann melde dich gerne bei uns! Nutze dafür einfach das [Kontaktformular](/contact/).
