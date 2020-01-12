@@ -20,8 +20,7 @@ from itertools import chain
 from .models import (
     Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, ContactMessage, UserRelation,
     Document, Team, Milestone, Donation, Milestep, BankAccount, TeamUserRelation, Content, User, JoinPage,
-    SocialMediaLink, CycleDonation,
-    QuestionAndAnswer, FAQ)
+    SocialMediaLink, CycleDonation, QuestionAndAnswer, FAQ, Photo)
 
 
 class MyTranslatedAdmin(TabbedTranslationAdmin):
@@ -563,6 +562,7 @@ class CycleDonationRelationInlineModel(PermissionInlineModel):
 class CycleDonationAdmin(MyAdmin):
     inlines = (CycleDonationRelationInlineModel, )
 
+
 class PostAdmin(MyAdmin):
     list_display = ('title', 'get_author', 'host', 'published',)
 
@@ -663,6 +663,22 @@ class LocationAdmin(MyAdmin):
     get_country.admin_order_field = 'country'
 
 
+class PhotoAdmin(MyAdmin):
+
+    list_display = ('title', 'slug', 'type', 'uploader', 'host',)
+    exclude = ('uploader', 'sites',)
+
+    def save_model(self, request, obj, form, change):
+        if not obj.uploader:
+            obj.uploader = request.user
+
+        if not obj.host and request.user.hosts.count() == 1:
+            obj.host = request.user.hosts.all()[0]
+
+        obj.save()
+
+
+
 # since we're not using Django's built-in permissions,
 # register our own user model and unregister the Group model from admin.
 try:
@@ -691,3 +707,4 @@ admin.site.register(NewsPost, PostAdmin)
 admin.site.register(Partner, PartnerAdmin)
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(Team, TeamAdmin)
+admin.site.register(Photo, PhotoAdmin)

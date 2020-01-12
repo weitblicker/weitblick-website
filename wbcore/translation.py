@@ -6,10 +6,9 @@ Necessary for the modeltranslation package
 
 from modeltranslation.translator import register, TranslationOptions
 from .models import (
-    Project, Location, Address, Host, Partner, NewsPost, BlogPost,
-    Document, Team, Milestep, Content, Event, Milestone, Donation,
-    BankAccount, ContactMessage, CycleDonation,
-    FAQ, QuestionAndAnswer, UserRelation, JoinPage, SocialMediaLink, TeamUserRelation, CycleDonationRelation)
+    Project, Location, Address, Host, Partner, NewsPost, BlogPost, Document, Team, Milestep, Content, Event, Milestone,
+    Donation, BankAccount, ContactMessage, CycleDonation, FAQ, QuestionAndAnswer, UserRelation, JoinPage,
+    SocialMediaLink, TeamUserRelation, CycleDonationRelation, Photo)
 from schedule.models.events import Event as ScheduleEvent
 
 
@@ -84,7 +83,7 @@ class FAQTranslationOptions(TranslationOptions):
 
 
 @register([BankAccount, Donation, Milestone, ContactMessage, Address, CycleDonation,
-           UserRelation, JoinPage, SocialMediaLink, TeamUserRelation, CycleDonationRelation])
-class BankAccountTranslationOptions(TranslationOptions):
+           UserRelation, JoinPage, SocialMediaLink, TeamUserRelation, CycleDonationRelation, Photo])
+class NoTranslationOptions(TranslationOptions):
     pass
 

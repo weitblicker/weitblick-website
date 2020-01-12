@@ -1,4 +1,7 @@
+import os
+
 from django.db import models, transaction
+from django.dispatch import receiver
 from django_countries.fields import CountryField
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
@@ -16,10 +19,18 @@ from rules.contrib.models import RulesModel, RulesModelBase, RulesModelMixin
 from sortedm2m.fields import SortedManyToManyField
 from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
-import rules
+import rules, datetime
 
 
-class Photo(PhotologuePhoto):
+class Photo(RulesModelMixin, PhotologuePhoto, metaclass=RulesModelBase):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "view": rules.always_allow,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "delete": pred.is_super_admin | pred.is_admin,
+        }
+
     TYPE_CHOICES = (
         ('header', 'Header'),
         ('project', 'Project'),
@@ -30,6 +41,9 @@ class Photo(PhotologuePhoto):
     type = models.CharField(max_length=20, choices=TYPE_CHOICES, null=True)
     uploader = models.ForeignKey('User', on_delete=models.SET_NULL, null=True)
     host = models.ForeignKey('Host', on_delete=models.SET_NULL, null=True)
+
+    def get_hosts(self):
+        return self.host
 
 
 class Address(models.Model):
@@ -318,6 +332,10 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'date_of_birth']
 
     def has_perm(self, perm, obj=None):
+
+        if "wbcore.photo" in perm:
+            print("has perm:", self, perm, obj)
+
         return super(User, self).has_perm(perm, obj)
         #print("out:", out)
         #print(self.role())
@@ -770,7 +788,7 @@ class Document(RulesModel):
             "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
             "delete": pred.is_super_admin | pred.is_admin | pred.is_editor,
         }
-        get_latest_by = 'published'
+        get_latest_by = 'valid_from'
 
     title = models.CharField(max_length=50)
     description = models.TextField(null=True, blank=True)
@@ -784,8 +802,9 @@ class Document(RulesModel):
         ('membership_declaration', 'Membership Declaration'),
         ('other', 'Other')
     )
-    document_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='financial_report', null=True)
-    valid_from = models.DateField(auto_now_add=True, blank=False)
+    document_type = models.CharField(max_length=40, choices=TYPE_CHOICES, default='financial_report', null=True)
+    updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+    valid_from = models.DateField(blank=False, default=datetime.date.today)
     public = models.BooleanField(default=True)
 
     def belongs_to_host(self, host):
@@ -1185,3 +1204,15 @@ class QuestionAndAnswer(RulesModel):
 
     def __str__(self):
         return self.question
+    
+    
+@receiver(models.signals.post_delete, sender=Photo)
+def auto_delete_photo_file_on_delete(sender, instance, **kwargs):
+    """
+    Deletes image file from filesystem
+    when corresponding `Photo` object is deleted.
+    """
+    if instance.image:
+        if os.path.isfile(instance.image.path):
+            os.remove(instance.image.path)
+
