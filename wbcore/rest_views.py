@@ -23,9 +23,22 @@ from rest_framework import status, viewsets, filters
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from allauth.account.views import ConfirmEmailView
+from slugify import slugify
 
 from weitblick import settings
 from .filter import filter_events, filter_projects, filter_news, filter_blog
+
+image_types = [
+    'image/png', 'image/jpg',
+    'image/jpeg', 'image/pjpeg', 'image/gif'
+]
+
+replacements = {
+    ' ': '-',
+    'ä': 'ae',
+    'ö': 'oe',
+    'ü': 'ue',
+}
 
 
 @login_required
@@ -38,10 +51,6 @@ def markdown_uploader(request):
         print(request.POST, request.path)
         if 'markdown-image-upload' in request.FILES:
             image = request.FILES['markdown-image-upload']
-            image_types = [
-                'image/png', 'image/jpg',
-                'image/jpeg', 'image/pjpeg', 'image/gif'
-            ]
             if image.content_type not in image_types:
                 data = json.dumps({
                     'status': 405,
@@ -59,7 +68,11 @@ def markdown_uploader(request):
                 return HttpResponse(
                     data, content_type='application/json', status=405)
 
-            img_uuid = "{0}-{1}".format(uuid.uuid4().hex[:10], image.name.replace(' ', '-'))
+            name = image.name.lower()
+            for k, i in replacements.items():
+                name = name.replace(k, i)
+
+            img_uuid = "{0}-{1}".format(uuid.uuid4().hex[:10], name)
             tmp_file = os.path.join(settings.MARTOR_UPLOAD_PATH, img_uuid)
             def_path = default_storage.save(tmp_file, ContentFile(image.read()))
             img_url = os.path.join(settings.MEDIA_URL, def_path)
@@ -67,7 +80,7 @@ def markdown_uploader(request):
             data = json.dumps({
                 'status': 200,
                 'link': img_url,
-                'name': image.name
+                'name': name
             })
             return HttpResponse(data, content_type='application/json')
         return HttpResponse(_('Invalid request!'))
