@@ -516,14 +516,9 @@ def team_view(request, host_slug=None, team_slug=None):
     else:
         breadcrumb = [('Home', reverse('home')), ('Team', reverse('teams')), (team.name, None)]
 
-    members = team.member.all()
-    relations = []
-    for member in members:
-        relations.append(TeamUserRelation.objects.get(team=team, user=member))
+    relations = team.teamuserrelation_set.all().order_by('priority')
 
-    members_relations = sorted(zip(members, relations), key=lambda tup: (tup[1].priority, tup[0].name().split(" ")[-1]))
-
-    teams = Team.objects.filter(host=host) if host else Team.objects.filter(host__slug='bundesverband')
+    teams = Team.objects.filter(host=host) if host else Team.objects.filter(host__slug=main_host_slug)
     projects = Project.objects.filter(hosts=host) if host else Project.objects.all()
     teams, projects = teams[:3], projects[:3]
 
@@ -534,7 +529,7 @@ def team_view(request, host_slug=None, team_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'team': team,
-        'members_relations': members_relations,
+        'members_relations': relations,
         'icon_links': icon_links,
         'hosts': Host.objects.all() if host_slug in [None, 'bundesverband'] else None,
         'teams': item_list_from_teams(teams, host_slug),
