@@ -598,7 +598,7 @@ class ProjectAdmin(MyAdmin):
     get_hosts.short_description = 'Hosts'
 
 
-class EventsAdmin(MyAdmin):
+class EventAdmin(MyAdmin):
 
     list_display = ('title', 'start', 'end', 'host')
 
@@ -607,6 +607,9 @@ class EventsAdmin(MyAdmin):
     exclude = ('calendar', 'creator')
 
     def save_model(self, request, obj, form, change):
+        if not hasattr(obj, 'host') and request.user.hosts.count() == 1:
+            obj.host = request.user.hosts.all()[0]
+
         try:
             calendar = Calendar.objects.get(slug=obj.host.slug)
         except Calendar.DoesNotExist:
@@ -697,7 +700,7 @@ admin.site.register(Content, ContentAdmin)
 admin.site.register(CycleDonation, CycleDonationAdmin)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(Donation, DonationAdmin)
-admin.site.register(Event, EventsAdmin)
+admin.site.register(Event, EventAdmin)
 admin.site.register(FAQ, FAQAdmin)
 admin.site.register(Host, HostAdmin)
 admin.site.register(Location, LocationAdmin)

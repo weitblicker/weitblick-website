@@ -53,9 +53,7 @@
             {% if host %} <a class="ui item header href="{% url 'events' host.slug %}">{% trans "Events" %}</a>
             {% else %} <a class="ui item header" href="{% url 'events' %}">{% trans "Events" %}</a>
             {% endif %}
-            {% for event in dot_nav.events %}
-                {% include 'wbcore/dot_nav_item.html' with type='event' slug=event.slug title=event.title|truncatechars:40 desc=event.description|truncatewords:7 show_date=event.show_date %}
-            {% endfor %}
+            {% include 'wbcore/dot_nav_event.html' %}
         </div>
     {% else %}
         <div class="ui three wide column unstackable items">
@@ -100,9 +98,7 @@
             {% if host %} <a class="ui item header" href="{% url 'events' host.slug %}">{% trans "Events" %}</a>
             {% else %} <a class="ui item header" href="{% url 'events' %}">{% trans "Events" %}</a>
             {% endif %}
-            {% for event in dot_nav.events %}
-                {% include 'wbcore/dot_nav_item.html' with type='event' slug=event.slug title=event.title|truncatechars:40 desc=event.description|truncatewords:7 show_date=event.show_date %}
-            {% endfor %}
+            {% include 'wbcore/dot_nav_event.html' %}
         </div>
     {% endif %}
 </div>

@@ -124,6 +124,8 @@ def get_dot_nav(host=None):
         occurences = Period(Event.objects.all(), datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
     events = [occ.event for occ in occurences]
     for event in events:
+        print("Event:", event)
+        print("Host:", event.host)
         if event.start.day == event.end.day:
             event.show_date = event.start.strftime('%a, %d. %b %Y')
             event.show_date += "<br>" + event.start.strftime('%H:%M') + " - " + event.end.strftime('%H:%M')
