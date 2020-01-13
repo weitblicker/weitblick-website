@@ -4,7 +4,7 @@
 {% for event in dot_nav.events %}
         <div class="item">
             <div class="label">
-                <div class="date"><i class="clock outline icon"></i> {{ event.start | naturalday:"d. D" }} {{ event.start | time:"H:i" }}</div>
+                <div class="date"><i class="clock outline icon"></i> {{ event.start | naturalday:"d. M" }} {{ event.start | time:"H:i" }}</div>
             </div>
             <div class="title">
                 {% if host %}
