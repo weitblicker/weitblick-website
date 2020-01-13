@@ -1,10 +1,11 @@
 {% extends 'wbcore/basic.html' %}
+{% load i18n %}
 {% load martortags %}
 {% load staticfiles %}
 
 {% block main %}
     {% trans "Transparency" as title %}
-    {% include 'wbcore/image-header.html' with title=title image=transparency.image default='/images/transparency_header.jpg' %}
+    {% include 'wbcore/image-header.html' with image=transparency.image default='/images/transparency_header.jpg' %}
 
     <div class="ui segment">
         {% include "wbcore/transparency_fillin.html" %}
