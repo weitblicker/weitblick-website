@@ -1,3 +1,4 @@
+{% load i18n %}
 {% if projects %}
   <div class="ui two fluid unstackable cards">
     {% for project in projects %}
@@ -5,5 +6,5 @@
     {% endfor %}
   </div>
 {% else %}
-  <p>No projects available!</p>
+  <p>{% trans "No projects available!" %}</p>
 {% endif %}

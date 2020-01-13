@@ -1,3 +1,4 @@
+{% load i18n %}
 <div class="ui sticky">
 
     {% if address %}
@@ -19,7 +20,8 @@
     {% endif %}
 
     <!--div class="ui segment">
-        {% include "wbcore/segment_header.html" with icon='donate' title='Donate' url_alias='donate' %}
+        {% trans "Donate" as title %}
+        {% include "wbcore/segment_header.html" with icon='donate' url_alias='donate' %}
     </div-->
 
     {% if hosts %}
@@ -36,42 +38,48 @@
 
     {% if annual_reports %}
     <div class="ui segment">
-        {% include "wbcore/segment_header.html" with icon='file alternate outline' title='Annual Reports' url_alias='reports' %}
+        {% trans "Annual Reports" as title %}
+        {% include "wbcore/segment_header.html" with icon='file alternate outline' url_alias='reports' %}
         {% include 'wbcore/document_list.html' with documents=annual_reports show_year=True %}
     </div>
     {% endif %}
 
     {% if financial_reports %}
     <div class="ui segment">
-        {% include "wbcore/segment_header.html" with icon='coins' title='Financial Reports' url_alias='reports' %}
+        {% trans "Financial Reports" as title %}
+        {% include "wbcore/segment_header.html" with icon='coins' url_alias='reports' %}
         {% include 'wbcore/document_list.html' with documents=financial_reports show_year=True %}
     </div>
     {% endif %}
 
     {% if charter_files %}
     <div class="ui segment">
-        {% include "wbcore/segment_header.html" with icon='file alternate outline' title='Charter' url_alias='reports' %}
+        {% trans "Charter" as title %}
+        {% include "wbcore/segment_header.html" with icon='file alternate outline' url_alias='reports' %}
         {% include 'wbcore/document_list.html' with documents=charter_files hide_year=True %}
     </div>
     {% endif %}
 
     {% if event_item_list %}
     <div class="ui segment">
-        {% include "wbcore/segment_header.html" with icon='calendar alternate outline' title='Events' url_alias='events' %}
+        {% trans "Events" as title %}
+        {% include "wbcore/segment_header.html" with icon='calendar alternate outline' url_alias='events' %}
         {% include 'wbcore/item_list.html' with item_list=event_item_list image_size='small' no_image=True %}
     </div>
     {% endif %}
 
     {% if project_item_list %}
     <div class="ui segment">
-        {% include "wbcore/segment_header.html" with icon='seedling' title='Projects' url_alias='projects' %}
+        {% trans "Projects" as title %}
+        {% include "wbcore/segment_header.html" with icon='seedling' url_alias='projects' %}
         {% include 'wbcore/item_list.html' with item_list=project_item_list image_size='small' no_image=False %}
     </div>
     {% endif %}
 
     {% if teams %}
     <div class="ui segment">
-        {% include "wbcore/segment_header.html" with icon='user' title='Teams' url_alias='teams' %}
+        {% trans "Teams" as title %}
+        {% include "wbcore/segment_header.html" with icon='user' url_alias='teams' %}
         <div class="ui divided unstackable items">
             {% for team in teams %}
                 {% include 'wbcore/team_list.html' with team=team %}

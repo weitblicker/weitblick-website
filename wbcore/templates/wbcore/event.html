@@ -1,7 +1,7 @@
 {% extends 'wbcore/basic.html' %}
 {% load martortags %}
 {% load staticfiles %}
-
+{% load i18n %}
 {% block main %}
     {% include 'wbcore/image-header.html' with title=event.title image=event.image default='/images/events_header.jpg' %}
     <div class="ui segment">
@@ -10,7 +10,8 @@
 
     {% if form %}
         <div class="ui segment">
-            {% include "wbcore/segment_header.html" with icon='pen fancy' title='Anmeldung' %}
+            {% trans "Registration" as title %}
+            {% include "wbcore/segment_header.html" with icon='pen fancy' %}
             {% include 'wbcore/event_form.html' with event=event form=form %}
         </div>
     {% endif %}

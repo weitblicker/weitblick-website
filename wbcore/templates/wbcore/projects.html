@@ -1,9 +1,10 @@
 {% extends 'wbcore/basic.html' %}
 {% load staticfiles %}
-
+{% load i18n %}
 {% block main %}
     <div class="ui segment">
-        {% include "wbcore/segment_header.html" with icon='map marker alternate' title='Project Map' url_alias='projects' %}
+        {% trans "Project Map" as title %}
+        {% include "wbcore/segment_header.html" with icon='map marker alternate' url_alias='projects' %}
         {% include 'wbcore/projects_map.html' %}
     </div>
     <div class="ui segment">

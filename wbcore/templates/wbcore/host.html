@@ -1,7 +1,7 @@
 {% extends 'wbcore/basic.html' %}
 {% load martortags %}
 {% load staticfiles %}
-
+{% load i18n %}
 {% block main %}
     {% if welcome %}
         <div class="ui segment">
@@ -9,7 +9,8 @@
         </div>
     {% endif %}
     <div id="news-list" class="ui segment">
-        {% include 'wbcore/segment_header.html' with icon='newspaper outline' title='News' url_alias='news' %}
+        {% trans "News" as title %}
+        {% include 'wbcore/segment_header.html' with icon='newspaper outline' url_alias='news' %}
         {% include 'wbcore/item_list.html' with item_list=posts %}
     </div>
 {% endblock %}

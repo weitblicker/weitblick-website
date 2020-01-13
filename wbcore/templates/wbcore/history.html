@@ -1,8 +1,10 @@
 {% extends 'wbcore/basic.html' %}
 {% load martortags %}
 {% load staticfiles %}
+{% load i18n %}
 {% block main %}
-    {% include 'wbcore/image-header.html' with title="History" default='/images/history_header.jpg' %}
+    {% trans "History" as title %}
+    {% include 'wbcore/image-header.html' with default='/images/history_header.jpg' %}
     <div class="ui segment">
         {% if history %}
             {{ history.text | safe_markdown }}

@@ -1,7 +1,9 @@
 {% extends 'wbcore/basic.html' %}
 {% load staticfiles %}
+{% load i18n %}
 {% block main %}
-    {% include 'wbcore/image-header.html' with title="Weitblick Vereine" default='/images/host_header.jpg'%}
+    {% trans "Associations" as title %}
+    {% include 'wbcore/image-header.html' with default='/images/host_header.jpg'%}
     <div class="ui segment">
         {% if hosts %}
             <div class="ui two column grid list">

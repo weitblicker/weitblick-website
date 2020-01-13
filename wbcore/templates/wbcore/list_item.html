@@ -1,5 +1,5 @@
 {% load static %}
-
+{% load i18n %}
 <div class="item">
 
     {% if not no_image %}
@@ -77,7 +77,7 @@
             {% endif %}
             {% endif %}
             {% if item.show_text and not no_read_more %}
-                <a class="details right floated" href="{{ item.link }}"> › Weiterlesen </a>
+                <a class="details right floated" href="{{ item.link }}"> › {% trans "Read more" %}</a>
             {% endif %}
         </div>
     </div>

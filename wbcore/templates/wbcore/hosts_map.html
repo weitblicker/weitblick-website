@@ -1,10 +1,11 @@
 {% load staticfiles %}
 {% load l10n %}
+{% load i18n %}
 <script src="{% static 'highmaps/proj4.js'%}"></script>
 <script src="{% static 'highmaps/highmaps.js'%}"></script>
 <script src="{% static 'highmaps/de-all.js'%}"></script>
-
-{% include "wbcore/segment_header.html" with icon='map' title='Vereine' %}
+{% trans "Associations" as title %}
+{% include "wbcore/segment_header.html" with icon='map' %}
 <div id="container" style="width: 100%">
 
 </div>

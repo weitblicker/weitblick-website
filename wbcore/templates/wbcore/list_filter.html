@@ -1,16 +1,18 @@
-{% include 'wbcore/segment_header.html' with icon='filter' title='Filter' %}
+{% load i18n %}
+{% trans "Filter" as title %}
+{% include 'wbcore/segment_header.html' with icon='filter' %}
 
 <div class="column-content" id="filter" data-ajax-endpoint="{{ ajax_endpoint }}">
     <div class="ui unstackable items">
         <div class="ui form">
             <div class="ui two unstackable fields">
                 {% if hosts %}
-                    <div class="field twelve wide">
-                        <label>Hosts</label>
+                    <div class="field eleven wide">
+                        <label>{% trans "Associations" %}</label>
                         <div id="filter-hosts" class="ui multiple search selection dropdown">
                             <input name="tags" type="hidden">
                             <i class="dropdown icon"></i>
-                            <div class="default text">Union</div>
+                            <div class="default text">{% trans "Association" %}</div>
                             <div class="menu">
                                 {% for host in hosts %}
                                     <div class="item" data-value="{{ host.slug }}">{{ host.name|cut:"Weitblick " }}</div>
@@ -19,14 +21,14 @@
                         </div>
                     </div>
 
-                    <div class="field four wide">
-                        <label>Clear Filter</label>
-                        <div id="filter-clear" class="ui fluid teal button">Clear</div>
+                    <div class="field five wide">
+                        <label>{% trans "Clear Filter" %}</label>
+                        <div id="filter-clear" class="ui fluid teal button">{% trans "Clear" %}</div>
                     </div>
                 {% else %}
                     <div class="field">
-                        <label>Clear Filter</label>
-                        <div id="filter-clear" class="ui fluid teal button">Clear</div>
+                        <label>{% trans "Clear Filter" %}</label>
+                        <div id="filter-clear" class="ui fluid teal button">{% trans "Clear" %}</div>
                     </div>
                 {% endif %}
             </div>
@@ -39,9 +41,9 @@
 
             {% if years %}
                 <div class="field">
-                    <label>Archive</label>
+                    <label>{% trans "Archive" %}</label>
                     <div id="filter-archive" class="ui fluid basic dropdown button">
-                        <span class="text">year or month</span>
+                        <span class="text">{% trans "year or month" %}</span>
                         <i class="dropdown icon"></i>
                         <div class="menu">
                             {% for year, months in years.items %}
@@ -61,9 +63,9 @@
             {% elif from_to %}
                 <div class="ui two unstackable fields">
                     <div class="field">
-                        <label>From</label>
+                        <label>{% trans "From" %}</label>
                         <div id="filter-from" class="ui fluid basic dropdown button">
-                            <span class="text">year or month</span>
+                            <span class="text">{% trans "year or month" %}</span>
                             <i class="dropdown icon"></i>
                             <div class="menu">
                                 {% for year, months in from_to.items %}
@@ -81,9 +83,9 @@
                         </div>
                     </div>
                     <div class="field">
-                        <label>To</label>
+                        <label>{% trans "To" %}</label>
                         <div id="filter-to" class="ui fluid basic dropdown button">
-                            <span class="text">year or month</span>
+                            <span class="text">{% trans "year or month" %}</span>
                             <i class="dropdown icon"></i>
                             <div class="menu">
                                 {% for year, months in from_to.items %}
@@ -106,11 +108,11 @@
             <div class="ui two unstackable fields">
                 {% if countries %}
                     <div class="field eleven wide">
-                        <label>Country</label>
+                        <label>{% trans "Country" %}</label>
                         <div id="filter-country" class="ui multiple search selection dropdown">
                             <input name="tags" type="hidden">
                             <i class="dropdown icon"></i>
-                            <div class="default text">Country</div>
+                            <div class="default text">{% trans "Country" %}</div>
                             <div class="menu">
                                 {% for country in countries %}
                                     <div class="item" data-value="{{ country.code }}">{{ country.name }}</div>
@@ -121,15 +123,15 @@
                 {% endif %}
                 {% if filter_visibility %}
                     <div class="field five wide">
-                        <label>Visibility</label>
+                        <label>{% trans "Visibility" %}</label>
                         <div id="filter-visibility" class="ui selection dropdown">
                             <input type="hidden" name="gender">
                             <i class="dropdown icon"></i>
-                            <div class="default text">Visibility</div>
+                            <div class="default text">{% trans "Visibility" %}</div>
                             <div class="menu">
-                                <div class="item" data-value="all">All</div>
-                                <div class="item" data-value="current">Current</div>
-                                <div class="item" data-value="completed">Completed</div>
+                                <div class="item" data-value="all">{% trans "All" %}</div>
+                                <div class="item" data-value="current">{% trans "Current" %}</div>
+                                <div class="item" data-value="completed">{% trans "Completed" %}</div>
                             </div>
                         </div>
                     </div>
@@ -137,8 +139,8 @@
             </div>
 
             <div class="field">
-                <label>Search</label>
-                <input id="filter-search" type="text" placeholder="Search in News">
+                <label>{% trans "Search" %}</label>
+                <input id="filter-search" type="text" placeholder="{% trans "Search" %} ...">
             </div>
         </div>
     </div>

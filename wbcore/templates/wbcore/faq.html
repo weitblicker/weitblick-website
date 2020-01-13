@@ -1,7 +1,9 @@
 {% extends 'wbcore/basic.html' %}
 {% load staticfiles %}
+{% load i18n %}
 {% block main %}
-    {% include 'wbcore/image-header.html' with title="Fragen & Antworten" default='/images/faq_header.jpg'%}
+    {% trans "FAQ" as title %}
+    {% include 'wbcore/image-header.html' with default='/images/faq_header.jpg'%}
     {% if faq %}
     <div class="ui segment">
         <div class="ui one column grid list">

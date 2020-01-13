@@ -1,8 +1,9 @@
+{% load i18n %}
 <form class="ui form" action="{% url 'event' event_slug=event.slug %}" method="post">
     {% csrf_token %}
     {% if form.success %}
         <div class="ui positive message">
-            <div class="header">Wir haben die Anmeldung erhalten. Vielen Dank!</div>
+            <div class="header">{% trans "We have received the registration. Thank you very much!" %}</div>
         </div>
     {% endif %}
 
@@ -21,6 +22,6 @@
         </div>
     {% endfor %}
     <div class="field">
-        <input class="ui submit button orange" type="submit" value="Anmelden">
+        <input class="ui submit button orange" type="submit" value="{% trans "Register" %}">
     </div>
 </form>

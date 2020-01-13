@@ -1,9 +1,11 @@
 {% load static %}
+{% load i18n %}
 <div class="item">
   <a class="image" href="{% url 'team' team.host.slug team.slug %}">
     <div class="image">
       {% if not team.image %}
-        <div class="image">{% include 'wbcore/svgs/placeholder.svg' with text="Team"%}</div>
+          {% trans "Team" as text %}
+        <div class="image">{% include 'wbcore/svgs/placeholder.svg' %}</div>
       {% else %}
         <img class="ui fluid image" src="{{ team.image.get_display_url }}">
       {% endif %}
@@ -15,7 +17,7 @@
       {{ team.teaser | truncatewords:10 | safe}}
     </div>
     <div class="extra">
-      <a class="details right floated" href="{% url 'team' team.host.slug team.slug %}">› Details</a>
+      <a class="details right floated" href="{% url 'team' team.host.slug team.slug %}">› {% trans "Details" %}</a>
       <span>
         <i class="user icon"></i>{{ team.member.count }}
       </span>

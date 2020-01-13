@@ -1,6 +1,8 @@
 {% extends 'wbcore/basic.html' %}
+{% load i18n %}
 {% block main %}
-    {% include 'wbcore/image-header.html' with title='News' default='/images/news_header.jpg' %}
+    {% trans "News" as title %}
+    {% include 'wbcore/image-header.html' with default='/images/news_header.jpg' %}
     <div class="ui segment">
         {% include 'wbcore/item_list.html' %}
     </div>

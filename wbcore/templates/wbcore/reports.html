@@ -4,7 +4,8 @@
 {% load i18n %}
 
 {% block main %}
-    {% include 'wbcore/image-header.html' with title="Reports" image=report.image default='/images/reports_header.jpg' %}
+    {% trans "Reports" as title %}
+    {% include 'wbcore/image-header.html' with image=report.image default='/images/reports_header.jpg' %}
     <div class="ui segment">
         {% if report %}
             {{ report.text | safe_markdown }}

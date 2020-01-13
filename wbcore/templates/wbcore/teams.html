@@ -1,7 +1,9 @@
 {% extends 'wbcore/basic.html' %}
 {% load staticfiles %}
+{% load i18n %}
 {% block main %}
-    {% include 'wbcore/image-header.html' with title="Teams" default='/images/team_header.jpg' %}
+    {% trans "Teams" as title %}
+    {% include 'wbcore/image-header.html' with default='/images/team_header.jpg' %}
     <div class="ui segment">
         {% include 'wbcore/item_list.html' %}
     </div>

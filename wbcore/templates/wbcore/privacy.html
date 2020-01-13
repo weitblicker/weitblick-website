@@ -1,9 +1,10 @@
 {% extends 'wbcore/basic.html' %}
 {% load martortags %}
 {% load staticfiles %}
-
+{% load i18n %}
 {% block main %}
-    {% include 'wbcore/image-header.html' with title="Datenschutzerklärung" default='/images/news_header.jpg' %}
+    {% trans "Data Protection Declaration" as title %}
+    {% include 'wbcore/image-header.html' with default='/images/news_header.jpg' %}
     <div class="ui segment">
         {% include 'wbcore/privacy_text.html' %}
     </div>

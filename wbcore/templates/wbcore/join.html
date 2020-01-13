@@ -13,13 +13,13 @@
 
     {% if enable_form %}
         <form class="ui form segment" action="{{ submit_url }}" method="post">
-            <h2>Antragsformular</h2>
+            <h2>{% trans "Registration Form" %}</h2>
             {% csrf_token %}
             {{ urel_form.host }}
 
             {% if success %}
                 <div class="ui positive message">
-                    <div class="header">Thank you for becoming part of Weitblick e.V.</div>
+                    <div class="header">{% trans "Thank you for becoming part of Weitblick." %}</div>
                 </div>
             {% endif %}
 
@@ -52,7 +52,7 @@
                 {% endfor %}
             {% endfor %}
 
-            <h4>Persönliche Daten</h4>
+            <h4>{% trans "Personal Data" %}</h4>
             <div class="two fields">
                 <div class="required field">
                     {{ user_form.first_name.label_tag }} {{ user_form.first_name }}
@@ -92,7 +92,7 @@
                 </div>
             </div>
 
-            <h4>Mitgliedsbeitrag und Kontodaten</h4>
+            <h4>{% trans "Membership fee and bank account details" %}</h4>
             <div class="two fields">
                 <div class="required field">
                     {{ bank_form.account_holder.label_tag }} {{ bank_form.account_holder }}

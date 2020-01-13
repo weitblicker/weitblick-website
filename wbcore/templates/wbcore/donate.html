@@ -1,9 +1,10 @@
 {% extends 'wbcore/basic.html' %}
 {% load martortags %}
 {% load staticfiles %}
-
+{% load i18n %}
 {% block main %}
-    {% include 'wbcore/image-header.html' with title='Spenden' default='/images/donate_header.jpg' %}
+    {% trans "Donate" as title %}
+    {% include 'wbcore/image-header.html' with default='/images/donate_header.jpg' %}
     <div class="ui segment">
         {{ donate.text | safe_markdown }}
     </div>
