@@ -5,8 +5,13 @@
     <div class="item">
         <i class="big clock outline icon"></i>
         <div class="content">
-            {{ event.start | date:"D, j. M Y H:i" }}<br>
-            {{ event.end | date:"D, j. M Y H:i"}}
+            {% if event.start.day == event.end.day and event.start.month == event.end.month and event.start.year == event.end.year %}
+                {{ event.start | date:"D, j. M Y" }}<br>
+                {{ event.start | date:"H:i"}} - {{ event.end | date:"H:i"}}
+            {% else %}
+                {{ event.start | date:"D, j. M Y H:i" }}<br>
+                {{ event.end | date:"D, j. M Y H:i"}}
+            {% endif %}
         </div>
     </div>
     <div class="ui hidden divider"></div>
