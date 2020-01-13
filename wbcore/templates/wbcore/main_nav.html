@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load translateurl %}
 <div class="ui container">
     <div class="segment">
 
@@ -13,7 +14,14 @@
                         </div>
                         <div class="results"></div>
                     </div>
+                    {% get_available_languages as languages %}
+                    {% for lang_code, lang_name in languages %}
+                    <a href="{% translate_url lang_code %}" class="item">
+                        <i class="{% if lang_code == 'en' %}gb{% else %}{{ lang_code }}{% endif %} flag"></i>{{ lang_name }}
+                    </a>
+                    {% endfor %}
                 </div>
+
                 <div class="ui grid">
                     <!-- computer only menu -->
                     <div class="ui computer only row compact menu" id="menu-nav">
