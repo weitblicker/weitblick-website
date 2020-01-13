@@ -6,11 +6,13 @@
 {% load wbcoretags %}
 
 {% block main %}
-    {% include 'wbcore/image-header.html' with title=post.title image=post.image default='/images/news_header.jpg' %}
+    {% if post.type == 'blog' %}
+        {% include 'wbcore/image-header.html' with title=post.title image=post.image default='/images/blog_header.jpg' %}
+    {% else %}
+        {% include 'wbcore/image-header.html' with title=post.title image=post.image default='/images/news_header.jpg' %}
+    {% endif %}
 
     <div class="ui segment">
-        {{ post.image }}
-
         <div class="ui image label">
             {% if post.author and post.author.image %}
                 <img class="ui avatar image" src='{{ post.author.image.url }}'>{{ post.author.name }}

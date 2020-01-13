@@ -1116,6 +1116,8 @@ def blog_post_view(request, host_slug=None, post_id=None):
     else:
         projects = None
 
+    post.type = "blog"
+
     context = {
         'main_nav': get_main_nav(host=host, active='blog'),
         'dot_nav': get_dot_nav(host=host),
@@ -1226,6 +1228,8 @@ def news_post_view(request, host_slug=None, post_id=None):
         projects = item_list_from_proj(Project.objects.filter(hosts=host), host_slug=host_slug)
     else:
         projects = None
+
+    post.type = "news"
 
     context = {
         'main_nav': get_main_nav(host=host, active='news'),
