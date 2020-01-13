@@ -169,7 +169,8 @@ def item_list_from_occ(occurrences, host_slug=None, text=True):
     return item_list
 
 
-def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='news_id', text=True):
+def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='post_id', text=True):
+
     item_list = []
     for post in posts:
         if not post.teaser:
@@ -178,8 +179,9 @@ def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='n
         if not text:
             post.teaser = ""
         current_host = Host.objects.get(slug=host_slug) if host_slug else None
-        if current_host and post.host and current_host is post.host:
+        if current_host and post.host and current_host == post.host:
             post.link = reverse(post_type, kwargs={id_key: post.id, 'host_slug': host_slug})
+            print('*** host in post')
         else:
             post.link = reverse(post_type, args=[post.id])
         post.show_text = text
@@ -578,6 +580,7 @@ def about_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'about': about,
+        'hosts': Host.objects.all(),
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id'),
         'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
         'event_item_list': item_list_from_occ(occurrences, text=True),
@@ -911,6 +914,8 @@ def host_view(request, host_slug):
         raise Http404()
 
     posts = NewsPost.objects.filter(host=host_slug).order_by('-published')[:5]
+    posts = item_list_from_posts(posts, host_slug=host_slug)
+
     events = Event.objects.filter(host=host_slug).order_by('-start')[:3]
     period = Period(events, datetime.now(), datetime.now() + timedelta(365/2))
     try:
@@ -919,18 +924,20 @@ def host_view(request, host_slug):
         print("Welcome content page for", host, "does not exists!")
         welcome = None
     occurrences = period.get_occurrences()
+    event_item_list = item_list_from_occ(occurrences, host_slug=host_slug)
+
     hosts = Host.objects.all()
     teams = Team.objects.filter(host=host)
 
     template = loader.get_template('wbcore/host.html')
     context = {
         'host': host,
-        'hosts': hosts,
         'breadcrumb': [('Home', reverse('home')), (host.name, None)],
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
         'posts': posts,
-        'occurrences': occurrences,
+        'hosts': hosts,
+        'event_item_list': event_item_list,
         'teams': teams,
         'welcome': welcome,
         'icon_links': icon_links,
@@ -1162,7 +1169,7 @@ def news_view(request, host_slug=None):
     except Host.DoesNotExist:
         raise Http404()
 
-    posts = posts.order_by('-published')
+    posts = item_list_from_posts(posts.order_by('-published'), host_slug=host_slug)
     hosts = Host.objects.all()
 
     if NewsPost.objects.count():
