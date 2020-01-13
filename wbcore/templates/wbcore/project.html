@@ -4,7 +4,7 @@
 {% load i18n %}
 {% block main %}
 
-    {% include 'wbcore/image-header.html' with title=project.name image=project.image default='/images/project_header.jpg' %}
+    {% include 'wbcore/image-header.html' with title=project.name image=project.image %}
 
     <div class="ui segment">
         {{ project.description | safe_markdown }}

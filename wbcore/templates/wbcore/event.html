@@ -3,7 +3,7 @@
 {% load staticfiles %}
 {% load i18n %}
 {% block main %}
-    {% include 'wbcore/image-header.html' with title=event.title image=event.image default='/images/events_header.jpg' %}
+    {% include 'wbcore/image-header.html' with title=event.title image=event.image %}
     <div class="ui segment">
         {{ event.description | safe_markdown }}
     </div>
