@@ -2,7 +2,7 @@
 {% load i18n %}
 {% block main %}
 
-    {% trans "Blog" %}
+    {% trans "Blog" as title %}
     {% include 'wbcore/image-header.html' with default='/images/blog_header.jpg' %}
     <div class="ui segment">
         {% if item_list %}
