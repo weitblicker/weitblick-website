@@ -245,7 +245,7 @@ def home_view(request):
         'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
         'hosts': hosts,
         'event_item_list': item_list_from_occ(occurrences, text=True),
-        'breadcrumb': [('Home', None)],
+        'breadcrumb': [(_('Home'), None)],
         'icon_links': icon_links
     }
 
@@ -258,12 +258,12 @@ def reports_view(request, host_slug=None):
     if host_slug:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Reports', None)]
+            breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Reports'), None)]
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('Reports', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('Reports'), None)]
 
     load_host = host if host else Host.objects.get(slug='bundesverband')
     try:
@@ -293,12 +293,12 @@ def charter_view(request, host_slug=None):
     if host_slug:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Charter', None)]
+            breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Charter'), None)]
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('Charter', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('Charter'), None)]
 
     load_host = host if host else Host.objects.get(slug='bundesverband')
     try:
@@ -329,12 +329,12 @@ def transparency_view(request, host_slug=None):
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Transparency', None)]
+            breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Transparency'), None)]
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('Transparency', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('Transparency'), None)]
 
     load_host = host if host else Host.objects.get(slug='bundesverband')
     try:
@@ -378,12 +378,12 @@ def facts_view(request, host_slug=None):
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Facts', None)]
+            breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Facts'), None)]
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('Facts', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('Facts'), None)]
 
     load_host = Host.objects.get(slug=host_slug) if host_slug else Host.objects.get(slug='bundesverband')
     try:
@@ -409,12 +409,12 @@ def history_view(request, host_slug=None):
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('History', None)]
+            breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('History'), None)]
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('History', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('History'), None)]
 
     load_host = host if host else Host.objects.get(slug='bundesverband')
     try:
@@ -447,12 +447,12 @@ def privacy_view(request, host_slug=None):
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Privacy', None)]
+            breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Privacy'), None)]
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('Privacy', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('Privacy'), None)]
 
     load_host = Host.objects.get(slug=host_slug) if host_slug else Host.objects.get(slug='bundesverband')
     try:
@@ -483,13 +483,13 @@ def teams_view(request, host_slug=None):
         raise Http404()
     if host:
         try:
-            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', None)]
+            breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Team'), None)]
             teams = Team.objects.filter(host=host)
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('Team', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('Team'), None)]
         teams = Team.objects.filter(host=Host.objects.get(slug='bundesverband'))
 
     projects = Project.objects.filter(hosts=host).order_by('-published') if host else Project.objects.all().order_by('-published')
@@ -524,9 +524,9 @@ def team_view(request, host_slug=None, team_slug=None):
         raise Http404()
 
     if host:
-        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Team', reverse('teams')), (team.name, None)]
+        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Team'), reverse('teams')), (team.name, None)]
     else:
-        breadcrumb = [('Home', reverse('home')), ('Team', reverse('teams')), (team.name, None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('Team'), reverse('teams')), (team.name, None)]
 
     relations = team.teamuserrelation_set.all().order_by('priority')
 
@@ -557,11 +557,11 @@ def about_view(request, host_slug=None):
 
     try:
         host = Host.objects.get(slug=host_slug) if host_slug else None
-        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('About', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('About'), None)]
     except:
         raise Http404()
 
-    breadcrumb = [('Home', reverse('home')), ('About', None)]
+    breadcrumb = [(_('Home'), reverse('home')), (_('About'), None)]
 
     try:
         about = Content.objects.get(host=host, type='about')
@@ -595,12 +595,12 @@ def idea_view(request, host_slug=None):
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Idea', None)]
+            breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Idea'), None)]
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('Idea', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('Idea'), None)]
 
     projects = Project.objects.all()
     project_item_list = item_list_from_proj(projects, host_slug)[:3]
@@ -631,15 +631,15 @@ def projects_view(request, host_slug=None):
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
             projects = Project.objects.filter(hosts__slug__in=host_slugs).distinct()
-            breadcrumb = [('Home', reverse('home')),
+            breadcrumb = [(_('Home'), reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
-                          ('Projects', None)]
+                          (_('Projects'), None)]
         except Host.DoesNotExist:
             raise Http404()
     else:
         host = None
         projects = Project.objects.all()
-        breadcrumb = [('Home', reverse('home')), ('Projects', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('Projects'), None)]
     posts = BlogPost.objects.filter(project__in=projects)
 
     countries = set([project.location.country for project in projects])
@@ -742,11 +742,11 @@ def join_view(request, host_slug=None):
     join_page = None
 
     if host:
-        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Mitmachen', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Participate'), None)]
         submit_url = reverse('join', args=[host_slug])
     else:
         submit_url = reverse('join')
-        breadcrumb = [('Home', reverse('home')), ('Mitmachen', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('Participate'), None)]
         try:
             host = Host.objects.get(slug=main_host_slug)
         except Host.DoesNotExist:
@@ -851,14 +851,14 @@ def project_view(request, host_slug=None, project_slug=None):
         if host_slug:
             project = Project.objects.get(slug=project_slug, hosts__slug=host_slug)
             host = Host.objects.get(slug=host_slug)
-            breadcrumb = [('Home', reverse('home')),
+            breadcrumb = [(_('Home'), reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
-                          ('Projects', reverse('projects')),
+                          (_('Projects'), reverse('projects')),
                           (project.name, None)]
         else:
             project = Project.objects.get(slug=project_slug)
             host = None
-            breadcrumb = [('Home', reverse('home')), ('Projects', reverse('projects')), (project.name, None)]
+            breadcrumb = [(_('Home'), reverse('home')), (_('Projects'), reverse('projects')), (project.name, None)]
     except Project.DoesNotExist:
         raise Http404("Project does not exist!")
     except Host.DoesNotExist:
@@ -899,7 +899,7 @@ def hosts_view(request):
         'hosts': hosts,
         'main_nav': get_main_nav(active='hosts'),
         'dot_nav': get_dot_nav(),
-        'breadcrumb': [('Home', reverse('home')), ("Unions", None)],
+        'breadcrumb': [(_('Home'), reverse('home')), (_('Associations'), None)],
         'icon_links': icon_links
     }
     return HttpResponse(template.render(context, request))
@@ -934,7 +934,7 @@ def host_view(request, host_slug):
     template = loader.get_template('wbcore/host.html')
     context = {
         'host': host,
-        'breadcrumb': [('Home', reverse('home')), (host.name, None)],
+        'breadcrumb': [(_('Home'), reverse('home')), (host.name, None)],
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
         'posts': posts,
@@ -953,15 +953,15 @@ def events_view(request, host_slug=None):
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
             events = Event.objects.filter(host__slug__in=host_slugs).distinct()
-            breadcrumb = [('Home', reverse('home')),
+            breadcrumb = [(_('Home'), reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
-                          ('Events', None)]
+                          (_('Events'), None)]
         except Host.DoesNotExist:
             raise Http404()
     else:
         host = None
         events = Event.objects.all()
-        breadcrumb = [('Home', reverse('home')), ('Events', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('Events'), None)]
 
     p = Period(events, datetime.now(), datetime.now() + timedelta(days=365))
     occurrences = p.get_occurrences()
@@ -999,14 +999,14 @@ def event_view(request, host_slug=None, event_slug=None):
         if host_slug:
             event = Event.objects.get(slug=event_slug, host__slug=host_slug)
             host = Host.objects.get(slug=host_slug)
-            breadcrumb = [('Home', reverse('home')),
+            breadcrumb = [(_('Home'), reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
-                          ("Events", reverse('events', args=[host_slug])),
+                          (_('Events'), reverse('events', args=[host_slug])),
                           (event.title, None)]
         else:
             event = Event.objects.get(slug=event_slug)
             host = None
-            breadcrumb = [('Home', reverse('home')), ("Events", reverse('events')), (event.title, None)]
+            breadcrumb = [(_('Home'), reverse('home')), (_('Events'), reverse('events')), (event.title, None)]
 
     except Event.DoesNotExist:
         raise Http404()
@@ -1075,9 +1075,9 @@ def blog_view(request, host_slug=None):
         year_months = None
 
     if host:
-        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ("Blog", None)]
+        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Blog'), None)]
     else:
-        breadcrumb = [('Home', reverse('home')), ('Blog', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('Blog'), None)]
 
     if request.is_ajax():
         template = loader.get_template('wbcore/list_items.html')
@@ -1104,14 +1104,14 @@ def blog_post_view(request, host_slug=None, post_id=None):
         if host_slug:
             post = BlogPost.objects.get(pk=post_id, host__slug=host_slug)
             host = Host.objects.get(slug=host_slug)
-            breadcrumb = [('Home', reverse('home')),
+            breadcrumb = [(_('Home'), reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
-                          ('Blog', reverse('blog', args=[host_slug])),
+                          (_('Blog'), reverse('blog', args=[host_slug])),
                           (post.title, None)]
         else:
             post = BlogPost.objects.get(pk=post_id)
             host = None
-            breadcrumb = [('Home', reverse('home')), ("Blog", reverse('blog')), (post.title, None)]
+            breadcrumb = [(_('Home'), reverse('home')), (_('Blog'), reverse('blog')), (post.title, None)]
 
     except BlogPost.DoesNotExist:
         raise Http404("The blog post does not exists!")
@@ -1185,11 +1185,11 @@ def news_view(request, host_slug=None):
         year_months = None
 
     if host:
-        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ("News", None)]
+        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('News'), None)]
         for post in posts:
             post.current_host = host
     else:
-        breadcrumb = [('Home', reverse('home')), ('News', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('News'), None)]
 
     if request.is_ajax():
         template = loader.get_template('wbcore/list_items.html')
@@ -1217,14 +1217,14 @@ def news_post_view(request, host_slug=None, post_id=None):
         if host_slug:
             post = NewsPost.objects.get(pk=post_id, host__slug=host_slug)
             host = Host.objects.get(slug=host_slug)
-            breadcrumb = [('Home', reverse('home')),
+            breadcrumb = [(_('Home'), reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
-                          ('News', reverse('news', args=[host_slug])),
+                          (_('News'), reverse('news', args=[host_slug])),
                           (post.title, None)]
         else:
             post = NewsPost.objects.get(pk=post_id)
             host = None
-            breadcrumb = [('Home', reverse('home')), ("News", reverse('news')), (post.title, None)]
+            breadcrumb = [(_('Home'), reverse('home')), (_('News'), reverse('news')), (post.title, None)]
 
     except NewsPost.DoesNotExist:
         raise Http404("The post does not exists!")
@@ -1266,7 +1266,7 @@ def host_projects_view(request, host_slug):
         'dot_nav': get_dot_nav(host=host),
         'projects': projects,
         'host': host,
-        'breadcrumb': [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Projects', None)],
+        'breadcrumb': [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Projects'), None)],
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
@@ -1284,7 +1284,7 @@ def host_events_view(request, host_slug):
         'dot_nav': get_dot_nav(host=host),
         'events': events,
         'host': host,
-        'breadcrumb': [('Home', reverse('home')), (host.name, reverse('host', host_slug)), ("Events", None)],
+        'breadcrumb': [(_('Home'), reverse('home')), (host.name, reverse('host', host_slug)), (_('Events'), None)],
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
@@ -1295,7 +1295,7 @@ def search_view(request, query=None):
     context = {
         'main_nav': get_main_nav(),
         'dot_nav': get_dot_nav(),
-        'breadcrumb': [('Home', reverse('home')), ("Search", None)],
+        'breadcrumb': [(_('Home'), reverse('home')), (_('Search'), None)],
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context), request)
@@ -1307,12 +1307,12 @@ def sitemap_view(request, host_slug=None):
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Sitemap', None)]
+            breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Sitemap'), None)]
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('Sitemap', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('Sitemap'), None)]
 
     projects = Project.objects.all()
 
@@ -1334,12 +1334,12 @@ def donate_view(request, host_slug=None):
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('donate', None)]
+            breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Donate'), None)]
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('donate', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('Donate'), None)]
 
     load_host = host if host else Host.objects.get(slug='bundesverband')
     donate = Content.objects.get(host=load_host, type='donate')
@@ -1367,12 +1367,12 @@ def imprint_view(request, host_slug=None):
     if host_slugs:
         try:
             host = Host.objects.get(slug=host_slug) if host_slug else None
-            breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Impressum', None)]
+            breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Imprint'), None)]
         except:
             raise Http404()
     else:
         host = None
-        breadcrumb = [('Home', reverse('home')), ('Impressum', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('Imprint'), None)]
 
     teams = Team.objects.filter(host__slug='bundesverband')[:3]
 
@@ -1396,9 +1396,9 @@ def contact_view(request, host_slug=None):
         raise Http404()
 
     if host:
-        breadcrumb = [('Home', reverse('home')), (host.name, reverse('host', args=[host_slug])), ('Contact', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Contact'), None)]
     else:
-        breadcrumb = [('Home', reverse('home')), ('Contact', None)]
+        breadcrumb = [(_('Home'), reverse('home')), (_('Contact'), None)]
 
     load_host = host if host else Host.objects.get(slug='bundesverband')
     try:
@@ -1481,7 +1481,7 @@ def sitemap_view(request):
         'main_nav': get_main_nav(),
         'dot_nav': get_dot_nav(),
         'hosts': hosts,
-        'breadcrumb': [('Home', reverse('home')), ("Sitemap", None)],
+        'breadcrumb': [(_('Home'), reverse('home')), (_('Sitemap'), None)],
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context), request)
@@ -1496,7 +1496,7 @@ def faq_view(request):
         'main_nav': get_main_nav(),
         'dot_nav': get_dot_nav(),
         'faq': faq,
-        'breadcrumb': [('Home', reverse('home')), ("FAQ", None)],
+        'breadcrumb': [(_('Home'), reverse('home')), (_('FAQ'), None)],
         'icon_links': icon_links,
         'hosts': Host.objects.all(),
     }
