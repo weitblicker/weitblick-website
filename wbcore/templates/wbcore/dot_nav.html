@@ -54,7 +54,7 @@
             {% else %} <a class="ui item header" href="{% url 'events' %}">{% trans "Events" %}</a>
             {% endif %}
             {% for event in dot_nav.events %}
-                {% include 'wbcore/dot_nav_item.html' with type='event' slug=event.slug title=event.title desc=event.description|truncatewords:7 show_date=event.show_date %}
+                {% include 'wbcore/dot_nav_item.html' with type='event' slug=event.slug title=event.title|truncatechars:40 desc=event.description|truncatewords:7 show_date=event.show_date %}
             {% endfor %}
         </div>
     {% else %}
@@ -101,7 +101,7 @@
             {% else %} <a class="ui item header" href="{% url 'events' %}">{% trans "Events" %}</a>
             {% endif %}
             {% for event in dot_nav.events %}
-                {% include 'wbcore/dot_nav_item.html' with type='event' slug=event.slug title=event.title desc=event.description|truncatewords:7 show_date=event.show_date %}
+                {% include 'wbcore/dot_nav_item.html' with type='event' slug=event.slug title=event.title|truncatechars:40 desc=event.description|truncatewords:7 show_date=event.show_date %}
             {% endfor %}
         </div>
     {% endif %}
