@@ -1109,16 +1109,22 @@ def blog_post_view(request, host_slug=None, post_id=None):
     except Host.DoesNotExist:
         raise Http404()
 
-    projects = item_list_from_proj([post.project], host_slug=host_slug) if post.project else None
+    if post.project:
+        projects = item_list_from_proj([post.project], host_slug=host_slug)
+    elif host:
+        projects = item_list_from_proj(Project.objects.filter(hosts=host), host_slug=host_slug)
+    else:
+        projects = None
 
     context = {
         'main_nav': get_main_nav(host=host, active='blog'),
         'dot_nav': get_dot_nav(host=host),
-        'post': post,
-        'projects': projects,
-        'breadcrumb': breadcrumb,
         'host': host,
-        'page_title': 'Blog',
+        'breadcrumb': breadcrumb,
+        'post': post,
+        'photos': post.photos,
+        'projects': projects,
+        'hosts': Host.objects.all(),
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
@@ -1214,16 +1220,22 @@ def news_post_view(request, host_slug=None, post_id=None):
     except Host.DoesNotExist:
         raise Http404()
 
-    projects = item_list_from_proj([post.project], host_slug=host_slug) if post.project else None
+    if post.project:
+        projects = item_list_from_proj([post.project], host_slug=host_slug)
+    elif host:
+        projects = item_list_from_proj(Project.objects.filter(hosts=host), host_slug=host_slug)
+    else:
+        projects = None
 
     context = {
         'main_nav': get_main_nav(host=host, active='news'),
         'dot_nav': get_dot_nav(host=host),
-        'post': post,
-        'projects': projects,
-        'breadcrumb': breadcrumb,
         'host': host,
-        'page_title': 'News',
+        'breadcrumb': breadcrumb,
+        'post': post,
+        'photos': post.photos,
+        'projects': projects,
+        'hosts': Host.objects.all(),
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))

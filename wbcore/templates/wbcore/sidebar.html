@@ -19,6 +19,14 @@
     </div>
     {% endif %}
 
+    {% if photos %}
+        <div class="ui segment">
+            {% trans "Gallery" as title %}
+            {% include 'wbcore/segment_header.html' with icon='image outline' %}
+            {% include 'wbcore/gallery.html' with photos=photos.all %}
+        </div>
+    {% endif %}
+
     <!--div class="ui segment">
         {% trans "Donate" as title %}
         {% include "wbcore/segment_header.html" with icon='donate' url_alias='donate' %}

@@ -1,46 +1,29 @@
-{% extends 'wbcore/single_content.html' %}
+{% extends 'wbcore/basic.html' %}
 {% load i18n %}
 {% load static %}
 {% load staticfiles %}
+{% load martortags %}
 {% load wbcoretags %}
-{% block content %}
 
-<div class="ui stackable grid container">
-    {% include 'wbcore/image-header.html' with title=page_title image=post.image default='/images/news_header.jpg' %}
+{% block main %}
+    {% include 'wbcore/image-header.html' with title=post.title image=post.image default='/images/news_header.jpg' %}
 
-    <div class="ten wide column divided items">
-        <div class="ui segment">
-            <h1 class="ui header">{{ post.title }}</h1>
-            <div class="ui image label">
-                {% if post.author and post.author.image %}
-                    <img class="ui avatar image" src='{{ post.author.image.url }}'>{{ post.author.name }}
-                {% elif post.author_name %}
-                    <img class="ui avatar image" src='{% get_media_prefix %}kristy.png'>{{ post.author_name }}
-                {% endif %}
-            </div>
-            <span class="date">{{ post.published | date:"D, j. M Y" }}</span>
-            <div class="ui hidden divider"></div>
-            <div class="item">
-                {{ post.text | safe_markdown }}
-                <div style="clear:both;"></div>
-            </div>
-        </div>
-    </div>
+    <div class="ui segment">
+        {{ post.image }}
 
-    <div class="six wide column divided items">
-        {% if projects %}
-            <div class="ui segment">
-                {% include 'wbcore/segment_header.html' with icon='seedling' title='Project' %}
-                {% include 'wbcore/item_list.html' with item_list=projects image_size='tiny' %}
-            </div>
-        {% endif %}
-        <div class="ui segment">
-            {% include 'wbcore/segment_header.html' with icon='image outline' title='Gallery' %}
-            {% if post.gallery %}
-                {% include 'wbcore/gallery.html' with photos=post.photos %}
+        <div class="ui image label">
+            {% if post.author and post.author.image %}
+                <img class="ui avatar image" src='{{ post.author.image.url }}'>{{ post.author.name }}
+            {% elif post.author_name %}
+                <img class="ui avatar image" src='{% get_media_prefix %}kristy.png'>{{ post.author_name }}
             {% endif %}
         </div>
+        <span class="date">{{ post.published | date:"D, j. M Y" }}</span>
+        <div class="ui hidden divider"></div>
+        <div class="item">
+            {{ post.text | safe_markdown }}
+            <div style="clear:both;"></div>
+        </div>
     </div>
-</div>
 
 {% endblock %}
