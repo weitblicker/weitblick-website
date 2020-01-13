@@ -10,6 +10,4 @@
             {{ charter.text | safe_markdown }}
         {% endif %}
     </div>
-    {% include 'wbcore/segment_header.html' with icon='file alternate outline'%}
-    {% include 'wbcore/document_list.html' with documents=charter_files hide_year=True %}
 {% endblock %}
