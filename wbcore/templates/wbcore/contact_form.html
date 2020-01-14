@@ -1,6 +1,6 @@
 {% load i18n %}
 <form class="ui form segment" action="{% url 'contact' %}" method="post">
-    {% trans "Write us!" %}
+    {% trans "Write us!" as title %}
     {% include "wbcore/segment_header.html" with icon='envelope outline' %}
 
     <div class="ui items">

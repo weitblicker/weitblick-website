@@ -1438,6 +1438,9 @@ def contact_view(request, host_slug=None):
         if form.is_valid():
             form.save()
 
+            recipient_host_slug = form.data['host']
+            recipient = f'kontakt@weitblicker.org' if recipient_host_slug == 'bundesverband' else f'{recipient_host_slug}@weitblicker.org'
+
             # sent info via email
             name = form.cleaned_data['name']
             email_addr = form.cleaned_data['email']
@@ -1449,7 +1452,7 @@ def contact_view(request, host_slug=None):
             message += 'Nachricht: ' + msg
 
             email = EmailMessage(
-                to=['admin@weitblicker.org'],
+                to=[recipient],
                 reply_to=[form.cleaned_data['email']],
                 subject=form.cleaned_data['email'],
                 body=message
@@ -1459,7 +1462,7 @@ def contact_view(request, host_slug=None):
                context['success'] = True
             # TODO handle error case more specifically
             except:
-                return HttpResponse('Invalid header found.')
+                return HttpResponse('Message delivery failed.')
             return HttpResponse(template.render(context, request))
         else:
             context['success'] = False
