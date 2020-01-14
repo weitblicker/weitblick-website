@@ -96,7 +96,7 @@ class Location(RulesModel):
 class Host(RulesModel):
     class Meta:
         rules_permissions = {
-            "add": pred.is_super_admin,
+            "add": pred.is_super_admin | pred.is_admin,
             "view": rules.always_allow,
             "change": pred.is_super_admin | pred.is_admin,
             "delete": pred.is_super_admin,
@@ -137,7 +137,7 @@ class Host(RulesModel):
         return self.name
 
     def get_hosts(self):
-        return [self]
+        return self
 
     def instagram(self):
         sm = self.socialmedialink_set.filter(type='instagram').all()

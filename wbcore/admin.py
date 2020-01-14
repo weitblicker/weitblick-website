@@ -546,6 +546,15 @@ class HostAdmin(MyAdmin, ReverseModelAdmin):
 
     list_display = ('name', 'slug', 'email', 'founding_date', 'address')
 
+    def get_readonly_fields(self, request, obj=None):
+        readonly_field = super().get_readonly_fields(request, obj)
+        if request.user.is_super_admin or request.user.is_superuser:
+            return super().get_readonly_fields(request, obj)
+
+        return readonly_field + ('slug', 'name', 'email')
+
+
+
 
 class PartnerAdmin(MyAdmin, ReverseModelAdmin):
     inline_type = 'stacked'
