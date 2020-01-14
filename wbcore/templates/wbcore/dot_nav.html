@@ -11,8 +11,11 @@
         </div>
     {% endif %}
 
-<div id="mobile-menu" class="ui grid mobile only">
-    <div class="five wide column">
+<div class="ui row">
+<div id="mobile-dot-menu" class="ui thr grid mobile only">
+    <div class="ui row">
+
+    <div class="six wide column">
         <div class="ui fluid vertical menu">
           {% if host %}
             <a class="item" href="{% url 'news' host.slug %}">{% trans "News" %}</a>
@@ -23,7 +26,7 @@
           {% endif %}
         </div>
     </div>
-    <div class="five wide column">
+    <div class="six wide column">
         <div class="ui fluid vertical menu">
             {% if host %}
                 <a class="item" href="{% url 'about' host.slug %}">{% trans "About" %}</a>
@@ -42,7 +45,7 @@
             {% endif %}
         </div>
     </div>
-    <div class="five wide column">
+    <div class="six wide column">
         <div class="ui fluid vertical menu">
             {% if host %}
                 <a class="item" href="{% url 'facts' host.slug %}">{% trans "Facts" %}</a>
@@ -64,4 +67,7 @@
 
         </div>
     </div>
+
+    </div>
+</div>
 </div>

@@ -143,8 +143,23 @@ $wb_lightgrey: #D6D6D9;
 	margin-top: 2rem;
 }
 
-#mobile-menu .menu{
+#mobile-dot-menu .menu{
 	background: transparent;
+}
+
+#mobile-menu{
+	.search .prompt{
+		border-width: 0;
+	}
+
+	.compact.menu .item::before
+	{
+		background: transparent;
+	}
+
+	.logo{
+		padding: 6px 12px 0 12px;
+	}
 }
 
 #menu-nav > .item {
@@ -563,6 +578,7 @@ a.details{
 {
 	background-color: white !important;
 }
+
 
 p{
 	font-size: 1.2rem;

@@ -100,42 +100,60 @@
             </div>
 
             <!-- mobile menu only -->
-            <div class="ui mobile only row">
-                <div class="ui grid">
-                        <div class="ui fluid compact menu">
-                                <div class="ui fluid category search item">
-                                    <div class="ui large icon input">
-                                        <input class="prompt" type="text" placeholder="{% trans "Search" %} ...">
-                                        <i class="search link icon"></i>
-                                    </div>
-                                    <div class="results"></div>
-                                </div>
-                            <div class="ui item">
-                                    {% include 'wbcore/logo.html' %}
+            <div class="ui mobile only row" id="mobile-menu">
+                <div class="ui stackable grid">
+                    <div class="ui three item grid compact menu">
+                        <div class="ui category transparent search item">
+                            <div class="ui small icon input">
+                                <input class="prompt" type="text" placeholder="{% trans "Search" %} ...">
+                                <i class="search link icon"></i>
                             </div>
+                            <div class="results"></div>
                         </div>
-                        <div class="ui mobile only row fluid three item labeled icon menu" id="menu-nav">
-                            {% for key, elem in main_nav.items %}
-                                {% if elem.mobile %}
-                                    {% if elem.link %}
-                                            <a class="item" href="{{ elem.link }}">
-                                            <i class="icon">{% include elem.icon %}</i>
-                                            {{ elem.name }}
-                                        </a>
-                                    {% else %}
-                                        <a class="item active" href="#">
-                                            <i class="icon">{% include elem.icon %}</i>
-                                            {{ elem.name }}</a>
-                                    {% endif %}
+                        <div class="ui item dropdown" id="language-dropdown">
+                            <input type="hidden" name="country">
+                            <div class="default text">
+                                {% get_current_language as current_language %}
+                                <i class="{% if current_language == 'en' %}gb{% else %}{{ current_language }}{% endif %} flag"></i>{{ current_language }}
+                            </div>
+                            <i class="dropdown icon"></i>
+                            <div class="menu">
+                            {% get_available_languages as languages %}
+                            {% for lang_code, lang_name in languages %}
+                                {% if lang_code != current_language %}
+                                <a href="{% translate_url lang_code %}" class="item">
+                                    <i class="{% if lang_code == 'en' %}gb{% else %}{{ lang_code }}{% endif %} flag"></i>{{ lang_code }}
+                                </a>
                                 {% endif %}
                             {% endfor %}
-                            <a class="popup-menu-btn item">
-                                <i class="fitted large chevron down icon"></i>
-                                More
-                            </a>
+
+                            </div>
                         </div>
+                        <div class="item logo">
+                            {% include 'wbcore/logo.html' %}
+                        </div>
+                    </div>
 
-
+                    <div class="ui mobile only row fluid three item labeled icon menu" id="menu-nav">
+                        {% for key, elem in main_nav.items %}
+                            {% if elem.mobile %}
+                                {% if elem.link %}
+                                    <a class="item" href="{{ elem.link }}">
+                                        <i class="icon">{% include elem.icon %}</i>
+                                        {{ elem.name }}
+                                    </a>
+                                {% else %}
+                                    <a class="item active" href="#">
+                                        <i class="icon">{% include elem.icon %}</i>
+                                        {{ elem.name }}</a>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        <a class="popup-menu-btn item">
+                            <i class="fitted large chevron down icon"></i>
+                            More
+                        </a>
+                    </div>
                 </div>
             </div>
             <div id="popup-menu">

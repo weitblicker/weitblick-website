@@ -5,6 +5,8 @@ $(document)
             $('.menu .item').tab();
         });
 
+        $('#language-dropdown').dropdown();
+
         $('.menu .item').tab();
 
         $('.ui.calendar')
