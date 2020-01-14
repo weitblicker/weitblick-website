@@ -1,0 +1,59 @@
+{% load static %}
+{% load i18n %}
+{% load humanize %}
+
+<div class="ui {% language 'en' %}{{ about_width | apnumber }}{% endlanguage %} wide column unstackable items">
+    {% if host %}
+        <a class="ui item header" href="{% url 'about' host.slug %}">{% trans "About" %}</a>
+        <div class="ui item"><a href="{% url 'idea' host.slug %}"><i class="lightbulb outline icon"></i> {% trans "Idea" %}</a></div>
+        <div class="ui item"><a href="{% url 'history' host.slug %}"><i class="history icon"></i> {% trans "History" %}</a></div>
+        <div class="ui item"><a href="{% url 'teams' host.slug %}"><i class="users icon"></i> {% trans "Team" %}</a></div>
+        <div class="ui item"><a href="{% url 'contact' host.slug %}"><i class="address book outline icon"></i> {% trans "Contact" %}</a></div>
+    {% else %}
+        <a class="ui item header" href="{% url 'about' %}">{% trans "About" %}</a>
+        <div class="ui item"><a href="{% url 'idea' %}"><i class="lightbulb outline icon"></i> {% trans "Idea" %}</a></div>
+        <div class="ui item"><a href="{% url 'history' %}"><i class="history icon"></i> {% trans "History" %}</a></div>
+        <div class="ui item"><a href="{% url 'teams' %}"><i class="users icon"></i> {% trans "Team" %}</a></div>
+        <div class="ui item"><a href="{% url 'contact' %}"><i class="address book outline icon"></i> {% trans "Contact" %}</a></div>
+    {% endif %}
+</div>
+
+<div class="ui {% language 'en' %}{{ news_width | apnumber }}{% endlanguage %} wide column unstackable items">
+    {% if host %} <a class="ui item header" href="{% url 'news' host.slug %}">{% trans "News" %}</a>
+    {% else %} <a class="ui item header" href="{% url 'news' %}">{% trans "News" %}</a>
+    {% endif %}
+    {% for entry in dot_nav.news %}
+        {% include 'wbcore/dot_nav_item.html' with image=entry.get_title_image type='news-post' id=entry.pk title=entry.title %}
+    {% endfor %}
+</div>
+{% if blog_width != 0 %}
+<div class="ui {% language 'en' %}{{ blog_width | apnumber }}{% endlanguage %} wide column unstackable items">
+    {% if host %} <a class="ui item header"href="{% url 'blog' host.slug %}" >{% trans "Blog" %}</a>
+    {% else %} <a class="ui item header"href="{% url 'blog' %}" >{% trans "Blog" %}</a>
+    {% endif %}
+    {% for entry in dot_nav.blog %}
+        {% include 'wbcore/dot_nav_item.html' with image=entry.get_title_image type='blog-post' id=entry.pk title=entry.title desc=entry.text|truncatewords:7 %}
+    {% endfor %}
+</div>
+{% endif %}
+<div class="ui {% language 'en' %}{{ facts_width | apnumber }}{% endlanguage %} wide column unstackable items">
+    {% if host %}
+        <a class="ui item header" href="{% url 'facts' host.slug %}">{% trans "Facts" %}</a>
+        <div class="ui item"><a href="{% url 'transparency' host.slug %}"><i class="eye outline icon"></i> {% trans "Transparency" %}</a></div>
+        <div class="ui item"><a href="{% url 'charter' host.slug %}"><i class="file alternate outline icon"></i> {% trans "Charter" %}</a></div>
+        <div class="ui item"><a href="{% url 'reports' host.slug %}"><i class="chart line icon"></i> {% trans "Reports" %}</a></div>
+        <div class="ui item"><a href="{% url 'faq' %}"><i class="question icon"></i> {% trans "FAQ" %}</a></div>
+    {% else %}
+        <a class="ui item header" href="{% url 'facts' %}">{% trans "Facts" %}</a>
+        <div class="ui item"><a href="{% url 'transparency' %}"><i class="eye outline icon"></i> {%  trans "Transparency" %}</a></div>
+        <div class="ui item"><a href="{% url 'charter' %}"><i class="file alternate outline icon"></i> {% trans "Charter" %}</a></div>
+        <div class="ui item"><a href="{% url 'reports' %}"><i class="chart line icon"></i> {% trans "Reports" %}</a></div>
+        <div class="ui item"><a href="{% url 'faq' %}"><i class="question icon"></i> {% trans "FAQ" %}</a></div>
+    {% endif %}
+</div>
+<div class="ui {% language 'en' %}{{ events_width | apnumber }}{% endlanguage %} wide column unstackable items">
+    {% if host %} <a class="ui item header href="{% url 'events' host.slug %}">{% trans "Events" %}</a>
+    {% else %} <a class="ui item header" href="{% url 'events' %}">{% trans "Events" %}</a>
+    {% endif %}
+    {% include 'wbcore/dot_nav_event.html' %}
+</div>

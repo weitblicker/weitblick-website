@@ -1,109 +1,146 @@
 {% load static %}
 {% load i18n %}
 {% load translateurl %}
-<div class="ui container">
-    <div class="segment">
-
-        <div id="main-menu" class="ui mobile reversed stackable grid container">
-            <div class="ui twelve wide column">
-                <div class="ui stackable menu">
-                    <div class="ui category search item">
-                        <div class="ui large transparent icon input">
-                            <input class="prompt" type="text" placeholder="{% trans "Search" %} ...">
-                            <i class="search link icon"></i>
-                        </div>
-                        <div class="results"></div>
-                    </div>
-                    {% get_available_languages as languages %}
-                    {% for lang_code, lang_name in languages %}
-                    <a href="{% translate_url lang_code %}" class="item">
-                        <i class="{% if lang_code == 'en' %}gb{% else %}{{ lang_code }}{% endif %} flag"></i>{{ lang_name }}
-                    </a>
-                    {% endfor %}
-                </div>
-
+    <div class="ui container">
+        <div id="main-menu" class="ui grid container">
+            <!-- computer only menu -->
+            <div class="ui computer only row">
                 <div class="ui grid">
-                    <!-- computer only menu -->
-                    <div class="ui computer only row compact menu" id="menu-nav">
-                        {% for key, elem in main_nav.items %}
-                            {% if elem.link %}
-                                <a class="item" href="{{ elem.link }}">
-                                    <i class="icon">{% include elem.icon %}</i>
-                                    {{ elem.name }}</a>
-                            {% else %}
-                                <a class="item active" href="#">
-                                    <i class="icon">{% include elem.icon %}</i>
-                                    {{ elem.name }}
+                    <div class="ui twelve wide compact column">
+                        <div class="ui compact secondary menu">
+                            <div class="ui category search item">
+                                <div class="ui large icon input">
+                                    <input class="prompt" type="text" placeholder="{% trans "Search" %} ...">
+                                    <i class="search link icon"></i>
+                                </div>
+                                <div class="results"></div>
+                            </div>
+                            {% get_available_languages as languages %}
+                            {% for lang_code, lang_name in languages %}
+                                <a href="{% translate_url lang_code %}" class="item">
+                                    <i class="{% if lang_code == 'en' %}gb{% else %}{{ lang_code }}{% endif %} flag"></i>{{ lang_name }}
                                 </a>
-                            {% endif %}
-                        {% endfor %}
-                        <a class="popup-menu-btn item">
-                            <i class="fitted large chevron down icon"></i>
-                        </a>
-                    </div>
-
-                    <!-- tablet menu only -->
-                    <div class="ui tablet only row fluid seven item labeled icon menu" id="menu-nav">
-                        {% for key, elem in main_nav.items %}
-                            {% if elem.link %}
-                                <a class="item" href="{{ elem.link }}">
-                                    <i class="icon">{% include elem.icon %}</i>
-                                    {{ elem.name }}
-                                </a>
-                            {% else %}
-                                <a class="item active" href="#">
-                                    <i class="icon">{% include elem.icon %}</i>
-                                    {{ elem.name }}
-                                </a>
-                            {% endif %}
-                        {% endfor %}
-                        <a class="popup-menu-btn item">
-                            <i class="fitted large chevron down icon"></i>
-                            More
-                        </a>
-                    </div>
-
-                    <!-- mobile menu only -->
-                    <div class="ui mobile only row fluid three item labeled icon menu" id="menu-nav">
-                        {% for key, elem in main_nav.items %}
-                            {% if elem.mobile %}
+                            {% endfor %}
+                        </div>
+                        <div class="ui compact menu" id="menu-nav">
+                            {% for key, elem in main_nav.items %}
                                 {% if elem.link %}
                                     <a class="item" href="{{ elem.link }}">
                                         <i class="icon">{% include elem.icon %}</i>
-                                        {{ elem.name }}
-                                    </a>
+                                        {{ elem.name }}</a>
                                 {% else %}
                                     <a class="item active" href="#">
                                         <i class="icon">{% include elem.icon %}</i>
-                                        {{ elem.name }}</a>
+                                        {{ elem.name }}
+                                    </a>
                                 {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                        <a class="popup-menu-btn item">
-                            <i class="fitted large chevron down icon"></i>
-                            More
-                        </a>
+                            {% endfor %}
+                            <a class="popup-menu-btn item">
+                                <i class="fitted large chevron down icon"></i>
+                            </a>
+                        </div>
+                        <br>
+                        <div class="ui compact secondary menu">
+                            {% include 'wbcore/breadcrumb.html' %}
+                        </div>
+                    </div>
+                    <div class="four wide column">
+                        <div class="ui basic segment">
+                            {% include 'wbcore/logo.html' %}
+                        </div>
                     </div>
                 </div>
-
             </div>
-            <div class="four wide column">
-                <div class="right menu">
-                    {% include 'wbcore/logo.html' %}
+
+            <!-- tablet menu only -->
+            <div class="ui tablet only row">
+                <div class="ui grid">
+                    <div class="ui twelve wide column">
+                        <div class="ui compact secondary menu">
+                            <div class="ui category search item">
+                                <div class="ui large icon input">
+                                    <input class="prompt" type="text" placeholder="{% trans "Search" %} ...">
+                                    <i class="search link icon"></i>
+                                </div>
+                                <div class="results"></div>
+                            </div>
+                            {% get_available_languages as languages %}
+                            {% for lang_code, lang_name in languages %}
+                                <a href="{% translate_url lang_code %}" class="item">
+                                    <i class="{% if lang_code == 'en' %}gb{% else %}{{ lang_code }}{% endif %} flag"></i>{{ lang_code }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="four wide column">
+                        <div class="ui basic segment">
+                            {% include 'wbcore/logo.html' %}
+                        </div>
+                    </div>
+                    <div class="sixteen wide column">
+                        <div class="ui compact menu" id="menu-nav">
+                            {% for key, elem in main_nav.items %}
+                                {% if elem.link %}
+                                    <a class="item" href="{{ elem.link }}">
+                                        <i class="icon">{% include elem.icon %}</i>
+                                        {{ elem.name }}</a>
+                                {% else %}
+                                    <a class="item active" href="#">
+                                        <i class="icon">{% include elem.icon %}</i>
+                                        {{ elem.name }}
+                                    </a>
+                                {% endif %}
+                            {% endfor %}
+                            <a class="popup-menu-btn item">
+                                <i class="fitted large chevron down icon"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="ui grid">
-                {% include 'wbcore/breadcrumb.html' %}
+
+            <!-- mobile menu only -->
+            <div class="ui mobile only row">
+                <div class="ui grid">
+                        <div class="ui fluid compact menu">
+                                <div class="ui fluid category search item">
+                                    <div class="ui large icon input">
+                                        <input class="prompt" type="text" placeholder="{% trans "Search" %} ...">
+                                        <i class="search link icon"></i>
+                                    </div>
+                                    <div class="results"></div>
+                                </div>
+                            <div class="ui item">
+                                    {% include 'wbcore/logo.html' %}
+                            </div>
+                        </div>
+                        <div class="ui mobile only row fluid three item labeled icon menu" id="menu-nav">
+                            {% for key, elem in main_nav.items %}
+                                {% if elem.mobile %}
+                                    {% if elem.link %}
+                                            <a class="item" href="{{ elem.link }}">
+                                            <i class="icon">{% include elem.icon %}</i>
+                                            {{ elem.name }}
+                                        </a>
+                                    {% else %}
+                                        <a class="item active" href="#">
+                                            <i class="icon">{% include elem.icon %}</i>
+                                            {{ elem.name }}</a>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            <a class="popup-menu-btn item">
+                                <i class="fitted large chevron down icon"></i>
+                                More
+                            </a>
+                        </div>
+
+
+                </div>
+            </div>
+            <div id="popup-menu">
+                {% include 'wbcore/dot_nav.html' %}
             </div>
         </div>
-    </div>
-</div>
 
-<div class="ui stackable grid container">
-    <div class="ui column">
-        <div id="popup-menu" class="ui basic segment">
-            {% include 'wbcore/dot_nav.html' %}
-        </div>
     </div>
-</div>
-

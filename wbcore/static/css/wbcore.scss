@@ -137,7 +137,6 @@ $wb_lightgrey: #D6D6D9;
 #main-menu{
 	background-color: $box-background;
 	margin-top: 0px;
-	padding-top: 15px;
 }
 
 .pusher.content{
@@ -208,6 +207,12 @@ $wb_lightgrey: #D6D6D9;
 }
 
 #popup-menu{
+	width: 100%;
+	color: white;
+	p{
+		color: white;
+	}
+
 	.ui.items {
     	margin: 0;
 
@@ -551,8 +556,12 @@ a.details{
 	background: $wb_orange2 !important;
 }
 // custom override here. Did not work through input.variables nor search.variables
-.menu > .search {
-	border: 1px solid $wb_lightgrey;
+.ui.search .prompt{
+	border-radius: 0 !important;
+}
+.ui.grid > .row > .secondary.column, .ui.grid > .secondary.column, .ui.grid > .secondary.row
+{
+	background-color: white !important;
 }
 
 p{

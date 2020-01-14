@@ -1,7 +1,6 @@
 <!-- Breadcrumb-Navigation -->
 {% load static %}
-<div class="ui row">
-	<div class="ui column small breadcrumb">
+	<div class="ui breadcrumb item">
 	    {% for crumb in breadcrumb %}
 	        {% if crumb.1 %}
 	            <a class="section" href="{{ crumb.1 }}">{{ crumb.0 }}</a>
@@ -10,5 +9,4 @@
 	            <div class="active section">{{ crumb.0 }}</div>
 	        {% endif %}
 	    {% endfor %}
-	</div>
-</div>
+    </div>
