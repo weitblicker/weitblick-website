@@ -534,6 +534,16 @@ class Project(RulesModel):
 
     def get_hosts(self):
         return self.hosts.all()
+    
+    def search_title(self):
+        return self.name
+
+    def search_url(self):
+        return reverse('project', args=[self.slug])
+
+    def search_image(self):
+        image = self.get_title_image()
+        return image.get_search_mini_url() if image else None
 
 
 class Event(RulesModelMixin, ScheduleEvent, metaclass=RulesModelBase):
