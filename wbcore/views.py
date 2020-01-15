@@ -1436,32 +1436,22 @@ def contact_view(request, host_slug=None):
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
-            form.save()
-
-            recipient_host_slug = form.data['host']
-            recipient = f'kontakt@weitblicker.org' if recipient_host_slug == 'bundesverband' else f'{recipient_host_slug}@weitblicker.org'
+            email_template = loader.get_template('wbcore/contact_mail.html')
+            contact_msg = form.save(commit=True)
 
             # sent info via email
-            name = form.cleaned_data['name']
-            email_addr = form.cleaned_data['email']
-            msg = form.cleaned_data['message']
-
-            # TODO use template for this
-            message = 'Name: ' + name + '\n'
-            message += 'E-Mail: ' + email_addr + '\n\n'
-            message += 'Nachricht: ' + msg
-
             email = EmailMessage(
-                to=[recipient],
-                reply_to=[form.cleaned_data['email']],
-                subject=form.cleaned_data['email'],
-                body=message
+                to=[contact_msg.host.email],
+                reply_to=[contact_msg.email],
+                subject=contact_msg.subject,
+                body=email_template.render(context={'msg': contact_msg})
             )
             try:
                email.send()
                context['success'] = True
             # TODO handle error case more specifically
             except:
+                # TODO render nice error page
                 return HttpResponse('Message delivery failed.')
             return HttpResponse(template.render(context, request))
         else:
