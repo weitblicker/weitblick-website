@@ -645,8 +645,8 @@ class NewsPost(RulesModel):
     text = models.TextField()
     image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     added = models.DateTimeField(blank=True, null=True)
-    updated = models.DateTimeField(blank=True, null=True)
-    published = models.DateTimeField(blank=True, null=True)
+    updated = models.DateTimeField(blank=True, null=True, auto_now=True)
+    published = models.DateTimeField(blank=True, null=True, auto_now_add=True)
     priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5)
     RANGE_CHOICES = (
         ('preview', 'Preview'),
