@@ -1,0 +1,17 @@
+{% load tz %}{% load i18n %}{% language 'de' %}{% timezone "Europe/Paris" %}
+Hallo {{ msg.host }},
+
+{{ msg.name }} schrieb am {{ msg.submission_date | date:"l, j.F Y \u\m H:i" }} zum Thema "{{ msg.subject }}" ({{ msg.get_reason_display }}):
+
+
+{{ msg.message }}
+
+Name:       {{ msg.name }}
+E-Mail:     {{ msg.email }}
+Betreff:    {{ msg.subject }}
+Kategorie:  {{ msg.get_reason_display }}
+
+
+Diese Nachricht wurde über das Kontaktformular auf der Weitblick Webseite abgeschickt.
+{% endtimezone %}
+{% endlanguage %}

@@ -9,8 +9,7 @@
             <div class="ui positive message">
                 <div class="header">{% trans "Your message has been delivered. Thank you." %}</div>
             </div>
-        {% endif %}
-
+        {% else %}
         {% for field in contact_form %}
             {% for error in field.errors %}
                 <div class="ui negative message">
@@ -50,5 +49,6 @@
                 <input class="ui submit button orange" type="submit" value="{% trans "Submit" %}">
             </div>
         </div>
+        {% endif %}
     </div>
 </form>

@@ -1023,9 +1023,9 @@ class ContactMessage(RulesModel):
         }
 
     REASON_CHOICES = (
-        ('donation', 'Donation'),
-        ('exit', 'Exit'),
-        ('other', 'Other')
+        ('donation', _('Donation')),
+        ('membership', _('Membership')),
+        ('other', _('Other'))
     )
     host = models.ForeignKey(Host, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, blank=True)
