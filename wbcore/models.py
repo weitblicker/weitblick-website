@@ -113,6 +113,7 @@ class Host(RulesModel):
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True)
     location = models.OneToOneField(Location, on_delete=models.SET_NULL, null=True)
     partners = SortedManyToManyField('Partner', blank=True, related_name='hosts')
+    bank_account = models.OneToOneField('BankAccount', on_delete=models.SET_NULL, null=True)
 
     def belongs_to_host(self, host):
         return host == self

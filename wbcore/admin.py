@@ -542,7 +542,7 @@ class FAQAdmin(MyAdmin):
 class HostAdmin(MyAdmin, ReverseModelAdmin):
     inlines = (JoinPageInlineModel, SocialMediaLinkInlineModel)
     inline_type = 'stacked'
-    inline_reverse = ['address', ]
+    inline_reverse = ['address', 'bank_account']
 
     list_display = ('name', 'slug', 'email', 'founding_date', 'address')
 
@@ -552,8 +552,6 @@ class HostAdmin(MyAdmin, ReverseModelAdmin):
             return super().get_readonly_fields(request, obj)
 
         return readonly_field + ('slug', 'name', 'email')
-
-
 
 
 class PartnerAdmin(MyAdmin, ReverseModelAdmin):
