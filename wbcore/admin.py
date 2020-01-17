@@ -565,9 +565,9 @@ class CycleDonationAdmin(MyAdmin):
 
 
 class PostAdmin(MyAdmin):
-    list_display = ('title', 'get_author', 'host', 'published',)
 
     ordering = ('-published', 'title',)
+    search_fields = ('title', 'text')
 
     def get_author(self, post):
         if post.author:
@@ -577,8 +577,37 @@ class PostAdmin(MyAdmin):
 
     get_author.short_description = 'Author'
 
+    class HostListFilter(admin.SimpleListFilter):
+        title = 'Host'
+        parameter_name = 'host'
+
+        def lookups(self, request, model_admin):
+            if request.user.is_super_admin:
+                return [(host.slug, host.name) for host in Host.objects.all()]
+
+            return [(host.slug, host.name) for host in request.user.hosts.all()]
+
+        def queryset(self, request, queryset):
+            if self.value():
+                queryset = queryset.filter(host__slug=self.value())
+            return queryset.distinct()
+
+    def get_list_filter(self, request):
+        if request.user.is_super_admin or request.user.is_superuser:
+            return self.HostListFilter, 'published',
+        else:
+            return 'published',
+
+    def get_list_display(self, request):
+        if request.user.is_super_admin or request.user.is_superuser:
+            return 'title', 'get_author', 'host', 'published',
+        else:
+            return 'title', 'get_author', 'published',
+
 
 class ContactMessageAdmin(MyAdmin):
+    search_fields = ('subject', 'message', 'email', 'name')
+
     class HostListFilter(admin.SimpleListFilter):
         title = 'Host'
         parameter_name = 'host'
