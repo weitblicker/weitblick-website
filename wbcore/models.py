@@ -113,7 +113,7 @@ class Host(RulesModel):
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True)
     location = models.OneToOneField(Location, on_delete=models.SET_NULL, null=True)
     partners = SortedManyToManyField('Partner', blank=True, related_name='hosts')
-    bank_account = models.OneToOneField('BankAccount', on_delete=models.SET_NULL, null=True)
+    bank = models.OneToOneField('BankAccount', on_delete=models.SET_NULL, null=True)
 
     def belongs_to_host(self, host):
         return host == self
@@ -149,7 +149,6 @@ class Host(RulesModel):
         if link:
             name = link.replace("https://www.instagram.com/", "")
             name = name.replace("/", "")
-            print("Instagram:", name)
             return name
         return None
 
@@ -303,7 +302,6 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
     def has_role_for_host(self, member_type, host):
         if isinstance(host, (list, QuerySet)):
             has_role = self.userrelation_set.filter(member_type=member_type, host__in=host).count() > 0
-            print("member_type:", member_type, "host:", host, "has role:", has_role)
             return has_role
         else:
             return self.userrelation_set.filter(member_type=member_type, host=host).count() > 0
@@ -335,47 +333,7 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'date_of_birth']
 
     def has_perm(self, perm, obj=None):
-
-        if "wbcore.photo" in perm:
-            print("has perm:", self, perm, obj)
-
         return super(User, self).has_perm(perm, obj)
-        #print("out:", out)
-        #print(self.role())
-
-        # Does the user have a specific permission?
-        #if obj:
-            #print("has perm:", perm, obj)
-        #else:
-            #print("has perm:", perm)
-
-        # admins have all rights
-        if self.is_super_admin:
-            return True
-
-        if not obj:
-            return self.has_role('admin')
-
-        if perm.startswith("wbcore.view"):
-            return True
-
-        # Get all host objects where the user is an admin
-        # If the object belongs to any of these hosts the
-        # user has the right to access it
-        for relation in self.userrelation_set.filter(member_type='admin'):
-
-            print("Object", obj, "User:", self, "Host:", relation.host)
-
-            if obj.belongs_to_host(relation.host):
-                if isinstance(obj, User):
-                    if obj.is_super_admin:
-                        return False
-                    if obj.userrelation_set.get(member_type='admin'):
-                        return False
-
-                return True
-
-        return False
 
     def has_module_perms(self, app_label):
         # only allow super admins to see the modules beside wbcore.
@@ -397,6 +355,7 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
     since = models.DateField(auto_now_add=True)
     until = models.DateField(null=True, blank=True)
+    bank = models.OneToOneField('BankAccount', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.name() + ", " + self.email
@@ -621,7 +580,6 @@ class UserRelation(RulesModel):
         validators=[MinValueValidator(2), MaxValueValidator(30)])
 
     def __str__(self):
-        print("member type", self.member_type, self.user)
         return str(self.user) + " in " + self.host.name + " as " + dict(self.TYPE_CHOICES)[self.member_type]
 
     def belongs_to_host(self, host):
@@ -877,7 +835,6 @@ class Team(RulesModel):
         same_host_and_slug = Team.objects.filter(host=self.host, slug=self.slug)
 
         if same_host_and_slug.exists() and (self not in same_host_and_slug):  # second part is necessary to be able to edit a team. Otherwise saving after editing will raise slug already exists error
-            print(same_host_and_slug, "\n", self)
             raise ValidationError(
                 {
                     NON_FIELD_ERRORS: [
@@ -993,25 +950,40 @@ class Milestep(RulesModel):
 class BankAccount(RulesModel):
     class Meta:
         rules_permissions = {
-            "add": pred.is_super_admin,
+            "add": pred.is_super_admin | pred.is_admin | pred.is_author | pred.is_editor | pred.is_member,
             "view": pred.is_super_admin | pred.is_admin | pred.is_user_of_bank_account,
-            "change": pred.is_super_admin | pred.is_user_of_bank_account,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_user_of_bank_account,
             "delete": pred.is_super_admin,
         }
 
     account_holder = models.CharField(max_length=100)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
     iban = IBANField(include_countries=IBAN_SEPA_COUNTRIES)
     bic = BICField()
 
     def belongs_to_host(self, host):
-        return self.user.belongs_to_host(host)
+        if hasattr(self, 'host') and self.host == host:
+            return True
+        elif hasattr(self, 'user') and self.user.host == host:
+            return True
+        else:
+            return False
+
+    def type(self):
+        if hasattr(self, 'host'):
+            return 'host'
+        if hasattr(self, 'user'):
+            return 'user'
 
     def __str__(self):
-        return 'Bankdaten von '+self.profile.name()
+        return self.account_holder
 
     def get_hosts(self):
-        return self.user.hosts
+        if self.host:
+            return self.host
+        elif self.user:
+            return self.user.hosts
+        else:
+            return None
 
 
 class ContactMessage(RulesModel):

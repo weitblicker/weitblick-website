@@ -44,9 +44,9 @@
               </div>
             {% endif %}
             <div class="four wide column">
-                {% if host and host.bank_account %}
+                {% if host and host.bank %}
                     <h4 class="ui inverted header">{% trans "Bank Account" %}</h4>
-                    {{ host.bank_account.account_holder }}
+                    {{ host.bank.account_holder }}
                     <table class="ui inverted compact very basic collapsing celled table">
                         <tbody>
                         <tr>
@@ -54,7 +54,7 @@
                                 IBAN:
                             </td>
                             <td>
-                                {{ host.bank_account.bic }}
+                                {{ host.bank.bic }}
                             </td>
                         </tr>
                         <tr>
@@ -62,7 +62,7 @@
                                 BIC:
                             </td>
                             <td>
-                                {{ host.bank_account.iban }}
+                                {{ host.bank.iban }}
                             </td>
                         </tr>
                     </table>

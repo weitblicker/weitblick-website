@@ -103,12 +103,10 @@ class UserRelationInlineModel(PermissionInlineModel):
     def formfield_for_choice_field(self, db_field, request=None, **kwargs):
         formfield = super().formfield_for_choice_field(db_field, request, **kwargs)
 
-        print("db_field:", db_field)
         if request and request.user.is_super_admin:
             return formfield
         if db_field.name == 'member_type':
 
-            print(kwargs)
             choices = dict(db_field.get_choices())
             del choices['admin']
             del choices['']
@@ -229,7 +227,6 @@ class MyAdmin(TabbedTranslationAdmin):
         if db_field.name == 'project':
                 hosts = request.user.hosts.all()
                 kwargs["queryset"] = Project.objects.filter(hosts__in=hosts).all()
-                print(kwargs['queryset'])
 
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
@@ -262,7 +259,6 @@ class MyAdmin(TabbedTranslationAdmin):
         opts = self.opts
         codename = get_permission_codename('change', opts)
         ret = request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
-        print("%s.%s" % (opts.app_label, codename), obj, ret)
         return ret
 
     def has_delete_permission(self, request, obj=None):
@@ -423,7 +419,6 @@ class UserAdmin(BaseUserAdmin):
         fieldset = super().get_fieldsets(request, obj)
         if request.user.is_super_admin:
             fieldset_dict = dict(fieldset)
-            print(fieldset_dict)
             if 'Account' in fieldset_dict:
                 if 'is_super_admin' not in fieldset_dict['Account']['fields']:
                     fieldset_dict['Account']['fields'] += ('is_super_admin',)
@@ -453,7 +448,7 @@ class UserAdmin(BaseUserAdmin):
         exclude = super().get_exclude(request, obj)
         if not request.user.is_super_admin:
             exclude = exclude + ('is_super_admin',)
-        return exclude
+        return exclude + ('bank',)
 
     def get_fields(self, request, obj=None):
         fields = super().get_fields(request, obj)
@@ -461,7 +456,6 @@ class UserAdmin(BaseUserAdmin):
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request).distinct()
-        print("users:", queryset.count())
 
         # super user can see everything
         if request.user.is_super_admin:
@@ -542,7 +536,7 @@ class FAQAdmin(MyAdmin):
 class HostAdmin(MyAdmin, ReverseModelAdmin):
     inlines = (JoinPageInlineModel, SocialMediaLinkInlineModel)
     inline_type = 'stacked'
-    inline_reverse = ['address', 'bank_account']
+    inline_reverse = ['address', 'bank']
 
     list_display = ('name', 'slug', 'email', 'founding_date', 'address')
 
@@ -688,6 +682,19 @@ class PhotoAdmin(MyAdmin):
         obj.save()
 
 
+class BankAccountAdmin(MyAdmin):
+
+    def get_queryset(self, request):
+        if request.user.is_superuser or request.user.is_super_admin:
+            return super().get_queryset(request)
+
+        hosts = request.user.get_maintaining_hosts()
+        if hosts:
+            qs_hosts = BankAccount.objects.filter(host__in=hosts)
+            qs_users = BankAccount.objects.filter(userrelation__host__in=hosts)
+            return qs_hosts + qs_users
+
+        return BankAccount.objects.filter(userrelation__user=request.user)
 
 # since we're not using Django's built-in permissions,
 # register our own user model and unregister the Group model from admin.

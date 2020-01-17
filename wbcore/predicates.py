@@ -63,7 +63,7 @@ def is_admin_for_milestep(user, milestep):
 
 @rules.predicate
 def is_admin_for_bank_account(user, bank_account):
-    return bank_account.user.hosts and user.is_admin_of_host(bank_account.user.hosts)
+    return user.is_admin_of_host(bank_account.get_hosts())
 
 
 @rules.predicate
@@ -178,8 +178,13 @@ def is_author(user, obj):
 
 
 @rules.predicate
+def is_member(user, obj):
+    return has_role_for_host('member', user, obj)
+
+
+@rules.predicate
 def is_user_of_bank_account(user, account):
-    if not account:
+    if not account or not hasattr(account, 'user'):
         return False
     return user == account.user
 
