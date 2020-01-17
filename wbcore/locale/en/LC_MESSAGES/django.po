@@ -1,8 +1,9 @@
-# Translation file for french.
-# Copyright (C) 2020, Bundesverband Weitblick e.V.
-# License: BSD 3-Clause
-# Sebastian Pütz <spuetz@uos.de>, 2020.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -11,11 +12,11 @@ msgstr ""
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: French\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: models.py:466 models.py:527 models.py:623 models.py:706
 msgid "photos"
@@ -203,11 +204,11 @@ msgstr ""
 
 #: templates/wbcore/footer.html:13 templates/wbcore/footer.html:33
 msgid "Data Protection"
-msgstr ""
+msgstr "Privacy"
 
 #: templates/wbcore/footer.html:19 templates/wbcore/footer.html:39
 msgid "Become a Member"
-msgstr ""
+msgstr "Join"
 
 #: templates/wbcore/footer.html:20 templates/wbcore/footer.html:40
 #: templates/wbcore/hosts.html:5 templates/wbcore/hosts_map.html:7
@@ -238,11 +239,11 @@ msgstr ""
 
 #: templates/wbcore/home.html:21 views.py:96 views.py:745 views.py:749
 msgid "Participate"
-msgstr ""
+msgstr "Join"
 
 #: templates/wbcore/home.html:22
 msgid "Come over!"
-msgstr ""
+msgstr "Take part!"
 
 #: templates/wbcore/join.html:16
 msgid "Registration Form"
@@ -254,7 +255,7 @@ msgstr ""
 
 #: templates/wbcore/join.html:55
 msgid "Personal Data"
-msgstr ""
+msgstr "Privacy"
 
 #: templates/wbcore/join.html:95
 msgid "Membership fee and bank account details"

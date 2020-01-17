@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-15 16:19+0000\n"
+"POT-Creation-Date: 2020-01-17 10:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,19 +18,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:506 models.py:567 models.py:664 models.py:747
+#: models.py:466 models.py:527 models.py:623 models.py:706
 msgid "photos"
 msgstr ""
 
-#| msgid "Donate"
+#: models.py:999
 msgid "Donation"
 msgstr "Spende"
 
-#: models.py:1027
+#: models.py:1000
 msgid "Membership"
 msgstr "Mitgliedschaft"
 
-#: models.py:1028
+#: models.py:1001
 msgid "Other"
 msgstr "Anderer"
 
@@ -215,6 +215,10 @@ msgstr "Mitglied werden"
 #: templates/wbcore/list_filter.html:11 views.py:103 views.py:902
 msgid "Associations"
 msgstr "Vereine"
+
+#: templates/wbcore/footer.html:48
+msgid "Bank Account"
+msgstr ""
 
 #: templates/wbcore/home.html:10
 msgid "What is Weitblick?"
