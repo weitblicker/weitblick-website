@@ -579,7 +579,32 @@ class PostAdmin(MyAdmin):
 
 
 class ContactMessageAdmin(MyAdmin):
-    list_display = ('subject', 'name', 'email', 'reason', 'host', )
+    class HostListFilter(admin.SimpleListFilter):
+        title = 'Host'
+        parameter_name = 'host'
+
+        def lookups(self, request, model_admin):
+            if request.user.is_super_admin:
+                return [(host.slug, host.name) for host in Host.objects.all()]
+
+            return [(host.slug, host.name) for host in request.user.hosts.all()]
+
+        def queryset(self, request, queryset):
+            if self.value():
+                queryset = queryset.filter(host__slug=self.value())
+            return queryset.distinct()
+
+    def get_list_filter(self, request):
+        if request.user.is_super_admin or request.user.is_superuser:
+            return self.HostListFilter, 'reason', 'submission_date'
+        else:
+            return 'reason', 'submission_date'
+
+    def get_list_display(self, request):
+        if request.user.is_super_admin or request.user.is_superuser:
+            return 'subject', 'name', 'email', 'reason', 'host', 'submission_date'
+        else:
+            return 'subject', 'name', 'email', 'reason', 'submission_date'
 
 
 class ProjectAdmin(MyAdmin):
