@@ -48,20 +48,22 @@ class BlogPostSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     gallery = GallerySerializer(read_only=True)
     image = PhotoSerializer()
+    published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
 
     class Meta:
         model = BlogPost
-        fields = ('id', 'title', 'text', 'image', 'added', 'updated', 'published', 'range', 'teaser', 'gallery')
+        fields = ('id', 'title', 'text', 'image', 'published', 'range', 'teaser', 'gallery')
 
 
 class NewsPostSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     photos = PhotoSerializer(many=True)
     image = PhotoSerializer(source='get_title_image')
+    published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
 
     class Meta:
         model = NewsPost
-        fields = ('id', 'title', 'text', 'image', 'added', 'updated', 'published', 'range', 'teaser', 'photos')
+        fields = ('id', 'title', 'text', 'image', 'published', 'range', 'teaser', 'photos')
 
 
 class HostSerializer(serializers.ModelSerializer):
@@ -77,6 +79,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     image = PhotoSerializer(source='get_title_image')
     cycle = serializers.SerializerMethodField()
     location = LocationSerializer()
+    published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
 
     def get_cycle(self, project):
         qs = project.cycledonationrelation_set.all()
@@ -87,8 +90,8 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
 
         depth = 0
-        fields = ('id', 'start_date', 'end_date', 'image', 'published', 'name', 'slug', 'hosts', 'description', 'location',
-                  'partners', 'photos', 'cycle')
+        fields = ('id', 'start_date', 'end_date', 'image', 'published', 'name', 'slug', 'hosts', 'description',
+                  'location', 'partners', 'photos', 'cycle', 'news', 'blog')
 
 
 class EventSerializer(serializers.ModelSerializer):
