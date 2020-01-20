@@ -52,7 +52,7 @@ class BlogPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BlogPost
-        fields = ('id', 'title', 'text', 'image', 'published', 'range', 'teaser', 'gallery')
+        fields = ('id', 'title', 'text', 'image', 'published', 'range', 'teaser', 'gallery', 'project')
 
 
 class NewsPostSerializer(serializers.ModelSerializer):
@@ -63,7 +63,7 @@ class NewsPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = NewsPost
-        fields = ('id', 'title', 'text', 'image', 'published', 'range', 'teaser', 'photos')
+        fields = ('id', 'title', 'text', 'image', 'published', 'range', 'teaser', 'photos', 'project')
 
 
 class HostSerializer(serializers.ModelSerializer):
