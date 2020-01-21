@@ -3,7 +3,7 @@ import csv
 from django.utils.translation import gettext as _
 from django.db.models import Count
 from django.http import HttpResponse, Http404
-from django.template import loader
+from django.template import loader, RequestContext
 from django.urls import reverse
 from django.core.mail import EmailMessage
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -1298,7 +1298,7 @@ def search_view(request, query=None):
         'breadcrumb': [(_('Home'), reverse('home')), (_('Search'), None)],
         'icon_links': icon_links,
     }
-    return HttpResponse(template.render(context), request)
+    return HttpResponse(template.render(context, request))
 
 
 def sitemap_view(request, host_slug=None):
@@ -1444,7 +1444,7 @@ def contact_view(request, host_slug=None):
                 to=[contact_msg.host.email],
                 reply_to=[contact_msg.email],
                 subject=contact_msg.subject,
-                body=email_template.render(context={'msg': contact_msg})
+                body=email_template.render(context={'msg': contact_msg}, request=request)
             )
             try:
                email.send()
@@ -1477,7 +1477,7 @@ def sitemap_view(request):
         'breadcrumb': [(_('Home'), reverse('home')), (_('Sitemap'), None)],
         'icon_links': icon_links,
     }
-    return HttpResponse(template.render(context), request)
+    return HttpResponse(template.render(context, request))
 
 
 def faq_view(request):
@@ -1493,6 +1493,4 @@ def faq_view(request):
         'icon_links': icon_links,
         'hosts': Host.objects.all(),
     }
-    return HttpResponse(template.render(context), request)
-
-    return None
+    return HttpResponse(template.render(context, request))
