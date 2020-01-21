@@ -187,7 +187,7 @@ def filter_events(request, default_limit=None):
     events = [result.object for result in results]
     if start and end:
         p = Period(events, start, end)
-    if start:
+    elif start:
         then = start.replace(year=start.year + 10)
         p = Period(events, start, then)
     elif end:
@@ -199,7 +199,8 @@ def filter_events(request, default_limit=None):
         p = Period(events, now, then)
 
     occurrences = p.get_occurrences()
+
     if limit:
         occurrences = occurrences[:limit]
 
-    return occurrences
+    return occurrences, events

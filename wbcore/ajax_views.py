@@ -82,7 +82,7 @@ def filter_news_view(request):
 @api_view(['GET', 'POST'])
 def filter_events_view(request):
     template = loader.get_template('wbcore/list_items.html')
-    event_occurrences = filter_events(request)
+    event_occurrences, events = filter_events(request)
     host = None  # TODO filter if on host specific news page
     context = {
         'item_list': item_list_from_occ(event_occurrences),

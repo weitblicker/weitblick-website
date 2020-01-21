@@ -110,7 +110,7 @@ def host_detail(request, pk, format=None):
 @api_view(['GET'])
 def event_list(request, format=None):
     if request.method == 'GET':
-        events = filter_events(request)
+        occ, events = filter_events(request)
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data)
 

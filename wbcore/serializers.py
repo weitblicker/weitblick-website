@@ -14,8 +14,13 @@ from django.utils.dateparse import parse_datetime
 from rest_auth.models import TokenModel
 from django.db.models import Sum
 
+
 class PhotoSerializer(serializers.ModelSerializer):
-    url = serializers.ImageField(source='image')
+    url = serializers.SerializerMethodField()
+
+    def get_url(self, photo):
+        if photo:
+            return photo.get_listsize_url()
 
     class Meta:
         model = Photo
@@ -46,13 +51,13 @@ class LocationSerializer(serializers.ModelSerializer):
 
 class BlogPostSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
-    gallery = GallerySerializer(read_only=True)
-    image = PhotoSerializer()
+    image = PhotoSerializer(source='get_title_image')
+    photos = PhotoSerializer(many=True)
     published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
 
     class Meta:
         model = BlogPost
-        fields = ('id', 'title', 'text', 'image', 'published', 'range', 'teaser', 'gallery', 'project')
+        fields = ('id', 'title', 'text', 'image', 'published', 'range', 'teaser', 'photos', 'project')
 
 
 class NewsPostSerializer(serializers.ModelSerializer):
@@ -97,10 +102,15 @@ class ProjectSerializer(serializers.ModelSerializer):
 class EventSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     gallery = GallerySerializer(read_only=True)
+    host = HostSerializer()
+    published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
+    photos = PhotoSerializer(many=True)
+    image = PhotoSerializer(source='get_title_image')
 
     class Meta:
         model = Event
-        fields = ('id', 'name', 'projects', 'host', 'gallery')
+        fields = ('id', 'title', 'projects', 'gallery', 'host', 'published', 'location', 'image', 'photos', 'form',
+                  'cost', 'start', 'end', 'description', 'rule', 'end_recurring_period', )
 
 
 class CycleDonationRelationSerializer(serializers.ModelSerializer):
