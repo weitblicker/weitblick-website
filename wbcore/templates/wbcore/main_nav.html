@@ -18,7 +18,7 @@
                             {% get_available_languages as languages %}
                             {% for lang_code, lang_name in languages %}
                                 <a href="{% translate_url lang_code %}" class="item">
-                                    <i class="{% if lang_code == 'en' %}gb{% else %}{{ lang_code }}{% endif %} flag"></i>{{ lang_name }}
+                                    <i class="{% if lang_code == 'en' %}gb{% else %}{{ lang_code }}{% endif %} flag"></i>{{ lang_code }}
                                 </a>
                             {% endfor %}
                         </div>
