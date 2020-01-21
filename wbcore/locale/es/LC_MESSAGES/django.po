@@ -31,15 +31,15 @@ msgstr "Solicitud invalido!"
 
 #: templates/cookielaw/banner.html:6
 msgid "COOKIE_INFO_HEADER"
-msgstr "COOKIE_INFO_HEADER"
+msgstr ""
 
 #: templates/cookielaw/banner.html:9
 msgid "COOKIE_INFO_PARA"
-msgstr "COOKIE_INFO_PARA"
+msgstr ""
 
 #: templates/cookielaw/banner.html:13
 msgid "COOKIE_INFO_OK"
-msgstr "COOKIE_INFO_OK"
+msgstr ""
 
 #: templates/wbcore/about.html:6 templates/wbcore/dot_nav.html:7 
 #: templates/wbcore/dot_nav.html:13 templates/wbcore/dot_nav.html:61 
@@ -315,7 +315,7 @@ msgstr "Leer más"
 
 #: templates/wbcore/logo.html:8
 msgid "Education opportunities worldwide!"
-msgstr "¡Oportunidades de educación en todo el mundo!"
+msgstr "¡Educación mundialmente!"
 
 #: templates/wbcore/photoswipe.html:30
 msgid "Close"
