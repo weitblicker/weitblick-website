@@ -1,16 +1,15 @@
 from abc import ABC
 
-from allauth.account.forms import default_token_generator
-from rest_auth.serializers import UserDetailsSerializer, UserModel
-from rest_framework.exceptions import ValidationError
-from rest_framework.fields import empty
+import datetime
+from django.utils import timezone
+from rest_auth.serializers import UserDetailsSerializer
+from schedule.models import Occurrence
 
 from wbcore.models import (
     NewsPost, BlogPost, Host, Event, Project, Location, CycleDonation, CycleDonationRelation, CycleSegment,
     CycleTour, User, FAQ, QuestionAndAnswer)
 from rest_framework import serializers
 from photologue.models import Gallery, Photo
-from django.utils.dateparse import parse_datetime
 from rest_auth.models import TokenModel
 from django.db.models import Sum
 
@@ -99,6 +98,12 @@ class ProjectSerializer(serializers.ModelSerializer):
                   'location', 'partners', 'photos', 'cycle', 'news', 'blog')
 
 
+class OccurrenceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Occurrence
+        fields = ('title', 'description', 'start', 'end', 'cancelled', 'original_start', 'original_end', 'updated_on')
+
+
 class EventSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     gallery = GallerySerializer(read_only=True)
@@ -106,11 +111,18 @@ class EventSerializer(serializers.ModelSerializer):
     published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
     photos = PhotoSerializer(many=True)
     image = PhotoSerializer(source='get_title_image')
+    location = LocationSerializer()
+    occurrences = serializers.SerializerMethodField()
+
+    def get_occurrences(self, event):
+        start = timezone.now()-datetime.timedelta(days=1)
+        end = start + datetime.timedelta(days=365)
+        return OccurrenceSerializer(instance=event.get_occurrences(start, end), many=True).data
 
     class Meta:
         model = Event
         fields = ('id', 'title', 'projects', 'gallery', 'host', 'published', 'location', 'image', 'photos', 'form',
-                  'cost', 'start', 'end', 'description', 'rule', 'end_recurring_period', )
+                  'cost', 'start', 'end', 'description', 'rule', 'end_recurring_period', 'occurrences')
 
 
 class CycleDonationRelationSerializer(serializers.ModelSerializer):
