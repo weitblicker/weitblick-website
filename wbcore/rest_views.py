@@ -12,7 +12,10 @@ from martor.utils import LazyEncoder
 from django.utils.translation import ugettext_lazy as _
 from rest_auth.models import TokenModel
 from rest_auth.views import UserDetailsView
+from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.parsers import MultiPartParser
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 
 from wbcore.serializers import (NewsPostSerializer, BlogPostSerializer, HostSerializer, EventSerializer,
                                 ProjectSerializer, LocationSerializer, CycleDonationSerializer,
@@ -243,20 +246,12 @@ def cycle_add_segment(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
-def cycle_user_tours(request):
-    if request.method == 'POST':
-        try:
-            token_serializer = TokenSerializer(data=request.data)
-            if token_serializer.is_valid():
-                token = token_serializer.instance
-                serializer = CycleTourSerializer(instance=token.user.cycletour_set.all(), many=True)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(token_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except TokenModel.DoesNotExist:
-            print("Token %s does not exist!" % token_str)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+class CycleUserToursViewSet(viewsets.ModelViewSet):
+    serializer_class = CycleTourSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        return self.request.user.cycletour_set.all()
 
 
 def get_best_users():
@@ -308,18 +303,35 @@ def cycle_ranking(request):
         })
 
 
-class RankingViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.exclude(cycletour=None)
+class CycleRankingViewSet(APIView):
     serializer_class = UserCycleSerializer
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = ['km', 'euro']
-    ordering = ['km']
 
-    def get_queryset(self):
-        return self.queryset.annotate(
-            euro=Sum('cycletour__euro'),
-            km=Sum('cycletour__km')
-        )
+    def get(self, request):
+        if not request.user.is_anonymous:
+            print("User:", request.user)
+            user_field = get_user_field(request.user)
+            if 'ordering' in request.GET and request.GET['ordering'] == 'euro':
+                user_field = user_field.order_by('-euro')
+            else:
+                user_field = user_field.order_by('-km')
+
+            user_field = self.serializer_class(user_field, many=True).data
+        else:
+            print("best field is none")
+            user_field = None
+
+        best_users = get_best_users()
+        if 'ordering' in request.GET and request.GET['ordering'] == 'euro':
+            best_users = best_users.order_by('-euro')
+        else:
+            best_users = best_users.order_by('-km')
+
+        best_field = self.serializer_class(best_users, many=True).data
+
+        return Response({
+            'user_field': user_field,
+            'best_field': best_field
+        })
 
 
 class FAQViewSet(viewsets.ModelViewSet):
@@ -327,21 +339,7 @@ class FAQViewSet(viewsets.ModelViewSet):
     serializer_class = FAQSerializer
 
 
-class UserrankingViewSet(object):
-    queryset = User.objects.exclude(cycletour=None)
-    serializer_class = UserCycleSerializer
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = ['km', 'euro']
-    ordering = ['km']
-
-    def get_queryset(self):
-        return self.queryset.annotate(
-            euro=Sum('cycletour__euro'),
-            km=Sum('cycletour__km')
-        )
-
-
-class UsersView(UserDetailsView):
+class UsersView(RetrieveUpdateAPIView):
     """
     Reads and updates UserModel fields
     Accepts GET, PUT, PATCH methods.
@@ -352,14 +350,20 @@ class UsersView(UserDetailsView):
 
     Returns UserModel fields.
     """
+    serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated,)
     parser_classes = (MultiPartParser, )
 
     def post(self, request, format=None):
-        print(request.FILES)
-        serializer = UserSerializer(data=request.data)
+
+        serializer = self.serializer_class(
+            instance=request.user,
+            data=request.data,
+            context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data)
+
         return JsonResponse(serializer.errors, status=400)
 
     def get_object(self):

@@ -244,22 +244,12 @@ class CycleTourSerializer(serializers.ModelSerializer):
         serializer = CycleProjectSerializer(read_only=True, instance=tour.project)
         return serializer.data
 
-    def validate(self, data):
-        try:
-            token = TokenModel.objects.get(key=data['token'])
-            data['user'] = token.user
-        except TokenModel.DoesNotExist:
-            print("Token %s is invalid!" % data['token'])
-            raise serializers.ValidationError("Token is invalid:%s" % data['token'])
-
-        return data
-
     class Meta:
         model = CycleTour
         fields = ('tour', 'project', 'finished', 'euro', 'km', 'start', 'end', 'duration')
 
 
-class UserSerializer(UserDetailsSerializer):
+class UserSerializer(serializers.ModelSerializer):
     """
     User model w/o password
     """

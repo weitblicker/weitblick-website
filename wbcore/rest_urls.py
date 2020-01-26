@@ -26,8 +26,8 @@ rest_patterns = [
 
     path('cycle/donations/', rest_views.cycle_donations_list, name="rest-cycle-donations"),
     path('cycle/segment/', rest_views.cycle_add_segment, name="rest-cycle-add-segment"),
-    path('cycle/tours/', rest_views.cycle_user_tours, name="rest-cycle-user-tours"),
-    path('cycle/ranking/', rest_views.cycle_ranking, name="rest-cycle-ranking"),
+    path('cycle/tours/', rest_views.CycleUserToursViewSet.as_view({'get': 'list'}), name="rest-cycle-user-tours"),
+    path('cycle/ranking/', rest_views.CycleRankingViewSet.as_view(), name="rest-cycle-ranking"),
     #path('cycle//', rest_views.UserrankingViewSet.as_view({'get': 'list'}), name="rest-cycle-userrank"),
 
     # URLs that do not require a session or valid token

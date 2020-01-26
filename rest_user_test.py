@@ -1,0 +1,121 @@
+import requests
+import getpass
+import json
+
+username = input("email: ")
+password = getpass.getpass()
+
+base_uri = 'http://localhost:8000'
+login_uri = '/rest/auth/login/'
+logout_uri = '/rest/auth/logout/'
+user_data_uri = '/rest/auth/user/'
+user_pw_change_uri = '/rest/auth/password/change/'
+cycle_tours_uri = '/rest/cycle/tours/'
+cycle_ranking_uri = '/rest/cycle/ranking/'
+
+def login(username, password):
+    login_request_header = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
+
+    login_request_body = {
+        'email': username,
+        'password': password
+    }
+
+    print("login...")
+    response = requests.post(
+        base_uri+login_uri,
+        data=json.dumps(login_request_body),
+        headers=login_request_header
+    )
+
+    print(response.content)
+    return json.loads(response.content)['key']
+
+
+def logout(token):
+    print("logout...")
+    header = {'Authorization': 'Token ' + token}
+    response = requests.post(base_uri+logout_uri, headers=header)
+    print(response.content)
+
+
+def user_data(token):
+    print("user data...")
+    header = {'Authorization': 'Token ' + token}
+    response = requests.get(base_uri+user_data_uri, headers=header)
+    print(response.content)
+    return response.content
+
+
+def upload_user_photo(data, token, photo):
+    print("upload user photo...")
+    header = {
+        'Authorization': 'Token ' + token,
+        'Accept': 'application/json',
+    }
+    response = requests.post(
+        base_uri+user_data_uri,
+        headers=header,
+        files={'image': open(photo, 'rb')},
+        data=json.loads(data)
+    )
+    print(response.content)
+
+
+def change_password(token):
+    print("change password...")
+
+    header = {
+        'Authorization': 'Token ' + token,
+        'Accept': 'application/json',
+    }
+
+    new_password1 = input("New Password: ")
+    new_password2 = input("Password repeat: ")
+    pw_data = {
+        'new_password1': new_password1,
+        'new_password2': new_password2
+    }
+
+    response = requests.post(
+        base_uri + user_pw_change_uri,
+        headers=header,
+        data=pw_data)
+
+    print("response: ", response.content)
+
+
+def cycle_user_tours(token):
+    print("user tours...")
+    header = {
+        'Authorization': 'Token ' + token,
+        'Accept': 'application/json',
+    }
+    response = requests.get(base_uri + cycle_tours_uri, headers=header)
+    print("response: ", response.content)
+
+
+def cycle_ranking(token=None):
+    print("cycle ranking...")
+    header = {'Accept': 'application/json'}
+    if token:
+        header['Authorization'] = 'Token ' + token
+
+    response = requests.get(base_uri + cycle_ranking_uri, headers=header)
+    print("response: ", response.content)
+
+
+token = login(username, password)
+#logout(token)
+#token = login(username, password)
+data = user_data(token)
+photo = '/home/spuetz/Downloads/puetz.jpg'
+#upload_user_photo(data, token, photo)
+#change_password(token)
+cycle_user_tours(token)
+cycle_ranking(token)
+logout(token)
+cycle_ranking()
