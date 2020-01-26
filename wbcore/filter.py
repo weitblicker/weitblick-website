@@ -102,7 +102,7 @@ def filter_projects(request, default_limit=None):
     if start:
         results &= SearchQuerySet().filter(start_date__gte=start) | SearchQuerySet().filter(end_date__gte=start)
     if end:
-        results &= SearchQuerySet().filter(start_date__lte=end) | SearchQuerySet().filter(end_date__lte=end)
+        results &= SearchQuerySet().filter(start_date__lt=end) | SearchQuerySet().filter(end_date__lt=end)
 
     results = results.models(Project).all()
     if limit:
@@ -128,7 +128,7 @@ def filter_news(request, default_limit=None):
     if start:
         results = results.filter_and(published__gte=start)
     if end:
-        results = results.filter_and(published__lte=end)
+        results = results.filter_and(published__lt=end)
 
     results = results.models(NewsPost).order_by('-published')
     if limit:
@@ -155,7 +155,7 @@ def filter_blog(request, default_limit=None):
     if start:
         results = results.filter_and(published__gte=start)
     if end:
-        results = results.filter_and(published__lte=end)
+        results = results.filter_and(published__lt=end)
 
     results = results.models(BlogPost).order_by('-published')
     if limit:
