@@ -287,6 +287,7 @@ class QuestionAndAnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuestionAndAnswer
         fields = ('question', 'answer',)
+        read_only_fields = ('question', 'answer')
 
 
 class FAQSerializer(serializers.ModelSerializer):
@@ -298,3 +299,4 @@ class FAQSerializer(serializers.ModelSerializer):
     class Meta:
         model = FAQ
         fields = ('title', 'faqs',)
+        read_only_fields = ('title', 'faqs')
