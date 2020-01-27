@@ -560,9 +560,6 @@ class CycleDonationRelationInlineModel(PermissionInlineModel):
     extra = 1
 
 
-class CycleDonationAdmin(MyAdmin):
-    inlines = (CycleDonationRelationInlineModel, )
-
 
 class PostAdmin(MyAdmin):
 
@@ -687,6 +684,7 @@ class AddressAdmin(MyAdmin):
 
 
 class CycleDonationAdmin(MyAdmin):
+    inlines = (CycleDonationRelationInlineModel, )
 
     list_display = ('name', 'get_projects', 'partner', 'slug', 'goal_amount')
 
