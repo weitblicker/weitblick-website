@@ -5,7 +5,10 @@ import json
 username = input("email: ")
 password = getpass.getpass()
 
-base_uri = 'http://localhost:8000'
+base_uri = 'https://weitblicker.org'
+photo = '/home/spuetz/Downloads/puetz.jpg'
+#base_uri = 'http://localhost:8000'
+
 login_uri = '/rest/auth/login/'
 logout_uri = '/rest/auth/logout/'
 user_data_uri = '/rest/auth/user/'
@@ -130,16 +133,14 @@ def cycle_add_segment(token, ):
     print("response: ", response.content)
 
 
-
 token = login(username, password)
-#logout(token)
-#token = login(username, password)
 data = user_data(token)
-photo = '/home/spuetz/Downloads/puetz.jpg'
-#upload_user_photo(data, token, photo)
-#change_password(token)
 cycle_user_tours(token)
 cycle_ranking(token)
 cycle_add_segment(token)
 logout(token)
 cycle_ranking()
+logout(token)
+token = login(username, password)
+upload_user_photo(data, token, photo)
+change_password(token)
