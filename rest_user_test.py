@@ -12,6 +12,8 @@ user_data_uri = '/rest/auth/user/'
 user_pw_change_uri = '/rest/auth/password/change/'
 cycle_tours_uri = '/rest/cycle/tours/'
 cycle_ranking_uri = '/rest/cycle/ranking/'
+cycle_add_segment_uri = '/rest/cycle/segment/'
+
 
 def login(username, password):
     login_request_header = {
@@ -108,6 +110,27 @@ def cycle_ranking(token=None):
     print("response: ", response.content)
 
 
+def cycle_add_segment(token, ):
+    print("cycle add segment...")
+    header = {
+        'Authorization': 'Token ' + token,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+    }
+
+    segment = {
+        "start": "2019-10-01T07:08:04Z",
+        "end": "2019-10-01T07:08:14Z",
+        "distance": 0.16,
+        "project": 1,
+        "tour": 0,
+    }
+
+    response = requests.post(base_uri + cycle_add_segment_uri, headers=header, data=json.dumps(segment))
+    print("response: ", response.content)
+
+
+
 token = login(username, password)
 #logout(token)
 #token = login(username, password)
@@ -117,5 +140,6 @@ photo = '/home/spuetz/Downloads/puetz.jpg'
 #change_password(token)
 cycle_user_tours(token)
 cycle_ranking(token)
+cycle_add_segment(token)
 logout(token)
 cycle_ranking()

@@ -132,31 +132,33 @@ class CycleDonationRelationSerializer(serializers.ModelSerializer):
 
 
 class CycleSegmentSerializer(serializers.ModelSerializer):
-    token = serializers.CharField(write_only=True)
     project = serializers.IntegerField(write_only=True)
     tour = serializers.IntegerField(write_only=True)
 
+    def __init__(self, user, **kwargs):
+        self.user = user
+        super().__init__(**kwargs)
+
     class Meta:
         model = CycleSegment
-        fields = ('start', 'end', 'distance', 'project', 'tour', 'token')
+        fields = ('start', 'end', 'distance', 'project', 'tour',)
 
     def create(self, validated_data):
-        user = validated_data['user']
         tour_index = validated_data['tour']
         project = validated_data['project']
 
         try:
-            tour = CycleTour.objects.get(user=user, index=tour_index)
+            tour = CycleTour.objects.get(user=self.user, index=tour_index)
 
         except CycleTour.DoesNotExist:
             # start new tour and finish all unfinished tours for the given user
-            unfinished_tours = CycleTour.objects.filter(user=user, finished=False).all()
+            unfinished_tours = CycleTour.objects.filter(user=self.user, finished=False).all()
             for tour in unfinished_tours:
                 tour.finished = True
                 tour.save()
 
             # create new tour
-            tour = CycleTour(user=user, index=tour_index, project=project)
+            tour = CycleTour(user=self.user, index=tour_index, project=project)
             tour.save()
 
         tour.donations.set(project.cycledonation_set.all())
@@ -169,13 +171,6 @@ class CycleSegmentSerializer(serializers.ModelSerializer):
         return segment
 
     def validate(self, data):
-        try:
-            token = TokenModel.objects.get(key=data['token'])
-            data['user'] = token.user
-        except TokenModel.DoesNotExist:
-            print("Token %s is invalid!" % data['token'])
-            raise serializers.ValidationError("Token is invalid:%s" % data['token'])
-
         try:
             project = Project.objects.get(pk=data['project'])
             data['project'] = project

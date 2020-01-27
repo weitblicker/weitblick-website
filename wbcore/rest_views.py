@@ -51,7 +51,6 @@ def markdown_uploader(request):
     and represent as json to markdown editor.
     """
     if request.method == 'POST' and request.is_ajax():
-        print(request.POST, request.path)
         if 'markdown-image-upload' in request.FILES:
             image = request.FILES['markdown-image-upload']
             if image.content_type not in image_types:
@@ -234,10 +233,11 @@ def cycle_donations_list(request):
         return Response(serializer.data)
 
 
-@api_view(['POST'])
-def cycle_add_segment(request):
-    if request.method == 'POST':
-        serializer = CycleSegmentSerializer(data=request.data)
+class CycleAddSegmentViewSet(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = CycleSegmentSerializer(request.user, data=request.data)
         if serializer.is_valid():
             segment = serializer.save()
             tour_serializer = CycleTourSerializer(segment.tour)
@@ -263,6 +263,7 @@ def get_best_users():
     return users
 
 
+# TODO use user for getting the user field around the user's ranking
 def get_user_field(user):
     users = User.objects.annotate(
         euro=Sum('cycletour__euro'),
@@ -271,44 +272,12 @@ def get_user_field(user):
     return users
 
 
-@api_view(['GET', 'POST'])
-def cycle_ranking(request):
-
-    best_users = get_best_users()
-    if 'ordering' in request.GET and request.GET['ordering'] == 'euro':
-        best_users = best_users.order_by('-euro')
-    else:
-        best_users = best_users.order_by('-km')
-
-    token_serializer = TokenSerializer(data=request.data, many=False)
-
-    if token_serializer.is_valid():
-        user = token_serializer.instance.user
-        user_field = get_user_field(user)
-        if 'ordering' in request.GET and request.GET['ordering'] == 'euro':
-            user_field = user_field.order_by('-euro')
-        else:
-            user_field = user_field.order_by('-km')
-
-        user_field = UserCycleSerializer(user_field, many=True).data
-
-    else:
-        user_field = None
-
-    best_field = UserCycleSerializer(best_users, many=True).data
-
-    return Response({
-            'user_field': user_field,
-            'best_field': best_field
-        })
-
-
 class CycleRankingViewSet(APIView):
+
     serializer_class = UserCycleSerializer
 
     def get(self, request):
         if not request.user.is_anonymous:
-            print("User:", request.user)
             user_field = get_user_field(request.user)
             if 'ordering' in request.GET and request.GET['ordering'] == 'euro':
                 user_field = user_field.order_by('-euro')
@@ -317,7 +286,6 @@ class CycleRankingViewSet(APIView):
 
             user_field = self.serializer_class(user_field, many=True).data
         else:
-            print("best field is none")
             user_field = None
 
         best_users = get_best_users()
