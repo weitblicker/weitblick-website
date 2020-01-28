@@ -686,7 +686,7 @@ class AddressAdmin(MyAdmin):
 class CycleDonationAdmin(MyAdmin):
     inlines = (CycleDonationRelationInlineModel, )
 
-    list_display = ('name', 'get_projects', 'partner', 'slug', 'goal_amount')
+    list_display = ('name', 'get_projects', 'partner', 'slug', 'rate_euro_km', 'goal_amount')
 
     def get_projects(self, cycle_donation):
         return ", ".join([project.name for project in cycle_donation.projects.all()])
