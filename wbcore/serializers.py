@@ -96,25 +96,27 @@ class HostSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'city')
 
 
+class CycleDonationRelationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CycleDonationRelation
+        fields = ('project', 'cycle_donation', 'current_amount', 'goal_amount', 'finished')
+
+
 class ProjectSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     photos = PhotoSerializer(many=True)
     image = PhotoSerializer(source='get_title_image')
-    cycle = serializers.SerializerMethodField()
+    cycle = CycleDonationRelationSerializer(many=True, source='cycledonationrelation_set')
     location = LocationSerializer()
     published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
     partners = PartnerSerializer(many=True)
-    def get_cycle(self, project):
-        qs = project.cycledonationrelation_set.all()
-        serializer = CycleDonationRelationSerializer(many=True, instance=qs)
-        return serializer.data
 
     class Meta:
         model = Project
 
         depth = 0
         fields = ('id', 'start_date', 'end_date', 'image', 'published', 'name', 'slug', 'hosts', 'description',
-                  'location', 'partners', 'photos', 'cycle', 'news', 'blog')
+                  'location', 'partners', 'photos', 'cycle', 'news', 'blog', 'donation_goal', 'donation_current')
 
 
 class OccurrenceSerializer(serializers.ModelSerializer):
@@ -142,12 +144,6 @@ class EventSerializer(serializers.ModelSerializer):
         model = Event
         fields = ('id', 'title', 'projects', 'gallery', 'host', 'published', 'location', 'image', 'photos', 'form',
                   'cost', 'start', 'end', 'description', 'rule', 'end_recurring_period', 'occurrences')
-
-
-class CycleDonationRelationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CycleDonationRelation
-        fields = ('project', 'cycle_donation', 'current_amount', 'goal_amount', 'finished')
 
 
 class CycleSegmentSerializer(serializers.ModelSerializer):
