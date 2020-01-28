@@ -7,7 +7,7 @@ from schedule.models import Occurrence
 
 from wbcore.models import (
     NewsPost, BlogPost, Host, Event, Project, Location, CycleDonation, CycleDonationRelation, CycleSegment,
-    CycleTour, User, FAQ, QuestionAndAnswer)
+    CycleTour, User, FAQ, QuestionAndAnswer, Partner, Address)
 from rest_framework import serializers
 from photologue.models import Gallery, Photo
 from rest_auth.models import TokenModel
@@ -48,6 +48,25 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'description', 'country', 'postal_code', 'city', 'state', 'street', 'address', 'lat', 'lng')
 
 
+class AddressSerializer(serializers.ModelSerializer):
+    country = serializers.SerializerMethodField()
+
+    def get_country(self, address):
+        return address.country.name
+
+    class Meta:
+        model = Address
+        fields = ('name', 'country', 'postal_code', 'city', 'state', 'street')
+
+
+class PartnerSerializer(serializers.ModelSerializer):
+    address = AddressSerializer()
+
+    class Meta:
+        model = Partner
+        fields = ('name', 'description', 'address', 'logo')
+
+
 class BlogPostSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     image = PhotoSerializer(source='get_title_image')
@@ -84,6 +103,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     cycle = serializers.SerializerMethodField()
     location = LocationSerializer()
     published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
+    partners = PartnerSerializer()
 
     def get_cycle(self, project):
         qs = project.cycledonationrelation_set.all()
@@ -186,6 +206,7 @@ class CycleSegmentSerializer(serializers.ModelSerializer):
 class CycleDonationSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     projects = serializers.SerializerMethodField()
+    partner = PartnerSerializer()
 
     def get_projects(self, donation):
         qs = donation.cycledonationrelation_set.all()
