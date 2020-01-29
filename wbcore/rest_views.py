@@ -233,6 +233,17 @@ def cycle_donations_list(request):
         return Response(serializer.data)
 
 
+@api_view(['GET'])
+def cycle_donation(request, pk):
+    if request.method == 'GET':
+        try:
+            cycle_donation = CycleDonation.objects.get(pk=pk)
+            serializer = CycleDonationSerializer(cycle_donation)
+            return Response(serializer.data)
+        except CycleDonation.DoesNotExist:
+            return Response(status.HTTP_404_NOT_FOUND)
+
+
 class CycleAddSegmentViewSet(APIView):
     permission_classes = (IsAuthenticated,)
 

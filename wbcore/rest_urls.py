@@ -25,6 +25,7 @@ rest_patterns = [
     path('locations/<int:pk>/', rest_views.location_detail, name="rest-blog-post"),
 
     path('cycle/donations/', rest_views.cycle_donations_list, name="rest-cycle-donations"),
+    path('cycle/donations/<int:pk>/', rest_views.cycle_donation, name="rest-cycle-donation"),
     path('cycle/segment/', rest_views.CycleAddSegmentViewSet.as_view(), name="rest-cycle-add-segment"),
     path('cycle/tours/', rest_views.CycleUserToursViewSet.as_view({'get': 'list'}), name="rest-cycle-user-tours"),
     path('cycle/ranking/', rest_views.CycleRankingViewSet.as_view(), name="rest-cycle-ranking"),
