@@ -19,7 +19,7 @@ from itertools import chain
 
 from .models import (
     Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, ContactMessage, UserRelation,
-    Document, Team, Milestone, Donation, Milestep, BankAccount, TeamUserRelation, Content, User, JoinPage,
+    Document, Team, Milestone, Donation, BankAccount, TeamUserRelation, Content, User, JoinPage,
     SocialMediaLink, CycleDonation, QuestionAndAnswer, FAQ, Photo)
 
 
@@ -130,6 +130,10 @@ class UserRelationInlineModel(PermissionInlineModel):
 class TeamUserRelationInlineModel(PermissionInlineModel):
     model = Team.member.through
     extra = 1
+
+
+class MilestoneInlineModel(PermissionInlineModel):
+    model = Milestone
 
 
 class JoinPageInlineModel(PermissionInlineModel):
@@ -634,6 +638,7 @@ class ContactMessageAdmin(MyAdmin):
 
 
 class ProjectAdmin(MyAdmin):
+    inlines = (MilestoneInlineModel, )
     list_display = ('name', 'get_hosts', 'get_country', 'start_date', 'end_date', 'completed', 'published')
 
     def get_hosts(self, project):
@@ -770,8 +775,6 @@ admin.site.register(Event, EventAdmin)
 admin.site.register(FAQ, FAQAdmin)
 admin.site.register(Host, HostAdmin)
 admin.site.register(Location, LocationAdmin)
-admin.site.register(Milestep, MyAdmin)
-admin.site.register(Milestone, MyAdmin)
 admin.site.register(NewsPost, PostAdmin)
 admin.site.register(Partner, PartnerAdmin)
 admin.site.register(Project, ProjectAdmin)

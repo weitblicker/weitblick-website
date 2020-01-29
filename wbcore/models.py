@@ -463,6 +463,7 @@ class Project(RulesModel):
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     partners = SortedManyToManyField(Partner, blank=True, related_name='projects')
     donation_goal = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    goal_description = models.CharField(max_length=500, blank=True)
     donation_current = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
     photos = SortedManyToManyField(Photo, related_name='projects', verbose_name=_('photos'), blank=True)
     completed = models.BooleanField(default=False)
@@ -911,41 +912,20 @@ class Milestone(RulesModel):
             "delete": pred.is_super_admin | pred.is_admin | pred.is_editor,
         }
 
-    project = models.OneToOneField(Project, on_delete=models.CASCADE, null=True, blank=True)
+    project = models.OneToOneField(Project, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    description = models.TextField()
+    date = models.DateField(blank=True)
+    reached = models.BooleanField()
 
     def __str__(self):
-        return "Milestone für " + self.project.name
+        return self.name
 
     def belongs_to_host(self, host):
         return self.project.belongs_to_host(host)
 
     def get_hosts(self):
         return self.project.get_hosts() if self.project else []
-
-
-class Milestep(RulesModel):
-    class Meta:
-        rules_permissions = {
-            "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
-            "view": rules.always_allow,
-            "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
-            "delete": pred.is_super_admin | pred.is_admin | pred.is_editor,
-        }
-
-    name = models.CharField(max_length=50)
-    description = models.TextField()
-    milestone = models.ForeignKey(Milestone, on_delete = models.CASCADE)
-    date = models.DateField(null=True, blank=True)
-    reached = models.BooleanField()
-
-    def belongs_to_host(self, host):
-        return self.milestone.belongs_to_host(host)
-
-    def __str__(self):
-        return self.name + ' (' + self.milestone.project.name + ')'
-
-    def get_hosts(self):
-        return self.milestone.get_hosts() if self.milestone else []
 
 
 class BankAccount(RulesModel):
