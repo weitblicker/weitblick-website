@@ -7,7 +7,7 @@ from schedule.models import Occurrence
 
 from wbcore.models import (
     NewsPost, BlogPost, Host, Event, Project, Location, CycleDonation, CycleDonationRelation, CycleSegment,
-    CycleTour, User, FAQ, QuestionAndAnswer, Partner, Address)
+    CycleTour, User, FAQ, QuestionAndAnswer, Partner, Address, BankAccount)
 from rest_framework import serializers
 from photologue.models import Gallery, Photo
 from rest_auth.models import TokenModel
@@ -64,7 +64,7 @@ class PartnerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Partner
-        fields = ('name', 'description', 'address', 'logo')
+        fields = ('name', 'description', 'address', 'logo', 'link')
 
 
 class BlogPostSerializer(serializers.ModelSerializer):
@@ -89,11 +89,22 @@ class NewsPostSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'text', 'image', 'published', 'range', 'teaser', 'photos', 'project')
 
 
+class BankAccountSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BankAccount
+        fields = ('account_holder', 'iban', 'bic')
+
+
 class HostSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='slug')
+    address = AddressSerializer()
+    location = LocationSerializer()
+    bank_account = BankAccountSerializer(source='bank')
+
     class Meta:
         model = Host
-        fields = ('id', 'name', 'city')
+        fields = ('id', 'name', 'city', 'founding_date', 'address', 'location', 'partners', 'bank_account')
 
 
 class CycleDonationRelationSerializer(serializers.ModelSerializer):

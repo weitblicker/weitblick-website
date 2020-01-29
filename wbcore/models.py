@@ -433,6 +433,7 @@ class Partner(RulesModel):
     description = models.TextField()
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, blank=True, null=True)
     logo = models.ImageField(upload_to=save_partner_logo, null=True, blank=True)
+    link = models.URLField(blank=True)
 
     def belongs_to_host(self, host):
         return True
