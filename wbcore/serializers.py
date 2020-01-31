@@ -121,6 +121,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     location = LocationSerializer()
     published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
     partners = PartnerSerializer(many=True)
+    hosts = HostSerializer(many=True)
 
     class Meta:
         model = Project
@@ -228,6 +229,7 @@ class CycleDonationSerializer(serializers.ModelSerializer):
 class CycleProjectSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     cycle = serializers.SerializerMethodField()
+    hosts = HostSerializer(many=True)
 
     def get_cycle(self, project):
         qs = project.cycledonationrelation_set.all()
