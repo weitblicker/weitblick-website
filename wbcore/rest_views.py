@@ -265,6 +265,15 @@ class CycleUserToursViewSet(viewsets.ModelViewSet):
         return self.request.user.cycletour_set.all()
 
 
+class CycleNewUserTourViewSet(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        max_index_tour = CycleTour.objects.filter(user=request.user).order_by('-index').first()
+        tour_index = max_index_tour.index + 1 if max_index_tour else 0
+        return Response(data={'tour_index': tour_index}, status=status.HTTP_201_CREATED)
+
+
 def get_best_users():
     users = User.objects.annotate(
         euro=Sum('cycletour__euro'),
