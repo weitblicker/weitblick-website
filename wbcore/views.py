@@ -881,7 +881,7 @@ def project_view(request, host_slug=None, project_slug=None):
         'main_nav': get_main_nav(host=host, active='projects'),
         'project': project,
         'event_item_list': item_list_from_occ(occurrences, text=False),
-        'news': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='news_id', text=False),
+        'news': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='post_id', text=False),
         'blogposts': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
         'host': host,
         'dot_nav': get_dot_nav(host=host),
