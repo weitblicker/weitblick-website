@@ -78,17 +78,6 @@ class BlogPostSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'text', 'image', 'published', 'range', 'teaser', 'photos', 'project')
 
 
-class NewsPostSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(source='pk')
-    photos = PhotoSerializer(many=True)
-    image = PhotoSerializer(source='get_title_image')
-    published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
-
-    class Meta:
-        model = NewsPost
-        fields = ('id', 'title', 'text', 'image', 'published', 'range', 'teaser', 'photos', 'project')
-
-
 class BankAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -105,6 +94,33 @@ class HostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Host
         fields = ('id', 'name', 'city', 'founding_date', 'address', 'location', 'partners', 'bank_account')
+
+
+class NewsPostSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='pk')
+    photos = PhotoSerializer(many=True)
+    image = PhotoSerializer(source='get_title_image')
+    published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
+    author = serializers.SerializerMethodField()
+    host = HostSerializer()
+
+    def get_author(self, news_post):
+        author_image = None
+        if news_post.author:
+            if news_post.author.image:
+                author_image = news_post.author.image
+            author_name = news_post.author.name()
+        else:
+            author_name = news_post.author_str
+
+        return {
+            'name': author_name,
+            'image': author_image
+        }
+
+    class Meta:
+        model = NewsPost
+        fields = ('id', 'title', 'text', 'image', 'published', 'range', 'teaser', 'photos', 'project', 'host', 'author')
 
 
 class CycleDonationRelationSerializer(serializers.ModelSerializer):
