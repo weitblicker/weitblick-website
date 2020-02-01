@@ -14,6 +14,21 @@ from rest_auth.models import TokenModel
 from django.db.models import Sum
 
 
+def get_author(post):
+    author_image = None
+    if post.author:
+        if post.author.image:
+            author_image = post.author.image.url
+        author_name = post.author.name()
+    else:
+        author_name = post.author_str
+
+    return {
+        'name': author_name,
+        'image': author_image
+    }
+
+
 class PhotoSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
 
@@ -67,17 +82,6 @@ class PartnerSerializer(serializers.ModelSerializer):
         fields = ('name', 'description', 'address', 'logo', 'link')
 
 
-class BlogPostSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(source='pk')
-    image = PhotoSerializer(source='get_title_image')
-    photos = PhotoSerializer(many=True)
-    published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
-
-    class Meta:
-        model = BlogPost
-        fields = ('id', 'title', 'text', 'image', 'published', 'range', 'teaser', 'photos', 'project')
-
-
 class BankAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -96,6 +100,22 @@ class HostSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'city', 'founding_date', 'address', 'location', 'partners', 'bank_account')
 
 
+class BlogPostSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='pk')
+    image = PhotoSerializer(source='get_title_image')
+    photos = PhotoSerializer(many=True)
+    published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
+    author = serializers.SerializerMethodField()
+    host = HostSerializer()
+
+    def get_author(self, post):
+        return get_author(post)
+
+    class Meta:
+        model = BlogPost
+        fields = ('id', 'title', 'text', 'image', 'published', 'range', 'teaser', 'photos', 'project', 'author', 'host')
+
+
 class NewsPostSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     photos = PhotoSerializer(many=True)
@@ -104,19 +124,8 @@ class NewsPostSerializer(serializers.ModelSerializer):
     author = serializers.SerializerMethodField()
     host = HostSerializer()
 
-    def get_author(self, news_post):
-        author_image = None
-        if news_post.author:
-            if news_post.author.image:
-                author_image = news_post.author.image.url
-            author_name = news_post.author.name()
-        else:
-            author_name = news_post.author_str
-
-        return {
-            'name': author_name,
-            'image': author_image
-        }
+    def get_author(self, post):
+        return get_author(post)
 
     class Meta:
         model = NewsPost
