@@ -108,7 +108,7 @@ class NewsPostSerializer(serializers.ModelSerializer):
         author_image = None
         if news_post.author:
             if news_post.author.image:
-                author_image = news_post.author.image
+                author_image = news_post.author.image.url
             author_name = news_post.author.name()
         else:
             author_name = news_post.author_str
