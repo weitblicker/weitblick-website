@@ -7,7 +7,7 @@ from schedule.models import Occurrence
 
 from wbcore.models import (
     NewsPost, BlogPost, Host, Event, Project, Location, CycleDonation, CycleDonationRelation, CycleSegment,
-    CycleTour, User, FAQ, QuestionAndAnswer, Partner, Address, BankAccount)
+    CycleTour, User, FAQ, QuestionAndAnswer, Partner, Address, BankAccount, Milestone)
 from rest_framework import serializers
 from photologue.models import Gallery, Photo
 from rest_auth.models import TokenModel
@@ -138,6 +138,12 @@ class CycleDonationRelationSerializer(serializers.ModelSerializer):
         fields = ('project', 'cycle_donation', 'current_amount', 'goal_amount', 'finished')
 
 
+class MilestoneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Milestone
+        fields = ('name', 'description', 'date', 'reached')
+
+
 class ProjectSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     photos = PhotoSerializer(many=True)
@@ -147,6 +153,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
     partners = PartnerSerializer(many=True)
     hosts = HostSerializer(many=True)
+    milestones = MilestoneSerializer(many=True)
 
     class Meta:
         model = Project
@@ -154,7 +161,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         depth = 0
         fields = ('id', 'start_date', 'end_date', 'image', 'published', 'name', 'slug', 'hosts', 'description',
                   'location', 'partners', 'photos', 'cycle', 'news', 'blog', 'donation_goal', 'goal_description',
-                  'donation_current')
+                  'donation_current', 'milestones')
 
 
 class OccurrenceSerializer(serializers.ModelSerializer):

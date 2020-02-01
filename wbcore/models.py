@@ -911,8 +911,9 @@ class Milestone(RulesModel):
             "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
             "delete": pred.is_super_admin | pred.is_admin | pred.is_editor,
         }
+        ordering = ('date', )
 
-    project = models.OneToOneField(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, related_name='milestones', on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     description = models.TextField()
     date = models.DateField(blank=True)
