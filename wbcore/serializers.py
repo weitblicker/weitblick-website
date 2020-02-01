@@ -161,7 +161,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         depth = 0
         fields = ('id', 'start_date', 'end_date', 'image', 'published', 'name', 'slug', 'hosts', 'description',
                   'location', 'partners', 'photos', 'cycle', 'news', 'blog', 'donation_goal', 'goal_description',
-                  'donation_current', 'milestones')
+                  'donation_current', 'milestones', 'events')
 
 
 class OccurrenceSerializer(serializers.ModelSerializer):

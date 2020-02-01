@@ -520,7 +520,7 @@ class Event(RulesModelMixin, ScheduleEvent, metaclass=RulesModelBase):
 
     slug = models.SlugField(max_length=50, unique=True, null=True)
     teaser = models.TextField(max_length=120, blank=True)
-    projects = models.ManyToManyField(Project, blank=True)
+    projects = models.ManyToManyField(Project, blank=True, related_name='events')
     host = models.ForeignKey(Host, on_delete=models.CASCADE)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
