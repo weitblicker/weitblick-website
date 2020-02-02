@@ -706,6 +706,7 @@ class BlogPost(RulesModel):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     author_str = models.CharField(max_length=200, null=True, blank=True)
     photos = SortedManyToManyField(Photo, related_name='blog_posts', verbose_name=_('photos'), blank=True)
+    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
 
     def belongs_to_host(self, host):
         return self.host == host

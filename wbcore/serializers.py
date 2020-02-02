@@ -107,13 +107,15 @@ class BlogPostSerializer(serializers.ModelSerializer):
     published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
     author = serializers.SerializerMethodField()
     host = HostSerializer()
+    location = LocationSerializer()
 
     def get_author(self, post):
         return get_author(post)
 
     class Meta:
         model = BlogPost
-        fields = ('id', 'title', 'text', 'image', 'published', 'range', 'teaser', 'photos', 'project', 'author', 'host')
+        fields = ('id', 'title', 'text', 'image', 'published', 'range', 'teaser', 'photos', 'project', 'author', 'host',
+                  'location')
 
 
 class NewsPostSerializer(serializers.ModelSerializer):
