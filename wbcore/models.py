@@ -1015,25 +1015,33 @@ class CycleDonationRelation(RulesModel):
     current_amount = models.FloatField(default=0)
     goal_amount = models.FloatField(null=True, blank=True, default=None)
     finished = models.BooleanField(default=False)
-    users = models.ManyToManyField(User, null=True)
+    current_km = models.FloatField(default=0)
+    users = models.ManyToManyField(User, null=True, blank=True)
 
     @classmethod
     def add_segment(cls, id, distance, user):
+        # TODO check for sum of all donations -> set finish
         with transaction.atomic():
             donation_relation = cls.objects.select_for_update().get(id=id)
+            goal_amount = donation_relation.goal_amount \
+                if donation_relation.goal_amount else donation_relation.cycle_donation.goal_amount
+            if donation_relation.finished and goal_amount == donation_relation.current_amount:
+                return 0
+
             amount = distance * donation_relation.cycle_donation.rate_euro_km
             new_amount = donation_relation.current_amount + amount
-            if new_amount >= donation_relation.goal_amount:
-                donation_relation.current_amount = donation_relation.goal_amount
+            if new_amount >= goal_amount:
+                donation_relation.current_amount = goal_amount
                 donation_relation.finished = True
 
             else:
                 donation_relation.current_amount = new_amount
                 donation_relation.finished = False
 
+            donation_relation.current_km + distance
             donation_relation.users.add(user)
             donation_relation.save()
-            return amount, (new_amount - donation_relation.goal_amount) / donation_relation.cycle_donation.rate_euro_km
+            return amount
 
     def __str__(self):
         return self.project.name
@@ -1055,7 +1063,7 @@ class CycleDonation(RulesModel):
     slug = models.SlugField(unique=True)
     description = models.TextField(null=True, blank=True)
     goal_amount = models.FloatField(null=False, blank=False)
-    rate_euro_km = models.FloatField() # euro per km, e.g. 0.1 per km (10 cents per km)
+    rate_euro_km = models.FloatField()  # euro per km, e.g. 0.1 per km (10 cents per km)
 
     def current_amount(self):
         current_amount = 0
@@ -1130,11 +1138,8 @@ class CycleSegment(RulesModel):
         user = self.tour.user
         self.tour.km += self.distance
 
-        distance_fraction = self.distance / project.cycledonationrelation_set.count()
         for cycle_relation in project.cycledonationrelation_set.all():
-            euro, rest = cycle_relation.add_segment(cycle_relation.pk, distance_fraction, user)
-            self.tour.euro += euro
-
+            self.tour.euro += cycle_relation.add_segment(cycle_relation.pk, self.distance, user)
         self.tour.save()
 
     def get_cycle_donations(self):

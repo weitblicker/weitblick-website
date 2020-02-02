@@ -563,6 +563,8 @@ class CycleDonationRelationInlineModel(PermissionInlineModel):
     model = CycleDonation.projects.through
     extra = 1
 
+    readonly_fields = ('current_km', 'current_amount', 'finished')
+    fields = ('project', 'goal_amount', 'current_km', 'current_amount', 'finished')
 
 
 class PostAdmin(MyAdmin):

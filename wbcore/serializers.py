@@ -5,6 +5,7 @@ from django.utils import timezone
 from rest_auth.serializers import UserDetailsSerializer
 from schedule.models import Occurrence
 
+from wbcore.cycle_statistics import get_cycle_stats
 from wbcore.models import (
     NewsPost, BlogPost, Host, Event, Project, Location, CycleDonation, CycleDonationRelation, CycleSegment,
     CycleTour, User, FAQ, QuestionAndAnswer, Partner, Address, BankAccount, Milestone)
@@ -146,16 +147,63 @@ class MilestoneSerializer(serializers.ModelSerializer):
         fields = ('name', 'description', 'date', 'reached')
 
 
+class CycleDonationSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='pk')
+    projects = serializers.SerializerMethodField()
+    partner = PartnerSerializer()
+
+    def get_projects(self, donation):
+        qs = donation.cycledonationrelation_set.all()
+        serializer = CycleDonationRelationSerializer(read_only=True, many=True, instance=qs)
+        return serializer.data
+
+    class Meta:
+        model = CycleDonation
+        fields = ('id', 'projects', 'partner', 'logo', 'name', 'description', 'goal_amount', 'rate_euro_km',)
+
+
+class CycleDonationSponsorSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='pk')
+    partner = PartnerSerializer()
+
+    class Meta:
+        model = CycleDonation
+        fields = ('id', 'partner', 'name', 'description', 'goal_amount', 'rate_euro_km',)
+
+
 class ProjectSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     photos = PhotoSerializer(many=True)
     image = PhotoSerializer(source='get_title_image')
     cycle = CycleDonationRelationSerializer(many=True, source='cycledonationrelation_set')
+    new_cycle = serializers.SerializerMethodField(method_name='get_cycle')
     location = LocationSerializer()
     published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
     partners = PartnerSerializer(many=True)
     hosts = HostSerializer(many=True)
     milestones = MilestoneSerializer(many=True)
+
+    def get_cycle(self, project):
+        stats = get_cycle_stats(project)
+        if stats:
+            print(stats)
+
+            donation_goal_sum = 0
+            for cycle_don_rel in project.cycledonationrelation_set.all():
+                donation_goal_sum += cycle_don_rel.goal_amount if cycle_don_rel.goal_amount else cycle_don_rel.cycle_donation.goal_amount
+
+            euro_sum = stats['euro_sum'] if stats['euro_sum'] else 0
+            progress = euro_sum / donation_goal_sum if donation_goal_sum else 0
+
+            return {
+                'km_sum': stats['km_sum'],
+                'euro_sum': euro_sum,
+                'cyclists': stats['cyclists'],
+                'euro_goal': donation_goal_sum,
+                'progress': progress,
+                'donations': CycleDonationSponsorSerializer(instance=project.cycledonation_set.all(), many=True).data,
+            }
+        return None
 
     class Meta:
         model = Project
@@ -163,7 +211,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         depth = 0
         fields = ('id', 'start_date', 'end_date', 'image', 'published', 'name', 'slug', 'hosts', 'description',
                   'location', 'partners', 'photos', 'cycle', 'news', 'blog', 'donation_goal', 'goal_description',
-                  'donation_current', 'milestones', 'events')
+                  'donation_current', 'milestones', 'events', 'new_cycle')
 
 
 class OccurrenceSerializer(serializers.ModelSerializer):
@@ -243,21 +291,6 @@ class CycleSegmentSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Tour index is negative!")
 
         return data
-
-
-class CycleDonationSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(source='pk')
-    projects = serializers.SerializerMethodField()
-    partner = PartnerSerializer()
-
-    def get_projects(self, donation):
-        qs = donation.cycledonationrelation_set.all()
-        serializer = CycleDonationRelationSerializer(read_only=True, many=True, instance=qs)
-        return serializer.data
-
-    class Meta:
-        model = CycleDonation
-        fields = ('id', 'projects', 'partner', 'logo', 'name', 'description', 'goal_amount', 'rate_euro_km',)
 
 
 class CycleProjectSerializer(serializers.ModelSerializer):
