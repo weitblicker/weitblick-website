@@ -176,7 +176,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     photos = PhotoSerializer(many=True)
     image = PhotoSerializer(source='get_title_image')
     #cycle = CycleDonationRelationSerializer(many=True, source='cycledonationrelation_set')
-    cycle = serializers.SerializerMethodField(method_name='get_cycle')
+    cycle = serializers.SerializerMethodField()
     location = LocationSerializer()
     published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
     partners = PartnerSerializer(many=True)
