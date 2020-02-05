@@ -35,7 +35,7 @@ class PhotoSerializer(serializers.ModelSerializer):
 
     def get_url(self, photo):
         if photo:
-            return photo.get_listsize_url()
+            return photo.get_rest_url()
 
     class Meta:
         model = Photo
@@ -175,8 +175,8 @@ class ProjectSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='pk')
     photos = PhotoSerializer(many=True)
     image = PhotoSerializer(source='get_title_image')
-    cycle = CycleDonationRelationSerializer(many=True, source='cycledonationrelation_set')
-    new_cycle = serializers.SerializerMethodField(method_name='get_cycle')
+    #cycle = CycleDonationRelationSerializer(many=True, source='cycledonationrelation_set')
+    cycle = serializers.SerializerMethodField(method_name='get_cycle')
     location = LocationSerializer()
     published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ%z")
     partners = PartnerSerializer(many=True)
@@ -211,7 +211,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         depth = 0
         fields = ('id', 'start_date', 'end_date', 'image', 'published', 'name', 'slug', 'hosts', 'description',
                   'location', 'partners', 'photos', 'cycle', 'news', 'blog', 'donation_goal', 'goal_description',
-                  'donation_current', 'milestones', 'events', 'new_cycle')
+                  'donation_current', 'milestones', 'events', 'cycle')
 
 
 class OccurrenceSerializer(serializers.ModelSerializer):
