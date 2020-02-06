@@ -185,23 +185,27 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def get_cycle(self, project):
         stats = get_cycle_stats(project)
-        if stats:
+        cycle_donations = project.cycledonation_set.all()
+
+        if stats and cycle_donations:
             print(stats)
 
             donation_goal_sum = 0
             for cycle_don_rel in project.cycledonationrelation_set.all():
                 donation_goal_sum += cycle_don_rel.goal_amount if cycle_don_rel.goal_amount else cycle_don_rel.cycle_donation.goal_amount
 
-            euro_sum = stats['euro_sum'] if stats['euro_sum'] else 0
+            euro_sum = stats['euro_sum'] or 0
+            km_sum = stats['km_sum'] or 0
+            cyclists = stats['cyclists'] or 0
             progress = euro_sum / donation_goal_sum if donation_goal_sum else 0
 
             return {
-                'km_sum': stats['km_sum'],
+                'km_sum': km_sum,
                 'euro_sum': euro_sum,
-                'cyclists': stats['cyclists'],
+                'cyclists': cyclists,
                 'euro_goal': donation_goal_sum,
                 'progress': progress,
-                'donations': CycleDonationSponsorSerializer(instance=project.cycledonation_set.all(), many=True).data,
+                'donations': CycleDonationSponsorSerializer(instance=cycle_donations, many=True).data,
             }
         return None
 
