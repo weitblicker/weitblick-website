@@ -61,7 +61,8 @@ class LocationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Location
-        fields = ('id', 'name', 'description', 'country', 'postal_code', 'city', 'state', 'street', 'address', 'lat', 'lng')
+        fields = ('id', 'name', 'description', 'country', 'postal_code', 'city', 'state', 'street', 'address',
+                  'lat', 'lng', 'map_zoom')
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -182,6 +183,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     partners = PartnerSerializer(many=True)
     hosts = HostSerializer(many=True)
     milestones = MilestoneSerializer(many=True)
+    donation_account = BankAccountSerializer()
 
     def get_cycle(self, project):
         stats = get_cycle_stats(project)
@@ -215,7 +217,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         depth = 0
         fields = ('id', 'start_date', 'end_date', 'image', 'published', 'name', 'slug', 'hosts', 'description',
                   'location', 'partners', 'photos', 'cycle', 'news', 'blog', 'donation_goal', 'goal_description',
-                  'donation_current', 'milestones', 'events', 'cycle')
+                  'donation_current', 'milestones', 'events', 'cycle', 'donation_account')
 
 
 class OccurrenceSerializer(serializers.ModelSerializer):

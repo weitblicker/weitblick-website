@@ -79,6 +79,7 @@ class Location(RulesModel):
     street = models.CharField(blank=True, null=True, max_length=30)
     address = map_fields.AddressField(max_length=200, null=True)
     geolocation = map_fields.GeoLocationField(max_length=100, null=True)
+    map_zoom = models.FloatField(default=14)
 
     def belongs_to_host(self, host):
         return True
@@ -462,9 +463,12 @@ class Project(RulesModel):
     image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     partners = SortedManyToManyField(Partner, blank=True, related_name='projects')
+
     donation_goal = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
     goal_description = models.CharField(max_length=500, blank=True)
+    donation_account = models.OneToOneField('BankAccount', on_delete=models.SET_NULL, null=True)
     donation_current = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+
     photos = SortedManyToManyField(Photo, related_name='projects', verbose_name=_('photos'), blank=True)
     completed = models.BooleanField(default=False)
     start_date = models.DateField(null=True, blank=True)
