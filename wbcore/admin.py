@@ -640,6 +640,7 @@ class ContactMessageAdmin(MyAdmin):
 
 
 class ProjectAdmin(MyAdmin, ReverseModelAdmin):
+    inline_type = 'stacked'
     inline_reverse = ['donation_account']
     inlines = (MilestoneInlineModel, )
     list_display = ('name', 'get_hosts', 'get_country', 'start_date', 'end_date', 'completed', 'published')
