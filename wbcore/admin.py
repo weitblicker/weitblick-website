@@ -639,7 +639,8 @@ class ContactMessageAdmin(MyAdmin):
             return 'subject', 'name', 'email', 'reason', 'submission_date'
 
 
-class ProjectAdmin(MyAdmin):
+class ProjectAdmin(MyAdmin, ReverseModelAdmin):
+    inline_reverse = ['donation_account']
     inlines = (MilestoneInlineModel, )
     list_display = ('name', 'get_hosts', 'get_country', 'start_date', 'end_date', 'completed', 'published')
 
