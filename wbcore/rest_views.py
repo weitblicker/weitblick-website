@@ -184,7 +184,6 @@ def account_confirm_email(request, key):
         except EmailConfirmation.DoesNotExist:
             raise Http404()
 
-    print("confirmation:", emailconfirmation.confirm(request), emailconfirmation.email_address.verified)
 
     return Response("Test")
 
