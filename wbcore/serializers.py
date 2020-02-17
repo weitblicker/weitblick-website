@@ -67,13 +67,13 @@ class TeamSerializer(serializers.ModelSerializer):
         for ur in ur_set:
             elem = {
                 'name': ur.user.name(),
-                'email': ur.email,
+                'email': ur.email if ur.email else ur.user.email,
                 'role': ur.role,
                 'text': ur.text,
                 'image': ur.user.image.url if ur.user.image else None
             }
             ret.append(elem)
-        return elem
+        return ret
 
     class Meta:
         model = Team
