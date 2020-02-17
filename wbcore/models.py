@@ -348,7 +348,16 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
         return False
 
     def name(self):
-        return self.first_name + " " + self.last_name
+        if self.first_name and self.last_name:
+            return self.first_name + " " + self.last_name
+        elif self.first_name:
+            return self.first_name
+        elif self.last_name:
+            return self.last_name
+        elif self.username:
+            return self.username
+        else:
+            return ""
 
     name.admin_order_field = 'first_name'
 
@@ -359,7 +368,11 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
     bank = models.OneToOneField('BankAccount', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return self.name() + ", " + self.email
+        name = self.name()
+        if name:
+            return self.name() + ", " + self.email
+        else:
+            return self.email
 
     def belongs_to_host(self, host):
         return host in self.hosts.all()
@@ -389,6 +402,7 @@ class Content(RulesModel):
         ('donate', 'Donate'),
         ('join', 'Join'),
     )
+
     type = models.CharField(max_length=20, choices=TYPE_CHOICES, null=True)
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=False)
     text = models.TextField()
