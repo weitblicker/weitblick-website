@@ -204,7 +204,6 @@ class ProjectSerializer(serializers.ModelSerializer):
         cycle_donations = project.cycledonation_set.all()
 
         if stats and cycle_donations:
-            print(stats)
 
             donation_goal_sum = 0
             for cycle_don_rel in project.cycledonationrelation_set.all():
@@ -293,7 +292,6 @@ class CycleSegmentSerializer(serializers.ModelSerializer):
 
         tour.donations.set(project.cycledonation_set.all())
         tour.save()
-        print("Tour donations:", tour.donations.all())
 
         segment = CycleSegment(start=validated_data['start'], end=validated_data['end'],
                                distance=validated_data['distance'], tour=tour)
@@ -338,11 +336,9 @@ class TokenSerializer(serializers.ModelSerializer):
         fields = ('token',)
 
     def validate(self, data):
-        print(data)
         try:
             self.instance = TokenModel.objects.get(key=data['token'])
         except TokenModel.DoesNotExist:
-            print("Token %s is invalid!" % data['token'])
             raise serializers.ValidationError("Token is invalid:%s" % data['token'])
 
         return data
