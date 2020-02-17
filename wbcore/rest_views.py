@@ -4,10 +4,12 @@ import uuid
 
 from allauth.account.models import EmailConfirmation, EmailConfirmationHMAC
 from django.contrib.auth.decorators import login_required
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db.models import Sum
 from django.http import HttpResponse, Http404, JsonResponse
+from django.template import loader
 from martor.utils import LazyEncoder
 from django.utils.translation import ugettext_lazy as _
 from rest_auth.models import TokenModel
@@ -332,7 +334,10 @@ class FAQViewSet(viewsets.ModelViewSet):
 class AGBView(APIView):
 
     def get(self, request):
-        return JsonResponse({}, status=status.HTTP_200_OK)
+        template = loader.get_template('wbcore/app_agb.html')
+        text = template.render({}, request)
+        image = static("images/agb_header.jpg")
+        return JsonResponse({'title': "Allgemeine Geschäftsbedingungen", 'image': image, 'text': text}, status=status.HTTP_200_OK)
 
 
 class ContactView(APIView):
