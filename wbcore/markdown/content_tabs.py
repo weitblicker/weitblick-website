@@ -12,7 +12,6 @@ class ContentTabProcessor(BlockProcessor):
 
     def test(self, parent, block):
         se = self.RE.search(block)
-        #print("re:", se)
         return bool(se)
 
     def run(self, parent, blocks):
@@ -30,12 +29,10 @@ class ContentTabProcessor(BlockProcessor):
         while blocks:
             block = blocks.pop(0)
             m = self.RE.search(block)
-            print(m, block)
             if m:
                 title = m.groups()[0]
                 id = m.groups()[1]
                 block = self.RE.sub("", block)
-                #print("Block id:", id, "title:", title, "content:", block)
                 button = util.etree.Element("a")
                 button.set("class", "item")
                 button.set("data-tab", id)
@@ -54,7 +51,6 @@ class ContentTabProcessor(BlockProcessor):
 
                 b = self.RE_BREAK.search(block)
                 if b:
-                    print("BB", b)
                     block = b.groups()[0]
                     self.parser.parseChunk(content_div, block)
                     next_block = b.groups()[2]

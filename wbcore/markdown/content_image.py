@@ -79,8 +79,6 @@ class ImageClearTreeprocessor(Treeprocessor):
         """ Crawl the footnote div and add missing duplicate footnotes. """
         self.findImgDiv(root)
         return None
-                    #if div.get("class").contains("image"):
-                    #    print(index)
 
 
 class MyExtension(Extension):
