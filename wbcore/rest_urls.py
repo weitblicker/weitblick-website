@@ -51,7 +51,7 @@ rest_patterns = [
     path('auth/user/', rest_views.UsersView.as_view(), name='rest_user_details'),
     path('auth/password/change/', PasswordChangeView.as_view(), name='rest_password_change'),
     path('auth/registration/', RegisterView.as_view(), name='rest_register'),
-    path('auth/registration/verify-email/', VerifyEmailView.as_view(), name='rest_verify_email'),
+    path('auth/registration/verify-email/', VerifyEmailView.as_view(), name='account_email_verification_sent'),
     path('auth/registration/account-confirm-email/<str:key>/', rest_views.account_confirm_email, name='account_confirm_email'),
 
     path('upload/', rest_views.markdown_uploader, name='markdown_uploader_page'),
