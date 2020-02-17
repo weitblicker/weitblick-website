@@ -32,6 +32,15 @@ rest_patterns = [
     path('cycle/ranking/', rest_views.CycleRankingViewSet.as_view(), name="rest-cycle-ranking"),
     #path('cycle//', rest_views.UserrankingViewSet.as_view({'get': 'list'}), name="rest-cycle-userrank"),
 
+    path('info/agb/', rest_views.AGBView.as_view(), name="rest-meta-agb"),
+    path('info/contact/', rest_views.ContactView.as_view(), name="rest-meta-agb"),
+    path('info/credits/', rest_views.CreditsView.as_view(), name="rest-meta-agb"),
+    path('info/faq/', rest_views.FAQViewSet.as_view({'get': 'list'}), name='rest-faq'),
+
+    ## TODO remove after change in App
+    path('faq/', rest_views.FAQViewSet.as_view({'get': 'list'}), name='rest-faq'),
+
+
     # URLs that do not require a session or valid token
     path('auth/password/reset/', PasswordResetView.as_view(), name='rest_password_reset'),
     path('auth/password/reset/confirm/', PasswordResetConfirmView.as_view(), name='rest_password_reset_confirm'),
@@ -46,7 +55,6 @@ rest_patterns = [
     path('auth/registration/account-confirm-email/<str:key>/', rest_views.account_confirm_email, name='account_confirm_email'),
 
     path('upload/', rest_views.markdown_uploader, name='markdown_uploader_page'),
-    path('faq/', rest_views.FAQViewSet.as_view({'get': 'list'}), name='rest-faq'),
 ]
 
 rest_patterns = format_suffix_patterns(rest_patterns)

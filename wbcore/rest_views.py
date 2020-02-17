@@ -20,8 +20,10 @@ from rest_framework.views import APIView
 from wbcore.serializers import (NewsPostSerializer, BlogPostSerializer, HostSerializer, EventSerializer,
                                 ProjectSerializer, LocationSerializer, CycleDonationSerializer,
                                 CycleDonationRelationSerializer, CycleSegmentSerializer, CycleTourSerializer,
-                                TokenSerializer, UserCycleSerializer, FAQSerializer, UserSerializer)
-from wbcore.models import NewsPost, BlogPost, Host, Event, Project, Location, Photo, CycleDonation, CycleTour, User, FAQ
+                                TokenSerializer, UserCycleSerializer, FAQSerializer, UserSerializer, TeamSerializer)
+from wbcore.models import (NewsPost, BlogPost, Host, Event, Project, Location, Photo, CycleDonation, CycleTour, User,
+                           FAQ, Team)
+
 from rest_framework import status, viewsets, filters
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -325,6 +327,27 @@ class CycleRankingViewSet(APIView):
 class FAQViewSet(viewsets.ModelViewSet):
     queryset = FAQ.objects.all()
     serializer_class = FAQSerializer
+
+
+class AGBView(APIView):
+
+    def get(self, request):
+        return JsonResponse({}, status=status.HTTP_200_OK)
+
+
+class ContactView(APIView):
+    def get(self, request):
+        return JsonResponse({}, status=status.HTTP_200_OK)
+
+
+class CreditsView(APIView):
+    def get(self, request):
+        try:
+            team = Team.objects.get(slug="app-developers")
+            serializer = TeamSerializer(instance=team)
+            return Response(serializer.data)
+        except Team.DoesNotExist:
+            return Response("App Developers Team not available on Server")
 
 
 class UsersView(RetrieveUpdateAPIView):
