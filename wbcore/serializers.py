@@ -8,7 +8,7 @@ from schedule.models import Occurrence
 from wbcore.cycle_statistics import get_cycle_stats
 from wbcore.models import (
     NewsPost, BlogPost, Host, Event, Project, Location, CycleDonation, CycleDonationRelation, CycleSegment,
-    CycleTour, User, FAQ, QuestionAndAnswer, Partner, Address, BankAccount, Milestone)
+    CycleTour, User, FAQ, QuestionAndAnswer, Partner, Address, BankAccount, Milestone, Team)
 from rest_framework import serializers
 from photologue.models import Gallery, Photo
 from rest_auth.models import TokenModel
@@ -54,6 +54,20 @@ class GallerySerializer(serializers.ModelSerializer):
         model = Gallery
         depth = 1
         fields = ('id', 'title', 'description', 'images')
+
+
+class TeamSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='pk')
+    member = serializers.SerializerMethodField()
+    image = PhotoSerializer()
+
+    def get_member(self, team):
+        ur_set = team.teamuserrelation_set.all()
+        return [{'name': ur.user.name(), 'email': ur.email, 'role': ur.role, 'text': ur.text, 'image': ur.user.image.url} for ur in ur_set]
+
+    class Meta:
+        model = Team
+        fields = ('id', 'name', 'description', 'image', 'member')
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -351,6 +365,12 @@ class UserSerializer(serializers.ModelSerializer):
     """
     User model w/o password
     """
+
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, user):
+        return user.image.url
+
     class Meta:
         model = User
         fields = ('pk', 'username', 'email', 'first_name', 'last_name', 'image')
