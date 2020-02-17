@@ -86,7 +86,6 @@ def filter_projects(request, default_limit=None):
     limit = parse_limit(request, default=default_limit) if default_limit else parse_limit(request)
     start, end = parse_archive_start_end(request)
 
-    print("Start:", start, "End:", end)
 
     results = SearchQuerySet()
     if host_slugs:
@@ -144,9 +143,6 @@ def filter_blog(request, default_limit=None):
     start, end = parse_archive_start_end(request)
     limit = parse_limit(request, default=default_limit) if default_limit else parse_limit(request)
 
-    print("Date", start, end)
-    print("Contains:", contains)
-
     results = SearchQuerySet()
     if host_slugs:
         results = results.filter_or(host_slug__in=host_slugs)
@@ -170,9 +166,6 @@ def filter_events(request, default_limit=None):
     start, end = parse_archive_start_end(request)
     limit = parse_limit(request, default=default_limit) if default_limit else parse_limit(request)
 
-    print("Date", start, '- ', end)
-    print("Contains:", contains)
-
     results = SearchQuerySet()
     if host_slugs:
         results = results.filter_or(hosts_slug__in=host_slugs)
@@ -180,7 +173,6 @@ def filter_events(request, default_limit=None):
         results = results.filter_and(content__contains=contains)
 
     results = results.models(Event)
-    print("Length:", len(results))
 
     # search results for start and end date
     # handle cases where no dates are given
