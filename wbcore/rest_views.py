@@ -342,7 +342,10 @@ class AGBView(APIView):
 
 class ContactView(APIView):
     def get(self, request):
-        return JsonResponse({}, status=status.HTTP_200_OK)
+        template = loader.get_template('wbcore/app_contact.html')
+        text = template.render({}, request)
+        image = static("images/contact_header.jpg")
+        return JsonResponse({'title': "Kontakt", 'image': image, 'text': text}, status=status.HTTP_200_OK)
 
 
 class CreditsView(APIView):
