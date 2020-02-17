@@ -50,7 +50,6 @@ def search(request, query):
             'name': str(key.get_model_name()),
             'results': result_set,
         }
-    print("Found %s results in %s categories." % (cnt, len(result_groups)))
 
     return JsonResponse(result_groups)
 
