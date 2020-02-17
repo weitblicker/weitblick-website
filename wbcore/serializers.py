@@ -63,7 +63,17 @@ class TeamSerializer(serializers.ModelSerializer):
 
     def get_member(self, team):
         ur_set = team.teamuserrelation_set.all()
-        return [{'name': ur.user.name(), 'email': ur.email, 'role': ur.role, 'text': ur.text, 'image': ur.user.image.url} for ur in ur_set]
+        ret = []
+        for ur in ur_set:
+            elem = {
+                'name': ur.user.name(),
+                'email': ur.email,
+                'role': ur.role,
+                'text': ur.text,
+                'image': ur.user.image.url if ur.user.image else None
+            }
+            ret.append(elem)
+        return elem
 
     class Meta:
         model = Team
