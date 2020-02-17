@@ -181,7 +181,7 @@ def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='p
         current_host = Host.objects.get(slug=host_slug) if host_slug else None
         if current_host and post.host and current_host == post.host:
             post.link = reverse(post_type, kwargs={id_key: post.id, 'host_slug': host_slug})
-            print('*** host in post')
+
         else:
             post.link = reverse(post_type, args=[post.id])
         post.show_text = text
@@ -247,7 +247,7 @@ def home_view(request):
         'icon_links': icon_links
     }
 
-    print(context['news_item_list'])
+
 
     return HttpResponse(template.render(context, request))
 
@@ -606,7 +606,6 @@ def idea_view(request, host_slug=None):
     try:
         idea = Content.objects.get(host=Host.objects.get(slug='bundesverband'), type='idea')
     except Content.DoesNotExist as e:
-        print("Idea content page for", host, "does not exists!")
         idea = None
 
     template = loader.get_template('wbcore/idea.html')
@@ -751,7 +750,6 @@ def join_view(request, host_slug=None):
             host = None
     try:
         join_page = host.joinpage
-        print("Join Page", join_page)
     except JoinPage.DoesNotExist:
         pass
 
@@ -805,11 +803,6 @@ def join_view(request, host_slug=None):
     load_host = host if host else Host.objects.get(host_slug='bundesverband')
     projects = Project.objects.filter(hosts=load_host)[:3]
 
-    print("***")
-    print(host)
-    print(Host.objects.get(slug='bundesverband'))
-    print(host is Host.objects.get(slug='bundesverband'))
-    print(host == Host.objects.get(slug='bundesverband'))
 
     context = {
         'main_nav': get_main_nav(active='join'),
@@ -823,7 +816,6 @@ def join_view(request, host_slug=None):
     }
 
     if join_page:
-        print("TestTestTest")
         context['image'] = join_page.image
         context['sepa_text'] = join_page.sepa_text
         context['text'] = join_page.text
@@ -921,7 +913,6 @@ def host_view(request, host_slug):
     try:
         welcome = Content.objects.get(host=host, type='welcome')
     except Content.DoesNotExist as e:
-        print("Welcome content page for", host, "does not exists!")
         welcome = None
     occurrences = period.get_occurrences()
     event_item_list = item_list_from_occ(occurrences, host_slug=host_slug)
