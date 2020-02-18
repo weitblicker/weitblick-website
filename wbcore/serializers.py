@@ -375,7 +375,7 @@ class UserSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
     def get_image(self, user):
-        return user.image.url
+        return user.image.url if user.image else None
 
     class Meta:
         model = User
