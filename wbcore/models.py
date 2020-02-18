@@ -480,7 +480,7 @@ class Project(RulesModel):
 
     donation_goal = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
     goal_description = models.CharField(max_length=500, blank=True)
-    donation_account = models.OneToOneField('BankAccount', on_delete=models.SET_NULL, null=True)
+    donation_account = models.OneToOneField('BankAccount', on_delete=models.SET_NULL, null=True, blank=True)
     donation_current = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
 
     photos = SortedManyToManyField(Photo, related_name='projects', verbose_name=_('photos'), blank=True)
