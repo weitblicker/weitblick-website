@@ -372,7 +372,7 @@ msgstr "Partenaire"
 
 #: templates/wbcore/projects.html:6
 msgid "Project Map"
-msgstr "Carte du projet (sg.)/Carte des projets (pl.)"
+msgstr "Carte des projets"
 
 #: templates/wbcore/projects_list.html:9
 msgid "No projects available!"
