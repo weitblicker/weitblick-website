@@ -1,7 +1,13 @@
 from django.urls import path, include
 from rest_auth.registration.views import VerifyEmailView, RegisterView
-from rest_auth.views import (UserDetailsView, PasswordResetView, PasswordResetConfirmView, LoginView, LogoutView,
+from rest_auth.views import (UserDetailsView, PasswordResetView, LoginView, LogoutView,
                              PasswordChangeView)
+
+from django.contrib.auth.views import PasswordResetConfirmView, PasswordResetCompleteView
+
+PasswordResetConfirmView.template_name = 'wbcore/password_reset_confirm.html'
+PasswordResetCompleteView.template_name = 'wbcore/password_reset_complete.html'
+
 from rest_framework.urlpatterns import format_suffix_patterns
 from wbcore import rest_views
 
@@ -44,6 +50,7 @@ rest_patterns = [
     # URLs that do not require a session or valid token
     path('auth/password/reset/', PasswordResetView.as_view(), name='rest_password_reset'),
     path('auth/password/reset/confirm/<uidb64>/<token>', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('auth/password/reset/complete/', PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('auth/login/', LoginView.as_view(), name='rest_login'),
     # URLs that require a user to be logged in with a valid session / token.
     path('auth/logout/', LogoutView.as_view(), name='rest_logout'),
