@@ -361,7 +361,7 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
 
     name.admin_order_field = 'first_name'
 
-    image = models.ImageField(null=True, blank=True)
+    image = models.ImageField(null=True, blank=True, upload_to='images/users/')
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
     since = models.DateField(auto_now_add=True)
     until = models.DateField(null=True, blank=True)
