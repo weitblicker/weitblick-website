@@ -379,7 +379,6 @@ class UserSerializer(serializers.ModelSerializer):
             self.cycle_tours_km = cycle['sum_km'] if 'sum_km' in cycle else 0
             self.cycle_tours_euro = cycle['sum_euro'] if 'sum_euro' in cycle else 0
 
-    image = serializers.SerializerMethodField()
     cycle_km = serializers.SerializerMethodField()
     cycle_euro = serializers.SerializerMethodField()
 
@@ -389,8 +388,11 @@ class UserSerializer(serializers.ModelSerializer):
     def get_cycle_km(self, user):
         return round(self.cycle_tours_km, 2) if self.cycle_tours_km else 0.0
 
-    def get_image(self, user):
-        return user.image.url if user.image else None
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        if instance.image:
+            response['image'] = instance.image.url
+        return response
 
     class Meta:
         model = User
