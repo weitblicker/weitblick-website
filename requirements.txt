@@ -12,7 +12,7 @@ django-haystack
 pytidylib
 psycopg2-binary
 djangorestframework
-django-rest-auth
+-e git://github.com/weitblicker/django-rest-auth.git#egg=django-rest-auth
 django-rest-auth[with_social]
 Pillow
 libsass
