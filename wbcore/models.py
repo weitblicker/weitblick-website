@@ -257,7 +257,7 @@ class UserManager(BaseUserManager):
 def user_image_path(user, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     extension = os.path.splitext(filename)[1]
-    return 'images/users/%s.%s' % (slugify.slugify(user.email), extension)
+    return 'images/users/%s%s' % (slugify.slugify(user.email), extension)
 
 
 class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesModelBase):
