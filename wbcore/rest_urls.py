@@ -43,7 +43,7 @@ rest_patterns = [
 
     # URLs that do not require a session or valid token
     path('auth/password/reset/', PasswordResetView.as_view(), name='rest_password_reset'),
-    path('auth/password/reset/confirm/', PasswordResetConfirmView.as_view(), name='rest_password_reset_confirm'),
+    path('auth/password/reset/confirm/<uidb64>/<token>', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('auth/login/', LoginView.as_view(), name='rest_login'),
     # URLs that require a user to be logged in with a valid session / token.
     path('auth/logout/', LogoutView.as_view(), name='rest_logout'),
