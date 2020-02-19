@@ -1,5 +1,5 @@
 import os
-
+import slugify
 from django.db import models, transaction
 from django.dispatch import receiver
 from django_countries.fields import CountryField
@@ -254,6 +254,12 @@ class UserManager(BaseUserManager):
         return user
 
 
+def user_image_path(user, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    extension = os.path.splitext(filename)[1]
+    return 'images/users/%s.%s' % (slugify.slugify(user.email), extension)
+
+
 class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesModelBase):
     class Meta:
         rules_permissions = {
@@ -361,7 +367,7 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
 
     name.admin_order_field = 'first_name'
 
-    image = models.ImageField(null=True, blank=True, upload_to='images/users/')
+    image = models.ImageField(null=True, blank=True, upload_to=user_image_path)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
     since = models.DateField(auto_now_add=True)
     until = models.DateField(null=True, blank=True)
