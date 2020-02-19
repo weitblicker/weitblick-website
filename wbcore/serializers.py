@@ -371,17 +371,23 @@ class UserSerializer(serializers.ModelSerializer):
     """
     User model w/o password
     """
+    def __init__(self, instance=None, **kwargs):
+        super().__init__(instance=instance, **kwargs)
+        self.cycle_tours_euro = self.cycle_tours_km = 0
+        if instance:
+            cycle = instance.cycletour_set.all().aggregate(sum_km=Sum('km'), sum_euro=Sum('euro'))
+            self.cycle_tours_km = cycle['sum_km'] if 'sum_km' in cycle else 0
+            self.cycle_tours_euro = cycle['sum_euro'] if 'sum_euro' in cycle else 0
 
     image = serializers.SerializerMethodField()
     cycle_km = serializers.SerializerMethodField()
     cycle_euro = serializers.SerializerMethodField()
 
-
     def get_cycle_euro(self, user):
-        return 1.23
+        return round(self.cycle_tours_euro, 2)
 
     def get_cycle_km(self, user):
-        return 12.3
+        return round(self.cycle_tours_km, 2)
 
     def get_image(self, user):
         return user.image.url if user.image else None
