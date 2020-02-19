@@ -373,14 +373,23 @@ class UserSerializer(serializers.ModelSerializer):
     """
 
     image = serializers.SerializerMethodField()
+    cycle_km = serializers.SerializerMethodField()
+    cycle_euro = serializers.SerializerMethodField()
+
+
+    def get_cycle_euro(self, user):
+        return 1.23
+
+    def get_cycle_km(self, user):
+        return 12.3
 
     def get_image(self, user):
         return user.image.url if user.image else None
 
     class Meta:
         model = User
-        fields = ('pk', 'username', 'email', 'first_name', 'last_name', 'image')
-        read_only_fields = ('email', )
+        fields = ('pk', 'username', 'email', 'first_name', 'last_name', 'image', 'cycle_km', 'cycle_euro')
+        read_only_fields = ('email', 'cycle_km', 'cycle_euro')
 
 
 class UserCycleSerializer(serializers.ModelSerializer):
