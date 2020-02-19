@@ -6,7 +6,7 @@ username = input("email: ")
 password = getpass.getpass()
 
 base_uri = 'https://weitblicker.org'
-photo = '/home/spuetz/Downloads/puetz.jpg'
+photo = '/home/spuetz/Pictures/puetz.jpeg'
 #base_uri = 'http://localhost:8000'
 
 login_uri = '/rest/auth/login/'
@@ -16,7 +16,7 @@ user_pw_change_uri = '/rest/auth/password/change/'
 cycle_tours_uri = '/rest/cycle/tours/'
 cycle_ranking_uri = '/rest/cycle/ranking/'
 cycle_add_segment_uri = '/rest/cycle/segment/'
-
+reset_password_uri = '/rest/auth/password/reset/'
 
 def login(username, password):
     login_request_header = {
@@ -133,14 +133,24 @@ def cycle_add_segment(token, ):
     print("response: ", response.content)
 
 
+def reset_password(email):
+    print("reset password...")
+    header = {'Accept': 'application/json',
+              'Content-Type': 'application/json'}
+    data = {'email': email}
+    response = requests.post(base_uri + reset_password_uri,  headers=header, data=json.dumps(data))
+    print("response: ", response.content)
+
+
 token = login(username, password)
 data = user_data(token)
-cycle_user_tours(token)
-cycle_ranking(token)
-cycle_add_segment(token)
-logout(token)
-cycle_ranking()
-logout(token)
-token = login(username, password)
-upload_user_photo(data, token, photo)
-change_password(token)
+reset_password(username)
+#cycle_user_tours(token)
+#cycle_ranking(token)
+#cycle_add_segment(token)
+#logout(token)
+#cycle_ranking()
+#logout(token)
+#token = login(username, password)
+#upload_user_photo(data, token, photo)
+#change_password(token)
