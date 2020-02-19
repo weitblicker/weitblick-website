@@ -384,10 +384,10 @@ class UserSerializer(serializers.ModelSerializer):
     cycle_euro = serializers.SerializerMethodField()
 
     def get_cycle_euro(self, user):
-        return round(self.cycle_tours_euro, 2)
+        return round(self.cycle_tours_euro, 2) if self.cycle_tours_euro else self.cycle_tours_euro
 
     def get_cycle_km(self, user):
-        return round(self.cycle_tours_km, 2)
+        return round(self.cycle_tours_km, 2) if self.cycle_tours_km else self.cycle_tours_km
 
     def get_image(self, user):
         return user.image.url if user.image else None
