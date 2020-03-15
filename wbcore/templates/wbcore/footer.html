@@ -3,70 +3,56 @@
     <div class="ui container">
         <div class="ui stackable inverted divided equal height stackable grid">
             {% if host %}
-              <div class="three wide column">
-                  <h4 class="ui inverted header">About</h4>
-                  <div class="ui inverted link list">
-                      <a href="{% url 'sitemap' %}" class="item">{% trans "Sitemap" %}</a>
-                      <a href="{% url 'transparency' host.slug %}" class="item">{% trans "Transparency" %}</a>
-                      <a href="{% url 'donate' host.slug %}" class="item">{% trans "Donate" %}</a>
-                      <a href="{% url 'imprint' %}" class="item">{% trans "Imprint" %}</a>
-                      <a href="{% url 'privacy' %}" class="item">{% trans "Data Protection" %}</a>
-                  </div>
-              </div>
-              <div class="three wide column">
-                  <h4 class="ui inverted header">Services</h4>
-                  <div class="ui inverted link list">
-                      <a href="{% url 'join' host.slug %}" class="item">{% trans "Become a Member" %}</a>
-                      <a href="{% url 'hosts' %}" class="item">{% trans "Associations" %}</a>
-                      <a href="{% url 'events' host.slug %}" class="item">{% trans "Events" %}</a>
-                      <a href="{% url 'contact' host.slug %}" class="item">{% trans "Contact" %}</a>
-                  </div>
-              </div>
+                <div class="two wide column">
+                    <h4 class="ui inverted header">About</h4>
+                    <div class="ui inverted link list">
+                        <a href="{% url 'transparency' host.slug %}" class="item">{% trans "Transparency" %}</a>
+                        <a href="{% url 'contact' host.slug %}" class="item">{% trans "Contact" %}</a>
+                        <a href="{% url 'imprint' %}" class="item">{% trans "Imprint" %}</a>
+                        <a href="{% url 'privacy' %}" class="item">{% trans "Data Protection" %}</a>
+                        <a href="{% url 'sitemap' %}" class="item">{% trans "Sitemap" %}</a>
+                    </div>
+                </div>
+                <div class="two wide column">
+                    <h4 class="ui inverted header">Weitblick</h4>
+                    <div class="ui inverted link list">
+                        <a href="{% url 'join' host.slug %}" class="item">{% trans "Become a Member" %}</a>
+                        <a href="{% url 'donate' host.slug %}" class="item">{% trans "Donate" %}</a>
+                        <a href="{% url 'idea' host.slug %}" class="item">{% trans "Idea" %}</a>
+                        <a href="{% url 'hosts' %}" class="item">{% trans "Associations" %}</a>
+                    </div>
+                </div>
+
             {% else %}
-              <div class="three wide column">
-                  <h4 class="ui inverted header">About</h4>
-                  <div class="ui inverted link list">
-                      <a href="{% url 'sitemap' %}" class="item">{% trans "Sitemap" %}</a>
-                      <a href="{% url 'transparency' %}" class="item">{% trans "Transparency" %}</a>
-                      <a href="{% url 'donate' %}" class="item">{% trans "Donate" %}</a>
-                      <a href="{% url 'imprint' %}" class="item">{% trans "Imprint" %}</a>
-                      <a href="{% url 'privacy' %}" class="item">{% trans "Data Protection" %}</a>
-                  </div>
-              </div>
-              <div class="three wide column">
-                  <h4 class="ui inverted header">Services</h4>
-                  <div class="ui inverted link list">
-                      <a href="{% url 'join' %}" class="item">{% trans "Become a Member" %}</a>
-                      <a href="{% url 'hosts' %}" class="item">{% trans "Associations" %}</a>
-                      <a href="{% url 'events' %}" class="item">{% trans "Events" %}</a>
-                      <a href="{% url 'contact' %}" class="item">{% trans "Contact" %}</a>
-                  </div>
-              </div>
+                <div class="two wide column">
+                    <h4 class="ui inverted header">About</h4>
+                    <div class="ui inverted link list">
+                        <a href="{% url 'transparency' %}" class="item">{% trans "Transparency" %}</a>
+                        <a href="{% url 'contact' %}" class="item">{% trans "Contact" %}</a>
+                        <a href="{% url 'imprint' %}" class="item">{% trans "Imprint" %}</a>
+                        <a href="{% url 'privacy' %}" class="item">{% trans "Data Protection" %}</a>
+                        <a href="{% url 'sitemap' %}" class="item">{% trans "Sitemap" %}</a>
+                    </div>
+                </div>
+                <div class="two wide column">
+                    <h4 class="ui inverted header">Weitblick</h4>
+                    <div class="ui inverted link list">
+                        <a href="{% url 'join' %}" class="item">{% trans "Become a Member" %}</a>
+                        <a href="{% url 'donate' %}" class="item">{% trans "Donate" %}</a>
+                        <a href="{% url 'idea' %}" class="item">{% trans "Idea" %}</a>
+                        <a href="{% url 'hosts' %}" class="item">{% trans "Associations" %}</a>
+                    </div>
+                </div>
             {% endif %}
-            <div class="four wide column">
-                {% if host and host.bank %}
-                    <h4 class="ui inverted header">{% trans "Bank Account" %}</h4>
-                    {{ host.bank.account_holder }}
-                    <table class="ui inverted compact very basic collapsing celled table">
-                        <tbody>
-                        <tr>
-                            <td>
-                                IBAN:
-                            </td>
-                            <td>
-                                {{ host.bank.iban }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                BIC:
-                            </td>
-                            <td>
-                                {{ host.bank.bic }}
-                            </td>
-                        </tr>
-                    </table>
-                {% endif %}
+            <div class="five wide column">
+                <h4 class="ui inverted header">{% trans "Internal" %}</h4>
+                <div class="ui inverted link list">
+                    <a href="/admin/login/" class="item">Login</a>
+                    <a href="https://intranet.weitblicker.org" class="item">Intranet</a>
+                    <a href="https://teams.weitblicker.org" class="item">Teams</a>
+                    <a href="https://wiki.weitblicker.org" class="item">Wiki</a>
+                    <a href="https://cloud.weitblicker.org" class="item">Cloud</a>
+                </div>
             </div>
             <div class="three wide column">
                 {% if host %}
