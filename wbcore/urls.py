@@ -63,3 +63,5 @@ urlpatterns = urlpatterns + main_patterns
 
 urlpatterns.append(path('<str:host_slug>/', include(main_patterns)))
 urlpatterns.append(path('<str:host_slug>/', views.host_view, name='host'))
+
+urlpatterns.append(path('Stadt/<str:host_slug>/', views.Stadt_redirect))

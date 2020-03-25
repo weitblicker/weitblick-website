@@ -2,7 +2,7 @@ import csv
 
 from django.utils.translation import gettext as _
 from django.db.models import Count
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader, RequestContext
 from django.urls import reverse
 from django.core.mail import EmailMessage
@@ -1483,3 +1483,18 @@ def faq_view(request):
         'hosts': Host.objects.all(),
     }
     return HttpResponse(template.render(context, request))
+
+def Stadt_redirect(request, host_slug=None):
+    '''redirects the host url from old homepage'''
+    if host_slug:
+        host_slug = host_slug.lower()  # typically old url was /Stadt/Münster
+        host_slug = host_slug.replace('ä', 'ae')
+        host_slug = host_slug.replace('ö', 'oe')
+        host_slug = host_slug.replace('ü', 'ue')
+        try:
+            host = Host.objects.get(slug=host_slug)
+        except Host.DoesNotExist:
+            raise Http404()
+    else:
+        raise Http404()
+    return HttpResponseRedirect(f'/{host.slug}/')
