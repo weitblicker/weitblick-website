@@ -559,6 +559,8 @@ class HostAdmin(MyAdmin, ReverseModelAdmin):
         from django.conf import settings
         from zipfile import ZipFile
         import os
+        import codecs
+
         template = loader.get_template('wbcore/svgs/logo_standalone.svg')
         path = "%(media_root)slogos/%(slug)s/%(name)s.%(ext)s"
 
@@ -602,7 +604,7 @@ class HostAdmin(MyAdmin, ReverseModelAdmin):
                  'color_puzzle': colors[2]
                  })
 
-            with open(svg_path, 'w') as file:
+            with codecs.open(svg_path, 'w', encoding='utf8') as file:
                 file.write(svg_logo)
 
             zip_obj.write(svg_path, os.path.basename(svg_path))
