@@ -6,6 +6,7 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth import get_permission_codename
 from django import forms
 from django.db import models
+from django.template import loader
 from modeltranslation.admin import TabbedTranslationAdmin, TranslationTabularInline
 from martor.widgets import AdminMartorWidget
 from django_google_maps import widgets as map_widgets
@@ -550,6 +551,32 @@ class HostAdmin(MyAdmin, ReverseModelAdmin):
             return super().get_readonly_fields(request, obj)
 
         return readonly_field + ('slug', 'name', 'email')
+
+    def save_model(self, request, obj, form, change):
+        super(HostAdmin, self).save_model(request, obj, form, change)
+        from django.conf import settings
+        from os import system
+        template = loader.get_template('wbcore/svgs/logo_standalone.svg')
+        svg_logo = template.render({'text': obj.city})
+        svg_path = "%slogos/%s.%s" % (settings.MEDIA_ROOT, obj.slug, "svg")
+
+        scales = [1, 2, 3]
+
+
+        with open(svg_path, 'w') as file:
+            file.write(svg_logo)
+
+        for scale in scales:
+            try:
+                width = 386.76 * scale
+                height = 141.55 * scale
+                scale_txt = "_%s" % scale if scale != 1 else ""
+                png_path = "%s/logos/%s%s.%s" % (settings.MEDIA_ROOT, obj.slug, scale_txt, "png")
+                system("inkscape -z -e %(png_path)s -w %(width)s -h %(height)s %(svg_path)s"
+                       %dict(png_path=png_path, svg_path=svg_path, width=width, height=height))
+            except OSError as exception:
+                print("Could not convert logo file %s, Exception %s" % (svg_path, exception))
+
 
 
 class PartnerAdmin(MyAdmin, ReverseModelAdmin):
