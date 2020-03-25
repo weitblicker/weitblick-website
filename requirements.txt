@@ -35,4 +35,4 @@ pandas
 pymysql
 sshtunnel
 django-instagram
-
+zipfile

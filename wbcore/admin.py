@@ -1,3 +1,5 @@
+import errno
+
 from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.admin import GenericInlineModelAdmin, GenericStackedInline, GenericTabularInline
@@ -555,28 +557,67 @@ class HostAdmin(MyAdmin, ReverseModelAdmin):
     def save_model(self, request, obj, form, change):
         super(HostAdmin, self).save_model(request, obj, form, change)
         from django.conf import settings
-        from os import system
+        from zipfile import ZipFile
+        import os
         template = loader.get_template('wbcore/svgs/logo_standalone.svg')
-        svg_logo = template.render({'text': obj.city})
-        svg_path = "%slogos/%s.%s" % (settings.MEDIA_ROOT, obj.slug, "svg")
+        path = "%(media_root)slogos/%(slug)s/%(name)s.%(ext)s"
 
-        scales = [1, 2, 3]
+        logo_black = '#04090e'
+        logo_orange = '#f3971b'
+        logo_grey = '#969696'
+        logo_white = '#ffffff'
 
+        color_map = {
+            # text, weitblick, puzzle
+            'standard': (logo_grey, logo_black, logo_orange),
+            'grey_negative': (logo_grey, logo_white, logo_grey),
+            'black': (logo_black, logo_black, logo_black),
+            'white': (logo_white, logo_white, logo_white),
+            'negative': (logo_grey, logo_white, logo_orange)
+        }
 
-        with open(svg_path, 'w') as file:
-            file.write(svg_logo)
+        dpi_list = [72, 150, 300]
+        width = 386.76
+        height = 141.55
 
-        for scale in scales:
+        zip_path = path % dict(media_root=settings.MEDIA_ROOT, slug=obj.slug, name="%s_%s" % ("logos", obj.slug), ext="zip")
+
+        if not os.path.exists(os.path.dirname(zip_path)):
             try:
-                width = 386.76 * scale
-                height = 141.55 * scale
-                scale_txt = "_%s" % scale if scale != 1 else ""
-                png_path = "%s/logos/%s%s.%s" % (settings.MEDIA_ROOT, obj.slug, scale_txt, "png")
-                system("inkscape -z -e %(png_path)s -w %(width)s -h %(height)s %(svg_path)s"
-                       %dict(png_path=png_path, svg_path=svg_path, width=width, height=height))
-            except OSError as exception:
-                print("Could not convert logo file %s, Exception %s" % (svg_path, exception))
+                os.makedirs(os.path.dirname(zip_path))
+            except OSError as exc:  # Guard against race condition
+                if exc.errno != errno.EEXIST:
+                    raise
 
+        zip_obj = ZipFile(zip_path, "w")
+
+        for key, colors in color_map.items():
+            svg_name = "logo_%s_%s" % (obj.slug, key)
+            svg_path = path % dict(media_root=settings.MEDIA_ROOT, slug=obj.slug, name=svg_name, ext="svg")
+
+            svg_logo = template.render(
+                {'text': obj.city,
+                 'color_text': colors[0],
+                 'color_weitblick': colors[1],
+                 'color_puzzle': colors[2]
+                 })
+
+            with open(svg_path, 'w') as file:
+                file.write(svg_logo)
+
+            zip_obj.write(svg_path, os.path.basename(svg_path))
+
+            for dpi in dpi_list:
+                try:
+                    name = "logo_%s_%s_%sdpi" % (obj.slug, key, dpi)
+                    png_path = path % dict(media_root=settings.MEDIA_ROOT, slug=obj.slug, name=name, ext="png")
+                    os.system("inkscape -z -%(ext_flag)s %(png_path)s -d %(dpi)s %(svg_path)s"
+                           %dict(png_path=png_path, svg_path=svg_path, dpi=dpi, ext_flag='e'))
+                    zip_obj.write(png_path, os.path.basename(png_path))
+                except OSError as exception:
+                    print("Could not convert logo file %s, Exception %s" % (svg_path, exception))
+
+        zip_obj.close()
 
 
 class PartnerAdmin(MyAdmin, ReverseModelAdmin):
