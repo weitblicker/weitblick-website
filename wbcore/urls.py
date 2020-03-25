@@ -64,4 +64,5 @@ urlpatterns = urlpatterns + main_patterns
 urlpatterns.append(path('<str:host_slug>/', include(main_patterns)))
 urlpatterns.append(path('<str:host_slug>/', views.host_view, name='host'))
 
-urlpatterns.append(path('Stadt/<str:host_slug>/', views.Stadt_redirect))
+# TODO deprecated, should be removed in Jan 2021
+urlpatterns.append(path('Stadt/<str:host_slug>/', views.stadt_redirect))

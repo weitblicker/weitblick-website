@@ -1484,7 +1484,8 @@ def faq_view(request):
     }
     return HttpResponse(template.render(context, request))
 
-def Stadt_redirect(request, host_slug=None):
+# TODO deprecated, should be removed in Jan 2021
+def stadt_redirect(request, host_slug=None):
     '''redirects the host url from old homepage'''
     if host_slug:
         host_slug = host_slug.lower()  # typically old url was /Stadt/Münster
@@ -1497,4 +1498,4 @@ def Stadt_redirect(request, host_slug=None):
             raise Http404()
     else:
         raise Http404()
-    return HttpResponseRedirect(f'/{host.slug}/')
+    return HttpResponseRedirect("/%s" % host.slug)
