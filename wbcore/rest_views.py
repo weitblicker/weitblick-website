@@ -4,7 +4,7 @@ import uuid
 
 from allauth.account.models import EmailConfirmation, EmailConfirmationHMAC
 from django.contrib.auth.decorators import login_required
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db.models import Sum

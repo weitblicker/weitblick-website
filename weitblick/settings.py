@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django_countries',
     'schedule',
-    'haystack',
     'sass_processor',
     'martor',
     'tinymce',
@@ -292,12 +291,9 @@ REST_FRAMEWORK = {
     ]
 }
 
-
-HAYSTACK_CONNECTIONS = {
+ELASTICSEARCH_DSL={
     'default': {
-        'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
-        'URL': os.getenv('elasticURL', 'http://127.0.0.1:9200/'),
-        'INDEX_NAME': 'haystack',
+        'hosts': 'localhost:9200'
     },
 }
 

@@ -1,8 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from rest_framework.decorators import api_view
-from haystack.query import SearchQuerySet
-from haystack.inputs import AutoQuery, Exact, Clean
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from itertools import groupby

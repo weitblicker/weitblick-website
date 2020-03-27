@@ -3,7 +3,7 @@ from django.conf.urls import include
 from django.contrib.sitemaps.views import sitemap
 from .sitemaps import NewsPostSitemap, ProjectSitemap, BlogPostSitemap, EventSitemap, TeamSitemap, HostSitemap
 from .sitemaps import AboutSitemap, HistorySitemap, ContactSitemap, JoinSitemap
-from wbcore import views, rest_views, ajax_views
+from wbcore import views
 from wbcore import rest_urls, ajax_urls
 
 sitemaps = {

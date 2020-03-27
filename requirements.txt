@@ -1,14 +1,13 @@
-Django==2.2.8
+Django
 django-countries
 django-sass-processor
-django-photologue==3.10
+django-photologue
 django-compressor
 django-localflavor
 django-filter
 django-google-maps
 django-allauth
-elasticsearch>=2,<3
-django-haystack
+django-elasticsearch-dsl
 pytidylib
 psycopg2-binary
 djangorestframework
@@ -35,4 +34,3 @@ pandas
 pymysql
 sshtunnel
 django-instagram
-zipfile
