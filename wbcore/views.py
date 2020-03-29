@@ -275,7 +275,7 @@ def reports_view(request, host_slug=None):
 
     template = loader.get_template('wbcore/reports.html')
     context = {
-        'main_nav': get_main_nav(),
+        'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
@@ -309,7 +309,7 @@ def charter_view(request, host_slug=None):
 
     template = loader.get_template('wbcore/charter.html')
     context = {
-        'main_nav': get_main_nav(),
+        'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
@@ -355,7 +355,7 @@ def transparency_view(request, host_slug=None):
 
     template = loader.get_template('wbcore/transparency.html')
     context = {
-        'main_nav': get_main_nav(),
+        'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'host_url_prefix': "/" + host.slug + "/" if host else "/",
@@ -391,7 +391,7 @@ def facts_view(request, host_slug=None):
 
     template = loader.get_template('wbcore/facts.html')
     context = {
-        'main_nav': get_main_nav(),
+        'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
@@ -427,7 +427,7 @@ def history_view(request, host_slug=None):
 
     template = loader.get_template('wbcore/history.html')
     context = {
-        'main_nav': get_main_nav(),
+        'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
@@ -460,7 +460,7 @@ def privacy_view(request, host_slug=None):
 
     template = loader.get_template('wbcore/privacy.html')
     context = {
-        'main_nav': get_main_nav(),
+        'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
@@ -495,7 +495,7 @@ def teams_view(request, host_slug=None):
 
     template = loader.get_template('wbcore/teams.html')
     context = {
-        'main_nav': get_main_nav(),
+        'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
@@ -534,7 +534,7 @@ def team_view(request, host_slug=None, team_slug=None):
 
     template = loader.get_template('wbcore/team.html')
     context = {
-        'main_nav': get_main_nav(),
+        'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
@@ -574,7 +574,7 @@ def about_view(request, host_slug=None):
 
     template = loader.get_template('wbcore/about.html')
     context = {
-        'main_nav': get_main_nav(),
+        'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
@@ -805,7 +805,7 @@ def join_view(request, host_slug=None):
 
 
     context = {
-        'main_nav': get_main_nav(active='join'),
+        'main_nav': get_main_nav(host=host, active='join'),
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
@@ -972,6 +972,7 @@ def events_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
+        'host': host,
         'breadcrumb': breadcrumb,
         'hosts': hosts,
         'filter_preset': {'host': [host.slug] if host else None, },
@@ -1367,7 +1368,7 @@ def imprint_view(request, host_slug=None):
 
     template = loader.get_template('wbcore/imprint.html')
     context = {
-        'main_nav': get_main_nav(),
+        'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
@@ -1410,7 +1411,7 @@ def contact_view(request, host_slug=None):
 
     template = loader.get_template('wbcore/contact.html')
     context = {
-        'main_nav': get_main_nav(),
+        'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
         'host': load_host,
         'breadcrumb': breadcrumb,
