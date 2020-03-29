@@ -66,8 +66,8 @@
                         <a class="item" href="mailto:{{ host.email }}">{{ host.email }}</a>
                     </p>
                     <p class="ui inverted list">
-                        IBAN: {{ account.iban }}
-                        <br>BIC: {{ account.bic }}
+                        IBAN: {{ host.bank.iban }}
+                        <br>BIC: {{ host.bank.bic }}
                     </p>
                 {% endif %}
             </div>
