@@ -1,8 +1,10 @@
 import csv
 from datetime import datetime, date, timedelta
+from haystack.query import SearchQuerySet
 from .models import NewsPost, BlogPost, Project, Event
 from schedule.periods import Period
 from dateutil.parser import parse
+
 
 def parse_union(request):
     host_slugs = request.GET.getlist("union")

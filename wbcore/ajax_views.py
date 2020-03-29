@@ -1,10 +1,11 @@
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
+from haystack.query import SearchQuerySet
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from itertools import groupby
-from .filter import filter_news, filter_projects, filter_events
+from .filter import filter_news, filter_projects, filter_events, filter_blog
 from .views import item_list_from_occ, item_list_from_posts, item_list_from_proj
 
 
@@ -91,9 +92,10 @@ def filter_events_view(request):
 @api_view(['GET', 'POST'])
 def filter_blog_view(request):
     template = loader.get_template('wbcore/list_items.html')
+    posts = filter_blog(request, default_limit=-1)
     host = None  # TODO filter if on host specific news page
     context = {
         'host': host,
-        'item_list': item_list_from_posts(posts, host_slug=host_slug, post_type="blog-post", id_key='post_id'),
+        'item_list': posts,
     }
     return HttpResponse(template.render(context, request))

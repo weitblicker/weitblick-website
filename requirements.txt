@@ -7,7 +7,6 @@ django-localflavor
 django-filter
 django-google-maps
 django-allauth
-django-elasticsearch-dsl
 pytidylib
 psycopg2-binary
 djangorestframework
@@ -22,6 +21,8 @@ django-modeltranslation
 django-tinymce4-lite
 python-slugify
 django-microsoft-auth
+django-haystack==3.0b1
+elasticsearch>=2.0.0,<3.0.0
 django-scheduler>=0.9.3
 form_designer
 django-el-pagination

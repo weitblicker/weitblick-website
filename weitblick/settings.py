@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'rest_auth',
     'rest_auth.registration',
+    'haystack',
+    'elasticsearch',
     'localflavor',
     'django_google_maps',
     'microsoft_auth',
@@ -291,9 +293,11 @@ REST_FRAMEWORK = {
     ]
 }
 
-ELASTICSEARCH_DSL={
+HAYSTACK_CONNECTIONS = {
     'default': {
-        'hosts': 'localhost:9200'
+        'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'haystack',
     },
 }
 
