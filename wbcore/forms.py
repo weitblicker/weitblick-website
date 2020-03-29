@@ -1,6 +1,7 @@
 from django.forms import ModelForm, Select, ModelChoiceField, NumberInput, CheckboxInput, BooleanField, HiddenInput
 from django.core.exceptions import ValidationError
 from localflavor.generic.forms import BICFormField, IBANFormField
+from captcha.fields import CaptchaField
 
 from wbcore.models import (
     ContactMessage, User, BankAccount, Host, UserRelation, Address
@@ -8,6 +9,8 @@ from wbcore.models import (
 
 
 class ContactForm(ModelForm):
+    # TODO customize field layout via widget and template https://django-simple-captcha.readthedocs.io/en/latest/advanced.html#rendering
+    captcha = CaptchaField()
     class Meta:
         model = ContactMessage
         fields = ['host', 'name', 'email', 'reason', 'subject', 'message']

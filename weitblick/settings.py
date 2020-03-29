@@ -65,7 +65,8 @@ INSTALLED_APPS = [
     'rules',
     'django_instagram',
     'cookielaw',
-    'django.contrib.humanize'
+    'django.contrib.humanize',
+    'captcha',
 ]
 
 AUTH_USER_MODEL = 'wbcore.User'

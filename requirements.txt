@@ -30,6 +30,7 @@ markdown-fenced-code-tabs
 rules
 django_reverse_admin
 django-cookie-law
+django-simple-captcha
 # load blog posts
 pandas
 pymysql
