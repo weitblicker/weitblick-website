@@ -68,6 +68,14 @@
     </div>
     {% endif %}
 
+    {% if membership_declaration %}
+    <div class="ui segment">
+        {% trans "Membership Declaration" as title %}
+        {% include "wbcore/segment_header.html" with icon='file alternate outline' url_alias='join' %}
+        {% include 'wbcore/document_list.html' with documents=membership_declaration hide_year=True %}
+    </div>
+    {% endif %}
+
     {% if event_item_list %}
     <div class="ui segment">
         {% trans "Events" as title %}

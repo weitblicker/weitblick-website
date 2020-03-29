@@ -802,7 +802,8 @@ def join_view(request, host_slug=None):
 
     load_host = host if host else Host.objects.get(host_slug='bundesverband')
     projects = Project.objects.filter(hosts=load_host)[:3]
-
+    membership_declaration = Document.objects.filter(host=host, document_type='membership_declaration', public=True).order_by('-valid_from') if host else None
+    print('***', membership_declaration)
 
     context = {
         'main_nav': get_main_nav(host=host, active='join'),
@@ -810,6 +811,7 @@ def join_view(request, host_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'success': success,
+        'membership_declaration': membership_declaration,
         'icon_links': icon_links,
         'hosts': Host.objects.all() if host == Host.objects.get(slug='bundesverband') else None,
         'project_item_list': item_list_from_proj(projects, host_slug),
