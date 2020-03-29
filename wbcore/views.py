@@ -748,8 +748,11 @@ def join_view(request, host_slug=None):
             host = Host.objects.get(slug=main_host_slug)
         except Host.DoesNotExist:
             host = None
+
+    # TODO join form disabled until privacy issues are sorted
     try:
-        join_page = host.joinpage
+        # join_page = host.joinpage
+        join_page = None
     except JoinPage.DoesNotExist:
         pass
 
@@ -803,7 +806,6 @@ def join_view(request, host_slug=None):
     load_host = host if host else Host.objects.get(host_slug='bundesverband')
     projects = Project.objects.filter(hosts=load_host)[:3]
     membership_declaration = Document.objects.filter(host=host, document_type='membership_declaration', public=True).order_by('-valid_from') if host else None
-    print('***', membership_declaration)
 
     context = {
         'main_nav': get_main_nav(host=host, active='join'),
