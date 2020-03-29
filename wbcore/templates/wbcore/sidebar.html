@@ -1,6 +1,12 @@
 {% load i18n %}
 <div class="ui sticky">
 
+    {% if host and host.instagram%}
+    <div class="ui segment">
+        {% include 'wbcore/instagram.html' with account_id=host.instagram %}
+    </div>
+    {% endif %}
+
     {% if address %}
     <div class="ui segment">
         {% include "wbcore/address.html" %}
@@ -13,12 +19,6 @@
     </div>
     {% endif %}
 
-    {% if host and host.instagram%}
-    <div class="ui segment">
-        {% include 'wbcore/instagram.html' with account_id=host.instagram %}
-    </div>
-    {% endif %}
-
     {% if photos %}
         <div class="ui segment">
             {% trans "Gallery" as title %}
@@ -27,10 +27,13 @@
         </div>
     {% endif %}
 
-    <!--div class="ui segment">
+    {% if account %}
+    <div class="ui segment">
         {% trans "Donate" as title %}
         {% include "wbcore/segment_header.html" with icon='donate' url_alias='donate' %}
-    </div-->
+        {% include 'wbcore/bank_account.html' with account=account %}
+    </div>
+    {% endif %}
 
     {% if hosts %}
     <div class="ui segment">

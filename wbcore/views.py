@@ -878,6 +878,7 @@ def project_view(request, host_slug=None, project_slug=None):
         'news': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='post_id', text=False),
         'blogposts': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
         'host': host,
+        'account': host.bank if host else None,
         'dot_nav': get_dot_nav(host=host),
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
@@ -1336,7 +1337,11 @@ def donate_view(request, host_slug=None):
         breadcrumb = [(_('Home'), reverse('home')), (_('Donate'), None)]
 
     load_host = host if host else Host.objects.get(slug='bundesverband')
-    donate = Content.objects.get(host=load_host, type='donate')
+    account = load_host.bank
+    try:
+        donate = Content.objects.get(host=load_host, type='donate')
+    except Content.DoesNotExist:
+        donate = None
 
     projects = Project.objects.filter(hosts=host) if host else Project.objects.all()
     projects = projects[:3]
@@ -1349,6 +1354,7 @@ def donate_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'donate': donate,
+        'account': account,
         'hosts': Host.objects.all(),
         'project_item_list': item_list_from_proj(projects, host_slug),
     }

@@ -65,6 +65,10 @@
                     <p class="ui inverted link list">
                         <a class="item" href="mailto:{{ host.email }}">{{ host.email }}</a>
                     </p>
+                    <p class="ui inverted list">
+                        IBAN: {{ account.iban }}
+                        <br>BIC: {{ account.bic }}
+                    </p>
                 {% endif %}
             </div>
             <div class="three wide column">
