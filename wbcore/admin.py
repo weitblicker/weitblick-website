@@ -711,8 +711,8 @@ class ContactMessageAdmin(MyAdmin):
 
 class ProjectAdmin(MyAdmin, ReverseModelAdmin):
     inline_type = 'stacked'
-    inline_reverse = ['donation_account']
-    inlines = (MilestoneInlineModel, )
+    inline_reverse = ['donation_account', 'milestones']
+    #inlines = (MilestoneInlineModel, )
     list_display = ('name', 'get_hosts', 'get_country', 'start_date', 'end_date', 'completed', 'published')
 
     def get_hosts(self, project):
