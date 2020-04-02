@@ -39,7 +39,7 @@ icon_links = OrderedDict([
          'icon': 'twitter'}),
     ('instagram',
         {'name': 'Instagram',
-         'link': 'https://www.instagram.com/weitblick_osnabrueck/',
+         'link': 'https://www.instagram.com/weitblick_e.v/',
          'icon': 'instagram'}),
     ('youtube',
         {'name': 'YouTube',
