@@ -637,6 +637,13 @@ def projects_view(request, host_slug=None):
         host = None
         projects = Project.objects.all()
         breadcrumb = [(_('Home'), reverse('home')), (_('Projects'), None)]
+
+    # sort projects
+    if host_slug or len(host_slugs) == 1:  # only order by priority in host view to avoid competition between hosts
+        projects = projects.order_by('-priority', '-updated')
+    else:
+        projects = projects.order_by('-updated')
+
     posts = BlogPost.objects.filter(project__in=projects)
 
     countries = set([project.location.country for project in projects])
