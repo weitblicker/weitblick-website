@@ -53,7 +53,7 @@
                     <a class="item" href="{% url 'transparency' host.slug %}">{% trans "Transparency" %}</a>
                     <a class="item" href="{% url 'charter' host.slug %}">{% trans "Charter" %}</a>
                     <a class="item" href="{% url 'reports' host.slug %}">{% trans "Reports" %}</a>
-                    <a class="item" href="{% url 'faq' %}">{% trans "FAQ" %}</a>
+                    <a class="item" href="{% url 'faq' host.slug %}">{% trans "FAQ" %}</a>
                 </div>
             {% else %}
                 <a class="item" href="{% url 'facts' %}">{% trans "Facts" %}</a>

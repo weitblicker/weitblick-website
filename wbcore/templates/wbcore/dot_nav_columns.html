@@ -42,7 +42,7 @@
         <div class="ui item"><a href="{% url 'transparency' host.slug %}"><i class="eye outline icon"></i> {% trans "Transparency" %}</a></div>
         <div class="ui item"><a href="{% url 'charter' host.slug %}"><i class="file alternate outline icon"></i> {% trans "Charter" %}</a></div>
         <div class="ui item"><a href="{% url 'reports' host.slug %}"><i class="chart line icon"></i> {% trans "Reports" %}</a></div>
-        <div class="ui item"><a href="{% url 'faq' %}"><i class="question icon"></i> {% trans "FAQ" %}</a></div>
+        <div class="ui item"><a href="{% url 'faq' host.slug %}"><i class="question icon"></i> {% trans "FAQ" %}</a></div>
     {% else %}
         <a class="ui item header" href="{% url 'facts' %}">{% trans "Facts" %}</a>
         <div class="ui item"><a href="{% url 'transparency' %}"><i class="eye outline icon"></i> {%  trans "Transparency" %}</a></div>

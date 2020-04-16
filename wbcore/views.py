@@ -1487,16 +1487,27 @@ def sitemap_view(request):
     return HttpResponse(template.render(context, request))
 
 
-def faq_view(request):
+def faq_view(request, host_slug=None):
+    if host_slug:
+        try:
+            host = Host.objects.get(slug=host_slug)
+            breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('FAQ'), None)]
+        except Host.DoesNotExist:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [(_('Home'), reverse('home')), (_('FAQ'), None)]
+
     template = loader.get_template('wbcore/faq.html')
     faq = FAQ.objects.all()
     for f in faq:
         f.questionandanswer_set
     context = {
-        'main_nav': get_main_nav(),
-        'dot_nav': get_dot_nav(),
+        'main_nav': get_main_nav(host=host),
+        'dot_nav': get_dot_nav(host=host),
+        'host': host,
         'faq': faq,
-        'breadcrumb': [(_('Home'), reverse('home')), (_('FAQ'), None)],
+        'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'hosts': Host.objects.all(),
     }
