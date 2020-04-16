@@ -272,12 +272,12 @@ msgstr "Association"
 
 #: templates/wbcore/list_filter.html:25 templates/wbcore/list_filter.html:30
 msgid "Clear Filter"
-msgstr "Réinitialiser/supprimer le filtre"
+msgstr "Réinitialiser le filtre"
 
 # Hängt vom genauen Kontext ab.
 #: templates/wbcore/list_filter.html:26 templates/wbcore/list_filter.html:31
 msgid "Clear"
-msgstr "Réinitialiser/supprimer/éffacer"
+msgstr "Réinitialiser"
 
 #: templates/wbcore/list_filter.html:44
 msgid "Archive"
