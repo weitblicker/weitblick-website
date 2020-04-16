@@ -185,6 +185,7 @@ def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='p
         else:
             post.link = reverse(post_type, args=[post.id])
         post.show_text = text
+        post.image = post.get_title_image()
         item_list.append(post)
     return item_list
 
@@ -213,6 +214,7 @@ def item_list_from_teams(teams, host_slug=None):
         team.title = team.name
         team.teaser = team.teaser if team.teaser else team.description
         team.image = team.image
+        print("***", team.image)
         team.country = None
         team.published = None
         team.hosts_list = [team.host]
