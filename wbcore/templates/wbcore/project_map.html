@@ -1,0 +1,92 @@
+{% load static %}
+{% load l10n %}
+{% load i18n %}
+<script src="{% static 'highmaps/proj4.js'%}"></script>
+<script src="{% static 'highmaps/highmaps.js'%}"></script>
+<script src="{% static 'highmaps/de-all.js'%}"></script>
+
+{% trans "Map" as title %}
+{% include 'wbcore/segment_header.html' with icon='map marker alternate' %}
+<div id="container" style="width: 100%">
+
+</div>
+<script>
+var mapKey = 'countries/' + '{{project.location.country|lower}}' +'/'+ '{{project.location.country|lower}}'  + '-all';
+$.getScript('https://code.highcharts.com/mapdata/' + mapKey + '.js', function() {
+
+    data = Highcharts.geojson(Highcharts.maps[mapKey]);
+
+    // Set a non-random bogus value
+    $.each(data, function(i) {
+        this.value = null;
+    });
+
+
+    var filtered_projects = [];
+        filtered_projects.push({
+            name: '{{project.name}}',
+            slug: '{{project.slug}}',
+            lat: {{project.location.geolocation.lat|stringformat:".11f" }},
+            lon: {{project.location.geolocation.lon|stringformat:".11f" }}
+        });
+
+    var map = Highcharts.mapChart('container', {
+        title: {
+            text: ''
+        },
+        plotOptions:{
+            series: {
+                dataLabels: {
+                    allowOverlap: true,
+                }
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        tooltip: {
+            enabled: false,
+        },
+        chart: {
+            spacingRight: 0,
+            spacingLeft: 0,
+            spacingTop: "2rem",
+            spacingBottom: "2rem",
+            marginTop:0,
+            marginLeft:0,
+            marginRight:0,
+            marginBottom:0,
+        },
+        series: [{
+            mapData: Highcharts.maps[mapKey],
+            joinBy: ['iso-a2', 'drilldown'],
+            name: 'project_country',
+            showInLegend: false,
+        },
+            {
+                // Specify points using lat/lon
+                type: 'mappoint',
+                name: 'project',
+                color: '#FF9900',
+                data: filtered_projects,
+                dataLabels: {
+                    align: 'center',
+                    format: '{point.name}'
+                },
+                tooltip: {
+                    enabled: false,
+                },
+                marker:{
+                    symbol: 'url(/static/puzzle-icon.svg)',
+                    width: 16,
+                    height: 16
+                },
+
+
+            },
+        ]
+    });
+
+    map.mapZoom(0.95);
+        });
+</script>
