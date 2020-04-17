@@ -15,6 +15,9 @@
 
     <div class="content">
         <div class="meta">
+            {% if item.location.country %}
+                <i class="{{ item.location.country |lower}} flag"></i>
+            {% endif %}
             {% if item.country %}
                 <span>{{ item.country }}</span>
             {% endif %}

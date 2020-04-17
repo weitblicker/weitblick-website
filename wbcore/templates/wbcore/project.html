@@ -13,8 +13,7 @@
 {% endblock %}
 {% block side_bar %}
         <div class="ui segment">
-            {% trans "Map" as title %}
-            {% include 'wbcore/segment_header.html' with icon='map marker alternate' %}
+            {% include 'wbcore/project_map.html' %}
         </div>
 
         {% if project.photos %}
