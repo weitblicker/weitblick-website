@@ -169,7 +169,7 @@ def item_list_from_occ(occurrences, host_slug=None, text=True):
     return item_list
 
 
-def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='post_id', text=True):
+def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='post_slug', text=True):
 
     item_list = []
     for post in posts:
@@ -180,10 +180,10 @@ def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='p
             post.teaser = ""
         current_host = Host.objects.get(slug=host_slug) if host_slug else None
         if current_host and post.host and current_host == post.host:
-            post.link = reverse(post_type, kwargs={id_key: post.id, 'host_slug': host_slug})
+            post.link = reverse(post_type, kwargs={id_key: post.slug, 'host_slug': host_slug})
 
         else:
-            post.link = reverse(post_type, args=[post.id])
+            post.link = reverse(post_type, args=[post.slug])
         post.show_text = text
         post.image = post.get_title_image()
         item_list.append(post)
@@ -241,8 +241,8 @@ def home_view(request):
         'main_nav': get_main_nav(),
         'dot_nav': get_dot_nav(),
         'projects': projects,
-        'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id', text=False),
-        'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
+        'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_slug', text=False),
+        'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='post_slug'),
         'hosts': hosts,
         'event_item_list': item_list_from_occ(occurrences, text=True),
         'breadcrumb': [(_('Home'), None)],
@@ -583,8 +583,8 @@ def about_view(request, host_slug=None):
         'icon_links': icon_links,
         'about': about,
         'hosts': Host.objects.all(),
-        'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id'),
-        'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
+        'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_slug'),
+        'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='post_slug'),
         'event_item_list': item_list_from_occ(occurrences, text=True),
     }
     return HttpResponse(template.render(context, request))
@@ -884,8 +884,8 @@ def project_view(request, host_slug=None, project_slug=None):
         'main_nav': get_main_nav(host=host, active='projects'),
         'project': project,
         'event_item_list': item_list_from_occ(occurrences, text=False),
-        'news': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='post_id', text=False),
-        'blogposts': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
+        'news': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='post_slug', text=False),
+        'blogposts': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_slug', text=False),
         'host': host,
         'account': host.bank if host else None,
         'dot_nav': get_dot_nav(host=host),
@@ -1095,25 +1095,25 @@ def blog_view(request, host_slug=None):
         'hosts': hosts,
         'filter_preset': {'host': [host.slug] if host else None, },
         'years': year_months,
-        'item_list': item_list_from_posts(posts, host_slug, post_type="blog-post", id_key='post_id'),
+        'item_list': item_list_from_posts(posts, host_slug, post_type="blog-post", id_key='post_slug'),
         'ajax_endpoint': reverse('ajax-filter-blog'),
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 
 
-def blog_post_view(request, host_slug=None, post_id=None):
+def blog_post_view(request, host_slug=None, post_slug=None):
     template = loader.get_template('wbcore/post.html')
     try:
         if host_slug:
-            post = BlogPost.objects.get(pk=post_id, host__slug=host_slug)
+            post = BlogPost.objects.get(slug=post_slug, host__slug=host_slug)
             host = Host.objects.get(slug=host_slug)
             breadcrumb = [(_('Home'), reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
                           (_('Blog'), reverse('blog', args=[host_slug])),
                           (post.title, None)]
         else:
-            post = BlogPost.objects.get(pk=post_id)
+            post = BlogPost.objects.get(slug=post_slug)
             host = None
             breadcrumb = [(_('Home'), reverse('home')), (_('Blog'), reverse('blog')), (post.title, None)]
 
@@ -1215,18 +1215,18 @@ def news_view(request, host_slug=None):
     return HttpResponse(template.render(context, request))
 
 
-def news_post_view(request, host_slug=None, post_id=None):
+def news_post_view(request, host_slug=None, post_slug=None):
     template = loader.get_template('wbcore/post.html')
     try:
         if host_slug:
-            post = NewsPost.objects.get(pk=post_id, host__slug=host_slug)
+            post = NewsPost.objects.get(slug=post_slug, host__slug=host_slug)
             host = Host.objects.get(slug=host_slug)
             breadcrumb = [(_('Home'), reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
                           (_('News'), reverse('news', args=[host_slug])),
                           (post.title, None)]
         else:
-            post = NewsPost.objects.get(pk=post_id)
+            post = NewsPost.objects.get(slug=post_slug)
             host = None
             breadcrumb = [(_('Home'), reverse('home')), (_('News'), reverse('news')), (post.title, None)]
 

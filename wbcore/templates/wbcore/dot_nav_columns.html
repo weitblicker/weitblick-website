@@ -23,7 +23,7 @@
     {% else %} <a class="ui item header" href="{% url 'news' %}">{% trans "News" %}</a>
     {% endif %}
     {% for entry in dot_nav.news %}
-        {% include 'wbcore/dot_nav_item.html' with image=entry.get_title_image type='news-post' id=entry.pk title=entry.title %}
+        {% include 'wbcore/dot_nav_item.html' with image=entry.get_title_image type='news-post' slug=entry.slug title=entry.title %}
     {% endfor %}
 </div>
 {% if blog_width != 0 %}
@@ -32,7 +32,7 @@
     {% else %} <a class="ui item header"href="{% url 'blog' %}" >{% trans "Blog" %}</a>
     {% endif %}
     {% for entry in dot_nav.blog %}
-        {% include 'wbcore/dot_nav_item.html' with image=entry.get_title_image type='blog-post' id=entry.pk title=entry.title desc=entry.text|truncatewords:7 %}
+        {% include 'wbcore/dot_nav_item.html' with image=entry.get_title_image type='blog-post' slug=entry.slug title=entry.title desc=entry.text|truncatewords:7 %}
     {% endfor %}
 </div>
 {% endif %}

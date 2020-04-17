@@ -2,11 +2,11 @@
 <div class="item">
     {% if image %}
         {% if host %}
-            <a href="{% url type post_id=id host_slug=host.slug %}" class="ui top aligned image">
+            <a href="{% url type post_slug=slug host_slug=host.slug %}" class="ui top aligned image">
                 <img src="{{ image.get_menusize_url }}" class="thumbnail" alt="{{ image.title }}">
             </a>
         {% else %}
-            <a href="{% url type post_id=id %}" class="ui top aligned image">
+            <a href="{% url type post_slug=slug %}" class="ui top aligned image">
                 <img src="{{ image.get_menusize_url }}" class="thumbnail" alt="{{ image.title }}">
             </a>
         {% endif %}
@@ -24,9 +24,9 @@
             <p>{{ show_date | safe }}</p>
         {% else %}
             {% if host %}
-                <a href="{% url type post_id=id host_slug=host.slug %}">{{ title }}</a>
+                <a href="{% url type post_slug=slug host_slug=host.slug %}">{{ title }}</a>
             {% else %}
-                <a href="{% url type post_id=id %}">{{ title }}</a>
+                <a href="{% url type post_slug=slug %}">{{ title }}</a>
             {% endif %}
             <p>{{ desc }}</p>
         {% endif %}

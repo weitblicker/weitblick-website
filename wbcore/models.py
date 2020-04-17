@@ -20,6 +20,7 @@ from sortedm2m.fields import SortedManyToManyField
 from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
 import rules, datetime
+from autoslug import AutoSlugField
 
 
 class Photo(RulesModelMixin, PhotologuePhoto, metaclass=RulesModelBase):
@@ -626,7 +627,7 @@ class NewsPost(RulesModel):
         get_latest_by = 'published'
 
     title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=100, null=False, blank=False, unique=True)
+    slug = AutoSlugField(populate_from='title', unique=True)
     text = models.TextField()
     image = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     added = models.DateTimeField(blank=True, null=True)
@@ -709,7 +710,7 @@ class BlogPost(RulesModel):
         get_latest_by = 'published'
 
     title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=100, null=False, blank=False, unique=True)
+    slug = AutoSlugField(populate_from='title', unique=True)
     text = models.TextField()
     image = models.ForeignKey(Photo, null=True, blank =True, on_delete=models.SET_NULL)
     added = models.DateTimeField(auto_now_add=True, blank=True, null=True)

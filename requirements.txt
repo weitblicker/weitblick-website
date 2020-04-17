@@ -36,3 +36,4 @@ pandas
 pymysql
 sshtunnel
 django-instagram
+django-autoslug
