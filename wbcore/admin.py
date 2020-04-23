@@ -17,6 +17,7 @@ from schedule.models import Calendar
 from copy import copy
 from django_reverse_admin import ReverseModelAdmin
 from rules.contrib.admin import ObjectPermissionsModelAdmin
+from cairosvg import svg2png
 
 from itertools import chain
 
@@ -572,15 +573,15 @@ class HostAdmin(MyAdmin, ReverseModelAdmin):
         color_map = {
             # text, weitblick, puzzle
             'standard': (logo_grey, logo_black, logo_orange),
+            'grey': (logo_grey, logo_black, logo_grey),
             'grey_negative': (logo_grey, logo_white, logo_grey),
             'black': (logo_black, logo_black, logo_black),
-            'white': (logo_white, logo_white, logo_white),
-            'negative': (logo_grey, logo_white, logo_orange)
+            'white': (logo_white, logo_white, logo_white)
         }
 
         dpi_list = [72, 150, 300]
-        width = 386.76
-        height = 141.55
+        width = 350  #386.76
+        height = 125  #141.55
 
         zip_path = path % dict(media_root=settings.MEDIA_ROOT, slug=obj.slug, name="%s_%s" % ("logos", obj.slug), ext="zip")
 
@@ -598,7 +599,8 @@ class HostAdmin(MyAdmin, ReverseModelAdmin):
             svg_path = path % dict(media_root=settings.MEDIA_ROOT, slug=obj.slug, name=svg_name, ext="svg")
 
             svg_logo = template.render(
-                {'text': obj.city,
+                {'text': 'Bildungschancen weltweit!' if obj.slug == 'bundesverband' else obj.city.upper(),
+                 'title_text': obj.city,
                  'color_text': colors[0],
                  'color_weitblick': colors[1],
                  'color_puzzle': colors[2]
@@ -613,8 +615,9 @@ class HostAdmin(MyAdmin, ReverseModelAdmin):
                 try:
                     name = "logo_%s_%s_%sdpi" % (obj.slug, key, dpi)
                     png_path = path % dict(media_root=settings.MEDIA_ROOT, slug=obj.slug, name=name, ext="png")
-                    os.system("inkscape -z -%(ext_flag)s %(png_path)s -d %(dpi)s %(svg_path)s"
-                           %dict(png_path=png_path, svg_path=svg_path, dpi=dpi, ext_flag='e'))
+
+                    svg2png(bytestring=svg_logo, write_to=png_path, dpi=dpi, output_width=round(width*dpi/72), output_height=round(height*dpi/72))
+
                     zip_obj.write(png_path, os.path.basename(png_path))
                 except OSError as exception:
                     print("Could not convert logo file %s, Exception %s" % (svg_path, exception))

@@ -14,7 +14,7 @@
             fill: {{ color_puzzle }};
         }
     </style>
-    <title>Weitblick Logo {{ text }}</title>
+    <title>Weitblick Logo {{ title_text }}</title>
     <text class="logo-text" x="340.5" y="134.79" text-anchor="end">{{ text }}</text>
     <g>
         <path class="logo-weitblick" d="M75.37,50.94l-2.75.25c-1.45.12-2.37,1.14-2.76,3.08L59.35,100.8H47.92l-8.77-38H38.9l-8.51,38H18.62L7.11,51.53l-4.76-.25V44h20.7v6.92l-2.76.25c-1.72.17-2.59.91-2.59,2.22a3.72,3.72,0,0,0,.09.77l7.26,33h.33l8.68-38.6H44.83l9,38.77H54L61.1,51.62l-4.51-.34V44H75.37Z" transform="translate(-2.35 -2.35)"/>
