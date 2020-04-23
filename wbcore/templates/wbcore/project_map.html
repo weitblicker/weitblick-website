@@ -24,13 +24,23 @@ $.getScript('https://code.highcharts.com/mapdata/' + mapKey + '.js', function() 
     });
 
 
+    var current_project = [];
+        current_project.push({
+            name: '{{project.name}}',
+            slug: '{{project.slug}}',
+            lat: {{project.location.geolocation.lat|stringformat:".11f" }},
+            lon: {{project.location.geolocation.lon|stringformat:".11f" }}
+        });
+
     var filtered_projects = [];
+    {% for project in other_projects_country %}
         filtered_projects.push({
             name: '{{project.name}}',
             slug: '{{project.slug}}',
             lat: {{project.location.geolocation.lat|stringformat:".11f" }},
             lon: {{project.location.geolocation.lon|stringformat:".11f" }}
         });
+    {% endfor %}
 
     var map = Highcharts.mapChart('container', {
         title: {
@@ -47,8 +57,41 @@ $.getScript('https://code.highcharts.com/mapdata/' + mapKey + '.js', function() 
             enabled: false
         },
         tooltip: {
-            enabled: false,
+            enabled: true,
+            formatter: function () {
+                if (this.series.name == 'other_projects') {
+                    var lat = this.point.lat,
+                        lon = this.point.lon,
+                        series = this.series,
+                        tooltiptxt = '';
+                    $.each(series.data, function(i,p){
+                    if(Math.abs(p.lat-lat) <= 0.1 && Math.abs(p.lon-lon) <= 0.1 ) {
+                       tooltiptxt +=  p.name + '<br>';
+
+                    }
+                    });
+
+                    return tooltiptxt
+                } else {
+                    var lat = this.point.lat,
+                        lon = this.point.lon,
+                        series = map.get('others'),
+                        tooltiptxt = '';
+                    $.each(series.data, function(i,p){
+                    if(Math.abs(p.lat-lat) <= 0.1 && Math.abs(p.lon-lon) <= 0.1 ) {
+                       tooltiptxt +=  p.name + '<br>';
+                       console.log(lat)
+                    }
+                    });
+                    if (tooltiptxt== ''){
+                        return false
+                    } else {
+                        return tooltiptxt
+                    }
+                }
+            },
         },
+
         chart: {
             spacingRight: 0,
             spacingLeft: 0,
@@ -64,19 +107,37 @@ $.getScript('https://code.highcharts.com/mapdata/' + mapKey + '.js', function() 
             joinBy: ['iso-a2', 'drilldown'],
             name: 'project_country',
             showInLegend: false,
-        },
+            },
+            {
+                type: 'mappoint',
+                name: 'other_projects',
+                id: 'others',
+                color: 'rgba(66,66,66,1.00)',
+                data: filtered_projects,
+                dataLabels: {
+                    enabled: false,
+                },
+                marker:{
+                    width: 35,
+                    height: 35
+                },
+                events: {
+                    click: function (e) {
+                        console.log(e.point.slug);
+                        window.open('../' + e.point.slug,'_self');
+                    }
+                }
+            },
             {
                 // Specify points using lat/lon
                 type: 'mappoint',
                 name: 'project',
                 color: '#FF9900',
-                data: filtered_projects,
+                states: { inactive: { opacity: 1 } },
+                data: current_project,
                 dataLabels: {
                     align: 'center',
                     format: '{point.name}'
-                },
-                tooltip: {
-                    enabled: false,
                 },
                 marker:{
                     symbol: 'url(/static/puzzle-icon.svg)',

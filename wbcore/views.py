@@ -877,6 +877,8 @@ def project_view(request, host_slug=None, project_slug=None):
     news = NewsPost.objects.filter(project=project).order_by('-published')[:3]
     blogposts = BlogPost.objects.filter(project=project).order_by('-published')[:3]
 
+    other_projects_country = Project.objects.filter(location__country=project.location.country).exclude(pk=project.pk)
+
     template = loader.get_template('wbcore/project.html')
     context = {
         'main_nav': get_main_nav(host=host, active='projects'),
@@ -889,6 +891,7 @@ def project_view(request, host_slug=None, project_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'other_projects_country': item_list_from_proj(other_projects_country)
     }
     return HttpResponse(template.render(context, request))
 
