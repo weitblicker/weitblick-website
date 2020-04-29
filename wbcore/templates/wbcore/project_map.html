@@ -136,8 +136,8 @@ $.getScript('https://code.highcharts.com/mapdata/' + mapKey + '.js', function() 
                 states: { inactive: { opacity: 1 } },
                 data: current_project,
                 dataLabels: {
-                    align: 'center',
-                    format: '{point.name}'
+                    format: '{point.name}',
+                    overflow: "justify"
                 },
                 marker:{
                     symbol: 'url(/static/puzzle-icon.svg)',
@@ -149,7 +149,7 @@ $.getScript('https://code.highcharts.com/mapdata/' + mapKey + '.js', function() 
             },
         ]
     });
-
     map.mapZoom(0.95);
+
         });
 </script>

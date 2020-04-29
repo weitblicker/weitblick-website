@@ -90,6 +90,7 @@
                               
                             chart.addSingleSeriesAsDrilldown(e.point, {
                                 type: 'mappoint',
+                                showInLegend: false,
                                 cluster: {
                                     enabled: true,
                                     allowOverlap: false,
@@ -204,6 +205,15 @@
                 duration: 500
             }
         }],
+
+        plotOptions:{
+            series: {
+                dataLabels: {
+                    allowOverlap: false,
+                    overflow: 'justify'
+                }
+            }
+        },
 
         drilldown: {
             activeDataLabelStyle: {
