@@ -878,6 +878,7 @@ def project_view(request, host_slug=None, project_slug=None):
     blogposts = BlogPost.objects.filter(project=project).order_by('-published')[:3]
 
     other_projects_country = Project.objects.filter(location__country=project.location.country).exclude(pk=project.pk)
+    hosts_list = project.hosts.all()
 
     template = loader.get_template('wbcore/project.html')
     context = {
@@ -887,6 +888,7 @@ def project_view(request, host_slug=None, project_slug=None):
         'news': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='post_id', text=False),
         'blogposts': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
         'host': host,
+        'hosts_list': hosts_list,
         'account': host.bank if host else None,
         'dot_nav': get_dot_nav(host=host),
         'breadcrumb': breadcrumb,
