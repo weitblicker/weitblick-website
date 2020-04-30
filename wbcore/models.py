@@ -340,6 +340,11 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'date_of_birth']
 
     def has_perm(self, perm, obj=None):
+        if 'schedule.delete_event' == perm and obj is None:
+          return True
+        elif 'photologue.delete_photo' == perm and obj is None:
+          return True
+
         return super(User, self).has_perm(perm, obj)
 
     def has_module_perms(self, app_label):
