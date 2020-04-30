@@ -27,7 +27,7 @@ urlpatterns = i18n_patterns(
     path('tinymce/', include('tinymce.urls')),
     path('microsoft/', include('microsoft_auth.urls', namespace='microsoft')),
     path('martor/', include('martor.urls')),
-    path(r'^captcha/', include('captcha.urls')),
+    path('captcha/', include('captcha.urls')),
     prefix_default_language=False) + [path('i18n/', include('django.conf.urls.i18n'))]
 
 if settings.DEBUG is True:
