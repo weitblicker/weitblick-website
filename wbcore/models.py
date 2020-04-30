@@ -15,6 +15,7 @@ from django_google_maps import fields as map_fields
 from schedule.models.events import Event as ScheduleEvent, Calendar
 from form_designer.models import Form as EventForm
 from wbcore import predicates as pred
+from wbcore.storage import OverwriteStorage
 from rules.contrib.models import RulesModel, RulesModelBase, RulesModelMixin
 from sortedm2m.fields import SortedManyToManyField
 from django.db.models.query import QuerySet
@@ -367,7 +368,7 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
 
     name.admin_order_field = 'first_name'
 
-    image = models.ImageField(null=True, blank=True, upload_to=user_image_path)
+    image = models.ImageField(null=True, blank=True, storage=OverwriteStorage(), upload_to=user_image_path)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
     since = models.DateField(auto_now_add=True)
     until = models.DateField(null=True, blank=True)

@@ -18,6 +18,7 @@ from copy import copy
 from django_reverse_admin import ReverseModelAdmin
 from rules.contrib.admin import ObjectPermissionsModelAdmin
 from cairosvg import svg2png
+from wbcore.models import User
 
 from itertools import chain
 
@@ -521,6 +522,11 @@ class UserAdmin(BaseUserAdmin):
 
     def has_module_permission(self, request):
         return request.user.has_module_perms(self.opts.app_label)
+
+    def save_model(self, request, obj, form, change):
+        if obj.image != User.objects.get(pk=obj.pk).image:  # delete old user image on upload
+            User.objects.get(pk=obj.pk).image.delete()
+        super(UserAdmin, self).save_model(request, obj, form, change)
 
 
 class TeamAdmin(MyAdmin):
