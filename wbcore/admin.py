@@ -41,6 +41,10 @@ class PermissionInlineModel(TranslationTabularInline):
         if request.user.is_super_admin:
             return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+        if db_field.name == 'user':
+            hosts = request.user.get_hosts_for_admin()
+            kwargs["queryset"] = User.objects.filter(hosts__in=hosts)
+
         if db_field.name == 'host':
             hosts = request.user.get_hosts_for_admin()
             kwargs["queryset"] = Host.objects.filter(pk__in=[host.pk for host in hosts])
