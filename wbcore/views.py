@@ -1254,7 +1254,7 @@ def news_post_view(request, host_slug=None, post_id=None):
         'breadcrumb': breadcrumb,
         'post': post,
         'photos': post.photos,
-        'projects': projects,
+        'project_item_list': projects,
         'hosts': Host.objects.all(),
         'icon_links': icon_links,
     }
