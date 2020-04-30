@@ -48,6 +48,7 @@ $.getScript('https://code.highcharts.com/mapdata/' + mapKey + '.js', function() 
         },
         plotOptions:{
             series: {
+                stickyTracking: false,
                 dataLabels: {
                     allowOverlap: true,
                 }
@@ -57,6 +58,11 @@ $.getScript('https://code.highcharts.com/mapdata/' + mapKey + '.js', function() 
             enabled: false
         },
         tooltip: {
+            useHTML: true,
+            hideDelay: 2000,
+            style: {
+                pointerEvents: 'auto'
+            },
             enabled: true,
             formatter: function () {
                 if (this.series.name == 'other_projects') {
@@ -66,7 +72,7 @@ $.getScript('https://code.highcharts.com/mapdata/' + mapKey + '.js', function() 
                         tooltiptxt = '';
                     $.each(series.data, function(i,p){
                     if(Math.abs(p.lat-lat) <= 0.1 && Math.abs(p.lon-lon) <= 0.1 ) {
-                       tooltiptxt +=  p.name + '<br>';
+                       tooltiptxt += "<a href=../"+p.slug+" target='_self' style='color:#000000'>&#8226 "+p.name+"</a> <br>";
 
                     }
                     });
@@ -79,8 +85,7 @@ $.getScript('https://code.highcharts.com/mapdata/' + mapKey + '.js', function() 
                         tooltiptxt = '';
                     $.each(series.data, function(i,p){
                     if(Math.abs(p.lat-lat) <= 0.1 && Math.abs(p.lon-lon) <= 0.1 ) {
-                       tooltiptxt +=  p.name + '<br>';
-                       console.log(lat)
+                        tooltiptxt += "<a href=../"+p.slug+" target='_self' style='color:#000000'>&#8226 "+p.name+"</a> <br>";
                     }
                     });
                     if (tooltiptxt== ''){
