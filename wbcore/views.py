@@ -881,7 +881,7 @@ def project_view(request, host_slug=None, project_slug=None):
 
     template = loader.get_template('wbcore/project.html')
     context = {
-        'main_nav': get_main_nav(host=host, active='projects'),
+        'main_nav': get_main_nav(host=host),
         'project': project,
         'event_item_list': item_list_from_occ(occurrences, text=False),
         'news': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='post_id', text=False),
@@ -1041,7 +1041,7 @@ def event_view(request, host_slug=None, event_slug=None):
 
     template = loader.get_template('wbcore/event.html')
     context = {
-        'main_nav': get_main_nav(host=host, active='events'),
+        'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
         'event': event,
         'project_item_list': project_list,
