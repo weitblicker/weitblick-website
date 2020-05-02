@@ -110,10 +110,38 @@
                                 marker: {
                                             fillColor: '#FF9900'},
                                 data: filtered_projects,
+                                // in progress
                                 tooltip: {
-                                    headerFormat: '',
-                                    pointFormat: '<b>{point.name}</b><br>'
+                                    useHTML: true,
+                                    hideDelay: 2000,
+                                    style: {
+                                        pointerEvents: 'auto'
+                                    },
+                                    enabled: true,
+                                    formatter: function () {
+                                        if (this.point.isCluster) {
+                                            var lat = this.point.lat,
+                                                lon = this.point.lon,
+                                                series = this.series,
+                                                tooltiptxt = '';
+                                            $.each(series.data, function(i,p){
+                                            if(Math.abs(p.lat-lat) <= 0.1 && Math.abs(p.lon-lon) <= 0.1 ) {
+                                               tooltiptxt += "<a href=../"+p.slug+" target='_self' style='color:#000000'>&#8226 "+p.name+"</a> <br>";
+
+                                            }
+                                            });
+
+                                            return tooltiptxt
+                                        }else {
+                                            return this.point.name
+
+                                            }
+                                        }
                                 },
+                                //tooltip: {
+                                //    headerFormat: '',
+                                //    pointFormat: '<b>{point.name}</b><br>'
+                                //},
                                 events: {
                                     click: function (e) {
                                         console.log(e.point.slug);
