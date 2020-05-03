@@ -10,7 +10,7 @@ If you have [Docker](https://docs.docker.com/compose/install/) installed, you ca
 
 It will install, build and run everything for you. For more info see the [Docker Documentation](https://docs.docker.com/compose/reference/overview/). Changes in the wbcore folder will be avaliable instantly, other changes will require a rebuild of the container using the `--build` flag when starting. Otherwise, follow the following steps to set up everything natively.
 
-*Required Software & Tools:* [Python 3](https://www.python.org/), [Java 8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html), [Tidy](http://binaries.html-tidy.org/) and [Elastic Search 2](https://www.elastic.co/de/downloads/past-releases/elasticsearch-2-4-2).
+*Required Software & Tools:* [Python 3](https://www.python.org/), [Java 8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html), [Tidy](http://binaries.html-tidy.org/), [cairo](https://www.cairographics.org/) and [Elastic Search 2](https://www.elastic.co/de/downloads/past-releases/elasticsearch-2-4-2).
 
 ### Buildtools for Visual Studio 2019
 
@@ -48,6 +48,10 @@ Install Java 8 and be sure to set JAVA_HOME.
 ### Install Elastic Search
 
 Install Elastic Search 2. You can download it [here](https://www.elastic.co/de/downloads/past-releases/elasticsearch-2-4-2) and unzip it.
+
+### Install cairo
+
+For windows users an easy way is the installation of GTK2 as it contains cairo. E.g. follow point 2. [here](https://github.com/Automattic/node-canvas/wiki/Installation%3A-Windows)
 
 ## Running the server for the first time
 
