@@ -4,6 +4,7 @@ from haystack.query import SearchQuerySet
 from .models import NewsPost, BlogPost, Project, Event
 from schedule.periods import Period
 from dateutil.parser import parse
+from dateutil.relativedelta import relativedelta
 
 
 def parse_union(request):
@@ -38,21 +39,22 @@ def parse_limit(request, default=20):
 
 
 def parse_archive_start_end(request):
-    start_str = request.GET.get('start')
-    end_str = request.GET.get('end')
+    start_str = request.GET.get('from')
+    end_str = request.GET.get('to')
 
     start = None
     end = None
 
     if start_str:
         try:
-            start = parse(start_str)
+            start = parse(start_str + '-01')
         except ValueError:
             pass
 
     if end_str:
         try:
-            end = parse(end_str)
+            # include the selected month
+            end = parse(end_str + '-01') + relativedelta(months=1)
         except ValueError:
             pass
 
@@ -165,6 +167,8 @@ def filter_events(request, default_limit=None):
     host_slugs = parse_union(request)
     contains = request.GET.get("search")
     start, end = parse_archive_start_end(request)
+    print(start)
+    print(end)
     limit = parse_limit(request, default=default_limit) if default_limit else parse_limit(request)
 
     results = SearchQuerySet()
