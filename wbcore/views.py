@@ -11,6 +11,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.contrib.auth import login
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.sites.models import Site
+from django_countries import countries as countriesdict
 
 from collections import OrderedDict
 from datetime import date, datetime, timedelta
@@ -650,6 +651,8 @@ def projects_view(request, host_slug=None):
 
     project_list = list(Location.objects.filter(project__in=projects).values(
             'country').annotate(number=Count('country')))
+    for country in project_list:
+        country['countryname'] = dict(countriesdict)[country['country']]
 
     hosts = Host.objects.all()
 
