@@ -966,7 +966,7 @@ def events_view(request, host_slug=None):
         events = Event.objects.all()
         breadcrumb = [(_('Home'), reverse('home')), (_('Events'), None)]
 
-    p = Period(events, datetime.now(), datetime.now() + timedelta(days=365))
+    p = Period(events, datetime.now()- timedelta(days=365), datetime.now() + timedelta(days=365))
     occurrences = p.get_occurrences()
     hosts = Host.objects.all()
 

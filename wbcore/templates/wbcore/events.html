@@ -1,11 +1,16 @@
 {% extends 'wbcore/basic.html' %}
 {% load static %}
 {% load i18n %}
+{% load date_has_passed  date_is_in_future from  wbcoretags %}
 {% block main %}
     {% trans "Events" as title %}
     {% include 'wbcore/image-header.html' with default='/images/events_header.jpg'%}
 
     <div class="ui segment">
-        {% include 'wbcore/item_list.html' %}
+        {% include 'wbcore/events_list.html' with my_item_list=item_list|date_is_in_future %}
+
+        {% include 'wbcore/events_separator.html' %}
+        {% include 'wbcore/events_list.html' with my_item_list=item_list|date_has_passed %}
     </div>
+
 {% endblock %}

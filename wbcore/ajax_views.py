@@ -80,13 +80,15 @@ def filter_news_view(request):
 @api_view(['GET', 'POST'])
 def filter_events_view(request):
     template = loader.get_template('wbcore/list_items.html')
+    template_separator = loader.get_template('wbcore/events_separator.html')
     event_occurrences, events = filter_events(request)
     host = None  # TODO filter if on host specific news page
     context = {
         'item_list': item_list_from_occ(event_occurrences),
         'host': host,
+        'ajax_called': True,
     }
-    return HttpResponse(template.render(context, request))
+    return HttpResponse(template.render(context, request)+template_separator.render(context, request)+template.render(context, request))
 
 
 @api_view(['GET', 'POST'])

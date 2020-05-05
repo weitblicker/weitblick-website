@@ -3,6 +3,7 @@ from django.template import loader
 from django.utils.safestring import mark_safe
 from martor.utils import markdownify
 import re
+from datetime import datetime, timezone
 register = template.Library()
 
 re_img_tag = re.compile(r'(?P<img_tag><img.*?>)')
@@ -54,3 +55,16 @@ def safe_markdown(field_name):
         {{ post.description|safe_markdown }}
     """
     return mark_safe(insert_ui_elems(markdownify(field_name)))
+
+@register.filter(is_safe=True)
+def date_has_passed(list):
+    """
+    To filter the event list.
+    :param list: all items
+    :return: items which have a passed event
+    """
+    return [item for item in list if item.end < datetime.now(timezone.utc)]
+
+@register.filter(is_safe=True)
+def date_is_in_future(list):
+    return [item for item in list if item.end > datetime.now(timezone.utc)]
