@@ -803,10 +803,38 @@ class ContentAdmin(MyAdmin):
 
 class LocationAdmin(MyAdmin):
 
-    list_display = ('name', 'street', 'postal_code', 'city', 'get_country', 'geolocation')
+    def get_queryset(self, request):
+        print("HELLOOOOOOOO", request)
+        event_locations = Location.objects.filter(event__host__in=request.user.hosts.all())
+        host_locations = Location.objects.filter(host__in=request.user.hosts.all())
+        project_locations = Location.objects.filter(project__hosts__in=request.user.hosts.all())
+        blogpost_locations = Location.objects.filter(blogpost__host__in=request.user.hosts.all())
+        return (event_locations | host_locations | project_locations | blogpost_locations).distinct()
+
+    list_display = ('name', 'street', 'postal_code', 'city', 'get_country', 'geolocation', 'get_occurrences')
 
     def get_country(self, address):
         return address.country.name
+
+    def event_link(self, name):
+        return name.title
+
+    def get_occurrences(self, location):
+        occurrences = []
+
+        #if location.host:
+        #    occurrences.append(location.host)
+        for event in location.event_set.all():
+            occurrences.append(self.event_link(event))
+        #if location.project_set:
+        #    occurrences.append(location.project_set.all())
+        #if location.blogpost_set:
+        #    occurrences.append(location.blogpost_set.all())
+
+        return occurrences
+
+    get_occurrences.allow_tags = True
+
     get_country.short_description = 'Country'
     get_country.admin_order_field = 'country'
 
