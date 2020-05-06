@@ -206,6 +206,10 @@ $wb_lightgrey: #D6D6D9;
 			text-transform: uppercase;
 			display: inline-block;
 			vertical-align: middle;
+			color: rgba(0,0,0,.4);
+		}
+		.wb-name:hover{
+			color: rgba(0,0,0,.87)
 		}
 	}
 }

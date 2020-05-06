@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <script src="{% static 'highmaps/proj4.js'%}"></script>
 <script src="{% static 'highmaps/highmaps.js'%}"></script>
 <script src="{% static 'highmaps/drilldown.js'%}"></script>
@@ -9,6 +10,11 @@
 
 <div id="project-map" style="width: 100%"></div>
 <script>
+Highcharts.setOptions({
+    lang: {
+        drillUpText: '◁ {% trans "Back to the world map" %}',
+    }
+});
 
     var mydata = {{project_list|safe}};
 
@@ -23,12 +29,13 @@
         for (var i = 0; i < mydata.length; i += 1) {
             if(mydata[i].country==this.properties['iso-a2']){
                 this.drilldown = this.properties['iso-a2'];
+                this.translated_country_name = mydata[i].countryname;
+                console.log(mydata[i].countryname);
                 this.value = mydata[i].number;
                 this.dataLabels = {enabled: false}
                 filtered_countries.push(this)
             }
         };
-        console.log(this.value);
         if(this.value == undefined){this.value = null}
     });
 
@@ -49,7 +56,6 @@
                                     }, 1000);
                                 }
                             }, 3000);
-                        console.log(mapKey);
                         // Show the spinner
                         chart.showLoading('<i class="icon-spinner icon-spin icon-3x"></i>'); // Font Awesome spinner
 
@@ -68,6 +74,7 @@
                             clearTimeout(fail);
                             chart.addSingleSeriesAsDrilldown(e.point, {
                                 name: e.point.name,
+                                colorAxis: 1,
                                 showInLegend: false,
                                 mapData: Highcharts.maps[mapKey],
                                 dataLabels: {
@@ -76,26 +83,28 @@
                                 }
                             });
                             var filtered_projects = [];
-                            var p_number = 0; // the coordinates are adjusted by some meters to avoid identical coordiantes
                             {% for project in item_list %}
                                 if ('{{project.location.country.code}}'==e.point.drilldown){
                                     filtered_projects.push({
                                         name: '{{project.name}}',
                                         slug: '{{project.slug}}',
                                         lat: {{project.location.geolocation.lat|stringformat:".11f" }},
-                                        lon: {{project.location.geolocation.lon|stringformat:".11f" }} + p_number*0.03});
-                                    p_number =p_number+1;
+                                        lon: {{project.location.geolocation.lon|stringformat:".11f" }}
+                                    });
                                 }
                             {% endfor %}
                               
                             chart.addSingleSeriesAsDrilldown(e.point, {
                                 type: 'mappoint',
+                                colorAxis: 1,
+                                showInLegend: false,
                                 cluster: {
                                     enabled: true,
                                     allowOverlap: false,
+                                    drillToCluster: true,
                                     layoutAlgorithm: {
-                                        type: 'grid',
-                                        gridSize: 5
+                                        type: 'kmeans',
+                                        distance: 10
                                     },
                                     zones: [{
                                         from: 0,
@@ -106,18 +115,15 @@
                                             }}]
                                 },
                                 name: 'Projekte',
+                                cursor: 'pointer',
                                 marker: {
                                             fillColor: '#FF9900'},
                                 data: filtered_projects,
-                                tooltip: {
-                                    headerFormat: '',
-                                    pointFormat: '<b>{point.name}</b><br>'
-                                },
                                 events: {
                                     click: function (e) {
                                         console.log(e.point.slug);
                                         window.open(e.point.slug,'_self');
-                                    }
+                                    },
                                 }
                             });
                             chart.applyDrilldown();
@@ -125,7 +131,7 @@
                     }
 
                     this.setTitle(null, {
-                        text: e.point.name
+                        text: e.point.translated_country_name
                     });
                 },
                 drillup: function() {
@@ -157,12 +163,20 @@
             enabled: true
         },
 
-        colorAxis: {
-            min: 0,
-            minColor: '#FFC266',
+        colorAxis: [{
+            type: 'logarithmic',
+            min: 1,
+            max: 10,
+            minColor: 'rgba(255,194,99,0.84)',
             maxColor: '#FF9900',
             showInLegend: false
-        },
+            },
+            {
+             type:'linear',
+                showInLegend: false,
+                maxColor: '#FF9900',
+            }
+        ],
 
         mapNavigation: {
             enabled: true,
@@ -204,6 +218,42 @@
                 duration: 500
             }
         }],
+
+        plotOptions:{
+            series: {
+                stickyTracking: false,
+                dataLabels: {
+                    allowOverlap: true,
+                    overflow: 'justify'
+                }
+            }
+        },
+        tooltip: {
+            useHTML: true,
+            hideDelay: 2000,
+            style: {
+                pointerEvents: 'auto'
+            },
+            enabled: true,
+            formatter: function (tooltip) {
+                if (this.series.name == 'Projekte') {
+                    if (this.point.clusteredData) {
+                        var tooltiptxt = [];
+                        this.point.clusteredData.forEach(p => {
+                            tooltiptxt.push("<a href=" + p.options.slug + " target='_self' style='color:#000000'>&#8226 " + p.options.name + "</a> <br>");
+                        })
+
+                        return tooltiptxt
+                    } else {
+                        //return this.point.name
+                        return false
+
+                    }
+                } else {
+                    return this.point.translated_country_name + ': ' + this.point.value
+                }
+                }
+        },
 
         drilldown: {
             activeDataLabelStyle: {

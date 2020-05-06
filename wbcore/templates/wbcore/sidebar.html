@@ -107,11 +107,12 @@
     </div>
     {% endif %}
 
-    {% comment %}
+    {% if blogposts %}
     <div class="ui segment">
-        {% include "wbcore/segment_header.html" with icon='globe africa' title='Project Blog Posts' url_alias='blog' %}
-        {% include 'wbcore/item_list.html' with item_list=posts no_image=True %}
+        {% trans "Blog Posts" as title %}
+        {% include "wbcore/segment_header.html" with icon='globe africa' url_alias='blog' %}
+        {% include 'wbcore/item_list.html' with item_list=blogposts image_size='small' no_image=False %}
     </div>
-    {% endcomment %}
+    {% endif %}
 
 </div>
