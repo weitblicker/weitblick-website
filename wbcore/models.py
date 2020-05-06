@@ -98,7 +98,7 @@ class Location(RulesModel):
 class Host(RulesModel):
     class Meta:
         rules_permissions = {
-            "add": pred.is_super_admin | pred.is_admin,
+            "add": pred.is_super_admin,
             "view": rules.always_allow,
             "change": pred.is_super_admin | pred.is_admin,
             "delete": pred.is_super_admin,
