@@ -11,6 +11,9 @@
 {% endif %}
 
 {% for item in item_list %}
+    {% if item.first_passed_item %}
+        <div class="ui large header"> {{ item.separator_text }} </div>
+    {% endif %}
     {% include 'wbcore/list_item.html' with item=item%}
 {% endfor %}
 {% show_more %}

@@ -26,6 +26,8 @@ from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
     UserRelation, JoinPage, SocialMediaLink, Content, Document, Donation, FAQ)
 
+from wbcore.filter import reorder_completed_projects, reorder_passed_events
+
 main_host_slug = 'bundesverband' ## TODO configure this?
 
 icon_links = OrderedDict([
@@ -166,6 +168,7 @@ def item_list_from_occ(occurrences, host_slug=None, text=True):
             occ.teaser = ""
         occ.show_text = text
         item_list.append(occ)
+    item_list = reorder_passed_events(item_list)
     return item_list
 
 
@@ -206,6 +209,7 @@ def item_list_from_proj(projects, host_slug=None, text=True):
         project.teaser = project.short_description if project.short_description else project.description
         project.show_text = True if text else False
         item_list.append(project)
+    item_list = reorder_completed_projects(item_list)
     return item_list
 
 def item_list_from_teams(teams, host_slug=None):
@@ -873,8 +877,9 @@ def project_view(request, host_slug=None, project_slug=None):
         events = Event.objects.filter(projects=project)
     else:
         events = Event.objects.filter(host=host if host else Host.objects.get(slug='bundesverband'))
-    period = Period(events, datetime.now(), datetime.now() + timedelta(365/2))
-    occurrences = period.get_occurrences()[:3]
+    period = Period(events, datetime.now() - timedelta(365), datetime.now() + timedelta(365/2))
+    occurrences = period.get_occurrences()[-3:]
+    print(occurrences)
 
     news = NewsPost.objects.filter(project=project).order_by('-published')[:3]
     blogposts = BlogPost.objects.filter(project=project).order_by('-published')[:3]

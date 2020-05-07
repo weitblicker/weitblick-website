@@ -3,12 +3,10 @@
         {% include  'wbcore/list_items.html' with item_list=item_list %}
     </div>
 
-    {% if not ajax_called %}
-        {% block js %}
-            <script src="/static/js/el-pagination.js"></script>
-            <script>$.endlessPaginate();</script>
-            <script src="/static/js/sticky-sidebar.js"></script>
-        {% endblock %}
-    {% endif %}
+    {% block js %}
+        <script src="/static/js/el-pagination.js"></script>
+        <script>$.endlessPaginate();</script>
+        <script src="/static/js/sticky-sidebar.js"></script>
+    {% endblock %}
 {% endif %}
 
