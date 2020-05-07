@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'cookielaw',
     'django.contrib.humanize',
     'captcha',
+    'django_cleanup.apps.CleanupConfig',  # should be at the bottom
 ]
 
 AUTH_USER_MODEL = 'wbcore.User'
