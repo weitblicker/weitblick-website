@@ -52,7 +52,7 @@
     {% endif %}
 </div>
 <div class="ui {% language 'en' %}{{ events_width | apnumber }}{% endlanguage %} wide column unstackable items">
-    {% if host %} <a class="ui item header href="{% url 'events' host.slug %}">{% trans "Events" %}</a>
+    {% if host %} <a class="ui item header" href="{% url 'events' host.slug %}">{% trans "Events" %}</a>
     {% else %} <a class="ui item header" href="{% url 'events' %}">{% trans "Events" %}</a>
     {% endif %}
     {% include 'wbcore/dot_nav_event.html' %}
