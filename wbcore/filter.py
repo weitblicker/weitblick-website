@@ -216,5 +216,5 @@ def reorder_passed_events(item_list):
     item_list_passed = [item for item in item_list if item.end < datetime.now(timezone.utc)][::-1]
     if item_list_passed:
         item_list_passed[0].first_passed_item = True
-        item_list_passed[0].separator_text = _('Passed')
+        item_list_passed[0].separator_text = _('Previous')
     return item_list_current + item_list_passed
