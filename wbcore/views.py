@@ -173,6 +173,7 @@ def sidebar_projects(projects):
         projects = active_projects + completed_projects[-(n_show - n_active):]
     return projects
 
+
 def item_list_from_occ(occurrences, host_slug=None, text=True):
     # set attributes to fill list_item template
     item_list = []
@@ -1015,15 +1016,6 @@ def events_view(request, host_slug=None):
     occurrences = p.get_occurrences()
     hosts = Host.objects.all()
 
-    if Event.objects.count():
-        latest = Event.objects.latest('start')
-        erliest = Event.objects.earliest('start')
-        start_date = erliest.start
-        end_date = latest.start
-        year_months = range_year_month(start_date, end_date)
-    else:
-        year_months = None
-
     if request.is_ajax():
         template = loader.get_template('wbcore/list_items.html')
     else:
@@ -1035,7 +1027,7 @@ def events_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'hosts': hosts,
         'filter_preset': {'host': [host.slug] if host else None, },
-        'from_to': year_months,
+        'from_to': True,
         'item_list': item_list_from_occ(occurrences, host_slug),
         'ajax_endpoint': reverse('ajax-filter-events'),
         'icon_links': icon_links,

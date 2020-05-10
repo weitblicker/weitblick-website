@@ -38,7 +38,6 @@
                 </script>
             {% endif %}
 
-
             {% if years %}
                 <div class="field">
                     <label>{% trans "Archive" %}</label>
@@ -64,41 +63,20 @@
                 <div class="ui two unstackable fields">
                     <div class="field">
                         <label>{% trans "From" %}</label>
-                        <div id="filter-from" class="ui fluid basic dropdown button">
-                            <span class="text">{% trans "year or month" %}</span>
-                            <i class="dropdown icon"></i>
-                            <div class="menu">
-                                {% for year, months in from_to.items %}
-                                    <div class="item" data-value="{{ year|date:'Y' }}">
-                                        <i class="dropdown icon"></i>
-                                        <span class="text">{{ year|date:'Y' }}</span>
-                                        <div class="menu">
-                                            {% for month in months %}
-                                                <div class="item" data-value="{{ month|date:'Y-m' }}">{{ month|date:'F Y' }}</div>
-                                            {% endfor %}
-                                         </div>
-                                    </div>
-                                {% endfor %}
+                        <div class="ui clearable calendar" id="filter-from">
+                            <div class="ui input left icon">
+                                <i class="calendar icon"></i>
+                                <input type="text" placeholder={% trans "Date" %}>
                             </div>
                         </div>
                     </div>
+
                     <div class="field">
                         <label>{% trans "To" %}</label>
-                        <div id="filter-to" class="ui fluid basic dropdown button">
-                            <span class="text">{% trans "year or month" %}</span>
-                            <i class="dropdown icon"></i>
-                            <div class="menu">
-                                {% for year, months in from_to.items %}
-                                    <div class="item" data-value="{{ year|date:'Y' }}">
-                                        <i class="dropdown icon"></i>
-                                        <span class="text">{{ year|date:'Y' }}</span>
-                                        <div class="menu">
-                                            {% for month in months %}
-                                                <div class="item" data-value="{{ month|date:'Y-m' }}">{{ month|date:'F Y' }}</div>
-                                            {% endfor %}
-                                         </div>
-                                    </div>
-                                {% endfor %}
+                        <div class="ui calendar" id="filter-to">
+                            <div class="ui input left icon">
+                                <i class="calendar icon"></i>
+                                <input type="text" placeholder={% trans "Date" %}>
                             </div>
                         </div>
                     </div>

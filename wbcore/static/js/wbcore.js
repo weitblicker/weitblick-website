@@ -129,9 +129,9 @@ $(document)
             filter_union = "";
             $('#filter-archive').dropdown('clear');
             filter_archive = "";
-            $('#filter-from').dropdown('clear');
+            $('#filter-from').calendar('clear');
             filter_from = "";
-            $('#filter-to').dropdown('clear');
+            $('#filter-to').calendar('clear');
             filter_to = "";
             $('#filter-country').dropdown('clear');
             filter_country = "";
@@ -161,22 +161,28 @@ $(document)
             });
 
         $('#filter-from')
-            .dropdown({
-                allowCategorySelection: true,
+            .calendar({
+                type: 'month',
+                startMode: 'month',
                 onChange: function(value, text, choice){
-                    filter_from = value;
-                    console.log(value, text, choice);
-                    filter();
+                    if (value) {  // needed so no error occurs during clearing the filter
+                        filter_from = value.getFullYear() + '-' + (value.getMonth() + 1);
+                        console.log(value, text, choice);
+                        filter();
+                    };
                 },
             });
 
         $('#filter-to')
-            .dropdown({
-                allowCategorySelection: true,
+            .calendar({
+                type: 'month',
+                startMode: 'month',
                 onChange: function(value, text, choice){
-                    filter_to = value;
-                    console.log(value, text, choice);
-                    filter();
+                    if (value) {  // needed so no error occurs during clearing the filter
+                        filter_to = value.getFullYear() + '-' + (value.getMonth() + 1);
+                        console.log(value, text, choice);
+                        filter();
+                    }
                 },
             });
 
