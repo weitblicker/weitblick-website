@@ -1,9 +1,11 @@
 import csv
-from datetime import datetime, date, timedelta
+from datetime import datetime, timezone, date
 from haystack.query import SearchQuerySet
 from .models import NewsPost, BlogPost, Project, Event
 from schedule.periods import Period
 from dateutil.parser import parse
+from dateutil.relativedelta import relativedelta
+from django.utils.translation import ugettext as _
 
 
 def parse_union(request):
@@ -38,21 +40,21 @@ def parse_limit(request, default=20):
 
 
 def parse_archive_start_end(request):
-    start_str = request.GET.get('start')
-    end_str = request.GET.get('end')
+    start_str = request.GET.get('from')
+    end_str = request.GET.get('to')
 
     start = None
     end = None
 
     if start_str:
         try:
-            start = parse(start_str)
+            start = parse(start_str + '-01')
         except ValueError:
             pass
 
     if end_str:
         try:
-            end = parse(end_str)
+            end = parse(end_str + '-01') + relativedelta(months=1)  # include the selected month
         except ValueError:
             pass
 
@@ -184,10 +186,10 @@ def filter_events(request, default_limit=None):
         then = start.replace(year=start.year + 10)
         p = Period(events, start, then)
     elif end:
-        now = datetime.now()
+        now = datetime.now() - relativedelta(years=1)
         p = Period(events, now, end)
     else:
-        now = datetime.now()
+        now = datetime.now() - relativedelta(years=1)
         then = datetime.now().replace(year=now.year + 10)
         p = Period(events, now, then)
 
@@ -197,3 +199,19 @@ def filter_events(request, default_limit=None):
         occurrences = occurrences[:limit]
 
     return occurrences, events
+
+def reorder_completed_projects(item_list):
+    item_list_current = [item for item in item_list if not item.completed]
+    item_list_passed = [item for item in item_list if item.completed]
+    if item_list_passed:
+        item_list_passed[0].first_passed_item = True
+        item_list_passed[0].separator_text = _('Completed')
+    return item_list_current + item_list_passed
+
+def reorder_passed_events(item_list):
+    item_list_current = [item for item in item_list if item.end > datetime.now(timezone.utc)]
+    item_list_passed = [item for item in item_list if item.end <= datetime.now(timezone.utc)][::-1]
+    if item_list_passed:
+        item_list_passed[0].first_passed_item = True
+        item_list_passed[0].separator_text = _('Previous')
+    return item_list_current + item_list_passed
