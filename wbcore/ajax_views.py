@@ -72,7 +72,7 @@ def filter_news_view(request):
     host = None  # TODO filter if on host specific news page
     context = {
         'host': host,
-        'item_list': posts,
+        'item_list': item_list_from_posts(posts),
     }
     return HttpResponse(template.render(context, request))
 
@@ -96,6 +96,6 @@ def filter_blog_view(request):
     host = None  # TODO filter if on host specific news page
     context = {
         'host': host,
-        'item_list': posts,
+        'item_list': item_list_from_posts(posts),
     }
     return HttpResponse(template.render(context, request))

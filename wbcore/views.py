@@ -1027,7 +1027,7 @@ def events_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'hosts': hosts,
         'filter_preset': {'host': [host.slug] if host else None, },
-        'from_to': True,
+        'filter_date': True,
         'item_list': item_list_from_occ(occurrences, host_slug),
         'ajax_endpoint': reverse('ajax-filter-events'),
         'icon_links': icon_links,
@@ -1104,16 +1104,6 @@ def blog_view(request, host_slug=None):
     posts = posts.order_by('-published')
     hosts = Host.objects.all()
 
-    if BlogPost.objects.count():
-        latest = BlogPost.objects.latest('published')
-        earliest = BlogPost.objects.earliest('published')
-        start_date = earliest.published
-        end_date = latest.published
-
-        year_months = range_year_month(start_date, end_date)
-    else:
-        year_months = None
-
     if host:
         breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Blog'), None)]
     else:
@@ -1130,7 +1120,7 @@ def blog_view(request, host_slug=None):
         'host': host,
         'hosts': hosts,
         'filter_preset': {'host': [host.slug] if host else None, },
-        'years': year_months,
+        'filter_date': True,
         'item_list': item_list_from_posts(posts, host_slug, post_type="blog-post", id_key='post_id'),
         'ajax_endpoint': reverse('ajax-filter-blog'),
         'icon_links': icon_links,
@@ -1182,24 +1172,6 @@ def blog_post_view(request, host_slug=None, post_id=None):
     return HttpResponse(template.render(context, request))
 
 
-def range_year_month(start_date, end_date):
-    years = OrderedDict()
-    d = date(year=start_date.year, month=start_date.month, day=1)
-    end_date = date(year=end_date.year, month=end_date.month, day=1)
-    months = []
-    while d <= end_date:
-        months.append(date(year=d.year, month=d.month, day=1))
-        if d.month < 12:
-            d = d.replace(month=d.month+1)
-        else:
-            years[d] = months
-            d = d.replace(year=d.year+1, month=1, day=1)
-            months = []
-    if months:
-        years[date(year=d.year, month=1, day=1)] = months
-    return years
-
-
 def news_view(request, host_slug=None):
     host_slugs = get_host_slugs(request, host_slug)
     try:
@@ -1214,16 +1186,6 @@ def news_view(request, host_slug=None):
 
     posts = item_list_from_posts(posts.order_by('-published'), host_slug=host_slug)
     hosts = Host.objects.all()
-
-    if NewsPost.objects.count():
-        latest = NewsPost.objects.latest('published')
-        earliest = NewsPost.objects.earliest('published')
-        start_date = earliest.published
-        end_date = latest.published
-
-        year_months = range_year_month(start_date, end_date)
-    else:
-        year_months = None
 
     if host:
         breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('News'), None)]
@@ -1244,7 +1206,7 @@ def news_view(request, host_slug=None):
         'posts': posts,
         'hosts': hosts,
         'filter_preset': {'host': [host.slug] if host else None, },
-        'years': year_months,
+        'filter_date': True,
         'item_list': posts,
         'icon_links': icon_links,
         'ajax_endpoint': reverse('ajax-filter-news'),

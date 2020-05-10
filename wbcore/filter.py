@@ -6,6 +6,7 @@ from schedule.periods import Period
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 from django.utils.translation import ugettext as _
+from wbcore.models import Host
 
 
 def parse_union(request):
@@ -39,7 +40,7 @@ def parse_limit(request, default=20):
     return limit
 
 
-def parse_archive_start_end(request):
+def parse_filter_date(request):
     start_str = request.GET.get('from')
     end_str = request.GET.get('to')
 
@@ -58,26 +59,6 @@ def parse_archive_start_end(request):
         except ValueError:
             pass
 
-    if start or end:
-        return start, end
-
-    archive = request.GET.get("archive")
-
-    if archive:
-        try:
-            start = datetime.strptime(archive, '%Y-%m').date()
-            if start.month is 12:
-                end = date(start.year + 1, 1, 1)
-            else:
-                end = date(start.year, start.month + 1, 1)
-        except ValueError:
-            try:
-                start = datetime.strptime(archive, '%Y').date()
-                end = date(start.year + 1, 1, 1)
-            except ValueError:
-                start = None
-                end = None
-
     return start, end
 
 
@@ -87,7 +68,7 @@ def filter_projects(request, default_limit=None):
     visibility = request.GET.get("visibility")
     country_codes = parse_country(request)
     limit = parse_limit(request, default=default_limit) if default_limit else parse_limit(request)
-    start, end = parse_archive_start_end(request)
+    start, end = parse_filter_date(request)
 
 
     results = SearchQuerySet()
@@ -119,7 +100,7 @@ def filter_news(request, default_limit=None):
     host_slugs = parse_union(request)
     contains = request.GET.get("search")
     limit = parse_limit(request, default=default_limit) if default_limit else parse_limit(request)
-    start, end = parse_archive_start_end(request)
+    start, end = parse_filter_date(request)
 
     results = SearchQuerySet()
 
@@ -143,7 +124,7 @@ def filter_news(request, default_limit=None):
 def filter_blog(request, default_limit=None):
     host_slugs = parse_union(request)
     contains = request.GET.get("search")
-    start, end = parse_archive_start_end(request)
+    start, end = parse_filter_date(request)
     limit = parse_limit(request, default=default_limit) if default_limit else parse_limit(request)
 
     results = SearchQuerySet()
@@ -166,7 +147,7 @@ def filter_blog(request, default_limit=None):
 def filter_events(request, default_limit=None):
     host_slugs = parse_union(request)
     contains = request.GET.get("search")
-    start, end = parse_archive_start_end(request)
+    start, end = parse_filter_date(request)
     limit = parse_limit(request, default=default_limit) if default_limit else parse_limit(request)
 
     results = SearchQuerySet()

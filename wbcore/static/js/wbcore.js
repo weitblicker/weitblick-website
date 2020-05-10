@@ -91,7 +91,6 @@ $(document)
         let filter_search = "";
         let filter_country = "";
         let filter_visibility = "";
-        let filter_archive = "";
         let filter_from = "";
         let filter_to = "";
 
@@ -104,7 +103,6 @@ $(document)
             if(filter_search) data['search'] = filter_search;
             if(filter_country) data['country'] = filter_country;
             if(filter_visibility) data['visibility'] = filter_visibility;
-            if(filter_archive) data['archive'] = filter_archive;
             if(filter_from) data['from'] = filter_from;
             if(filter_to) data['to'] = filter_to;
             $.ajax({
@@ -127,8 +125,6 @@ $(document)
         $('#filter-clear').on('click', function() {
             $('#filter-hosts').dropdown('clear');
             filter_union = "";
-            $('#filter-archive').dropdown('clear');
-            filter_archive = "";
             $('#filter-from').calendar('clear');
             filter_from = "";
             $('#filter-to').calendar('clear');
@@ -146,16 +142,6 @@ $(document)
             .dropdown({
                 onChange: function(value, text, choice){
                     filter_union = value;
-                    filter();
-                },
-            });
-
-        $('#filter-archive')
-            .dropdown({
-                allowCategorySelection: true,
-                onChange: function(value, text, choice){
-                    filter_archive = value;
-                    console.log(value, text, choice);
                     filter();
                 },
             });

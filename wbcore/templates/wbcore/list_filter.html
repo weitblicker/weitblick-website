@@ -38,28 +38,7 @@
                 </script>
             {% endif %}
 
-            {% if years %}
-                <div class="field">
-                    <label>{% trans "Archive" %}</label>
-                    <div id="filter-archive" class="ui fluid basic dropdown button">
-                        <span class="text">{% trans "year or month" %}</span>
-                        <i class="dropdown icon"></i>
-                        <div class="menu">
-                            {% for year, months in years.items %}
-                                <div class="item" data-value="{{ year|date:'Y' }}">
-                                    <i class="dropdown icon"></i>
-                                    <span class="text">{{ year|date:'Y' }}</span>
-                                    <div class="menu">
-                                        {% for month in months %}
-                                            <div class="item" data-value="{{ month|date:'Y-m' }}">{{ month|date:'F Y' }}</div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            {% elif from_to %}
+            {% if filter_date %}
                 <div class="ui two unstackable fields">
                     <div class="field">
                         <label>{% trans "From" %}</label>
@@ -101,11 +80,11 @@
                 {% endif %}
                 {% if filter_visibility %}
                     <div class="field five wide">
-                        <label>{% trans "Visibility" %}</label>
+                        <label>{% trans "Status" %}</label>
                         <div id="filter-visibility" class="ui selection dropdown">
                             <input type="hidden" name="gender">
                             <i class="dropdown icon"></i>
-                            <div class="default text">{% trans "Visibility" %}</div>
+                            <div class="default text">{% trans "Status" %}</div>
                             <div class="menu">
                                 <div class="item" data-value="all">{% trans "All" %}</div>
                                 <div class="item" data-value="current">{% trans "Current" %}</div>
