@@ -15,6 +15,7 @@ from django_google_maps import fields as map_fields
 from schedule.models.events import Event as ScheduleEvent, Calendar
 from form_designer.models import Form as EventForm
 from wbcore import predicates as pred
+from wbcore.storage import OverwriteStorage
 from rules.contrib.models import RulesModel, RulesModelBase, RulesModelMixin
 from sortedm2m.fields import SortedManyToManyField
 from django.db.models.query import QuerySet
@@ -97,7 +98,7 @@ class Location(RulesModel):
 class Host(RulesModel):
     class Meta:
         rules_permissions = {
-            "add": pred.is_super_admin | pred.is_admin,
+            "add": pred.is_super_admin,
             "view": rules.always_allow,
             "change": pred.is_super_admin | pred.is_admin,
             "delete": pred.is_super_admin,
@@ -255,9 +256,9 @@ class UserManager(BaseUserManager):
 
 
 def user_image_path(user, filename):
-    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     extension = os.path.splitext(filename)[1]
-    return 'images/users/%s%s' % (slugify.slugify(user.email), extension)
+    extension = extension.lower().replace("jpeg", "jpg")
+    return 'images/users/%s%s' % (user.pk, extension)
 
 
 class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesModelBase):
@@ -372,7 +373,7 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
 
     name.admin_order_field = 'first_name'
 
-    image = models.ImageField(null=True, blank=True, upload_to=user_image_path)
+    image = models.ImageField(null=True, blank=True, storage=OverwriteStorage(), upload_to=user_image_path)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
     since = models.DateField(auto_now_add=True)
     until = models.DateField(null=True, blank=True)

@@ -9,6 +9,9 @@ from django.contrib.auth import get_permission_codename
 from django import forms
 from django.db import models
 from django.template import loader
+from django.urls import reverse
+from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from modeltranslation.admin import TabbedTranslationAdmin, TranslationTabularInline
 from martor.widgets import AdminMartorWidget
 from django_google_maps import widgets as map_widgets
@@ -18,6 +21,7 @@ from copy import copy
 from django_reverse_admin import ReverseModelAdmin
 from rules.contrib.admin import ObjectPermissionsModelAdmin
 from cairosvg import svg2png
+from wbcore.models import User
 
 from itertools import chain
 
@@ -522,6 +526,11 @@ class UserAdmin(BaseUserAdmin):
     def has_module_permission(self, request):
         return request.user.has_module_perms(self.opts.app_label)
 
+    def save_model(self, request, obj, form, change):
+        if obj.image != User.objects.get(pk=obj.pk).image:  # delete old user image on upload
+            User.objects.get(pk=obj.pk).image.delete()
+        super(UserAdmin, self).save_model(request, obj, form, change)
+
 
 class TeamAdmin(MyAdmin):
     inlines = (TeamUserRelationInlineModel,)
@@ -797,10 +806,47 @@ class ContentAdmin(MyAdmin):
 
 class LocationAdmin(MyAdmin):
 
-    list_display = ('name', 'street', 'postal_code', 'city', 'get_country', 'geolocation')
+    def get_queryset(self, request):
+        event_locations = Location.objects.filter(event__host__in=request.user.hosts.all())
+        host_locations = Location.objects.filter(host__in=request.user.hosts.all())
+        project_locations = Location.objects.filter(project__hosts__in=request.user.hosts.all())
+        blogpost_locations = Location.objects.filter(blogpost__host__in=request.user.hosts.all())
+        return (event_locations | host_locations | project_locations | blogpost_locations).distinct()
+
+    list_display = ('name', 'street', 'postal_code', 'city', 'get_country', 'geolocation', 'get_occurrences')
+    readonly_fields = ('get_occurrences',)
 
     def get_country(self, address):
         return address.country.name
+
+    def link(self, type_name, pk, title, ):
+        return mark_safe(format_html('<b>{type_name}</b>: <a href="{url}">{title}<a/>',
+                           url=reverse("admin:wbcore_{type_name}_change".format(type_name=type_name.lower()), args=(pk,)),
+                           title=title, type_name=type_name))
+
+    def get_occurrences(self, location):
+        occurrences = []
+
+        print(location)
+        for event in location.event_set.all():
+            occurrences.append(self.link('Event', event.pk, event.title))
+
+        try:
+            if location.host:
+                occurrences.append(self.link('Host', location.host.pk, location.host.name))
+        except Exception as e:
+            print(e)
+
+        for project in location.project_set.all():
+            occurrences.append(self.link('Project', project.pk, project.name))
+
+        for blogpost in location.blogpost_set.all():
+            occurrences.append(self.link('Blogpost', blogpost.pk, blogpost.title))
+
+        return mark_safe(", ".join(occurrences))
+
+    get_occurrences.short_description = 'Occurrences'
+    get_occurrences.allow_tags = True
     get_country.short_description = 'Country'
     get_country.admin_order_field = 'country'
 

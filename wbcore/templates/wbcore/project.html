@@ -7,6 +7,12 @@
     {% include 'wbcore/image-header.html' with title=project.name image=project.image %}
 
     <div class="ui segment">
+        <div class="meta">
+            {% for host in hosts_list %}
+                {% include 'wbcore/host_icon.html' with host=host %}
+            {% endfor %}
+        </div>
+    <div class="ui hidden divider"></div>
         {{ project.description | safe_markdown }}
     </div>
 

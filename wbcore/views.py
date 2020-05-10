@@ -11,6 +11,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.contrib.auth import login
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.sites.models import Site
+from django_countries import countries as countriesdict
 
 from collections import OrderedDict
 from datetime import date, datetime, timedelta
@@ -686,6 +687,8 @@ def projects_view(request, host_slug=None):
 
     project_list = list(Location.objects.filter(project__in=projects).values(
             'country').annotate(number=Count('country')))
+    for country in project_list:
+        country['countryname'] = dict(countriesdict)[country['country']]
 
     hosts = Host.objects.all()
 
@@ -916,6 +919,9 @@ def project_view(request, host_slug=None, project_slug=None):
     news = NewsPost.objects.filter(project=project).order_by('-published')[:3]
     blogposts = BlogPost.objects.filter(project=project).order_by('-published')[:3]
 
+    other_projects_country = Project.objects.filter(location__country=project.location.country).exclude(pk=project.pk)
+    hosts_list = project.hosts.all()
+
     template = loader.get_template('wbcore/project.html')
     context = {
         'main_nav': get_main_nav(host=host),
@@ -924,10 +930,12 @@ def project_view(request, host_slug=None, project_slug=None):
         'news': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='post_id', text=False),
         'blogposts': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
         'host': host,
+        'hosts_list': hosts_list,
         'account': host.bank if host else None,
         'dot_nav': get_dot_nav(host=host),
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'other_projects_country': item_list_from_proj(other_projects_country)
     }
     return HttpResponse(template.render(context, request))
 
