@@ -54,8 +54,7 @@ def parse_archive_start_end(request):
 
     if end_str:
         try:
-            # include the selected month
-            end = parse(end_str + '-01') + relativedelta(months=1)
+            end = parse(end_str + '-01') + relativedelta(months=1)  # include the selected month
         except ValueError:
             pass
 
@@ -168,8 +167,6 @@ def filter_events(request, default_limit=None):
     host_slugs = parse_union(request)
     contains = request.GET.get("search")
     start, end = parse_archive_start_end(request)
-    print(start)
-    print(end)
     limit = parse_limit(request, default=default_limit) if default_limit else parse_limit(request)
 
     results = SearchQuerySet()
@@ -212,8 +209,8 @@ def reorder_completed_projects(item_list):
     return item_list_current + item_list_passed
 
 def reorder_passed_events(item_list):
-    item_list_current = [item for item in item_list if not item.end < datetime.now(timezone.utc)]
-    item_list_passed = [item for item in item_list if item.end < datetime.now(timezone.utc)][::-1]
+    item_list_current = [item for item in item_list if item.end > datetime.now(timezone.utc)]
+    item_list_passed = [item for item in item_list if item.end <= datetime.now(timezone.utc)][::-1]
     if item_list_passed:
         item_list_passed[0].first_passed_item = True
         item_list_passed[0].separator_text = _('Previous')
