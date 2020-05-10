@@ -1,12 +1,11 @@
 import csv
 from datetime import datetime, timezone, date
 from haystack.query import SearchQuerySet
-from .models import NewsPost, BlogPost, Project, Event
+from wbcore.models import NewsPost, BlogPost, Project, Event
 from schedule.periods import Period
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 from django.utils.translation import ugettext as _
-from wbcore.models import Host
 
 
 def parse_union(request):

@@ -111,10 +111,10 @@ $(document)
                 dataType: 'html',
                 success: function (data) {
                     console.log("success...", data)
-                    let projects_list = $('#item-list');
-                    projects_list.children().fadeOut('fast');
-                    projects_list.html(data);
-                    projects_list.children().fadeIn('fast');
+                    let item_list = $('#item-list');
+                    item_list.children().fadeOut('fast');
+                    item_list.html(data);
+                    item_list.children().fadeIn('fast');
                 },
                 error: function(error){
                     console.log(error)

@@ -284,7 +284,7 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
 
     @property
     def is_staff(self):
-        return True;
+        return True
 
     is_super_admin = models.BooleanField(default=False)
 
@@ -699,9 +699,6 @@ class NewsPost(RulesModel):
     def __str__(self):
         city = (" (" + self.host.name + ")") if self.host else ''
         return self.title + city
-
-    def get_hosts(self):
-        return [self.host]
 
 
 class BlogPost(RulesModel):
