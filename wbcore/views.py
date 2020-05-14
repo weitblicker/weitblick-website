@@ -13,7 +13,7 @@ from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.sites.models import Site
 from django_countries import countries as countriesdict
 
-from collections import OrderedDict
+from collections import OrderedDict, Counter
 from datetime import date, datetime, timedelta
 from schedule.periods import Period
 import locale
@@ -153,12 +153,12 @@ def sidebar_occurrences(events):
     return occurrences
 
 
-def item_list_from_occ(occurrences, host_slug=None, text=True):
+def item_list_from_occ(occurrences, host_slug=None, text=True, language="de_DE"):
     # set attributes to fill list_item template
     item_list = []
+    locale.setlocale(locale.LC_ALL, language)
     for occ in occurrences:
         occ.image = occ.event.image
-        locale.setlocale(locale.LC_ALL, "de_DE")
         if occ.start.day == occ.end.day:
             occ.show_date = occ.start.strftime('%a, %d. %b %Y')
         else:
@@ -176,6 +176,29 @@ def item_list_from_occ(occurrences, host_slug=None, text=True):
         occ.show_text = text
         item_list.append(occ)
     item_list = reorder_passed_events(item_list)
+
+    # display only the next occurrence of all events
+    counter_dict = Counter([i.event.slug for i in item_list])
+    for slug, value in counter_dict.items():
+        if value > 1:
+            idx = []
+            for counter, item in enumerate(item_list):
+                if item.event.slug == slug:
+                    idx.append(counter)
+            following_dates = [item.start for item in [item_list[i] for i in idx[1:]]]
+            for i in idx[:0:-1]:
+                try:
+                    if item_list[i].first_passed_item and len(item_list) > i+1:
+                        item_list[i+1].first_passed_item = True
+                        item_list[i+1].separator_text = _('Previous')
+                except AttributeError:
+                    pass
+                del item_list[i]
+            item_list[idx[0]].show_date += " "
+            for date in following_dates[:2]:
+                item_list[idx[0]].show_date += " & " + date.strftime('%d. %b')
+            if len(following_dates) > 2:
+                item_list[idx[0]].show_date += " ..."
     return item_list
 
 
@@ -253,7 +276,7 @@ def home_view(request):
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id', text=False),
         'item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
         'hosts': hosts,
-        'event_item_list': item_list_from_occ(occurrences, text=True)[:3],
+        'event_item_list': item_list_from_occ(occurrences, text=True, language=request.LANGUAGE_CODE)[:3],
         'breadcrumb': [(_('Home'), None)],
         'icon_links': icon_links
     }
@@ -595,7 +618,7 @@ def about_view(request, host_slug=None):
         'hosts': Host.objects.all(),
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id'),
         'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
-        'event_item_list': item_list_from_occ(occurrences, text=True)[:3],
+        'event_item_list': item_list_from_occ(occurrences, text=True, language=request.LANGUAGE_CODE)[:3],
     }
     return HttpResponse(template.render(context, request))
 
@@ -906,7 +929,7 @@ def project_view(request, host_slug=None, project_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'project': project,
-        'event_item_list': item_list_from_occ(occurrences, text=False)[:3],
+        'event_item_list': item_list_from_occ(occurrences, text=False, language=request.LANGUAGE_CODE)[:3],
         'news_item_list': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='post_id', text=False),
         'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
         'host': host,
@@ -968,7 +991,7 @@ def host_view(request, host_slug):
         'dot_nav': get_dot_nav(host=host),
         'item_list': item_list_from_posts(posts, host_slug=host_slug),
         'hosts': hosts,
-        'event_item_list': item_list_from_occ(occurrences, host_slug=host_slug)[:3],
+        'event_item_list': item_list_from_occ(occurrences, host_slug=host_slug, language=request.LANGUAGE_CODE)[:3],
         'teams': teams,
         'welcome': welcome,
         'icon_links': icon_links,
@@ -1009,7 +1032,7 @@ def events_view(request, host_slug=None):
         'hosts': hosts,
         'filter_preset': {'host': [host.slug] if host else None, },
         'filter_date': True,
-        'item_list': item_list_from_occ(occurrences, host_slug),
+        'item_list': item_list_from_occ(occurrences, host_slug, language=request.LANGUAGE_CODE),
         'ajax_endpoint': reverse('ajax-filter-events'),
         'icon_links': icon_links,
     }
