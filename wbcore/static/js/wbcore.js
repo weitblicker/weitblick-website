@@ -88,6 +88,7 @@ $(document)
 
 
         let filter_union = "";
+        if(filter_union_preset) filter_union = filter_union_preset;
         let filter_search = "";
         let filter_country = "";
         let filter_visibility = "";
@@ -125,6 +126,10 @@ $(document)
         $('#filter-clear').on('click', function() {
             $('#filter-hosts').dropdown('clear');
             filter_union = "";
+            if(filter_union_preset) {
+                filter_union = filter_union_preset;
+                $('#filter-hosts').dropdown('set selected', filter_union_preset);
+            }
             $('#filter-from').calendar('clear');
             filter_from = "";
             $('#filter-to').calendar('clear');
