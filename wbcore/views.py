@@ -889,7 +889,11 @@ def project_view(request, host_slug=None, project_slug=None):
     if Event.objects.filter(projects=project).exists():
         events = Event.objects.filter(projects=project)
     else:
-        events = Event.objects.filter(host=host if host else Host.objects.get(slug='bundesverband'))
+        if host:
+            events = Event.objects.filter(host=host)
+        else:
+            project_hosts = Host.objects.filter(projects=project)
+            events = Event.objects.filter(host__in=project_hosts)
     occurrences = sidebar_occurrences(events)
 
     news = NewsPost.objects.filter(project=project).order_by('-published')[:3]
