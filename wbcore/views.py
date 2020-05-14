@@ -251,7 +251,7 @@ def home_view(request):
         'dot_nav': get_dot_nav(),
         'projects': projects,
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id', text=False),
-        'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
+        'item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
         'hosts': hosts,
         'event_item_list': item_list_from_occ(occurrences, text=True)[:3],
         'breadcrumb': [(_('Home'), None)],
@@ -682,7 +682,7 @@ def projects_view(request, host_slug=None):
         'host': host,
         'filter_preset': {'host': [host.slug] if host else None, },
         'hosts': hosts,
-        'posts': posts,
+        'blog_item_list': posts,
         'countries': countries,
         'filter_visibility': True,
         'ajax_endpoint': reverse('ajax-filter-projects'),
@@ -907,8 +907,8 @@ def project_view(request, host_slug=None, project_slug=None):
         'main_nav': get_main_nav(host=host),
         'project': project,
         'event_item_list': item_list_from_occ(occurrences, text=False)[:3],
-        'news': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='post_id', text=False),
-        'blogposts': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
+        'news_item_list': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='post_id', text=False),
+        'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
         'host': host,
         'hosts_list': hosts_list,
         'account': host.bank if host else None,
@@ -945,7 +945,8 @@ def host_view(request, host_slug):
         raise Http404()
 
     posts = NewsPost.objects.filter(host=host_slug).order_by('-published')[:5]
-    posts = item_list_from_posts(posts, host_slug=host_slug)
+
+    blog = BlogPost.objects.filter(host=host_slug).order_by('-published')[:3]
 
     events = Event.objects.filter(host=host_slug).order_by('-start')
     occurrences = sidebar_occurrences(events)
@@ -965,12 +966,13 @@ def host_view(request, host_slug):
         'breadcrumb': [(_('Home'), reverse('home')), (host.name, None)],
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
-        'posts': posts,
+        'item_list': item_list_from_posts(posts, host_slug=host_slug),
         'hosts': hosts,
         'event_item_list': item_list_from_occ(occurrences, host_slug=host_slug)[:3],
         'teams': teams,
         'welcome': welcome,
         'icon_links': icon_links,
+        'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id', text=False, host_slug=host_slug)
     }
     return HttpResponse(template.render(context, request))
 
