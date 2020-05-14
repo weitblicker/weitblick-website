@@ -380,9 +380,9 @@ def transparency_view(request, host_slug=None):
     }
 
     financial_reports = Document.objects.filter(host=load_host, document_type='financial_report', public=True)
-    financial_reports = financial_reports.order_by('valid_from') if financial_reports else financial_reports
+    financial_reports = financial_reports.order_by('-valid_from') if financial_reports else financial_reports
     annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
-    annual_reports = annual_reports.order_by('valid_from') if annual_reports else annual_reports
+    annual_reports = annual_reports.order_by('-valid_from') if annual_reports else annual_reports
 
 
     template = loader.get_template('wbcore/transparency.html')
