@@ -148,30 +148,9 @@ def get_host_slugs(request, host_slug):
 
 
 def sidebar_occurrences(events):
-    # show n events, future events are preferred
-    n_show = 3
-    passed_period = Period(events, datetime.now() - timedelta(365), datetime.now())
-    future_period = Period(events, datetime.now(), datetime.now() + timedelta(365))
-    passed_occurrences = passed_period.get_occurrences()
-    future_occurrences = future_period.get_occurrences()
-    n_future = len(future_occurrences)
-    if n_future >= n_show:
-        occ = future_occurrences[:n_show]
-    else:
-        occ = future_occurrences + passed_occurrences[-(n_show - n_future):]  # fill with most recent passed occurrences
-    return occ
-
-
-def sidebar_projects(projects):
-    n_show = 3
-    active_projects = [p for p in projects if not p.completed]
-    completed_projects = [p for p in projects if p.completed]
-    n_active = len(active_projects)
-    if n_active >= n_show:
-        projects = active_projects[:3]
-    else:
-        projects = active_projects + completed_projects[-(n_show - n_active):]
-    return projects
+    period = Period(events, datetime.now() - timedelta(365), datetime.now() + timedelta(365))
+    occurrences = period.get_occurrences()
+    return occurrences
 
 
 def item_list_from_occ(occurrences, host_slug=None, text=True):
@@ -274,7 +253,7 @@ def home_view(request):
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id', text=False),
         'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
         'hosts': hosts,
-        'event_item_list': item_list_from_occ(occurrences, text=True),
+        'event_item_list': item_list_from_occ(occurrences, text=True)[:3],
         'breadcrumb': [(_('Home'), None)],
         'icon_links': icon_links
     }
@@ -456,7 +435,6 @@ def history_view(request, host_slug=None):
         projects = Project.objects.filter(hosts__slug=host_slug).order_by('-priority', '-updated')
     else:
         projects = Project.objects.all().order_by('-updated')
-    projects = sidebar_projects(projects)
 
     template = loader.get_template('wbcore/history.html')
     context = {
@@ -467,7 +445,7 @@ def history_view(request, host_slug=None):
         'icon_links': icon_links,
         'history': history,
         'hosts': Host.objects.all(),
-        'project_item_list': item_list_from_proj(projects, host_slug),
+        'project_item_list': item_list_from_proj(projects, host_slug)[:3],
     }
     return HttpResponse(template.render(context, request))
 
@@ -527,7 +505,6 @@ def teams_view(request, host_slug=None):
         projects = Project.objects.filter(hosts__slug=host_slug).order_by('-priority', '-updated')
     else:
         projects = Project.objects.all().order_by('-updated')
-    projects = sidebar_projects(projects)
 
     template = loader.get_template('wbcore/teams.html')
     context = {
@@ -538,7 +515,7 @@ def teams_view(request, host_slug=None):
         'item_list': item_list_from_teams(teams, host_slug),
         'icon_links': icon_links,
         'hosts': Host.objects.all(),
-        'project_item_list': item_list_from_proj(projects, host_slug),
+        'project_item_list': item_list_from_proj(projects, host_slug)[:3],
     }
     return HttpResponse(template.render(context, request))
 
@@ -618,7 +595,7 @@ def about_view(request, host_slug=None):
         'hosts': Host.objects.all(),
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id'),
         'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
-        'event_item_list': item_list_from_occ(occurrences, text=True),
+        'event_item_list': item_list_from_occ(occurrences, text=True)[:3],
     }
     return HttpResponse(template.render(context, request))
 
@@ -639,7 +616,6 @@ def idea_view(request, host_slug=None):
         projects = Project.objects.filter(hosts__slug=host_slug).order_by('-priority', '-updated')
     else:
         projects = Project.objects.all().order_by('-updated')
-    projects = sidebar_projects(projects)
 
     try:
         idea = Content.objects.get(host=Host.objects.get(slug='bundesverband'), type='idea')
@@ -654,7 +630,7 @@ def idea_view(request, host_slug=None):
         'idea': idea,
         'breadcrumb': breadcrumb,
         'hosts': Host.objects.all(),
-        'project_item_list': item_list_from_proj(projects, host_slug=host_slug),
+        'project_item_list': item_list_from_proj(projects, host_slug=host_slug)[:3],
     }
     return HttpResponse(template.render(context, request))
 
@@ -854,7 +830,6 @@ def join_view(request, host_slug=None):
         projects = Project.objects.filter(hosts__slug=host_slug).order_by('-priority', '-updated')
     else:
         projects = Project.objects.all().order_by('-updated')
-    projects = sidebar_projects(projects)
 
     membership_declaration = Document.objects.filter(host=host, document_type='membership_declaration', public=True).order_by('-valid_from') if host else None
 
@@ -867,7 +842,7 @@ def join_view(request, host_slug=None):
         'membership_declaration': membership_declaration,
         'icon_links': icon_links,
         'hosts': Host.objects.all() if host == Host.objects.get(slug='bundesverband') else None,
-        'project_item_list': item_list_from_proj(projects, host_slug),
+        'project_item_list': item_list_from_proj(projects, host_slug)[:3],
     }
 
     if join_page:
@@ -927,7 +902,7 @@ def project_view(request, host_slug=None, project_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'project': project,
-        'event_item_list': item_list_from_occ(occurrences, text=False),
+        'event_item_list': item_list_from_occ(occurrences, text=False)[:3],
         'news': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='post_id', text=False),
         'blogposts': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
         'host': host,
@@ -988,7 +963,7 @@ def host_view(request, host_slug):
         'dot_nav': get_dot_nav(host=host),
         'posts': posts,
         'hosts': hosts,
-        'event_item_list': item_list_from_occ(occurrences, host_slug=host_slug),
+        'event_item_list': item_list_from_occ(occurrences, host_slug=host_slug)[:3],
         'teams': teams,
         'welcome': welcome,
         'icon_links': icon_links,
@@ -1071,7 +1046,7 @@ def event_view(request, host_slug=None, event_slug=None):
     event.image = event.get_title_image()
 
     if event.projects.exists():
-        projects = sidebar_projects(event.projects.all().order_by('-priority', '-updated'))
+        projects = event.projects.all().order_by('-priority', '-updated')
     else:
         projects = []
 
@@ -1080,7 +1055,7 @@ def event_view(request, host_slug=None, event_slug=None):
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
         'event': event,
-        'project_item_list': item_list_from_proj(projects, host_slug=host_slug, text=False),
+        'project_item_list': item_list_from_proj(projects, host_slug=host_slug, text=False)[:3],
         'form': form,
         'breadcrumb': breadcrumb,
         'host': host,
@@ -1154,7 +1129,6 @@ def blog_post_view(request, host_slug=None, post_id=None):
         projects = Project.objects.filter(hosts=host).order_by('-priority', '-updated')
     else:
         projects = None
-    projects = sidebar_projects(projects)
 
     post.type = "blog"
 
@@ -1165,7 +1139,7 @@ def blog_post_view(request, host_slug=None, post_id=None):
         'breadcrumb': breadcrumb,
         'post': post,
         'photos': post.photos,
-        'project_item_list': item_list_from_proj(projects, host_slug=host_slug),
+        'project_item_list': item_list_from_proj(projects, host_slug=host_slug)[:3],
         'hosts': Host.objects.all(),
         'icon_links': icon_links,
     }
@@ -1240,7 +1214,6 @@ def news_post_view(request, host_slug=None, post_id=None):
         projects = Project.objects.filter(hosts=host).order_by('-priority', '-updated')
     else:
         projects = None
-    projects = sidebar_projects(projects)
 
     post.type = "news"
 
@@ -1251,7 +1224,7 @@ def news_post_view(request, host_slug=None, post_id=None):
         'breadcrumb': breadcrumb,
         'post': post,
         'photos': post.photos,
-        'project_item_list': item_list_from_proj(projects, host_slug=host_slug),
+        'project_item_list': item_list_from_proj(projects, host_slug=host_slug)[:3],
         'hosts': Host.objects.all(),
         'icon_links': icon_links,
     }
@@ -1353,7 +1326,6 @@ def donate_view(request, host_slug=None):
         donate = None
 
     projects = Project.objects.filter(hosts=host) if host else Project.objects.all().order_by('-updated')
-    projects = sidebar_projects(projects)
 
     template = loader.get_template('wbcore/donate.html')
     context = {
@@ -1365,7 +1337,7 @@ def donate_view(request, host_slug=None):
         'donate': donate,
         'account': account,
         'hosts': Host.objects.all(),
-        'project_item_list': item_list_from_proj(projects, host_slug=host_slug),
+        'project_item_list': item_list_from_proj(projects, host_slug=host_slug)[:3],
     }
     return HttpResponse(template.render(context, request))
 
