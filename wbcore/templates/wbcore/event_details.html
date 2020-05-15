@@ -5,6 +5,10 @@
     <div class="item">
         <i class="big clock outline icon"></i>
         <div class="content">
+        {% for event in occurrences_item_list|slice:":3" %}
+            {% if event.first_passed_item and occurrences_item_list.1%}
+                <div class="ui small header"> {{ event.separator_text }} </div>
+            {% endif %}
             {% if event.start.day == event.end.day and event.start.month == event.end.month and event.start.year == event.end.year %}
                 {{ event.start | date:"D, j. M Y" }}<br>
                 {{ event.start | date:"H:i"}} - {{ event.end | date:"H:i"}}
@@ -12,6 +16,11 @@
                 {{ event.start | date:"D, j. M Y H:i" }}<br>
                 {{ event.end | date:"D, j. M Y H:i"}}
             {% endif %}
+            <br><br>
+        {% endfor %}
+        {% if occurrences_item_list.3 %}
+            ...
+        {% endif %}
         </div>
     </div>
     <div class="ui hidden divider"></div>
@@ -20,7 +29,12 @@
         <div class="content">
             {% if event.location.street %}
                 {{ event.location.street }}<br>
-                {{ event.location.postal_code }} {{ event.location.city }}
+                {% if event.location.postal_code %}
+                    {{ event.location.postal_code }}
+                {% endif %}
+                {% if event.location.city %}
+                    {{ event.location.city }}
+                {% endif %}
             {% else %}
                 {{ event.location.address }}
             {% endif %}

@@ -153,7 +153,7 @@ def sidebar_occurrences(events):
     return occurrences
 
 
-def item_list_from_occ(occurrences, host_slug=None, text=True, language="de_DE"):
+def item_list_from_occ(occurrences, host_slug=None, text=True, language="de_DE", show_only_first_occ=True):
     # set attributes to fill list_item template
     item_list = []
     locale.setlocale(locale.LC_ALL, language)
@@ -177,28 +177,29 @@ def item_list_from_occ(occurrences, host_slug=None, text=True, language="de_DE")
         item_list.append(occ)
     item_list = reorder_passed_events(item_list)
 
-    # display only the next occurrence of all events
-    counter_dict = Counter([i.event.slug for i in item_list])
-    for slug, value in counter_dict.items():
-        if value > 1:
-            idx = []
-            for counter, item in enumerate(item_list):
-                if item.event.slug == slug:
-                    idx.append(counter)
-            following_dates = [item.start for item in [item_list[i] for i in idx[1:]]]
-            for i in idx[:0:-1]:
-                try:
-                    if item_list[i].first_passed_item and len(item_list) > i+1:
-                        item_list[i+1].first_passed_item = True
-                        item_list[i+1].separator_text = _('Previous')
-                except AttributeError:
-                    pass
-                del item_list[i]
-            item_list[idx[0]].show_date += " "
-            for date in following_dates[:2]:
-                item_list[idx[0]].show_date += " & " + date.strftime('%d. %b')
-            if len(following_dates) > 2:
-                item_list[idx[0]].show_date += " ..."
+    if show_only_first_occ:
+        # display only the next occurrence of all events
+        counter_dict = Counter([i.event.slug for i in item_list])
+        for slug, value in counter_dict.items():
+            if value > 1:
+                idx = []
+                for counter, item in enumerate(item_list):
+                    if item.event.slug == slug:
+                        idx.append(counter)
+                following_dates = [item.start for item in [item_list[i] for i in idx[1:]]]
+                for i in idx[:0:-1]:
+                    try:
+                        if item_list[i].first_passed_item and len(item_list) > i+1:
+                            item_list[i+1].first_passed_item = True
+                            item_list[i+1].separator_text = _('Previous')
+                    except AttributeError:
+                        pass
+                    del item_list[i]
+                item_list[idx[0]].show_date += " "
+                for date in following_dates[:2]:
+                    item_list[idx[0]].show_date += " & " + date.strftime('%d. %b')
+                if len(following_dates) > 2:
+                    item_list[idx[0]].show_date += " ..."
     return item_list
 
 
@@ -1079,6 +1080,9 @@ def event_view(request, host_slug=None, event_slug=None):
     else:
         projects = []
 
+    p = Period([event], datetime(2008, 1, 1), datetime.now() + timedelta(days=365))
+    occurrences = p.get_occurrences()
+
     template = loader.get_template('wbcore/event.html')
     context = {
         'main_nav': get_main_nav(host=host),
@@ -1089,6 +1093,7 @@ def event_view(request, host_slug=None, event_slug=None):
         'breadcrumb': breadcrumb,
         'host': host,
         'icon_links': icon_links,
+        'occurrences_item_list': item_list_from_occ(occurrences, show_only_first_occ=False)[:4]
     }
     return HttpResponse(template.render(context, request))
 
