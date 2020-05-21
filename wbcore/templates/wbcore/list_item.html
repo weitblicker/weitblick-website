@@ -34,32 +34,41 @@
                 <span class="date">{{ item.published | date:"D, j. M Y" }}</span>
             {% endif %}
 
-            {% if item.hosts_list %}
-                {% if item.show_text %}
-                    {% if item.show_date or item.date or item.published %}<span> | </span>{% endif %}
-                {% else %}
-                    <br>
+            {% with item.show_date|length as show_date_length %}
+                {% if item.hosts_list %}
+                    {% if item.show_date or item.date or item.published %}
+                        {% if item.show_text and show_date_length < 25 %}
+                            {{ item.show_date }}
+                            <span> | </span>
+                        {% else %}
+                            <br>
+                        {% endif %}
+                    {% endif %}
+                    {% for host in item.hosts_list %}
+                        {% include 'wbcore/host_icon.html' with host=host %}
+                    {% endfor %}
+                {% elif item.hosts %}
+                    {% if item.show_date or item.date or item.published %}
+                        {% if item.show_text and show_date_length < 25 %}
+                            <span> | </span>
+                        {% else %}
+                            <br>
+                        {% endif %}
+                    {% endif %}
+                    {% for host in item.hosts %}
+                        {% include 'wbcore/host_icon.html' with host=host %}
+                    {% endfor %}
+                {% elif item.host %}
+                    {% if item.show_date or item.date or item.published %}
+                        {% if item.show_text and show_date_length < 25 %}
+                            <span> | </span>
+                        {% else %}
+                            <br>
+                        {% endif %}
+                    {% endif %}
+                    {% include 'wbcore/host_icon.html' with host=item.host %}
                 {% endif %}
-                {% for host in item.hosts_list %}
-                    {% include 'wbcore/host_icon.html' with host=host %}
-                {% endfor %}
-            {% elif item.hosts %}
-                {% if item.show_text %}
-                    {% if item.show_date or item.date or item.published %}<span> | </span>{% endif %}
-                {% else %}
-                    <br>
-                {% endif %}
-                {% for host in item.hosts %}
-                    {% include 'wbcore/host_icon.html' with host=host %}
-                {% endfor %}
-            {% elif item.host %}
-                {% if item.show_text %}
-                    {% if item.show_date or item.date or item.published %}<span> | </span>{% endif %}
-                {% else %}
-                    <br>
-                {% endif %}
-                {% include 'wbcore/host_icon.html' with host=item.host %}
-            {% endif %}
+            {% endwith %}
         </div>
         <a class="ui medium header" href="{{ item.link }}">{{ item.title }}</a>
 

@@ -129,7 +129,6 @@ def get_dot_nav(host=None):
         blog = BlogPost.objects.all().order_by('-published')[:3]
         occurrences = Period(Event.objects.all(), datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()
     occurrences = item_list_from_occ(occurrences, host_slug=host_slug, text=False, show_only_first_occ=True)[:3]
-    print(occurrences[0].event.location)
     return {'news': news, 'blog': blog, 'occurrences': occurrences}
 
 
@@ -214,6 +213,15 @@ def item_list_from_occ(occurrences, host_slug=None, text=True, show_only_first_o
                         else:
                             item.frequency = None
 
+                # modify show_date
+                first_occ = item_list[idx[0]]
+                first_occ.show_date = first_occ.frequency + ': ' + _date(first_occ.start, 'd. M Y') if first_occ.frequency else _date(first_occ.start, 'd. M Y')
+                following_dates = [item.start for item in [item_list[i] for i in idx[1:]]]
+                for date in following_dates[:2]:
+                    first_occ.show_date += ", " + _date(date, 'd. M')
+                if len(following_dates) > 2:
+                    first_occ.show_date += ", ..."
+
                 # find most recent passed occurrence
                 # add separator text
                 # remove all other occurrences from item_list
@@ -225,15 +233,6 @@ def item_list_from_occ(occurrences, host_slug=None, text=True, show_only_first_o
                     except AttributeError:
                         pass
                     del item_list[i]
-
-                # modify show_date
-                first_occ = item_list[idx[0]]
-                first_occ.show_date = first_occ.frequency + ': ' + _date(first_occ.start, 'd. M Y') if first_occ.frequency else _date(first_occ.start, 'd. M Y')
-                following_dates = [item.start for item in [item_list[i] for i in idx[1:]]]
-                for date in following_dates[:2]:
-                    first_occ.show_date += ", " + _date(date, 'd. M')
-                if len(following_dates) > 2:
-                    first_occ.show_date += ", ..."
     return item_list
 
 
