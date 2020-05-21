@@ -193,7 +193,6 @@ class MyAdmin(TabbedTranslationAdmin):
                 # making the field readonly
                 kwargs['disabled'] = True
             kwargs["queryset"] = request.user.hosts
-
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
     def get_exclude(self, request, obj=None):
@@ -224,13 +223,22 @@ class MyAdmin(TabbedTranslationAdmin):
         if request.user.is_super_admin:
             return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+        print("db_field:", db_field)
         if db_field.name == 'author':
             # setting the user from the request object
             kwargs['initial'] = request.user.pk
             # making the field readonly
             kwargs['disabled'] = True
 
-        if db_field.name == 'host':
+        elif db_field.name == 'location':
+            hosts = request.user.get_hosts_for_admin()
+            event_locations = Location.objects.filter(event__host__in=hosts)
+            host_locations = Location.objects.filter(host__in=hosts)
+            project_locations = Location.objects.filter(project__hosts__in=hosts)
+            blogpost_locations = Location.objects.filter(blogpost__host__in=hosts)
+            kwargs["queryset"] = (event_locations | host_locations | project_locations | blogpost_locations).distinct()
+
+        elif db_field.name == 'host':
             if request.user.hosts.count() == 1:
                 # setting the hosts the user belongs to from the request object
                 kwargs['initial'] = request.user.hosts.all()[0].pk
@@ -240,7 +248,7 @@ class MyAdmin(TabbedTranslationAdmin):
                 hosts = request.user.get_hosts_for_admin()
                 kwargs["queryset"] = Host.objects.filter(pk__in=[host.pk for host in hosts])
 
-        if db_field.name == 'project':
+        elif db_field.name == 'project':
                 hosts = request.user.hosts.all()
                 kwargs["queryset"] = Project.objects.filter(hosts__in=hosts).all()
 
