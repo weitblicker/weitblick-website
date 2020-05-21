@@ -289,7 +289,10 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
     is_super_admin = models.BooleanField(default=False)
 
     def get_hosts_for_role(self, role):
-        admin_relations = self.userrelation_set.filter(member_type=role).all()
+        if isinstance(role, (list, QuerySet)):
+            admin_relations = self.userrelation_set.filter(member_type__in=role).all()
+        else:
+            admin_relations = self.userrelation_set.filter(member_type=role).all()
         return [relation.host for relation in admin_relations]
 
     def get_maintaining_hosts(self):
@@ -308,9 +311,12 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
         return self.get_hosts_for_role('member')
 
     def has_role_for_host(self, member_type, host):
-        if isinstance(host, (list, QuerySet)):
-            has_role = self.userrelation_set.filter(member_type=member_type, host__in=host).count() > 0
-            return has_role
+        if isinstance(member_type, (list, QuerySet)) and isinstance(host, (list, QuerySet)):
+            return self.userrelation_set.filter(member_type__in=member_type, host__in=host).count() > 0
+        elif isinstance(member_type, (list, QuerySet)):
+            return self.userrelation_set.filter(member_type__in=member_type, host=host).count() > 0
+        elif isinstance(host, (list, QuerySet)):
+            return self.userrelation_set.filter(member_type=member_type, host__in=host).count() > 0
         else:
             return self.userrelation_set.filter(member_type=member_type, host=host).count() > 0
 

@@ -223,7 +223,6 @@ class MyAdmin(TabbedTranslationAdmin):
         if request.user.is_super_admin:
             return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
-        print("db_field:", db_field)
         if db_field.name == 'author':
             # setting the user from the request object
             kwargs['initial'] = request.user.pk
@@ -231,7 +230,7 @@ class MyAdmin(TabbedTranslationAdmin):
             kwargs['disabled'] = True
 
         elif db_field.name == 'location':
-            hosts = request.user.get_hosts_for_admin()
+            hosts = request.user.get_hosts_for_role(['admin', 'editor'])
             event_locations = Location.objects.filter(event__host__in=hosts)
             host_locations = Location.objects.filter(host__in=hosts)
             project_locations = Location.objects.filter(project__hosts__in=hosts)
