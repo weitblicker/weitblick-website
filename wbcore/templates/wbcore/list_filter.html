@@ -34,7 +34,12 @@
             </div>
             {% if filter_preset.host %}
                 <script>
-                    $('.ui.multiple.search.selection.dropdown').dropdown('set selected', [{% for host_preset in filter_preset.host %} '{{ host_preset }}', {% endfor %}])
+                    let filter_union_preset = {{ filter_preset.host | safe }};
+                    $('#filter-hosts').dropdown('set selected', filter_union_preset);
+                </script>
+            {% else %}
+                <script>
+                    let filter_union_preset = false;
                 </script>
             {% endif %}
 
