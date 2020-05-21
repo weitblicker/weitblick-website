@@ -37,3 +37,4 @@ pymysql
 sshtunnel
 django-instagram
 cairosvg
+django-cleanup
