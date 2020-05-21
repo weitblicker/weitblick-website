@@ -4,6 +4,7 @@ from django.utils.translation import gettext as _
 from django.db.models import Count
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader, RequestContext
+from django.template.defaultfilters import date as _date  # localized date https://stackoverflow.com/questions/6945251/localized-date-strftime-in-django-view
 from django.urls import reverse
 from django.core.mail import EmailMessage
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -118,22 +119,18 @@ def get_main_nav(host=None, active=None):
 
 def get_dot_nav(host=None):
     if host:
+        host_slug = host.slug
         news = NewsPost.objects.filter(host=host).order_by('-published')[:3]
         blog = BlogPost.objects.filter(host=host).order_by('-published')[:3]
-        occurences = Period(Event.objects.filter(host=host), datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
+        occurrences = Period(Event.objects.filter(host=host), datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()
     else:
+        host_slug = None
         news = NewsPost.objects.all().order_by('-published')[:3]
         blog = BlogPost.objects.all().order_by('-published')[:3]
-        occurences = Period(Event.objects.all(), datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()[:3]
-    events = [occ.event for occ in occurences]
-    for event in events:
-        if event.start.day == event.end.day:
-            event.show_date = event.start.strftime('%a, %d. %b %Y')
-            event.show_date += "<br>" + event.start.strftime('%H:%M') + " - " + event.end.strftime('%H:%M')
-        else:
-            event.show_date = event.start.strftime('%a, %d. %b')
-            event.show_date += " -<br>" + event.end.strftime('%a, %d. %b %Y')
-    return {'news': news, 'blog': blog, 'events': events}
+        occurrences = Period(Event.objects.all(), datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()
+    occurrences = item_list_from_occ(occurrences, host_slug=host_slug, text=False, show_only_first_occ=True)[:3]
+    print(occurrences[0].event.location)
+    return {'news': news, 'blog': blog, 'occurrences': occurrences}
 
 
 def get_host_slugs(request, host_slug):
@@ -153,58 +150,94 @@ def sidebar_occurrences(events):
     return occurrences
 
 
-def item_list_from_occ(occurrences, host_slug=None, text=True, language="de_DE", show_only_first_occ=True):
+def item_list_from_occ(occurrences, host_slug=None, text=True, show_only_first_occ=True):
     # set attributes to fill list_item template
     item_list = []
-    locale.setlocale(locale.LC_ALL, language)
     for occ in occurrences:
+        # image
         occ.image = occ.event.image
         if occ.start.day == occ.end.day:
-            occ.show_date = occ.start.strftime('%a, %d. %b %Y')
+            occ.show_date = _date(occ.start, 'D, d. M Y')
         else:
-            occ.show_date = occ.start.strftime('%d. %b') + " - " + occ.end.strftime('%d. %b %Y')
+            occ.show_date = _date(occ.start, 'd. M') + " - " + _date(occ.end, 'd. M Y')
+
+        # host
         occ.host = occ.event.host
+
+        # link
         current_host = Host.objects.get(slug=host_slug) if host_slug else None
         if current_host and current_host == occ.event.host:
             occ.link = reverse('event', kwargs={'event_slug': occ.event.slug, 'host_slug': host_slug})
         else:
             occ.link = reverse('event', args=[occ.event.slug])
+
+        # teaser
         if text:
             occ.teaser = occ.event.teaser if occ.event.teaser else occ.description
         else:
             occ.teaser = ""
         occ.show_text = text
+
+        # location
+        if occ.event.location:
+            name = occ.event.location.name
+            city = occ.event.location.city
+            if host_slug:
+                occ.location = name
+            else:
+                if name and city:
+                    occ.location = name + ', ' + city
+                elif name:
+                    occ.location = name
+                elif city:
+                    occ.location = city
+                else:
+                    occ.location = None
+        else:
+            occ.location = None
         item_list.append(occ)
     item_list = reorder_passed_events(item_list)
 
     if show_only_first_occ:
         # display only the next occurrence of all events
-        counter_dict = Counter([i.event.slug for i in item_list])
+        counter_dict = Counter([i.event.slug for i in item_list])  # {event slug: how often it occurs}
         for slug, value in counter_dict.items():
             if value > 1:
-                idx = []
-                for counter, item in enumerate(item_list):
+                idx = []  # indexes of occurrences with same slug (= same event)
+                for i, item in enumerate(item_list):
                     if item.event.slug == slug:
-                        idx.append(counter)
-                following_dates = [item.start for item in [item_list[i] for i in idx[1:]]]
+                        idx.append(i)
+                        item.recurring = True
+                        if item.event.rule.frequency == 'WEEKLY':
+                            item.frequency = _("every") + " " + _date(item.start, 'l')
+                            item.frequency_short = _("every") + " " + _date(item.start, 'D')  # for dot nav
+                        else:
+                            item.frequency = None
+
+                # find most recent passed occurrence
+                # add separator text
+                # remove all other occurrences from item_list
                 for i in idx[:0:-1]:
                     try:
-                        if item_list[i].first_passed_item and len(item_list) > i+1:
-                            item_list[i+1].first_passed_item = True
-                            item_list[i+1].separator_text = _('Previous')
+                        if item_list[i].first_passed_item and len(item_list) > i + 1:
+                            item_list[i + 1].first_passed_item = True
+                            item_list[i + 1].separator_text = _('Previous')
                     except AttributeError:
                         pass
                     del item_list[i]
-                item_list[idx[0]].show_date += " "
+
+                # modify show_date
+                first_occ = item_list[idx[0]]
+                first_occ.show_date = first_occ.frequency + ': ' + _date(first_occ.start, 'd. M Y') if first_occ.frequency else _date(first_occ.start, 'd. M Y')
+                following_dates = [item.start for item in [item_list[i] for i in idx[1:]]]
                 for date in following_dates[:2]:
-                    item_list[idx[0]].show_date += " & " + date.strftime('%d. %b')
+                    first_occ.show_date += ", " + _date(date, 'd. M')
                 if len(following_dates) > 2:
-                    item_list[idx[0]].show_date += " ..."
+                    first_occ.show_date += ", ..."
     return item_list
 
 
 def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='post_id', text=True):
-
     item_list = []
     for post in posts:
         if not post.teaser:
@@ -277,7 +310,7 @@ def home_view(request):
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id', text=False),
         'item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
         'hosts': hosts,
-        'event_item_list': item_list_from_occ(occurrences, text=True, language=request.LANGUAGE_CODE)[:3],
+        'event_item_list': item_list_from_occ(occurrences, text=True)[:3],
         'breadcrumb': [(_('Home'), None)],
         'icon_links': icon_links
     }
@@ -619,7 +652,7 @@ def about_view(request, host_slug=None):
         'hosts': Host.objects.all(),
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id'),
         'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
-        'event_item_list': item_list_from_occ(occurrences, text=True, language=request.LANGUAGE_CODE)[:3],
+        'event_item_list': item_list_from_occ(occurrences, text=True)[:3],
     }
     return HttpResponse(template.render(context, request))
 
@@ -930,7 +963,7 @@ def project_view(request, host_slug=None, project_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'project': project,
-        'event_item_list': item_list_from_occ(occurrences, text=False, language=request.LANGUAGE_CODE)[:3],
+        'event_item_list': item_list_from_occ(occurrences, text=False)[:3],
         'news_item_list': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='post_id', text=False),
         'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
         'host': host,
@@ -992,7 +1025,7 @@ def host_view(request, host_slug):
         'dot_nav': get_dot_nav(host=host),
         'item_list': item_list_from_posts(posts, host_slug=host_slug),
         'hosts': hosts,
-        'event_item_list': item_list_from_occ(occurrences, host_slug=host_slug, language=request.LANGUAGE_CODE)[:3],
+        'event_item_list': item_list_from_occ(occurrences, host_slug=host_slug)[:3],
         'teams': teams,
         'welcome': welcome,
         'icon_links': icon_links,
@@ -1033,7 +1066,7 @@ def events_view(request, host_slug=None):
         'hosts': hosts,
         'filter_preset': {'host': [host.slug] if host else None, },
         'filter_date': True,
-        'item_list': item_list_from_occ(occurrences, host_slug, language=request.LANGUAGE_CODE),
+        'item_list': item_list_from_occ(occurrences, host_slug),
         'ajax_endpoint': reverse('ajax-filter-events'),
         'icon_links': icon_links,
     }

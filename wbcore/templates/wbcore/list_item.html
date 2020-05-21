@@ -24,6 +24,7 @@
 
             {% if item.show_date %}
                 {% if item.country %}<span> | </span>{% endif %}
+                {% if item.recurring %}<i class="redo alternate icon"></i>{% endif %}
                 <span class="date">{{ item.show_date }}</span>
             {% elif item.date %}
                 {% if item.country %}<span> | </span>{% endif %}
