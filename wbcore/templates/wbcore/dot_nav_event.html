@@ -1,27 +1,35 @@
 {% load static %}
 {% load humanize %}
-<div class="ui feed">
-{% for event in dot_nav.events %}
+
+{% for occ in dot_nav.occurrences %}
         <div class="item">
-            <div class="label">
-                <div class="date"><i class="clock outline icon"></i> {{ event.start | naturalday:"d. M" }} {{ event.start | time:"H:i" }}</div>
-            </div>
-            <div class="title">
-                {% if host %}
-                    <a class="summary" href="{% url 'event' event_slug=event.slug host_slug=host.slug %}">
-                        {{ event.title | truncatechars:20 }}
-                    </a>
-                {% else %}
-                    <a class="summary" href="{% url 'event' event_slug=event.slug %}">
-                        {{ event.title | truncatechars:20 }}
-                    </a>
+            <div class="content">
+                <div class="date">
+                    <i class="clock outline icon"></i>
+                    {{ occ.start | naturalday:"d. M" }} {{ occ.start | time:"H:i" }}
+                    {% if occ.recurring %}
+                        <i class="redo alternate icon"></i>
+                        {% if occ.frequency_short %} {{ occ.frequency_short }} {% endif %}
+                    {% endif %}
+                </div>
+                <div class="title">
+                    {% if host %}
+                        <a href="{% url 'event' event_slug=occ.event.slug host_slug=host.slug %}">
+                            {{ occ.title | truncatechars:20 }}
+                        </a>
+                    {% else %}
+                        <a href="{% url 'event' event_slug=occ.event.slug %}">
+                            {{ occ.title | truncatechars:20 }}
+                        </a>
+                    {% endif %}
+                </div>
+                {% if occ.location %}
+                    <div class="location">
+                        <i class="map marker alternate icon"></i>
+                        {{ occ.location }}
+                    </div>
                 {% endif %}
-            </div>
-            <div class="description">
-                <i class="map marker alternate icon"></i>
-                {% if event.location.city %}{{ event.location.city }}{% endif %}
-                {% if event.location.name %}{{ event.location.name }}{% endif %}
             </div>
         </div>
 {% endfor %}
-</div>
+
