@@ -23,6 +23,7 @@ from wbcore.tokens import account_activation_token
 
 from wbcore.forms import (
     ContactForm, UserForm, BankForm, UserRelationForm, AddressForm, User)
+from honeypot.decorators import check_honeypot
 
 from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
@@ -1436,6 +1437,7 @@ def imprint_view(request, host_slug=None):
     return HttpResponse(template.render(context, request))
 
 
+@check_honeypot
 def contact_view(request, host_slug=None):
     try:
         host = Host.objects.get(slug=host_slug) if host_slug else None

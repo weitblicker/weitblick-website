@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'cookielaw',
     'django.contrib.humanize',
     'captcha',
+    'honeypot',
     'django_cleanup.apps.CleanupConfig',  # should be at the bottom
 ]
 
@@ -308,3 +309,7 @@ GOOGLE_MAPS_API_KEY = 'AIzaSyCtEff9Z-Kl_nRc5GU28LvwzXFlz-6ltHc'
 REST_AUTH_SERIALIZERS = {
   'USER_DETAILS_SERIALIZER': 'wbcore.serializers.UserSerializer',
 }
+
+CAPTCHA_LENGTH = 6
+CAPTCHA_LETTER_ROTATION = (-50, 50)
+HONEYPOT_FIELD_NAME = "phone"

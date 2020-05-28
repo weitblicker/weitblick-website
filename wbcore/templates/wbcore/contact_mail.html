@@ -1,12 +1,12 @@
 {% load tz %}{% load i18n %}{% language 'de' %}{% timezone "Europe/Paris" %}
 Hallo {{ msg.host }},
 
-{{ msg.name }} schrieb am {{ msg.submission_date | date:"l, j.F Y \u\m H:i" }} zum Thema "{{ msg.subject }}" ({{ msg.get_reason_display }}):
+{{ msg.fullname }} schrieb am {{ msg.submission_date | date:"l, j.F Y \u\m H:i" }} zum Thema "{{ msg.subject }}" ({{ msg.get_reason_display }}):
 
 
 {{ msg.message }}
 
-Name:       {{ msg.name }}
+Name:       {{ msg.fullname }}
 E-Mail:     {{ msg.email }}
 Betreff:    {{ msg.subject }}
 Kategorie:  {{ msg.get_reason_display }}
