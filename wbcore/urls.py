@@ -34,6 +34,7 @@ main_patterns = [
     path('history/', views.history_view, name='history'),
     path('team/<str:team_slug>/', views.team_view, name='team'),
     path('team/', views.teams_view, name='teams'),
+    path('partners/', views.partners_view, name='partners'),
     path('contact/', views.contact_view, name='contact'),
     path('transparency/', views.transparency_view, name='transparency'),
     path('charter/', views.charter_view, name='charter'),

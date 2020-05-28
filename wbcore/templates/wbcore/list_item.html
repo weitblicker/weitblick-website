@@ -3,13 +3,24 @@
 <div class="item">
 
     {% if not no_image %}
-        <a class="{% if image_size %}ui {{ image_size }} {% endif %}image" href="{{ item.link }}">
+        {% if item.link %}
+            <a class="{% if image_size %}ui {{ image_size }} {% endif %}image" {% if item.link %}href="{{ item.link }}"{% endif %}>
+        {% else %}
+            <span class="{% if image_size %}ui {{ image_size }} {% endif %}image" {% if item.link %}href="{{ item.link }}"{% endif %}>
+        {% endif %}
+
             {% if item.image %}
                 <img src="{{ item.image.get_listsize_url }}" alt="{{ item.image.title }}">
             {% else %}
                 <div class="ui image {{ image_size }}">{% include 'wbcore/svgs/placeholder.svg' with text=item.get_model_name %}</div>
             {% endif %}
-        </a>
+
+        {% if item.link %}
+            </a>
+        {% else %}
+            </span>
+        {% endif %}
+
     {% endif %}
 
 
@@ -70,7 +81,11 @@
                 {% endif %}
             {% endwith %}
         </div>
-        <a class="ui medium header" href="{{ item.link }}">{{ item.title }}</a>
+        {% if item.link %}
+            <a class="ui medium header" href="{{ item.link }}">{{ item.title }}</a>
+        {% else %}
+            <span class="ui medium header">{{ item.title }}</span>
+        {% endif %}
 
         <div class="description">
             {% if show_text|default_if_none:True %}

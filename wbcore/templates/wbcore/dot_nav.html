@@ -20,9 +20,11 @@
           {% if host %}
             <a class="item" href="{% url 'news' host.slug %}">{% trans "News" %}</a>
             <a class="item" href="{% url 'blog' host.slug %}">{% trans "Blog" %}</a>
+            <a class="item" href="{% url 'events' host.slug %}">{% trans "Events" %}</a>
           {% else %}
             <a class="item" href="{% url 'news' %}">{% trans "News" %}</a>
             <a class="item" href="{% url 'blog' %}">{% trans "Blog" %}</a>
+            <a class="item" href="{% url 'events' %}">{% trans "Events" %}</a>
           {% endif %}
         </div>
     </div>
@@ -33,6 +35,7 @@
                 <div class="ui vertical fluid menu">
                     <a class="item" href="{% url 'history' host.slug %}">{% trans "History" %}</a>
                     <a class="item" href="{% url 'teams' host.slug %}">{% trans "Team" %}</a>
+                    <a class="item" href="{% url 'partners' host.slug %}">{% trans "Partners" %}</a>
                     <a class="item" href="{% url 'contact' host.slug %}">{% trans "Contact" %}</a>
                 </div>
             {% else %}
@@ -40,6 +43,7 @@
                 <div class="ui vertical fluid menu">
                     <a class="item" href="{% url 'history' %}">{% trans "History" %}</a>
                     <a class="item" href="{% url 'teams' %}">{% trans "Team" %}</a>
+                    <a class="item" href="{% url 'partners' %}">{% trans "Partners" %}</a>
                     <a class="item" href="{% url 'contact' %}">{% trans "Contact" %}</a>
                 </div>
             {% endif %}

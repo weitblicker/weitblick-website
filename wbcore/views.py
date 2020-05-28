@@ -26,7 +26,7 @@ from wbcore.forms import (
 
 from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
-    UserRelation, JoinPage, SocialMediaLink, Content, Document, Donation, FAQ)
+    UserRelation, Partner, JoinPage, SocialMediaLink, Content, Document, Donation, FAQ)
 
 from wbcore.filter import reorder_completed_projects, reorder_passed_events
 
@@ -289,6 +289,17 @@ def item_list_from_teams(teams, host_slug=None):
         else:
             team.link = reverse('team', kwargs={'team_slug': team.slug})
         item_list.append(team)
+    return item_list
+
+
+def item_list_from_partners(partners, host_slug=None):
+    item_list = []
+    for partner in partners:
+        partner.title = partner.name
+        partner.teaser = partner.description
+        partner.image = partner.logo
+        partner.hosts_list = [host for host in Host.objects.filter(partners=partner).order_by('name')]
+        item_list.append(partner)
     return item_list
 
 
@@ -613,6 +624,34 @@ def team_view(request, host_slug=None, team_slug=None):
         'hosts': Host.objects.all() if host_slug in [None, 'bundesverband'] else None,
         'teams': item_list_from_teams(teams, host_slug),
         'project_item_list': item_list_from_proj(projects, host_slug)
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def partners_view(request, host_slug=None):
+    if host_slug:
+        try:
+            host = Host.objects.get(slug=host_slug)
+            breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Partners'), None)]
+        except:
+            raise Http404()
+    else:
+        host = None
+        breadcrumb = [(_('Home'), reverse('home')), (_('Partners'), None)]
+
+    if host:
+        partners = host.partners.order_by('name')
+    else:
+        partners = Host.objects.get(slug='bundesverband').partners.order_by('name')
+
+    template = loader.get_template('wbcore/partners.html')
+    context = {
+        'main_nav': get_main_nav(host=host, active='events'),
+        'dot_nav': get_dot_nav(host=host),
+        'host': host,
+        'breadcrumb': breadcrumb,
+        'item_list': item_list_from_partners(partners),
+        'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
 

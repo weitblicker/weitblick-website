@@ -1,0 +1,10 @@
+{% extends 'wbcore/basic.html' %}
+{% load static %}
+{% load i18n %}
+{% block main %}
+    {% trans "Partners" as title %}
+    {% include 'wbcore/image-header.html' with default='/images/team_header.jpg' %}
+    <div class="ui segment">
+        {% include 'wbcore/item_list.html' %}
+    </div>
+{% endblock %}
