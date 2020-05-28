@@ -30,7 +30,6 @@ Highcharts.setOptions({
             if(mydata[i].country==this.properties['iso-a2']){
                 this.drilldown = this.properties['iso-a2'];
                 this.translated_country_name = mydata[i].countryname;
-                console.log(mydata[i].countryname);
                 this.value = mydata[i].number;
                 this.dataLabels = {enabled: false}
                 filtered_countries.push(this)

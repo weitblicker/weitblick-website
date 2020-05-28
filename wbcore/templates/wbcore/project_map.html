@@ -9,7 +9,7 @@
 {% include 'wbcore/segment_header.html' with icon='map marker alternate' %}
 <h1 class="ui item centered large header">{{ project.location.country.name }}</h1>
 <div class="ui hidden divider"></div>
-<div id="container" style="width: 100%">
+<div id="container_project_map" style="width: 100%">
 
 </div>
 <script>
@@ -42,7 +42,7 @@ $.getScript('https://code.highcharts.com/mapdata/' + mapKey + '.js', function() 
         });
     {% endfor %}
 
-    var map = Highcharts.mapChart('container', {
+    var map = Highcharts.mapChart('container_project_map', {
         title: {
             text: ''
         },
