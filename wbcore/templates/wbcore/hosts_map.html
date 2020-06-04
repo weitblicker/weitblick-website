@@ -2,7 +2,7 @@
 {% load l10n %}
 {% load i18n %}
 <!-- Do not reload highmaps.js in /projects where it was already loaded -->
-{% if not countries %}s
+{% if not countries %}
     <script src="{% static 'highmaps/proj4.js'%}"></script>
     <script src="{% static 'highmaps/highmaps.js'%}"></script>
 {% endif %}
