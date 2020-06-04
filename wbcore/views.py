@@ -300,6 +300,10 @@ def item_list_from_partners(partners, host_slug=None):
         partner.image = partner.logo
         partner.hosts_list = [host for host in Host.objects.filter(partners=partner).order_by('name')]
         item_list.append(partner)
+        if host_slug:
+            partner.link = reverse('partner', kwargs={'partner_slug': partner.slug, 'host_slug': host_slug})
+        else:
+            partner.link = reverse('partner', kwargs={'partner_slug': partner.slug})
     return item_list
 
 
@@ -632,9 +636,9 @@ def partners_view(request, host_slug=None):
     if host_slug:
         try:
             host = Host.objects.get(slug=host_slug)
-            breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Partners'), None)]
         except:
             raise Http404()
+        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Partners'), None)]
     else:
         host = None
         breadcrumb = [(_('Home'), reverse('home')), (_('Partners'), None)]
@@ -646,11 +650,44 @@ def partners_view(request, host_slug=None):
 
     template = loader.get_template('wbcore/partners.html')
     context = {
-        'main_nav': get_main_nav(host=host, active='events'),
+        'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'breadcrumb': breadcrumb,
         'item_list': item_list_from_partners(partners),
+        'icon_links': icon_links,
+    }
+    return HttpResponse(template.render(context, request))
+
+def partner_view(request, host_slug=None, partner_slug=None):
+    try:
+        partner = Partner.objects.get(slug=partner_slug)
+    except Partner.DoesNotExist:
+        raise Http404()
+
+    if host_slug:
+        try:
+            host = Host.objects.get(slug=host_slug)
+        except Host.DoesNotExist:
+            raise Http404()
+        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])),
+                      (_('Partners'), reverse('partners', args=[host_slug])), (partner.name, None)]
+    else:
+        host = None
+        breadcrumb = [(_('Home'), reverse('home')), (_('Partners'), reverse('partners')), (partner.name, None)]
+
+    projects = Project.objects.filter(partners=partner)
+
+    # sidebar: logo, link, events, blog
+
+    template = loader.get_template('wbcore/partner.html')
+    context = {
+        'main_nav': get_main_nav(host=host, active='events'),
+        'dot_nav': get_dot_nav(host=host),
+        'host': host,
+        'partner': partner,
+        'item_list': item_list_from_proj(projects, host_slug=host_slug),
+        'breadcrumb': breadcrumb,
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))

@@ -463,10 +463,21 @@ class Partner(RulesModel):
         }
 
     name = models.CharField(max_length=200, unique=True)
+    slug = models.SlugField(max_length=50, unique=True, null=True)
     description = models.TextField()
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, blank=True, null=True)
     logo = models.ImageField(upload_to=save_partner_logo, null=True, blank=True)
     link = models.URLField(blank=True)
+
+    CATEGORY_CHOICES = (
+        ('project', _('Project Partner')),
+        ('sponsor', _('Sponsor')),
+        ('patron', _('Patron')),
+        ('network', _('Network'))
+    )
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    active = models.BooleanField(default=True, help_text='If this is not selected, the partnership will be displayed as concluded')
+    public = models.BooleanField(default=True, help_text='If this is not selected, the partner will not be displayed.')
 
     def belongs_to_host(self, host):
         return True
