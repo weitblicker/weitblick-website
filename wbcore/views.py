@@ -256,8 +256,12 @@ def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='p
     return item_list
 
 
-def item_list_from_proj(projects, host_slug=None, text=True):
+def item_list_from_proj(projects, host_slug=None, text=True, max_num_items=None):
     item_list = []
+    if projects is None:
+        return item_list
+    if max_num_items:
+        projects = projects[:max_num_items]
     for project in projects:
         project.image = project.get_title_image()
         project.country = project.location.country.name
@@ -501,7 +505,7 @@ def history_view(request, host_slug=None):
         'icon_links': icon_links,
         'history': history,
         'hosts': Host.objects.all(),
-        'project_item_list': item_list_from_proj(projects, host_slug)[:3],
+        'project_item_list': item_list_from_proj(projects, host_slug, max_num_items=3),
     }
     return HttpResponse(template.render(context, request))
 
@@ -571,7 +575,7 @@ def teams_view(request, host_slug=None):
         'item_list': item_list_from_teams(teams, host_slug),
         'icon_links': icon_links,
         'hosts': Host.objects.all(),
-        'project_item_list': item_list_from_proj(projects, host_slug)[:3],
+        'project_item_list': item_list_from_proj(projects, host_slug, max_num_items=3),
     }
     return HttpResponse(template.render(context, request))
 
@@ -686,7 +690,7 @@ def idea_view(request, host_slug=None):
         'idea': idea,
         'breadcrumb': breadcrumb,
         'hosts': Host.objects.all(),
-        'project_item_list': item_list_from_proj(projects, host_slug=host_slug)[:3],
+        'project_item_list': item_list_from_proj(projects, host_slug=host_slug, max_num_items=3),
     }
     return HttpResponse(template.render(context, request))
 
@@ -898,7 +902,7 @@ def join_view(request, host_slug=None):
         'membership_declaration': membership_declaration,
         'icon_links': icon_links,
         'hosts': Host.objects.all() if host == Host.objects.get(slug='bundesverband') else None,
-        'project_item_list': item_list_from_proj(projects, host_slug)[:3],
+        'project_item_list': item_list_from_proj(projects, host_slug, max_num_items=3),
     }
 
     if join_page:
@@ -1120,7 +1124,7 @@ def event_view(request, host_slug=None, event_slug=None):
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
         'event': event,
-        'project_item_list': item_list_from_proj(projects, host_slug=host_slug, text=False)[:3],
+        'project_item_list': item_list_from_proj(projects, host_slug=host_slug, text=False, max_num_items=3),
         'form': form,
         'breadcrumb': breadcrumb,
         'host': host,
@@ -1205,7 +1209,7 @@ def blog_post_view(request, host_slug=None, post_id=None):
         'breadcrumb': breadcrumb,
         'post': post,
         'photos': post.photos,
-        'project_item_list': item_list_from_proj(projects, host_slug=host_slug)[:3],
+        'project_item_list': item_list_from_proj(projects, host_slug=host_slug, max_num_items=3),
         'hosts': Host.objects.all(),
         'icon_links': icon_links,
     }
@@ -1290,7 +1294,7 @@ def news_post_view(request, host_slug=None, post_id=None):
         'breadcrumb': breadcrumb,
         'post': post,
         'photos': post.photos,
-        'project_item_list': item_list_from_proj(projects, host_slug=host_slug)[:3],
+        'project_item_list': item_list_from_proj(projects, host_slug=host_slug, max_num_items=3),
         'hosts': Host.objects.all(),
         'icon_links': icon_links,
     }
@@ -1403,7 +1407,7 @@ def donate_view(request, host_slug=None):
         'donate': donate,
         'account': account,
         'hosts': Host.objects.all(),
-        'project_item_list': item_list_from_proj(projects, host_slug=host_slug)[:3],
+        'project_item_list': item_list_from_proj(projects, host_slug=host_slug, max_num_items=3),
     }
     return HttpResponse(template.render(context, request))
 
