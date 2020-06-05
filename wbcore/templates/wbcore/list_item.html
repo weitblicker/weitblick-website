@@ -1,16 +1,18 @@
 {% load static %}
 {% load i18n %}
-<div class="item">
+<div class="item" style="display: flex; align-items: center">
 
     {% if not no_image %}
         {% if item.link %}
-            <a class="{% if image_size %}ui {{ image_size }} {% endif %}image" {% if item.link %}href="{{ item.link }}"{% endif %}>
+            <a class="{% if image_size %}ui {{ image_size }} {% endif %}image" href="{{ item.link }}">
         {% else %}
-            <span class="{% if image_size %}ui {{ image_size }} {% endif %}image" {% if item.link %}href="{{ item.link }}"{% endif %}>
+            <span class="{% if image_size %}ui {{ image_size }} {% endif %}image">
         {% endif %}
 
             {% if item.image %}
                 <img src="{{ item.image.get_listsize_url }}" alt="{{ item.image.title }}">
+            {% elif item.fixed_image %}
+                <img src="{{ item.fixed_image.url }}" style="max-width: 100%; max-height: 70.58%">
             {% else %}
                 <div class="ui image {{ image_size }}">{% include 'wbcore/svgs/placeholder.svg' with text=item.get_model_name %}</div>
             {% endif %}
@@ -88,7 +90,7 @@
         {% endif %}
 
         <div class="description">
-            {% if show_text|default_if_none:True %}
+            {% if item.show_text|default_if_none:True %}
                 {% with tw=truncate_words|default:"20" %}
                     <p>{{ item.teaser | striptags | safe | truncatewords:tw}}</p>
                 {% endwith %}

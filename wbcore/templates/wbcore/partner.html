@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block main %}
-    {% include 'wbcore/image-header.html' with title=partner.name default='/images/team_header.jpg' %}
+    {% include 'wbcore/image-header.html' with title=partner.name default='/images/partners_header.jpg' %}
     <div class="ui segment">
         <p>{{ partner.description | safe_markdown }}</p>
     </div>

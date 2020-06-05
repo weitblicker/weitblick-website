@@ -17,7 +17,13 @@
         {% if partner.logo %}
             <div class="ui segment">
                 {% include "wbcore/segment_header.html" with icon='handshake' url_alias='partners' title='' %}
-                <img src="{{ partner.logo.url }}" style="max-width: 100%; padding: 5%; padding-top: 0%">
+                {% if partner.link %}
+                    <a href="{{ partner.link }}">
+                        <img src="{{ partner.logo.url }}" style="max-width: 100%; padding: 5%">
+                    </a>
+                {% else %}
+                    <img src="{{ partner.logo.url }}" style="max-width: 100%; padding: 5%; padding-top: 0%">
+                {% endif %}
             </div>
         {% endif %}
     {% endif %}
@@ -85,6 +91,14 @@
         {% trans "Membership Declaration" as title %}
         {% include "wbcore/segment_header.html" with icon='file alternate outline' url_alias='join' %}
         {% include 'wbcore/document_list.html' with documents=membership_declaration hide_year=True %}
+    </div>
+    {% endif %}
+
+    {% if partner_item_list %}
+    <div class="ui segment">
+        {% trans "Partners" as title %}
+        {% include "wbcore/segment_header.html" with icon='handshake' url_alias='partners' %}
+        {% include 'wbcore/item_list.html' with item_list=partner_item_list image_size='small' %}
     </div>
     {% endif %}
 

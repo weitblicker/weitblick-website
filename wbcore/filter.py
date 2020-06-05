@@ -180,6 +180,35 @@ def filter_events(request, default_limit=None):
 
     return occurrences, events
 
+
+def filter_partners(request, default_limit=None):
+    host_slugs = parse_union(request)
+    contains = request.GET.get("search")
+    # status = request.GET.get("status")
+    # category = request.GET.get("category")
+    limit = parse_limit(request, default=default_limit) if default_limit else parse_limit(request)
+
+    results = SearchQuerySet()
+    if host_slugs:
+        results = results.filter(hosts_slug__in=host_slugs)
+    if contains:
+        results = results.filter_and(text__contains=contains)
+    # if category:
+    #     results = results.filter_and(category=category)
+    # if status == 'active':
+    #     results = results.filter_and(active=True)
+    # if status == 'active':
+    #     results = results.filter_and(active=False)
+    results.exclude(public=False)
+
+    results = results.models(Partner).all()
+    if limit:
+        results = results[:limit]
+
+    partners = [result.object for result in results]
+    return partners
+
+
 def reorder_completed_projects(item_list):
     item_list_current = [item for item in item_list if not item.completed]
     item_list_passed = [item for item in item_list if item.completed]
@@ -187,6 +216,7 @@ def reorder_completed_projects(item_list):
         item_list_passed[0].first_passed_item = True
         item_list_passed[0].separator_text = _('Completed')
     return item_list_current + item_list_passed
+
 
 def reorder_passed_events(item_list):
     item_list_current = [item for item in item_list if item.end > datetime.now(timezone.utc)]

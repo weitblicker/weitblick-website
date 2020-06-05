@@ -296,18 +296,21 @@ def item_list_from_teams(teams, host_slug=None):
     return item_list
 
 
-def item_list_from_partners(partners, host_slug=None):
+def item_list_from_partners(partners, host_slug=None, text=True):
     item_list = []
     for partner in partners:
+        if not partner.public: continue
         partner.title = partner.name
         partner.teaser = partner.description
-        partner.image = partner.logo
+        partner.fixed_image = partner.logo
         partner.hosts_list = [host for host in Host.objects.filter(partners=partner).order_by('name')]
-        item_list.append(partner)
+        if not partner.hosts_list: continue  # do not show partners without host
         if host_slug:
             partner.link = reverse('partner', kwargs={'partner_slug': partner.slug, 'host_slug': host_slug})
         else:
             partner.link = reverse('partner', kwargs={'partner_slug': partner.slug})
+        partner.show_text = True if text else False
+        item_list.append(partner)
     return item_list
 
 
@@ -648,24 +651,28 @@ def partners_view(request, host_slug=None):
         breadcrumb = [(_('Home'), reverse('home')), (_('Partners'), None)]
 
     if host:
-        partners = host.partners.order_by('name')
+        partners = host.partners.exclude(public=False).order_by('name')
     else:
-        partners = Host.objects.get(slug='bundesverband').partners.order_by('name')
+        partners = Host.objects.get(slug='bundesverband').partners.exclude(public=False).order_by('name')
 
     template = loader.get_template('wbcore/partners.html')
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
-        'host': host,
         'breadcrumb': breadcrumb,
-        'item_list': item_list_from_partners(partners),
         'icon_links': icon_links,
+        'ajax_endpoint': reverse('ajax-filter-partners'),
+        'filter_preset': {'host': [host.slug] if host else None, },
+        'hosts': Host.objects.all(),
+        'host': host,
+        'item_list': item_list_from_partners(partners),
     }
     return HttpResponse(template.render(context, request))
 
 def partner_view(request, host_slug=None, partner_slug=None):
     try:
         partner = Partner.objects.get(slug=partner_slug)
+        if not partner.public: raise Http404()
     except Partner.DoesNotExist:
         raise Http404()
 
@@ -682,21 +689,22 @@ def partner_view(request, host_slug=None, partner_slug=None):
 
     projects = Project.objects.filter(partners=partner)
 
-    # sidebar: logo, link, events, blog
-    #occurrences = None
-    #projects = None
+    events = Event.objects.filter(projects__in=projects)
+    occurrences = sidebar_occurrences(events)
+
+    blogposts = BlogPost.objects.filter(project__in=projects)
 
     template = loader.get_template('wbcore/partner.html')
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
-        'host': host,
-        'partner': partner,
-        #'event_item_list': item_list_from_occ(occurrences, host_slug=host_slug),
-        #'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug),
-        'item_list': item_list_from_proj(projects, host_slug=host_slug),
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'host': host,
+        'partner': partner,
+        'item_list': item_list_from_proj(projects, host_slug=host_slug),
+        'event_item_list': item_list_from_occ(occurrences, host_slug=host_slug)[:3],
+        'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False)[:3],
     }
     return HttpResponse(template.render(context, request))
 
@@ -1026,6 +1034,8 @@ def project_view(request, host_slug=None, project_slug=None):
 
     project.image = project.get_title_image()
 
+    partners = project.partners.exclude(public=False)
+
     if Event.objects.filter(projects=project).exists():
         events = Event.objects.filter(projects=project)
     else:
@@ -1046,7 +1056,8 @@ def project_view(request, host_slug=None, project_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'project': project,
-        'event_item_list': item_list_from_occ(occurrences, text=False)[:3],
+        'partner_item_list': item_list_from_partners(partners, host_slug=host_slug, text=False),
+        'event_item_list': item_list_from_occ(occurrences, text=True)[:3],
         'news_item_list': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='post_id', text=False),
         'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
         'host': host,
