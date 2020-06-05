@@ -1,12 +1,15 @@
 {% load static %}
 {% load l10n %}
 {% load i18n %}
-<script src="{% static 'highmaps/proj4.js'%}"></script>
-<script src="{% static 'highmaps/highmaps.js'%}"></script>
+<!-- Do not reload highmaps.js in /projects where it was already loaded -->
+{% if not countries %}
+    <script src="{% static 'highmaps/proj4.js'%}"></script>
+    <script src="{% static 'highmaps/highmaps.js'%}"></script>
+{% endif %}
 <script src="{% static 'highmaps/de-all.js'%}"></script>
 {% trans "Associations" as title %}
 {% include "wbcore/segment_header.html" with icon='map' %}
-<div id="container" style="width: 100%">
+<div id="container_host_map" style="width: 100%">
 
 </div>
 <script>
@@ -23,7 +26,7 @@
         {% endif %}
     {% endfor %}
 
-    var map = Highcharts.mapChart('container', {
+    var map = Highcharts.mapChart('container_host_map', {
         title: {
             text: ''
         },

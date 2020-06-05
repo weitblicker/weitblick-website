@@ -450,7 +450,8 @@ class Content(RulesModel):
 
 
 def save_partner_logo(instance, filename):
-    return "partners/" + instance.name.lower().replace(' ', '_') + splitext(filename)[1].lower()
+    path = "partners/" + instance.name.lower().replace(' ', '_') + splitext(filename)[1].lower()
+    return replace_umlaute(path)
 
 
 class Partner(RulesModel):
@@ -792,9 +793,15 @@ class BlogPost(RulesModel):
     def get_hosts(self):
         return [self.host]
 
+def replace_umlaute(string):
+    string_utf8 = string.replace('ä', 'ae').replace('ü', 'ue').replace('ö', 'oe').replace('ß', 'ss')
+    # get rid of other utf8 symbols
+    string_ascii = string_utf8.encode("utf-8").decode("ascii", "ignore")
+    return string_ascii
 
 def save_document(instance, filename):
-    return "documents/"+ instance.host.slug +"/" + instance.title.lower().replace(' ', '_') + splitext(filename)[1].lower()
+    path = "documents/" + instance.host.slug + "/" + instance.title.lower().replace(' ', '_') + splitext(filename)[1].lower()
+    return replace_umlaute(path)
 
 
 class Document(RulesModel):
