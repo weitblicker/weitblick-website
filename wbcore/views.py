@@ -679,6 +679,8 @@ def partner_view(request, host_slug=None, partner_slug=None):
     projects = Project.objects.filter(partners=partner)
 
     # sidebar: logo, link, events, blog
+    #occurrences = None
+    #projects = None
 
     template = loader.get_template('wbcore/partner.html')
     context = {
@@ -686,6 +688,8 @@ def partner_view(request, host_slug=None, partner_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'host': host,
         'partner': partner,
+        #'event_item_list': item_list_from_occ(occurrences, host_slug=host_slug),
+        #'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug),
         'item_list': item_list_from_proj(projects, host_slug=host_slug),
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,

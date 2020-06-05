@@ -13,6 +13,15 @@
     </div>
     {% endif %}
 
+    {% if partner %}
+        {% if partner.logo %}
+            <div class="ui segment">
+                {% include "wbcore/segment_header.html" with icon='handshake' url_alias='partners' title='' %}
+                <img src="{{ partner.logo.url }}" style="max-width: 100%; padding: 5%; padding-top: 0%">
+            </div>
+        {% endif %}
+    {% endif %}
+
     {% if event %}
     <div class="ui segment">
         {% include "wbcore/event_details.html" %}
