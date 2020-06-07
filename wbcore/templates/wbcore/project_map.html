@@ -34,7 +34,12 @@ $.getScript('https://code.highcharts.com/mapdata/' + mapKey + '.js', function() 
 
     var filtered_projects = [];
     {% for project in other_projects_country %}
+        var proj_hosts = []
+        {% for proj_host in project.hosts_list %}
+            proj_hosts.push("{{ proj_host.slug }}")
+        {% endfor %}
         filtered_projects.push({
+            proj_hosts: proj_hosts,
             name: '{{project.name}}',
             slug: '{{project.slug}}',
             lat: {{project.location.geolocation.lat|stringformat:".11f" }},
@@ -65,27 +70,21 @@ $.getScript('https://code.highcharts.com/mapdata/' + mapKey + '.js', function() 
             },
             enabled: true,
             formatter: function () {
-                if (this.series.name == 'other_projects') {
-                    var lat = this.point.lat,
-                        lon = this.point.lon,
-                        series = this.series,
-                        tooltiptxt = '';
-                    $.each(series.data, function(i,p){
-                    if(Math.abs(p.lat-lat) <= 0.1 && Math.abs(p.lon-lon) <= 0.1 ) {
-                       tooltiptxt += "<a href=../"+p.slug+" target='_self' style='color:#000000'>&#8226 "+p.name+"</a> <br>";
-
-                    }
-                    });
-
-                    return tooltiptxt
-                } else {
-                    var lat = this.point.lat,
+                    let lat = this.point.lat,
                         lon = this.point.lon,
                         series = map.get('others'),
                         tooltiptxt = '';
                     $.each(series.data, function(i,p){
                     if(Math.abs(p.lat-lat) <= 0.1 && Math.abs(p.lon-lon) <= 0.1 ) {
-                        tooltiptxt += "<a href=../"+p.slug+" target='_self' style='color:#000000'>&#8226 "+p.name+"</a> <br>";
+                        let pathArray = window.location.pathname.split( '/' );
+                        //check if in host context and if the project is of the same host --> then the context is preserved
+                        if($.inArray(pathArray[1], p.proj_hosts)!= -1)
+                        {
+                            tooltiptxt += "<a href=../"+p.slug+" target='_self' style='color:#000000'>&#8226 "+p.name+"</a> <br>";
+                        } else {
+                            tooltiptxt += "<a href=" + window.location.origin + "/projects/" + p.slug + " target='_self' style='color:#000000'>&#8226 " + p.name + "</a> <br>";
+                        }
+
                     }
                     });
                     if (tooltiptxt== ''){
@@ -93,7 +92,7 @@ $.getScript('https://code.highcharts.com/mapdata/' + mapKey + '.js', function() 
                     } else {
                         return tooltiptxt
                     }
-                }
+
             },
         },
 
