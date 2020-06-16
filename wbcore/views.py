@@ -297,7 +297,7 @@ def item_list_from_teams(teams, host_slug=None):
 
 
 def home_view(request):
-    projects = Project.objects.all()
+    projects = Project.objects.all()[:5]
     hosts = Host.objects.all()
     news = NewsPost.objects.all().order_by('-published')[:5]
     blog = BlogPost.objects.all().order_by('-published')[:3]
@@ -714,18 +714,22 @@ def projects_view(request, host_slug=None):
 
     # sort projects
     if host_slug or len(host_slugs) == 1:  # only order by priority in host view to avoid competition between hosts
-        projects = projects.order_by('-priority', '-updated')
+        projects = projects.order_by('completed', '-priority', '-updated')
     else:
-        projects = projects.order_by('-updated')
+        projects = projects.order_by('completed', '-updated')
 
-    posts = BlogPost.objects.filter(project__in=projects)
+    blogposts = BlogPost.objects.filter(project__in=projects).order_by('-published')[:3]
 
-    countries = set([project.location.country for project in projects])
+    all_countries_dict = dict(countriesdict)
+    # get a list of all countries for the filter
+    #countries = set([project.location.country for project in projects]) # is replaced by the following to reduce the loop length, distinct speed advantage
+    countries = [{'name': all_countries_dict[key], 'code':key} for key in set(projects.values_list('location__country', flat=True))]
 
     project_list = list(Location.objects.filter(project__in=projects).values(
             'country').annotate(number=Count('country')))
+    # add translated country names
     for country in project_list:
-        country['countryname'] = dict(countriesdict)[country['country']]
+        country['countryname'] = all_countries_dict[country['country']]
 
     hosts = Host.objects.all()
 
@@ -742,7 +746,7 @@ def projects_view(request, host_slug=None):
         'host': host,
         'filter_preset': {'host': [host.slug] if host else None, },
         'hosts': hosts,
-        'blog_item_list': posts,
+        'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
         'countries': countries,
         'filter_visibility': True,
         'ajax_endpoint': reverse('ajax-filter-projects'),
