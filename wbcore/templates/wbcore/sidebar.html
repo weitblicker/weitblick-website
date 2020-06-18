@@ -1,16 +1,22 @@
 {% load i18n %}
 <div class="ui sticky">
 
-    {% if host and host.instagram%}
+    {% comment %}{% if host and host.instagram%}
     <div class="ui segment">
         {% include 'wbcore/instagram.html' with account_id=host.instagram %}
     </div>
+    {% endif %}{% endcomment %}
+
+    {% if project_map %}
+        <div class="ui segment">
+            {% include 'wbcore/project_map.html' %}
+        </div>
     {% endif %}
 
     {% if address %}
-    <div class="ui segment">
-        {% include "wbcore/address.html" %}
-    </div>
+        <div class="ui segment">
+            {% include "wbcore/address.html" %}
+        </div>
     {% endif %}
 
     {% if partner %}
@@ -29,16 +35,16 @@
     {% endif %}
 
     {% if event %}
-    <div class="ui segment">
-        {% include "wbcore/event_details.html" %}
-    </div>
+        <div class="ui segment">
+            {% include "wbcore/event_details.html" %}
+        </div>
     {% endif %}
 
     {% if photos %}
         <div class="ui segment">
             {% trans "Gallery" as title %}
             {% include 'wbcore/segment_header.html' with icon='image outline' %}
-            {% include 'wbcore/gallery.html' with photos=photos.all %}
+            {% include 'wbcore/gallery.html' with photos=photos %}
         </div>
     {% endif %}
 

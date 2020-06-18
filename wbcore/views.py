@@ -711,26 +711,36 @@ def partner_view(request, host_slug=None, partner_slug=None):
 
 def about_view(request, host_slug=None):
 
-    if not host_slug:
-        host_slug = main_host_slug
 
-    try:
-        host = Host.objects.get(slug=host_slug) if host_slug else None
+
+    if host_slug:
+        try:
+            host = Host.objects.get(slug=host_slug)
+        except:
+            raise Http404()
         breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('About'), None)]
-    except:
-        raise Http404()
-
-    breadcrumb = [(_('Home'), reverse('home')), (_('About'), None)]
+    else:
+        host = None
+        breadcrumb = [(_('Home'), reverse('home')), (_('About'), None)]
 
     try:
-        about = Content.objects.get(host=host, type='about')
+        if host:
+            about = Content.objects.get(host=host, type='about')
+        else:
+            about = Content.objects.get(host__slug='bundesverband', type='about')
     except Content.DoesNotExist:
         about = None
 
-    news = NewsPost.objects.all().order_by('-published')[:3]
-    blog = BlogPost.objects.all().order_by('-published')[:3]
-    events = Event.objects.filter(host=host if host else Host.objects.get(slug='bundesverband')).order_by('-start')
-    occurrences = sidebar_occurrences(events)
+    if host:
+        news = NewsPost.objects.filter(host=host).order_by('-published')[:3]
+        blog = BlogPost.objects.filter(host=host).order_by('-published')[:3]
+        events = Event.objects.filter(host=host).order_by('-start')
+        occurrences = sidebar_occurrences(events)
+    else:
+        news = NewsPost.objects.all().order_by('-published')[:3]
+        blog = BlogPost.objects.all().order_by('-published')[:3]
+        events = Event.objects.filter(host__slug=host_slug if host else 'bundesverband').order_by('-start')
+        occurrences = sidebar_occurrences(events)
 
     template = loader.get_template('wbcore/about.html')
     context = {
@@ -1056,8 +1066,9 @@ def project_view(request, host_slug=None, project_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'project': project,
+        'photos': project.photos.all(),
         'partner_item_list': item_list_from_partners(partners, host_slug=host_slug, text=False),
-        'event_item_list': item_list_from_occ(occurrences, text=True)[:3],
+        'event_item_list': item_list_from_occ(occurrences, text=False)[:3],
         'news_item_list': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='post_id', text=False),
         'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
         'host': host,
@@ -1299,7 +1310,7 @@ def blog_post_view(request, host_slug=None, post_id=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'post': post,
-        'photos': post.photos,
+        'photos': post.photos.all(),
         'project_item_list': item_list_from_proj(projects, host_slug=host_slug, max_num_items=3),
         'hosts': Host.objects.all(),
         'icon_links': icon_links,
@@ -1384,7 +1395,7 @@ def news_post_view(request, host_slug=None, post_id=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'post': post,
-        'photos': post.photos,
+        'photos': post.photos.all(),
         'project_item_list': item_list_from_proj(projects, host_slug=host_slug, max_num_items=3),
         'hosts': Host.objects.all(),
         'icon_links': icon_links,
