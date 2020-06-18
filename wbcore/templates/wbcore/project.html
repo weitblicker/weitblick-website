@@ -18,26 +18,7 @@
 
 {% endblock %}
 {% block side_bar %}
-        <div class="ui segment">
-            {% include 'wbcore/project_map.html' %}
-        </div>
 
-        {% if project.photos %}
-        <div class="ui segment">
-            {% trans "Gallery" as title %}
-            {% include 'wbcore/segment_header.html' with icon='image outline' %}
-            {% include 'wbcore/gallery.html' with photos=project.photos.all %}
-        </div>
-        {% endif %}
-
-        {% if project.partner %}
-            <div class="ui segment">
-                {% trans "Partner" %}
-                {% include 'wbcore/segment_header.html' with icon='handshake outline' %}
-                {{ project.partner }}
-            </div>
-        {% endif %}
-
-        {% include 'wbcore/sidebar.html' %}
+        {% include 'wbcore/sidebar.html' with project_map=True %}
 
 {% endblock %}
