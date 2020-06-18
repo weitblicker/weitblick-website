@@ -1,11 +1,11 @@
 {% load i18n %}
 <div class="ui sticky">
 
-    {% if host and host.instagram%}
+    {% comment %}{% if host and host.instagram%}
     <div class="ui segment">
         {% include 'wbcore/instagram.html' with account_id=host.instagram %}
     </div>
-    {% endif %}
+    {% endif %}{% endcomment %}
 
     {% if address %}
     <div class="ui segment">
