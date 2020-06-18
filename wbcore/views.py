@@ -623,26 +623,36 @@ def team_view(request, host_slug=None, team_slug=None):
 
 def about_view(request, host_slug=None):
 
-    if not host_slug:
-        host_slug = main_host_slug
 
-    try:
-        host = Host.objects.get(slug=host_slug) if host_slug else None
+
+    if host_slug:
+        try:
+            host = Host.objects.get(slug=host_slug)
+        except:
+            raise Http404()
         breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('About'), None)]
-    except:
-        raise Http404()
-
-    breadcrumb = [(_('Home'), reverse('home')), (_('About'), None)]
+    else:
+        host = None
+        breadcrumb = [(_('Home'), reverse('home')), (_('About'), None)]
 
     try:
-        about = Content.objects.get(host=host, type='about')
+        if host:
+            about = Content.objects.get(host=host, type='about')
+        else:
+            about = Content.objects.get(host__slug='bundesverband', type='about')
     except Content.DoesNotExist:
         about = None
 
-    news = NewsPost.objects.all().order_by('-published')[:3]
-    blog = BlogPost.objects.all().order_by('-published')[:3]
-    events = Event.objects.filter(host=host if host else Host.objects.get(slug='bundesverband')).order_by('-start')
-    occurrences = sidebar_occurrences(events)
+    if host:
+        news = NewsPost.objects.filter(host=host).order_by('-published')[:3]
+        blog = BlogPost.objects.filter(host=host).order_by('-published')[:3]
+        events = Event.objects.filter(host=host).order_by('-start')
+        occurrences = sidebar_occurrences(events)
+    else:
+        news = NewsPost.objects.all().order_by('-published')[:3]
+        blog = BlogPost.objects.all().order_by('-published')[:3]
+        events = Event.objects.filter(host__slug=host_slug if host else 'bundesverband').order_by('-start')
+        occurrences = sidebar_occurrences(events)
 
     template = loader.get_template('wbcore/about.html')
     context = {
