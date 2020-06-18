@@ -1,7 +1,7 @@
 import csv
 
 from django.utils.translation import gettext as _
-from django.db.models import Count
+from django.db.models import Count, F, Value, Case, When, BooleanField
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader, RequestContext
 from django.template.defaultfilters import date as _date  # localized date https://stackoverflow.com/questions/6945251/localized-date-strftime-in-django-view
@@ -257,26 +257,44 @@ def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='p
 
 
 def item_list_from_proj(projects, host_slug=None, text=True, max_num_items=None):
+    """
+    Creates a list of projects with the necessary informations for the templates appended.
+    :param projects: This must be a queryset of Project objects
+    :param host_slug: host_slug or None
+    :param text: boolean, if text should be shown
+    :param max_num_items: integer or None
+    :return: a list of projects
+    """
     item_list = []
-    if projects is None:
+    if not projects.exists():
         return item_list
     if max_num_items:
         projects = projects[:max_num_items]
+    current_host = Host.objects.get(slug=host_slug) if host_slug else None
+
+    projects = projects.annotate(title=F('name'))
+    projects = projects.annotate(show_text=Value(text, output_field=BooleanField()))
+    projects = projects.annotate(teaser=Case(When(short_description__isnull=False, then=F('short_description')),
+                                             default=F('description')))
+
+    completed_projects = False
     for project in projects:
         project.image = project.get_title_image()
         project.country = project.location.country.name
         project.published = None  # do not show published date, but rather if active or not
         project.hosts_list = project.hosts.all()
-        current_host = Host.objects.get(slug=host_slug) if host_slug else None
+
         if current_host and current_host in project.hosts.all():
             project.link = reverse('project', kwargs={'project_slug': project.slug, 'host_slug': host_slug})
         else:
             project.link = reverse('project', args=[project.slug])
-        project.title = project.name
-        project.teaser = project.short_description if project.short_description else project.description
-        project.show_text = True if text else False
+
+        if project.completed and not completed_projects:
+            project.first_passed_item = True
+            project.separator_text = _('Completed')
+            completed_projects = True
         item_list.append(project)
-    item_list = reorder_completed_projects(item_list)
+    #item_list = reorder_completed_projects(item_list)
     return item_list
 
 def item_list_from_teams(teams, host_slug=None):
@@ -492,9 +510,9 @@ def history_view(request, host_slug=None):
         history = None
 
     if host_slug:
-        projects = Project.objects.filter(hosts__slug=host_slug).order_by('-priority', '-updated')
+        projects = Project.objects.filter(hosts__slug=host_slug).order_by('completed', '-priority', '-updated')
     else:
-        projects = Project.objects.all().order_by('-updated')
+        projects = Project.objects.all().order_by('completed', '-updated')
 
     template = loader.get_template('wbcore/history.html')
     context = {
@@ -562,9 +580,9 @@ def teams_view(request, host_slug=None):
         teams = Team.objects.filter(host=Host.objects.get(slug='bundesverband'))
 
     if host_slug:
-        projects = Project.objects.filter(hosts__slug=host_slug).order_by('-priority', '-updated')
+        projects = Project.objects.filter(hosts__slug=host_slug).order_by('completed', '-priority', '-updated')
     else:
-        projects = Project.objects.all().order_by('-updated')
+        projects = Project.objects.all().order_by('completed', '-updated')
 
     template = loader.get_template('wbcore/teams.html')
     context = {
@@ -602,7 +620,10 @@ def team_view(request, host_slug=None, team_slug=None):
     relations = team.teamuserrelation_set.all().order_by('priority')
 
     teams = Team.objects.filter(host=host) if host else Team.objects.filter(host__slug=main_host_slug)
-    projects = Project.objects.filter(hosts=host) if host else Project.objects.all()
+    if host_slug:
+        projects = Project.objects.filter(hosts__slug=host_slug).order_by('completed', '-priority', '-updated')
+    else:
+        projects = Project.objects.all().order_by('completed', '-updated')
     teams, projects = teams[:3], projects[:3]
 
     template = loader.get_template('wbcore/team.html')
@@ -673,9 +694,9 @@ def idea_view(request, host_slug=None):
         breadcrumb = [(_('Home'), reverse('home')), (_('Idea'), None)]
 
     if host_slug:
-        projects = Project.objects.filter(hosts__slug=host_slug).order_by('-priority', '-updated')
+        projects = Project.objects.filter(hosts__slug=host_slug).order_by('completed', '-priority', '-updated')
     else:
-        projects = Project.objects.all().order_by('-updated')
+        projects = Project.objects.all().order_by('completed', '-updated')
 
     try:
         idea = Content.objects.get(host=Host.objects.get(slug='bundesverband'), type='idea')
@@ -724,11 +745,11 @@ def projects_view(request, host_slug=None):
     # get a list of all countries for the filter
     #countries = set([project.location.country for project in projects]) # is replaced by the following to reduce the loop length, distinct speed advantage
     countries = [{'name': all_countries_dict[key], 'code':key} for key in set(projects.values_list('location__country', flat=True))]
-
-    project_list = list(Location.objects.filter(project__in=projects).values(
+    # for chororpleth map
+    country_list_for_map = list(Location.objects.filter(project__in=projects).values(
             'country').annotate(number=Count('country')))
     # add translated country names
-    for country in project_list:
+    for country in country_list_for_map:
         country['countryname'] = all_countries_dict[country['country']]
 
     hosts = Host.objects.all()
@@ -742,7 +763,7 @@ def projects_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'breadcrumb': breadcrumb,
         'item_list': item_list_from_proj(projects, host_slug),
-        'project_list': project_list,
+        'country_list_for_map': country_list_for_map,
         'host': host,
         'filter_preset': {'host': [host.slug] if host else None, },
         'hosts': hosts,
@@ -891,9 +912,9 @@ def join_view(request, host_slug=None):
         bank_form = BankForm()
 
     if host_slug:
-        projects = Project.objects.filter(hosts__slug=host_slug).order_by('-priority', '-updated')
+        projects = Project.objects.filter(hosts__slug=host_slug).order_by('completed', '-priority', '-updated')
     else:
-        projects = Project.objects.all().order_by('-updated')
+        projects = Project.objects.all().order_by('completed', '-updated')
 
     membership_declaration = Document.objects.filter(host=host, document_type='membership_declaration', public=True).order_by('-valid_from') if host else None
 
@@ -1116,9 +1137,9 @@ def event_view(request, host_slug=None, event_slug=None):
     event.image = event.get_title_image()
 
     if event.projects.exists():
-        projects = event.projects.all().order_by('-priority', '-updated')
+        projects = event.projects.all().order_by('completed', '-priority', '-updated')
     else:
-        projects = []
+        projects = Project.objects.none()
 
     p = Period([event], datetime(2008, 1, 1), datetime.now() + timedelta(days=365))
     occurrences = p.get_occurrences()
@@ -1198,11 +1219,12 @@ def blog_post_view(request, host_slug=None, post_id=None):
         raise Http404()
 
     if post.project:
-        projects = [post.project]
+        # keep projects a queryset
+        projects = Project.objects.filter(blog=post)
     elif host:
-        projects = Project.objects.filter(hosts=host).order_by('-priority', '-updated')
+        projects = Project.objects.filter(hosts=host).order_by('completed', '-priority', '-updated')
     else:
-        projects = None
+        projects = Project.objects.none()
 
     post.type = "blog"
 
@@ -1283,11 +1305,11 @@ def news_post_view(request, host_slug=None, post_id=None):
         raise Http404()
 
     if post.project:
-        projects = [post.project]
+        projects = Project.objects.filter(news=post)
     elif host:
-        projects = Project.objects.filter(hosts=host).order_by('-priority', '-updated')
+        projects = Project.objects.filter(hosts=host).order_by('completed', '-priority', '-updated')
     else:
-        projects = None
+        projects = Project.objects.none()
 
     post.type = "news"
 
@@ -1300,42 +1322,6 @@ def news_post_view(request, host_slug=None, post_id=None):
         'photos': post.photos,
         'project_item_list': item_list_from_proj(projects, host_slug=host_slug, max_num_items=3),
         'hosts': Host.objects.all(),
-        'icon_links': icon_links,
-    }
-    return HttpResponse(template.render(context, request))
-
-
-def host_projects_view(request, host_slug):
-    template = loader.get_template('wbcore/projects.html')
-    try:
-        host = Host.objects.get(slug=host_slug) if host_slug else None
-    except Host.DoesNotExist:
-        raise Http404()
-    projects = Project.objects.filter(hosts__slug=host_slug)
-    context = {
-        'main_nav': get_main_nav(host=host, active='projects'),
-        'dot_nav': get_dot_nav(host=host),
-        'projects': projects,
-        'host': host,
-        'breadcrumb': [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Projects'), None)],
-        'icon_links': icon_links,
-    }
-    return HttpResponse(template.render(context, request))
-
-
-def host_events_view(request, host_slug):
-    template = loader.get_template('wbcore/events.html')
-    try:
-        host = Host.objects.get(slug=host_slug) if host_slug else None
-    except Host.DoesNotExist:
-        raise Http404()
-    events = Event.objects.filter(hosts__slug=host_slug)
-    context = {
-        'main_nav': get_main_nav(host=host, active='events'),
-        'dot_nav': get_dot_nav(host=host),
-        'events': events,
-        'host': host,
-        'breadcrumb': [(_('Home'), reverse('home')), (host.name, reverse('host', host_slug)), (_('Events'), None)],
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
@@ -1399,7 +1385,10 @@ def donate_view(request, host_slug=None):
     except Content.DoesNotExist:
         donate = None
 
-    projects = Project.objects.filter(hosts=host) if host else Project.objects.all().order_by('-updated')
+    if host:
+        projects = Project.objects.filter(hosts=host).order_by('completed', '-priority', '-updated')
+    else:
+        projects = Project.objects.all().order_by('completed', '-updated')
 
     template = loader.get_template('wbcore/donate.html')
     context = {
@@ -1521,18 +1510,6 @@ def contact_view(request, host_slug=None):
 
     return HttpResponse(template.render(context, request))
 
-
-def sitemap_view(request):
-    template = loader.get_template('wbcore/sitemap.html')
-    hosts = Host.objects.all()
-    context = {
-        'main_nav': get_main_nav(),
-        'dot_nav': get_dot_nav(),
-        'hosts': hosts,
-        'breadcrumb': [(_('Home'), reverse('home')), (_('Sitemap'), None)],
-        'icon_links': icon_links,
-    }
-    return HttpResponse(template.render(context, request))
 
 
 def faq_view(request, host_slug=None):
