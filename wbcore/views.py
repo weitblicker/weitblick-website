@@ -28,7 +28,7 @@ from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
     UserRelation, Partner, JoinPage, SocialMediaLink, Content, Document, Donation, FAQ)
 
-from wbcore.filter import reorder_completed_projects, reorder_passed_events
+from wbcore.filter import reorder_completed_projects, reorder_passed_events, reorder_inactive_partners
 
 main_host_slug = 'bundesverband' ## TODO configure this?
 
@@ -311,6 +311,7 @@ def item_list_from_partners(partners, host_slug=None, text=True):
             partner.link = reverse('partner', kwargs={'partner_slug': partner.slug})
         partner.show_text = True if text else False
         item_list.append(partner)
+    item_list = reorder_inactive_partners(item_list)
     return item_list
 
 

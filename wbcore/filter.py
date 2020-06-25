@@ -225,3 +225,11 @@ def reorder_passed_events(item_list):
         item_list_passed[0].first_passed_item = True
         item_list_passed[0].separator_text = _('Previous')
     return item_list_current + item_list_passed
+
+def reorder_inactive_partners(item_list):
+    item_list_current = [item for item in item_list if item.active]
+    item_list_passed = [item for item in item_list if not item.active]
+    if item_list_passed:
+        item_list_passed[0].first_passed_item = True
+        item_list_passed[0].separator_text = _('Former')
+    return item_list_current + item_list_passed
