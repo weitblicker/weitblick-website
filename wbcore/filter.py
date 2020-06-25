@@ -24,6 +24,12 @@ def parse_country(request):
     return country_codes
 
 
+def parse_categories(request):
+    categories = request.GET.getlist("category")
+    categories = list(csv.reader(categories))
+    categories = categories[0] if len(categories) > 0 else []
+    return categories
+
 def parse_limit(request, default=20):
     limit_str = request.GET.get('limit')
     limit = default
@@ -184,8 +190,8 @@ def filter_events(request, default_limit=None):
 def filter_partners(request, default_limit=None):
     host_slugs = parse_union(request)
     contains = request.GET.get("search")
-    # status = request.GET.get("status")
-    # category = request.GET.get("category")
+    active = request.GET.get("active")
+    categories = parse_categories(request)
     limit = parse_limit(request, default=default_limit) if default_limit else parse_limit(request)
 
     results = SearchQuerySet()
@@ -193,13 +199,12 @@ def filter_partners(request, default_limit=None):
         results = results.filter(hosts_slug__in=host_slugs)
     if contains:
         results = results.filter_and(text__contains=contains)
-    # if category:
-    #     results = results.filter_and(category=category)
-    # if status == 'active':
-    #     results = results.filter_and(active=True)
-    # if status == 'active':
-    #     results = results.filter_and(active=False)
-    results.exclude(public=False)
+    if categories:
+        results = results.filter_and(category__in=categories)
+    if active == 'active':
+        results = results.filter_and(active=True)
+    if active == 'former':
+        results = results.exclude(active=True)
 
     results = results.models(Partner).all()
     if limit:

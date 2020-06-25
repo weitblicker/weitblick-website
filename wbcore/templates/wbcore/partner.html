@@ -5,6 +5,10 @@
 {% block main %}
     {% include 'wbcore/image-header.html' with title=partner.name default='/images/partners_header.jpg' %}
     <div class="ui segment">
+        <div class="ui label">
+            <i class="{{ partner.category_icon }} icon"></i>
+            {{ partner.category }}
+        </div>
         <p>{{ partner.description | safe_markdown }}</p>
     </div>
     <div class="ui segment">

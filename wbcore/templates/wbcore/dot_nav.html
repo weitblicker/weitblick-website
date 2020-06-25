@@ -20,11 +20,9 @@
           {% if host %}
             <a class="item" href="{% url 'news' host.slug %}">{% trans "News" %}</a>
             <a class="item" href="{% url 'blog' host.slug %}">{% trans "Blog" %}</a>
-            <a class="item" href="{% url 'events' host.slug %}">{% trans "Events" %}</a>
           {% else %}
             <a class="item" href="{% url 'news' %}">{% trans "News" %}</a>
             <a class="item" href="{% url 'blog' %}">{% trans "Blog" %}</a>
-            <a class="item" href="{% url 'events' %}">{% trans "Events" %}</a>
           {% endif %}
         </div>
     </div>

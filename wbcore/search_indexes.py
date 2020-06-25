@@ -86,6 +86,7 @@ class PartnerIndex(indexes.SearchIndex, indexes.Indexable):
     model = indexes.CharField(model_attr='get_model_name', faceted=True)
     hosts_slug = indexes.MultiValueField()
     active = indexes.BooleanField(model_attr='active')
+    category = indexes.CharField(model_attr='category')
 
     def get_model(self):
         return Partner

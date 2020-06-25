@@ -17,7 +17,6 @@ from django_countries import countries as countriesdict
 from collections import OrderedDict, Counter
 from datetime import date, datetime, timedelta
 from schedule.periods import Period
-import locale
 
 from wbcore.tokens import account_activation_token
 
@@ -298,8 +297,9 @@ def item_list_from_teams(teams, host_slug=None):
 
 def item_list_from_partners(partners, host_slug=None, text=True):
     item_list = []
+    categories = dict(Partner.CATEGORY_CHOICES)
+    category_icons = dict(Partner.CATEGORY_ICONS)
     for partner in partners:
-        if not partner.public: continue
         partner.title = partner.name
         partner.teaser = partner.description
         partner.fixed_image = partner.logo
@@ -310,6 +310,8 @@ def item_list_from_partners(partners, host_slug=None, text=True):
         else:
             partner.link = reverse('partner', kwargs={'partner_slug': partner.slug})
         partner.show_text = True if text else False
+        partner.category_icon = category_icons[partner.category]
+        partner.category = categories[partner.category]
         item_list.append(partner)
     item_list = reorder_inactive_partners(item_list)
     return item_list
@@ -652,9 +654,9 @@ def partners_view(request, host_slug=None):
         breadcrumb = [(_('Home'), reverse('home')), (_('Partners'), None)]
 
     if host:
-        partners = host.partners.exclude(public=False).order_by('name')
+        partners = host.partners.order_by('-priority')
     else:
-        partners = Host.objects.get(slug='bundesverband').partners.exclude(public=False).order_by('name')
+        partners = Partner.objects.all().order_by('-updated')
 
     template = loader.get_template('wbcore/partners.html')
     context = {
@@ -664,16 +666,17 @@ def partners_view(request, host_slug=None):
         'icon_links': icon_links,
         'ajax_endpoint': reverse('ajax-filter-partners'),
         'filter_preset': {'host': [host.slug] if host else None, },
+        'filter_active': True,
+        'categories': Partner.CATEGORY_CHOICES,
         'hosts': Host.objects.all(),
         'host': host,
-        'item_list': item_list_from_partners(partners),
+        'item_list': item_list_from_partners(partners, host_slug=host_slug),
     }
     return HttpResponse(template.render(context, request))
 
 def partner_view(request, host_slug=None, partner_slug=None):
     try:
         partner = Partner.objects.get(slug=partner_slug)
-        if not partner.public: raise Http404()
     except Partner.DoesNotExist:
         raise Http404()
 
@@ -687,6 +690,11 @@ def partner_view(request, host_slug=None, partner_slug=None):
     else:
         host = None
         breadcrumb = [(_('Home'), reverse('home')), (_('Partners'), reverse('partners')), (partner.name, None)]
+
+    categories = dict(Partner.CATEGORY_CHOICES)
+    category_icons = dict(Partner.CATEGORY_ICONS)
+    partner.category_icon = category_icons[partner.category]
+    partner.category = categories[partner.category]
 
     projects = Project.objects.filter(partners=partner)
 
@@ -1045,7 +1053,7 @@ def project_view(request, host_slug=None, project_slug=None):
 
     project.image = project.get_title_image()
 
-    partners = project.partners.exclude(public=False)
+    partners = project.partners.all()
 
     if Event.objects.filter(projects=project).exists():
         events = Event.objects.filter(projects=project)
