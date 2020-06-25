@@ -1,7 +1,7 @@
 import csv
 from datetime import datetime, timezone, date
 from haystack.query import SearchQuerySet
-from wbcore.models import NewsPost, BlogPost, Project, Event
+from wbcore.models import NewsPost, BlogPost, Project, Event, Partner
 from schedule.periods import Period
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta

@@ -1,6 +1,6 @@
 import datetime
 from haystack import indexes
-from wbcore.models import Host, NewsPost, Project, Event, BlogPost
+from wbcore.models import Host, NewsPost, Project, Event, BlogPost, Partner
 
 
 class HostIndex(indexes.SearchIndex, indexes.Indexable):
@@ -79,3 +79,19 @@ class EventsIndex(indexes.SearchIndex, indexes.Indexable):
 
     def prepare_hosts_slug(self, event):
         return [event.host.slug]
+
+
+class PartnerIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.CharField(document=True, use_template=True)
+    model = indexes.CharField(model_attr='get_model_name', faceted=True)
+    hosts_slug = indexes.MultiValueField()
+    active = indexes.BooleanField(model_attr='active')
+
+    def get_model(self):
+        return Partner
+
+    def index_queryset(self, using=None):
+        return self.get_model().objects.all()
+
+    def prepare_hosts_slug(self, partner):
+        return [host.slug for host in Host.objects.all() if partner.belongs_to_host(host)]

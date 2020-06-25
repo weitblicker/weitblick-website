@@ -6,7 +6,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from itertools import groupby
 from .filter import filter_news, filter_projects, filter_events, filter_blog, filter_partners
-from .views import item_list_from_occ, item_list_from_posts, item_list_from_proj
+from .views import item_list_from_occ, item_list_from_posts, item_list_from_proj, item_list_from_partners
 
 
 def remove_tags(text):

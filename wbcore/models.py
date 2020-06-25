@@ -481,13 +481,31 @@ class Partner(RulesModel):
     public = models.BooleanField(default=True, help_text='If this is not selected, the partner will not be displayed.')
 
     def belongs_to_host(self, host):
-        return True
+        if self in host.partners.all():
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def get_model_name():
+        return 'Partner'
 
     def __str__(self):
         return self.name
 
     def get_hosts(self):
         return Host.objects.all()
+
+    def search_title(self):
+        return self.name
+
+    def search_url(self):
+        return reverse('partner', args=[self.slug])
+
+    def search_image(self):
+        image = self.logo()
+        return image.url if image else None
+
 
 
 class Project(RulesModel):

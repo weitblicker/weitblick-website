@@ -207,7 +207,7 @@ def item_list_from_occ(occurrences, host_slug=None, text=True, show_only_first_o
                     if item.event.slug == slug:
                         idx.append(i)
                         item.recurring = True
-                        if item.event.rule.frequency == 'WEEKLY':
+                        if item.event.rule and item.event.rule.frequency == 'WEEKLY':
                             item.frequency = _("every") + " " + _date(item.start, 'l')
                             item.frequency_short = _("every") + " " + _date(item.start, 'D')  # for dot nav
                         else:
