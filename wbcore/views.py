@@ -148,6 +148,9 @@ def sidebar_occurrences(events):
     occurrences = period.get_occurrences()
     return occurrences
 
+def item_list_from_events(events, start, end, host_slug=None, text=True):
+    events_one_time = events.filter(rule__isnull=True)
+
 
 def item_list_from_occ(occurrences, host_slug=None, text=True, show_only_first_occ=True):
     # set attributes to fill list_item template
@@ -258,7 +261,7 @@ def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='p
 
 def item_list_from_proj(projects, host_slug=None, text=True, max_num_items=None):
     """
-    Creates a list of projects with the necessary informations for the templates appended.
+    Creates a list of projects with the necessary information for the templates appended.
     :param projects: This must be a queryset of Project objects
     :param host_slug: host_slug or None
     :param text: boolean, if text should be shown
