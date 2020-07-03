@@ -24,13 +24,19 @@
             <div class="ui segment">
                 {% include "wbcore/segment_header.html" with icon='handshake' url_alias='partners' title='' %}
                 {% if partner.link %}
-                    <a href="{{ partner.link }}">
+                    <a target="_blank" rel="noopener noreferrer" href="{{ partner.link }}">
                         <img src="{{ partner.logo.url }}" style="max-width: 100%; padding: 5%">
                     </a>
                 {% else %}
                     <img src="{{ partner.logo.url }}" style="max-width: 100%; padding: 5%; padding-top: 0%">
                 {% endif %}
             </div>
+        {% elif partner.link %}
+            <div class="ui segment">
+                {% include "wbcore/segment_header.html" with icon='handshake' url_alias='partners' title='' %}
+                <br>
+                <i class="world icon"></i>
+                <a target="_blank" rel="noopener noreferrer" href="{{ partner.link }}">{{ partner.link }} </a>
         {% endif %}
     {% endif %}
 
