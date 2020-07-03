@@ -658,7 +658,11 @@ def partners_view(request, host_slug=None):
     else:
         partners = Partner.objects.all().order_by('-updated')
 
-    template = loader.get_template('wbcore/partners.html')
+    # ajax needs a different template as 'more' calls this view and not the ajax_view
+    if request.is_ajax():
+        template = loader.get_template('wbcore/list_items.html')
+    else:
+        template = loader.get_template('wbcore/partners.html')
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
