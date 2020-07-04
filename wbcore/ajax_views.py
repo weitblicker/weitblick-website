@@ -105,7 +105,7 @@ def filter_blog_view(request):
 def filter_partners_view(request, host_slug=None):
     template = loader.get_template('wbcore/list_items.html')
     partners = filter_partners(request)
-    host = None  # TODO filter if on host specific news page
+    host = None  # TODO filter if on host specific partners page
     context = {
         'host': host,
         'item_list': item_list_from_partners(partners)

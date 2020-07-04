@@ -469,7 +469,8 @@ class Partner(RulesModel):
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, blank=True, null=True)
     logo = models.ImageField(upload_to=save_partner_logo, null=True, blank=True)
     link = models.URLField(blank=True)
-    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5, help_text="priority from 0 (lowest) to 1 (highest), is used to determine display order")
+    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5,
+                                   help_text="priority from 0 (lowest) to 1 (highest), is used to determine display order")
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     CATEGORY_CHOICES = (
@@ -486,7 +487,8 @@ class Partner(RulesModel):
     }
 
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
-    active = models.BooleanField(default=True, help_text='If this is not selected, the partnership will be displayed as concluded')
+    active = models.BooleanField(default=True,
+                                 help_text='If this is not selected, the partnership will be displayed as concluded')
 
     def belongs_to_host(self, host):
         if self in host.partners.all():
@@ -543,7 +545,8 @@ class Project(RulesModel):
     completed = models.BooleanField(default=False)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
-    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5, help_text="priority from 0 (lowest) to 1 (highest), is used to determine display order")
+    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5,
+                                   help_text="priority from 0 (lowest) to 1 (highest), is used to determine display order")
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
@@ -682,7 +685,8 @@ class NewsPost(RulesModel):
     added = models.DateTimeField(blank=True, null=True)
     updated = models.DateTimeField(blank=True, null=True, auto_now=True)
     published = models.DateTimeField(blank=True, null=True, auto_now_add=True)
-    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5, help_text="priority from 0 (lowest) to 1 (highest), is used to determine display order")
+    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5,
+                                   help_text="priority from 0 (lowest) to 1 (highest), is used to determine display order")
     RANGE_CHOICES = (
         ('preview', 'Preview'),
         ('hidden', 'Hidden'),
@@ -762,7 +766,8 @@ class BlogPost(RulesModel):
     added = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5, help_text="priority from 0 (lowest) to 1 (highest), is used to determine display order")
+    priority = models.DecimalField(max_digits=3, decimal_places=2, default=0.5,
+                                   help_text="priority from 0 (lowest) to 1 (highest), is used to determine display order")
     RANGE_CHOICES = (
         ('preview', 'Preview'),
         ('hidden', 'Hidden'),

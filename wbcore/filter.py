@@ -203,7 +203,7 @@ def filter_partners(request, default_limit=None):
         results = results.filter_and(category__in=categories)
     if active == 'active':
         results = results.filter_and(active=True)
-    if active == 'former':
+    elif active == 'former':
         results = results.exclude(active=True)
 
     results = results.models(Partner).all()
