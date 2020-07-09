@@ -17,7 +17,7 @@ class ContactForm(ModelForm):
         labels = {
             'host': 'Verein',
             'name': 'Name',
-            'email':'E-Mail',
+            'email': 'E-Mail',
             'reason': 'Anlass',
             'subject': 'Betreff',
             'message': 'Nachricht'
