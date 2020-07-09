@@ -1,15 +1,28 @@
 {% load static %}
 {% load i18n %}
-<div class="item">
+<div class="item" style="display: flex; align-items: center">
 
     {% if not no_image %}
-        <a class="{% if image_size %}ui {{ image_size }} {% endif %}image" href="{{ item.link }}">
-            {% if item.image %}
+        {% if item.link %}
+            <a class="{% if image_size %}ui {{ image_size }} {% endif %}image" href="{{ item.link }}">
+        {% else %}
+            <span class="{% if image_size %}ui {{ image_size }} {% endif %}image">
+        {% endif %}
+
+            {% if item.image %} <!-- Photologue image -->
                 <img src="{{ item.image.get_listsize_url }}" alt="{{ item.image.title }}">
+            {% elif item.fixed_image %} <!-- ImageField -->
+                <img src="{{ item.fixed_image.url }}" style="max-width: 100%; max-height: 70.58%">
             {% else %}
                 <div class="ui image {{ image_size }}">{% include 'wbcore/svgs/placeholder.svg' with text=item.get_model_name %}</div>
             {% endif %}
-        </a>
+
+        {% if item.link %}
+            </a>
+        {% else %}
+            </span>
+        {% endif %}
+
     {% endif %}
 
 
@@ -68,12 +81,20 @@
                     {% endif %}
                     {% include 'wbcore/host_icon.html' with host=item.host %}
                 {% endif %}
+                {% if item.category and image_size != 'small' %}
+                    <i class="right floated {{ item.category_icon }} icon"></i>
+                    <div class="right floated ">{{ item.category }}</div>
+                {% endif %}
             {% endwith %}
         </div>
-        <a class="ui medium header" href="{{ item.link }}">{{ item.title }}</a>
+        {% if item.link %}
+            <a class="ui medium header" href="{{ item.link }}">{{ item.title }}</a>
+        {% else %}
+            <span class="ui medium header">{{ item.title }}</span>
+        {% endif %}
 
         <div class="description">
-            {% if show_text|default_if_none:True %}
+            {% if item.show_text|default_if_none:True %}
                 {% with tw=truncate_words|default:"20" %}
                     <p>{{ item.teaser | striptags | safe | truncatewords:tw}}</p>
                 {% endwith %}
@@ -81,13 +102,13 @@
         </div>
         <div class="extra">
             {% if show_author|default_if_none:True %}
-            {% if item.author %}
-                <img class="ui avatar image" src="{% get_media_prefix %}{% if item.author.image %}{{ item.author.image }}{% else %}kristy.png{% endif %}">
-                {{ item.author.name }}
-            {% elif item.author_str %}
-                <img class="ui avatar image" src="{% get_media_prefix %}kristy.png">
-                {{ item.author_str }}
-            {% endif %}
+                {% if item.author %}
+                    <img class="ui avatar image" src="{% get_media_prefix %}{% if item.author.image %}{{ item.author.image }}{% else %}kristy.png{% endif %}">
+                    {{ item.author.name }}
+                {% elif item.author_str %}
+                    <img class="ui avatar image" src="{% get_media_prefix %}kristy.png">
+                    {{ item.author_str }}
+                {% endif %}
             {% endif %}
             {% if item.show_text and not no_read_more %}
                 <a class="details right floated" href="{{ item.link }}"> › {% trans "Read more" %}</a>

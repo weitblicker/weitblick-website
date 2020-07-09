@@ -17,7 +17,6 @@ from django_countries import countries as countriesdict
 from collections import OrderedDict, Counter
 from datetime import date, datetime, timedelta
 from schedule.periods import Period
-import locale
 
 from wbcore.tokens import account_activation_token
 
@@ -27,9 +26,9 @@ from honeypot.decorators import check_honeypot
 
 from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
-    UserRelation, JoinPage, SocialMediaLink, Content, Document, Donation, FAQ)
+    UserRelation, Partner, JoinPage, SocialMediaLink, Content, Document, Donation, FAQ)
 
-from wbcore.filter import reorder_completed_projects, reorder_passed_events
+from wbcore.filter import reorder_completed_projects, reorder_passed_events, reorder_inactive_partners
 
 main_host_slug = 'bundesverband' ## TODO configure this?
 
@@ -208,7 +207,7 @@ def item_list_from_occ(occurrences, host_slug=None, text=True, show_only_first_o
                     if item.event.slug == slug:
                         idx.append(i)
                         item.recurring = True
-                        if item.event.rule.frequency == 'WEEKLY':
+                        if item.event.rule and item.event.rule.frequency == 'WEEKLY':
                             item.frequency = _("every") + " " + _date(item.start, 'l')
                             item.frequency_short = _("every") + " " + _date(item.start, 'D')  # for dot nav
                         else:
@@ -294,6 +293,28 @@ def item_list_from_teams(teams, host_slug=None):
         else:
             team.link = reverse('team', kwargs={'team_slug': team.slug})
         item_list.append(team)
+    return item_list
+
+
+def item_list_from_partners(partners, host_slug=None, text=True):
+    item_list = []
+    categories = dict(Partner.CATEGORY_CHOICES)
+    category_icons = dict(Partner.CATEGORY_ICONS)
+    for partner in partners:
+        partner.title = partner.name
+        partner.teaser = partner.description
+        partner.fixed_image = partner.logo
+        partner.hosts_list = [host for host in Host.objects.filter(partners=partner).order_by('name')]
+        if not partner.hosts_list: continue  # do not show partners without host
+        if host_slug:
+            partner.link = reverse('partner', kwargs={'partner_slug': partner.slug, 'host_slug': host_slug})
+        else:
+            partner.link = reverse('partner', kwargs={'partner_slug': partner.slug})
+        partner.show_text = True if text else False
+        partner.category_icon = category_icons[partner.category]
+        partner.category = categories[partner.category]
+        item_list.append(partner)
+    item_list = reorder_inactive_partners(item_list)
     return item_list
 
 
@@ -618,6 +639,86 @@ def team_view(request, host_slug=None, team_slug=None):
         'hosts': Host.objects.all() if host_slug in [None, 'bundesverband'] else None,
         'teams': item_list_from_teams(teams, host_slug),
         'project_item_list': item_list_from_proj(projects, host_slug)
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def partners_view(request, host_slug=None):
+    if host_slug:
+        try:
+            host = Host.objects.get(slug=host_slug)
+        except:
+            raise Http404()
+        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Partners'), None)]
+    else:
+        host = None
+        breadcrumb = [(_('Home'), reverse('home')), (_('Partners'), None)]
+
+    if host:
+        partners = host.partners.order_by('-priority')
+    else:
+        partners = Partner.objects.all().order_by('-updated')
+
+    # ajax needs a different template as 'more' calls this view and not the ajax_view
+    if request.is_ajax():
+        template = loader.get_template('wbcore/list_items.html')
+    else:
+        template = loader.get_template('wbcore/partners.html')
+    context = {
+        'main_nav': get_main_nav(host=host),
+        'dot_nav': get_dot_nav(host=host),
+        'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
+        'ajax_endpoint': reverse('ajax-filter-partners'),
+        'filter_preset': {'host': [host.slug] if host else None, },
+        'filter_active': True,
+        'categories': Partner.CATEGORY_CHOICES,
+        'hosts': Host.objects.all(),
+        'host': host,
+        'item_list': item_list_from_partners(partners, host_slug=host_slug),
+    }
+    return HttpResponse(template.render(context, request))
+
+def partner_view(request, host_slug=None, partner_slug=None):
+    try:
+        partner = Partner.objects.get(slug=partner_slug)
+    except Partner.DoesNotExist:
+        raise Http404()
+
+    if host_slug:
+        try:
+            host = Host.objects.get(slug=host_slug)
+        except Host.DoesNotExist:
+            raise Http404()
+        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])),
+                      (_('Partners'), reverse('partners', args=[host_slug])), (partner.name, None)]
+    else:
+        host = None
+        breadcrumb = [(_('Home'), reverse('home')), (_('Partners'), reverse('partners')), (partner.name, None)]
+
+    categories = dict(Partner.CATEGORY_CHOICES)
+    category_icons = dict(Partner.CATEGORY_ICONS)
+    partner.category_icon = category_icons[partner.category]
+    partner.category = categories[partner.category]
+
+    projects = Project.objects.filter(partners=partner)
+
+    events = Event.objects.filter(projects__in=projects)
+    occurrences = sidebar_occurrences(events)
+
+    blogposts = BlogPost.objects.filter(project__in=projects)
+
+    template = loader.get_template('wbcore/partner.html')
+    context = {
+        'main_nav': get_main_nav(host=host, active='events'),
+        'dot_nav': get_dot_nav(host=host),
+        'breadcrumb': breadcrumb,
+        'icon_links': icon_links,
+        'host': host,
+        'partner': partner,
+        'item_list': item_list_from_proj(projects, host_slug=host_slug),
+        'event_item_list': item_list_from_occ(occurrences, host_slug=host_slug)[:3],
+        'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False)[:3],
     }
     return HttpResponse(template.render(context, request))
 
@@ -957,6 +1058,8 @@ def project_view(request, host_slug=None, project_slug=None):
 
     project.image = project.get_title_image()
 
+    partners = project.partners.all()
+
     if Event.objects.filter(projects=project).exists():
         events = Event.objects.filter(projects=project)
     else:
@@ -978,6 +1081,7 @@ def project_view(request, host_slug=None, project_slug=None):
         'main_nav': get_main_nav(host=host),
         'project': project,
         'photos': project.photos.all(),
+        'partner_item_list': item_list_from_partners(partners, host_slug=host_slug, text=False),
         'event_item_list': item_list_from_occ(occurrences, text=False)[:3],
         'news_item_list': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='post_id', text=False),
         'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),

@@ -651,6 +651,7 @@ class PartnerAdmin(MyAdmin, ReverseModelAdmin):
     inline_reverse = ['address', ]
 
     list_display = ('name', 'address', 'logo')
+    prepopulated_fields = {'slug': ('name', )}
 
 
 class CycleDonationRelationInlineModel(PermissionInlineModel):
