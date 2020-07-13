@@ -122,13 +122,13 @@ def get_dot_nav(host=None):
         host_slug = host.slug
         news = NewsPost.objects.filter(host=host).order_by('-published')[:3]
         blog = BlogPost.objects.filter(host=host).order_by('-published')[:3]
-        occurrences = Period(Event.objects.filter(host=host), datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()
+        events = Event.objects.filter(host=host)
     else:
         host_slug = None
         news = NewsPost.objects.all().order_by('-published')[:3]
         blog = BlogPost.objects.all().order_by('-published')[:3]
-        occurrences = Period(Event.objects.all(), datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()
-    occurrences = item_list_from_occ(occurrences, host_slug=host_slug, text=False, show_only_first_occ=True)[:3]
+        events = Event.objects.all()
+    occurrences = item_list_from_events(events, start=datetime.now(), host_slug=host_slug, text=False, show_only_first_occ=True, max_num_items=3)
     return {'news': news, 'blog': blog, 'occurrences': occurrences}
 
 
@@ -148,20 +148,109 @@ def sidebar_occurrences(events):
     occurrences = period.get_occurrences()
     return occurrences
 
-def item_list_from_events(events, start, end, host_slug=None, text=True):
-    events_one_time = events.filter(rule__isnull=True)
+def item_list_from_events(events, host_slug=None, start=None, end=None, text=True, max_num_items=None, show_only_first_occ=True):
+    if start is None:
+        start = datetime.now() - timedelta(days=365)
+    if end is None:
+        end = datetime.now() + timedelta(days=365)
+
+    try:
+        events_one_time = events.filter(rule__isnull=True)
+        events_recurring = events.filter(rule__isnull=False)
+    except AttributeError: #events is not a query but a single object
+        if events.rule:
+            events_one_time = []
+            events_recurring = [events]
+        else:
+            events_one_time = [events]
+            events_recurring = []
 
 
-def item_list_from_occ(occurrences, host_slug=None, text=True, show_only_first_occ=True):
+    if end > datetime.now():
+        print(type(start),type(datetime.now()))
+        print(start)
+        p_one_time_future = Period(events_one_time, max(start, datetime.now()), end)
+        occurrences_one_time_future = p_one_time_future.get_occurrences()
+
+        p_recurring = Period(events_recurring, max(start, datetime.now()), end)
+        all_occurrences_recurring = p_recurring.get_occurrences()
+        # restrict recurring occurrences to the next one
+        if show_only_first_occ:
+            events_recurring = set([item.event.slug for item in all_occurrences_recurring])
+            occurrences_recurring = []
+            for event_slug in events_recurring:
+                # look for all occurrences of the specific event
+                event_occurrences = [occ for occ in all_occurrences_recurring if occ.event.slug == event_slug]
+                # append the first occurrence of the event to the list
+                occurrences_recurring.append(event_occurrences[0])
+                # add dates of the following occurrences
+                occurrences_recurring[-1].following_dates = [occ.start for occ in event_occurrences[1:4]]
+                occurrences_recurring[-1].recurring = True
+        else:
+            occurrences_recurring = all_occurrences_recurring
+
+        occurrences = occurrences_one_time_future + occurrences_recurring
+        occurrences.sort(key=lambda x: x.start)
+        if max_num_items:
+            occurrences = occurrences[:max_num_items]
+
+        # add past events
+        if start < datetime.now() and (max_num_items is None or len(occurrences) < max_num_items):
+            p_one_time_past = Period(events_one_time, start, datetime.now())
+            occurrences_one_time_past = p_one_time_past.get_occurrences()
+            if max_num_items:
+                occurrences_one_time_past = occurrences_one_time_past[:max_num_items-len(occurrences)]
+
+            try:
+                occurrences_one_time_past[-1].first_passed_item = True
+                occurrences_one_time_past[-1].separator_text = _('Previous')
+            except IndexError:
+                pass
+
+            occurrences.extend(occurrences_one_time_past[::-1])
+
+    # all events are in the past
+    else:
+        p = Period(events_one_time, start, end)
+        occurrences = p.get_occurences()
+        occurrences[0].first_passed_item = True
+        occurrences[0].separator_text = _('Previous')
+        if max_num_items:
+            occurrences = occurrences[:max_num_items]
+
+    return item_list_from_occ(occurrences, host_slug=host_slug, text=text)
+
+
+def item_list_from_occ(occurrences, host_slug=None, text=True):
     # set attributes to fill list_item template
     item_list = []
     for occ in occurrences:
         # image
         occ.image = occ.event.image
-        if occ.start.day == occ.end.day:
-            occ.show_date = _date(occ.start, 'D, d. M Y')
-        else:
-            occ.show_date = _date(occ.start, 'd. M') + " - " + _date(occ.end, 'd. M Y')
+
+        # frequency
+        try:
+            if occ.event.rule.frequency == 'WEEKLY':
+                occ.frequency = _("every") + " " + _date(occ.start, 'l')
+                occ.frequency_short = _("every") + " " + _date(occ.start, 'D')  # for dot nav
+            else:
+                occ.frequency = None
+        except AttributeError:
+            occ.frequency = None
+
+        # date
+        try:
+            if occ.recurring:
+                occ.show_date = occ.frequency + ': ' + _date(occ.start, 'd. M Y') if occ.frequency else _date(occ.start, 'd. M Y')
+                for date in occ.following_dates[:2]:
+                    occ.show_date += ", " + _date(date, 'd. M')
+                if len(occ.following_dates) > 2:
+                    occ.show_date += ", ..."
+        except AttributeError:
+            if occ.start.day == occ.end.day:
+                occ.show_date = _date(occ.start, 'D, d. M Y')
+            else:
+                occ.show_date = _date(occ.start, 'd. M') + " - " + _date(occ.end, 'd. M Y')
 
         # host
         occ.host = occ.event.host
@@ -197,45 +286,46 @@ def item_list_from_occ(occurrences, host_slug=None, text=True, show_only_first_o
                     occ.location = None
         else:
             occ.location = None
+
         item_list.append(occ)
-    item_list = reorder_passed_events(item_list)
 
-    if show_only_first_occ:
-        # display only the next occurrence of all events
-        counter_dict = Counter([i.event.slug for i in item_list])  # {event slug: how often it occurs}
-        for slug, value in counter_dict.items():
-            if value > 1:
-                idx = []  # indexes of occurrences with same slug (= same event)
-                for i, item in enumerate(item_list):
-                    if item.event.slug == slug:
-                        idx.append(i)
-                        item.recurring = True
-                        if item.event.rule.frequency == 'WEEKLY':
-                            item.frequency = _("every") + " " + _date(item.start, 'l')
-                            item.frequency_short = _("every") + " " + _date(item.start, 'D')  # for dot nav
-                        else:
-                            item.frequency = None
 
-                # modify show_date
-                first_occ = item_list[idx[0]]
-                first_occ.show_date = first_occ.frequency + ': ' + _date(first_occ.start, 'd. M Y') if first_occ.frequency else _date(first_occ.start, 'd. M Y')
-                following_dates = [item.start for item in [item_list[i] for i in idx[1:]]]
-                for date in following_dates[:2]:
-                    first_occ.show_date += ", " + _date(date, 'd. M')
-                if len(following_dates) > 2:
-                    first_occ.show_date += ", ..."
-
-                # find most recent passed occurrence
-                # add separator text
-                # remove all other occurrences from item_list
-                for i in idx[:0:-1]:
-                    try:
-                        if item_list[i].first_passed_item and len(item_list) > i + 1:
-                            item_list[i + 1].first_passed_item = True
-                            item_list[i + 1].separator_text = _('Previous')
-                    except AttributeError:
-                        pass
-                    del item_list[i]
+    # if show_only_first_occ:
+    #     # display only the next occurrence of all events
+    #     counter_dict = Counter([i.event.slug for i in item_list])  # {event slug: how often it occurs}
+    #     for slug, value in counter_dict.items():
+    #         if value > 1:
+    #             idx = []  # indexes of occurrences with same slug (= same event)
+    #             for i, item in enumerate(item_list):
+    #                 if item.event.slug == slug:
+    #                     idx.append(i)
+    #                     item.recurring = True
+    #                     if item.event.rule.frequency == 'WEEKLY':
+    #                         item.frequency = _("every") + " " + _date(item.start, 'l')
+    #                         item.frequency_short = _("every") + " " + _date(item.start, 'D')  # for dot nav
+    #                     else:
+    #                         item.frequency = None
+    #
+    #             # modify show_date
+    #             first_occ = item_list[idx[0]]
+    #             first_occ.show_date = first_occ.frequency + ': ' + _date(first_occ.start, 'd. M Y') if first_occ.frequency else _date(first_occ.start, 'd. M Y')
+    #             following_dates = [item.start for item in [item_list[i] for i in idx[1:]]]
+    #             for date in following_dates[:2]:
+    #                 first_occ.show_date += ", " + _date(date, 'd. M')
+    #             if len(following_dates) > 2:
+    #                 first_occ.show_date += ", ..."
+    #
+    #             # find most recent passed occurrence
+    #             # add separator text
+    #             # remove all other occurrences from item_list
+    #             for i in idx[:0:-1]:
+    #                 try:
+    #                     if item_list[i].first_passed_item and len(item_list) > i + 1:
+    #                         item_list[i + 1].first_passed_item = True
+    #                         item_list[i + 1].separator_text = _('Previous')
+    #                 except AttributeError:
+    #                     pass
+    #                 del item_list[i]
     return item_list
 
 
@@ -1037,7 +1127,7 @@ def host_view(request, host_slug):
     blog = BlogPost.objects.filter(host=host_slug).order_by('-published')[:3]
 
     events = Event.objects.filter(host=host_slug).order_by('-start')
-    occurrences = sidebar_occurrences(events)
+
     try:
         welcome = Content.objects.get(host=host, type='welcome')
     except Content.DoesNotExist as e:
@@ -1056,7 +1146,7 @@ def host_view(request, host_slug):
         'dot_nav': get_dot_nav(host=host),
         'item_list': item_list_from_posts(posts, host_slug=host_slug),
         'hosts': hosts,
-        'event_item_list': item_list_from_occ(occurrences, host_slug=host_slug)[:3],
+        'event_item_list': item_list_from_events(events, host_slug=host_slug, max_num_items=3),
         'teams': teams,
         'welcome': welcome,
         'icon_links': icon_links,
@@ -1081,8 +1171,6 @@ def events_view(request, host_slug=None):
         events = Event.objects.all()
         breadcrumb = [(_('Home'), reverse('home')), (_('Events'), None)]
 
-    p = Period(events, datetime.now()- timedelta(days=365), datetime.now() + timedelta(days=365))
-    occurrences = p.get_occurrences()
     hosts = Host.objects.all()
 
     if request.is_ajax():
@@ -1097,7 +1185,7 @@ def events_view(request, host_slug=None):
         'hosts': hosts,
         'filter_preset': {'host': [host.slug] if host else None, },
         'filter_date': True,
-        'item_list': item_list_from_occ(occurrences, host_slug),
+        'item_list': item_list_from_events(events, host_slug),
         'ajax_endpoint': reverse('ajax-filter-events'),
         'icon_links': icon_links,
     }
@@ -1144,9 +1232,6 @@ def event_view(request, host_slug=None, event_slug=None):
     else:
         projects = Project.objects.none()
 
-    p = Period([event], datetime(2008, 1, 1), datetime.now() + timedelta(days=365))
-    occurrences = p.get_occurrences()
-
     template = loader.get_template('wbcore/event.html')
     context = {
         'main_nav': get_main_nav(host=host),
@@ -1157,7 +1242,7 @@ def event_view(request, host_slug=None, event_slug=None):
         'breadcrumb': breadcrumb,
         'host': host,
         'icon_links': icon_links,
-        'occurrences_item_list': item_list_from_occ(occurrences, show_only_first_occ=False)[:4]
+        'occurrences_item_list': item_list_from_events(event, start=datetime(2008, 1, 1), show_only_first_occ=False)[:4]
     }
     return HttpResponse(template.render(context, request))
 
