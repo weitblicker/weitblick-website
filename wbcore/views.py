@@ -155,7 +155,7 @@ def item_list_from_events(events, host_slug=None, start=None, end=None, text=Tru
     This function finds all relevant occurrences of a queryset of events, sorts them and gives the resulting list of
     occurrences to item_list_from_occ().
 
-    :param events: a queryset of events or a single event
+    :param events: a queryset/searchqueryset of events or a single event
     :param host_slug: the host slug
     :param start: the start date, defaults to a year ago
     :param end: the end date, defaults to a year ahead
@@ -183,8 +183,6 @@ def item_list_from_events(events, host_slug=None, start=None, end=None, text=Tru
         else:
             events_one_time = [events]
             events_recurring = []
-
-    print(events_one_time, events_recurring)
 
     if end > datetime.now():
         p_one_time_future = Period(events_one_time, max(start, datetime.now()), end)
@@ -235,7 +233,7 @@ def item_list_from_events(events, host_slug=None, start=None, end=None, text=Tru
             occurrences = occurrences[::-1]
             occurrences[0].first_passed_item = True
             occurrences[0].separator_text = _('Previous')
-        except ValueError:
+        except IndexError:
             pass
         if max_num_items:
             occurrences = occurrences[:max_num_items]
@@ -929,7 +927,7 @@ def join_view(request, host_slug=None):
         submit_url = reverse('join')
         breadcrumb = [(_('Home'), reverse('home')), (_('Participate'), None)]
         try:
-            host = Host.objects.get(slug=main_host_slug)
+            host = Host.objects.get(slug=main_host_slug) #  ??? Why do we need this? It changes host context to 'bundesverband' logo, links etc.
         except Host.DoesNotExist:
             host = None
 
