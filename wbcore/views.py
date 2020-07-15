@@ -370,7 +370,6 @@ def item_list_from_proj(projects, host_slug=None, text=True, max_num_items=None)
             project.separator_text = _('Completed')
             completed_projects = True
         item_list.append(project)
-    #item_list = reorder_completed_projects(item_list)
     return item_list
 
 def item_list_from_teams(teams, host_slug=None):
