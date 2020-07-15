@@ -2,6 +2,7 @@ import csv
 
 from django.utils.translation import gettext as _
 from django.db.models import Count, F, Value, Case, When, BooleanField
+from django.db.models.query import QuerySet
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader, RequestContext
 from django.template.defaultfilters import date as _date  # localized date https://stackoverflow.com/questions/6945251/localized-date-strftime-in-django-view
@@ -17,6 +18,7 @@ from django_countries import countries as countriesdict
 from collections import OrderedDict, Counter
 from datetime import date, datetime, timedelta
 from schedule.periods import Period
+from haystack.query import SearchQuerySet
 import locale
 
 from wbcore.tokens import account_activation_token
@@ -28,7 +30,6 @@ from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
     UserRelation, JoinPage, SocialMediaLink, Content, Document, Donation, FAQ)
 
-from wbcore.filter import reorder_completed_projects, reorder_passed_events
 
 main_host_slug = 'bundesverband' ## TODO configure this?
 
@@ -148,16 +149,34 @@ def sidebar_occurrences(events):
     occurrences = period.get_occurrences()
     return occurrences
 
-def item_list_from_events(events, host_slug=None, start=None, end=None, text=True, max_num_items=None, show_only_first_occ=True):
+def item_list_from_events(events, host_slug=None, start=None, end=None, text=True, max_num_items=None,
+                          show_only_first_occ=True):
+    """
+    This function finds all relevant occurrences of a queryset of events, sorts them and gives the resulting list of
+    occurrences to item_list_from_occ().
+
+    :param events: a queryset of events or a single event
+    :param host_slug: the host slug
+    :param start: the start date, defaults to a year ago
+    :param end: the end date, defaults to a year ahead
+    :param text: if text should be displayed
+    :param max_num_items: maximum number of items which should be in the item_list
+    :param show_only_first_occ: if True, only the first occurrence of reccurring events is in the list
+    :return: item_list of occurrences
+    """
     if start is None:
         start = datetime.now() - timedelta(days=365)
     if end is None:
         end = datetime.now() + timedelta(days=365)
 
-    try:
+    if isinstance(events, QuerySet):
         events_one_time = events.filter(rule__isnull=True)
         events_recurring = events.filter(rule__isnull=False)
-    except AttributeError: #events is not a query but a single object
+    elif isinstance(events, SearchQuerySet):
+        events = [result.object for result in events]
+        events_one_time = [event for event in events if not event.rule]
+        events_recurring = [event for event in events if event.rule]
+    else:  # events is not a query but a single object
         if events.rule:
             events_one_time = []
             events_recurring = [events]
@@ -165,10 +184,9 @@ def item_list_from_events(events, host_slug=None, start=None, end=None, text=Tru
             events_one_time = [events]
             events_recurring = []
 
+    print(events_one_time, events_recurring)
 
     if end > datetime.now():
-        print(type(start),type(datetime.now()))
-        print(start)
         p_one_time_future = Period(events_one_time, max(start, datetime.now()), end)
         occurrences_one_time_future = p_one_time_future.get_occurrences()
 
@@ -198,23 +216,27 @@ def item_list_from_events(events, host_slug=None, start=None, end=None, text=Tru
         if start < datetime.now() and (max_num_items is None or len(occurrences) < max_num_items):
             p_one_time_past = Period(events_one_time, start, datetime.now())
             occurrences_one_time_past = p_one_time_past.get_occurrences()
-            if max_num_items:
-                occurrences_one_time_past = occurrences_one_time_past[:max_num_items-len(occurrences)]
-
             try:
                 occurrences_one_time_past[-1].first_passed_item = True
                 occurrences_one_time_past[-1].separator_text = _('Previous')
-            except IndexError:
+            except IndexError:  # list might be empty
                 pass
+            occurrences_one_time_past = occurrences_one_time_past[::-1]
+            if max_num_items:
+                occurrences_one_time_past = occurrences_one_time_past[:max_num_items-len(occurrences)]
 
-            occurrences.extend(occurrences_one_time_past[::-1])
+            occurrences.extend(occurrences_one_time_past)
 
     # all events are in the past
     else:
         p = Period(events_one_time, start, end)
-        occurrences = p.get_occurences()
-        occurrences[0].first_passed_item = True
-        occurrences[0].separator_text = _('Previous')
+        occurrences = p.get_occurrences()
+        try:
+            occurrences = occurrences[::-1]
+            occurrences[0].first_passed_item = True
+            occurrences[0].separator_text = _('Previous')
+        except ValueError:
+            pass
         if max_num_items:
             occurrences = occurrences[:max_num_items]
 
@@ -289,43 +311,6 @@ def item_list_from_occ(occurrences, host_slug=None, text=True):
 
         item_list.append(occ)
 
-
-    # if show_only_first_occ:
-    #     # display only the next occurrence of all events
-    #     counter_dict = Counter([i.event.slug for i in item_list])  # {event slug: how often it occurs}
-    #     for slug, value in counter_dict.items():
-    #         if value > 1:
-    #             idx = []  # indexes of occurrences with same slug (= same event)
-    #             for i, item in enumerate(item_list):
-    #                 if item.event.slug == slug:
-    #                     idx.append(i)
-    #                     item.recurring = True
-    #                     if item.event.rule.frequency == 'WEEKLY':
-    #                         item.frequency = _("every") + " " + _date(item.start, 'l')
-    #                         item.frequency_short = _("every") + " " + _date(item.start, 'D')  # for dot nav
-    #                     else:
-    #                         item.frequency = None
-    #
-    #             # modify show_date
-    #             first_occ = item_list[idx[0]]
-    #             first_occ.show_date = first_occ.frequency + ': ' + _date(first_occ.start, 'd. M Y') if first_occ.frequency else _date(first_occ.start, 'd. M Y')
-    #             following_dates = [item.start for item in [item_list[i] for i in idx[1:]]]
-    #             for date in following_dates[:2]:
-    #                 first_occ.show_date += ", " + _date(date, 'd. M')
-    #             if len(following_dates) > 2:
-    #                 first_occ.show_date += ", ..."
-    #
-    #             # find most recent passed occurrence
-    #             # add separator text
-    #             # remove all other occurrences from item_list
-    #             for i in idx[:0:-1]:
-    #                 try:
-    #                     if item_list[i].first_passed_item and len(item_list) > i + 1:
-    #                         item_list[i + 1].first_passed_item = True
-    #                         item_list[i + 1].separator_text = _('Previous')
-    #                 except AttributeError:
-    #                     pass
-    #                 del item_list[i]
     return item_list
 
 
@@ -413,7 +398,6 @@ def home_view(request):
     news = NewsPost.objects.all().order_by('-published')[:5]
     blog = BlogPost.objects.all().order_by('-published')[:3]
     events = Event.objects.all().order_by('-start')
-    occurrences = sidebar_occurrences(events)
 
 
     template = loader.get_template('wbcore/home.html')
@@ -424,7 +408,7 @@ def home_view(request):
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id', text=False),
         'item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
         'hosts': hosts,
-        'event_item_list': item_list_from_occ(occurrences, text=True)[:3],
+        'event_item_list': item_list_from_events(events, text=True, max_num_items=3),
         'breadcrumb': [(_('Home'), None)],
         'icon_links': icon_links
     }
@@ -756,7 +740,6 @@ def about_view(request, host_slug=None):
     news = NewsPost.objects.all().order_by('-published')[:3]
     blog = BlogPost.objects.all().order_by('-published')[:3]
     events = Event.objects.filter(host=host if host else Host.objects.get(slug='bundesverband')).order_by('-start')
-    occurrences = sidebar_occurrences(events)
 
     template = loader.get_template('wbcore/about.html')
     context = {
@@ -769,7 +752,7 @@ def about_view(request, host_slug=None):
         'hosts': Host.objects.all(),
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id'),
         'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
-        'event_item_list': item_list_from_occ(occurrences, text=True)[:3],
+        'event_item_list': item_list_from_events(events, text=True, max_num_items=3),
     }
     return HttpResponse(template.render(context, request))
 
@@ -1072,7 +1055,6 @@ def project_view(request, host_slug=None, project_slug=None):
         else:
             project_hosts = Host.objects.filter(projects=project)
             events = Event.objects.filter(host__in=project_hosts)
-    occurrences = sidebar_occurrences(events)
 
     news = NewsPost.objects.filter(project=project).order_by('-published')[:3]
     blogposts = BlogPost.objects.filter(project=project).order_by('-published')[:3]
@@ -1084,7 +1066,7 @@ def project_view(request, host_slug=None, project_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'project': project,
-        'event_item_list': item_list_from_occ(occurrences, text=False)[:3],
+        'event_item_list': item_list_from_events(events, text=True, max_num_items=3),
         'news_item_list': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='post_id', text=False),
         'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
         'host': host,

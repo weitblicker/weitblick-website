@@ -155,43 +155,26 @@ def filter_events(request, default_limit=None):
     if contains:
         results = results.filter_and(content__contains=contains)
 
-    results = results.models(Event)
+    events = results.models(Event)
 
     # search results for start and end date
     # handle cases where no dates are given
-    events = [result.object for result in results]
     if start and end:
-        p = Period(events, start, end)
+        start_date = start
+        end_date = end
     elif start:
         then = start.replace(year=start.year + 10)
-        p = Period(events, start, then)
+        start_date = start
+        end_date = then
     elif end:
-        now = datetime.now() - relativedelta(years=1)
-        p = Period(events, now, end)
+        last_year = datetime.now() - relativedelta(years=1)
+        start_date = last_year
+        end_date = end
     else:
-        now = datetime.now() - relativedelta(years=1)
-        then = datetime.now().replace(year=now.year + 10)
-        p = Period(events, now, then)
+        last_year = datetime.now() - relativedelta(years=1)
+        then = datetime.now().replace(year=last_year.year + 10)
+        start_date = last_year
+        end_date = then
 
-    occurrences = p.get_occurrences()
+    return events, start_date, end_date, limit
 
-    if limit:
-        occurrences = occurrences[:limit]
-
-    return occurrences, events
-
-def reorder_completed_projects(item_list):
-    item_list_current = [item for item in item_list if not item.completed]
-    item_list_passed = [item for item in item_list if item.completed]
-    if item_list_passed:
-        item_list_passed[0].first_passed_item = True
-        item_list_passed[0].separator_text = _('Completed')
-    return item_list_current + item_list_passed
-
-def reorder_passed_events(item_list):
-    item_list_current = [item for item in item_list if item.end > datetime.now(timezone.utc)]
-    item_list_passed = [item for item in item_list if item.end <= datetime.now(timezone.utc)][::-1]
-    if item_list_passed:
-        item_list_passed[0].first_passed_item = True
-        item_list_passed[0].separator_text = _('Previous')
-    return item_list_current + item_list_passed
