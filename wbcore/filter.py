@@ -219,4 +219,3 @@ def reorder_inactive_partners(item_list):
         item_list_passed[0].first_passed_item = True
         item_list_passed[0].separator_text = _('Former')
     return item_list_current + item_list_passed
->>>>>>> master
