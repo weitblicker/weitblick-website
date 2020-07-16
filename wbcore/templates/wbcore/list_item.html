@@ -81,9 +81,9 @@
                     {% endif %}
                     {% include 'wbcore/host_icon.html' with host=item.host %}
                 {% endif %}
-                {% if item.category and image_size != 'small' %}
+                {% if item.category_name and image_size != 'small' %}
                     <i class="right floated {{ item.category_icon }} icon"></i>
-                    <div class="right floated ">{{ item.category }}</div>
+                    <div class="right floated ">{{ item.category_name }}</div>
                 {% endif %}
             {% endwith %}
         </div>

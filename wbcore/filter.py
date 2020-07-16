@@ -67,7 +67,7 @@ def parse_filter_date(request):
     return start, end
 
 
-def filter_projects(request, default_limit=None):
+def filter_projects(request, default_limit=None, return_queryset=False):
     host_slugs = parse_union(request)
     contains = request.GET.get("search")
     visibility = request.GET.get("visibility")
@@ -96,7 +96,14 @@ def filter_projects(request, default_limit=None):
     if limit:
         results = results[:limit]
 
-    projects = [result.object for result in results]
+    if return_queryset:
+        projects_pk = [r.pk for r in results]
+        if len(host_slugs) == 1:
+            projects = Project.objects.filter(pk__in=projects_pk).order_by('completed', '-priority', '-updated')
+        else:
+            projects = Project.objects.filter(pk__in=projects_pk).order_by('completed', '-updated')
+    else:
+        projects = [result.object for result in results]
     return projects
 
 
@@ -185,8 +192,9 @@ def filter_events(request, default_limit=None):
     return events, start_date, end_date, limit
 
 
-def filter_partners(request, default_limit=None):
+def filter_partners(request, default_limit=None, return_queryset=False):
     host_slugs = parse_union(request)
+    print(host_slugs)
     contains = request.GET.get("search")
     active = request.GET.get("active")
     categories = parse_categories(request)
@@ -208,14 +216,12 @@ def filter_partners(request, default_limit=None):
     if limit:
         results = results[:limit]
 
-    partners = [result.object for result in results]
+    if return_queryset:
+        partners_pk = [r.pk for r in results]
+        if len(host_slugs) == 1:
+            partners = Partner.objects.filter(pk__in=partners_pk).order_by('-active', '-priority', '-updated')
+        else:
+            partners = Partner.objects.filter(pk__in=partners_pk).order_by('-active', '-updated')
+    else:  # for rest_views
+        partners = [result.object for result in results]
     return partners
-
-
-def reorder_inactive_partners(item_list):
-    item_list_current = [item for item in item_list if item.active]
-    item_list_passed = [item for item in item_list if not item.active]
-    if item_list_passed:
-        item_list_passed[0].first_passed_item = True
-        item_list_passed[0].separator_text = _('Former')
-    return item_list_current + item_list_passed

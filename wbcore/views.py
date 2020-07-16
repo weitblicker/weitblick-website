@@ -1,7 +1,7 @@
 import csv
 
 from django.utils.translation import gettext as _
-from django.db.models import Count, F, Value, Case, When, BooleanField
+from django.db.models import Count, F, Value, Case, When, BooleanField, CharField
 from django.db.models.query import QuerySet
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader, RequestContext
@@ -31,7 +31,6 @@ from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
     UserRelation, Partner, JoinPage, SocialMediaLink, Content, Document, Donation, FAQ)
 
-from wbcore.filter import reorder_inactive_partners
 
 main_host_slug = 'bundesverband' ## TODO configure this?
 
@@ -145,11 +144,6 @@ def get_host_slugs(request, host_slug):
         host_slugs = [x.strip(' ') for x in host_slugs]
     return host_slugs
 
-
-def sidebar_occurrences(events):
-    period = Period(events, datetime.now() - timedelta(365), datetime.now() + timedelta(365))
-    occurrences = period.get_occurrences()
-    return occurrences
 
 def item_list_from_events(events, host_slug=None, start=None, end=None, text=True, max_num_items=None,
                           show_only_first_occ=True):
@@ -374,6 +368,7 @@ def item_list_from_proj(projects, host_slug=None, text=True, max_num_items=None)
         item_list.append(project)
     return item_list
 
+
 def item_list_from_teams(teams, host_slug=None):
     item_list = []
     for team in teams:
@@ -391,13 +386,28 @@ def item_list_from_teams(teams, host_slug=None):
     return item_list
 
 
-def item_list_from_partners(partners, host_slug=None, text=True):
+def item_list_from_partners(partners, host_slug=None, text=True, max_num_items=None):
     item_list = []
     categories = dict(Partner.CATEGORY_CHOICES)
     category_icons = dict(Partner.CATEGORY_ICONS)
+
+    # Expressions for annotating the category and its icon
+    whens_categories = [When(category=k, then=Value(v, output_field=CharField())) for k, v in categories.items()]
+    whens_icons = [When(category=k, then=Value(v, output_field=CharField())) for k, v in category_icons.items()]
+
+    if not partners.exists():
+        return item_list
+    if max_num_items:
+        partners = partners[:max_num_items]
+
+    partners = partners.annotate(title=F('name'))
+    partners = partners.annotate(show_text=Value(text, output_field=BooleanField()))
+    partners = partners.annotate(teaser=F('description'))
+    partners = partners.annotate(category_icon=Case(*whens_icons))
+    partners = partners.annotate(category_name=Case(*whens_categories))
+
+    inactive_partners = False
     for partner in partners:
-        partner.title = partner.name
-        partner.teaser = partner.description
         partner.fixed_image = partner.logo
         partner.hosts_list = [host for host in Host.objects.filter(partners=partner).order_by('name')]
         if not partner.hosts_list: continue  # do not show partners without host
@@ -405,11 +415,11 @@ def item_list_from_partners(partners, host_slug=None, text=True):
             partner.link = reverse('partner', kwargs={'partner_slug': partner.slug, 'host_slug': host_slug})
         else:
             partner.link = reverse('partner', kwargs={'partner_slug': partner.slug})
-        partner.show_text = True if text else False
-        partner.category_icon = category_icons[partner.category]
-        partner.category = categories[partner.category]
+        if not partner.active and not inactive_partners:
+            partner.first_passed_item = True
+            partner.separator_text = _('Former')
+            inactive_partners = True
         item_list.append(partner)
-    item_list = reorder_inactive_partners(item_list)
     return item_list
 
 
@@ -433,8 +443,6 @@ def home_view(request):
         'breadcrumb': [(_('Home'), None)],
         'icon_links': icon_links
     }
-
-
 
     return HttpResponse(template.render(context, request))
 
@@ -752,9 +760,9 @@ def partners_view(request, host_slug=None):
         breadcrumb = [(_('Home'), reverse('home')), (_('Partners'), None)]
 
     if host:
-        partners = host.partners.order_by('-priority')
+        partners = host.partners.order_by('-active', '-priority')
     else:
-        partners = Partner.objects.all().order_by('-updated')
+        partners = Partner.objects.all().order_by('-active', '-updated')
 
     # ajax needs a different template as 'more' calls this view and not the ajax_view
     if request.is_ajax():
@@ -776,6 +784,7 @@ def partners_view(request, host_slug=None):
     }
     return HttpResponse(template.render(context, request))
 
+
 def partner_view(request, host_slug=None, partner_slug=None):
     try:
         partner = Partner.objects.get(slug=partner_slug)
@@ -796,12 +805,11 @@ def partner_view(request, host_slug=None, partner_slug=None):
     categories = dict(Partner.CATEGORY_CHOICES)
     category_icons = dict(Partner.CATEGORY_ICONS)
     partner.category_icon = category_icons[partner.category]
-    partner.category = categories[partner.category]
+    partner.category_name = categories[partner.category]
 
     projects = Project.objects.filter(partners=partner)
 
     events = Event.objects.filter(projects__in=projects)
-    occurrences = sidebar_occurrences(events)
 
     blogposts = BlogPost.objects.filter(project__in=projects)
 
@@ -814,7 +822,7 @@ def partner_view(request, host_slug=None, partner_slug=None):
         'host': host,
         'partner': partner,
         'item_list': item_list_from_proj(projects, host_slug=host_slug),
-        'event_item_list': item_list_from_occ(occurrences, host_slug=host_slug)[:3],
+        'event_item_list': item_list_from_events(events, host_slug=host_slug, max_num_items=3),
         'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False)[:3],
     }
     return HttpResponse(template.render(context, request))
@@ -1157,7 +1165,7 @@ def project_view(request, host_slug=None, project_slug=None):
 
     project.image = project.get_title_image()
 
-    partners = project.partners.all()
+    partners = project.partners.all().order_by('-active')
 
     if Event.objects.filter(projects=project).exists():
         events = Event.objects.filter(projects=project)

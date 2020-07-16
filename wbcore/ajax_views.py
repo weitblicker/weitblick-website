@@ -56,7 +56,7 @@ def search(request, query):
 @api_view(['GET', 'POST'])
 def filter_projects_view(request, host_slug=None):
     template = loader.get_template('wbcore/list_items.html')
-    projects = filter_projects(request)
+    projects = filter_projects(request, return_queryset=True)
     host = None  # TODO filter if on host specific news page
     context = {
         'host': host,
@@ -104,7 +104,7 @@ def filter_blog_view(request):
 @api_view(['GET', 'POST'])
 def filter_partners_view(request, host_slug=None):
     template = loader.get_template('wbcore/list_items.html')
-    partners = filter_partners(request)
+    partners = filter_partners(request, return_queryset=True)
     host = None  # TODO filter if on host specific partners page
     context = {
         'host': host,
