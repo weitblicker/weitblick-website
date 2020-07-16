@@ -543,6 +543,7 @@ class TeamAdmin(MyAdmin):
     inlines = (TeamUserRelationInlineModel,)
 
     list_display = ('name', 'slug', 'host', 'get_member', 'rank')
+    prepopulated_fields = {'slug': ('name', 'host', )}
 
     def get_member(self, team):
         return ", ".join([user.name() for user in team.member.all()])
@@ -650,6 +651,7 @@ class PartnerAdmin(MyAdmin, ReverseModelAdmin):
     inline_reverse = ['address', ]
 
     list_display = ('name', 'address', 'logo')
+    prepopulated_fields = {'slug': ('name', )}
 
 
 class CycleDonationRelationInlineModel(PermissionInlineModel):
@@ -664,6 +666,8 @@ class PostAdmin(MyAdmin):
 
     ordering = ('-published', 'title',)
     search_fields = ('title', 'text')
+
+    prepopulated_fields = {'slug': ('title',)}
 
     def get_author(self, post):
         if post.author:
@@ -737,6 +741,7 @@ class ProjectAdmin(MyAdmin, ReverseModelAdmin):
     inline_reverse = ['donation_account', 'milestones']
     #inlines = (MilestoneInlineModel, )
     list_display = ('name', 'get_hosts', 'get_country', 'start_date', 'end_date', 'completed', 'published')
+    prepopulated_fields = {'slug': ('name',)}
 
     def get_hosts(self, project):
         return ", ".join([host.name.replace("Weitblick ", "") for host in project.hosts.all()])
@@ -755,6 +760,7 @@ class ProjectAdmin(MyAdmin, ReverseModelAdmin):
 class EventAdmin(MyAdmin):
 
     list_display = ('title', 'start', 'end', 'host')
+    prepopulated_fields = {'slug': ('title', 'host', )}
 
     ordering = ('-start',)
 

@@ -5,8 +5,8 @@ from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from itertools import groupby
-from .filter import filter_news, filter_projects, filter_events, filter_blog
-from .views import item_list_from_events, item_list_from_posts, item_list_from_proj
+from .filter import filter_news, filter_projects, filter_events, filter_blog, filter_partners
+from .views import item_list_from_events, item_list_from_posts, item_list_from_proj, item_list_from_partners
 
 
 def remove_tags(text):
@@ -97,5 +97,17 @@ def filter_blog_view(request):
     context = {
         'host': host,
         'item_list': item_list_from_posts(posts),
+    }
+    return HttpResponse(template.render(context, request))
+
+
+@api_view(['GET', 'POST'])
+def filter_partners_view(request, host_slug=None):
+    template = loader.get_template('wbcore/list_items.html')
+    partners = filter_partners(request)
+    host = None  # TODO filter if on host specific partners page
+    context = {
+        'host': host,
+        'item_list': item_list_from_partners(partners)
     }
     return HttpResponse(template.render(context, request))

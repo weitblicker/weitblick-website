@@ -1,7 +1,7 @@
 import csv
 from datetime import datetime, timezone, date
 from haystack.query import SearchQuerySet
-from wbcore.models import NewsPost, BlogPost, Project, Event
+from wbcore.models import NewsPost, BlogPost, Project, Event, Partner
 from schedule.periods import Period
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
@@ -23,6 +23,12 @@ def parse_country(request):
     country_codes = [x.strip(' ') for x in country_codes]
     return country_codes
 
+
+def parse_categories(request):
+    categories = request.GET.getlist("category")
+    categories = list(csv.reader(categories))
+    categories = categories[0] if len(categories) > 0 else []
+    return categories
 
 def parse_limit(request, default=20):
     limit_str = request.GET.get('limit')
@@ -178,3 +184,39 @@ def filter_events(request, default_limit=None):
 
     return events, start_date, end_date, limit
 
+
+def filter_partners(request, default_limit=None):
+    host_slugs = parse_union(request)
+    contains = request.GET.get("search")
+    active = request.GET.get("active")
+    categories = parse_categories(request)
+    limit = parse_limit(request, default=default_limit) if default_limit else parse_limit(request)
+
+    results = SearchQuerySet()
+    if host_slugs:
+        results = results.filter(hosts_slug__in=host_slugs)
+    if contains:
+        results = results.filter_and(text__contains=contains)
+    if categories:
+        results = results.filter_and(category__in=categories)
+    if active == 'active':
+        results = results.filter_and(active=True)
+    elif active == 'former':
+        results = results.exclude(active=True)
+
+    results = results.models(Partner).all()
+    if limit:
+        results = results[:limit]
+
+    partners = [result.object for result in results]
+    return partners
+
+
+def reorder_inactive_partners(item_list):
+    item_list_current = [item for item in item_list if item.active]
+    item_list_passed = [item for item in item_list if not item.active]
+    if item_list_passed:
+        item_list_passed[0].first_passed_item = True
+        item_list_passed[0].separator_text = _('Former')
+    return item_list_current + item_list_passed
+>>>>>>> master

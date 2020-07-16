@@ -100,6 +100,39 @@
                 {% endif %}
             </div>
 
+            <div class="ui two unstackable fields">
+                {% if categories %}
+                    <div class="field eleven wide">
+                        <label>{% trans "Category" %}</label>
+                        <div id="filter-category" class="ui multiple search selection dropdown">
+                            <input name="tags" type="hidden">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">{% trans "Category" %}</div>
+                            <div class="menu">
+                                {% for category in categories %}
+                                    <div class="item" data-value="{{ category.0 }}">{{ category.1 }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if filter_active %}
+                    <div class="field five wide">
+                        <label>{% trans "Status" %}</label>
+                        <div id="filter-active" class="ui selection dropdown">
+                            <input type="hidden" name="choice_active">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">{% trans "Status" %}</div>
+                            <div class="menu">
+                                <div class="item" data-value="all">{% trans "All" %}</div>
+                                <div class="item" data-value="active">{% trans "Current" %}</div>
+                                <div class="item" data-value="former">{% trans "Former" %}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
             <div class="field">
                 <label>{% trans "Search" %}</label>
                 <input id="filter-search" type="text" placeholder="{% trans "Search" %} ...">

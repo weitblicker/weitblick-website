@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load honeypot %}
 <form class="ui form segment" action="{% url 'contact' %}" method="post">
     {% trans "Write us!" as title %}
     {% include "wbcore/segment_header.html" with icon='envelope outline' %}
@@ -28,6 +29,7 @@
         </div>
         <div class="fields">
             <div class="eight wide field">
+                {% render_honeypot_field %}
                 {{ contact_form.name.label_tag }} {{ contact_form.name }}
             </div>
             <div class="eight wide required field">

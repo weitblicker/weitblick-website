@@ -92,6 +92,8 @@ $(document)
         let filter_search = "";
         let filter_country = "";
         let filter_visibility = "";
+        let filter_category = "";
+        let filter_active = "";
         let filter_from = "";
         let filter_to = "";
 
@@ -104,6 +106,8 @@ $(document)
             if(filter_search) data['search'] = filter_search;
             if(filter_country) data['country'] = filter_country;
             if(filter_visibility) data['visibility'] = filter_visibility;
+            if(filter_category) data['category'] = filter_category;
+            if(filter_active) data['active'] = filter_active;
             if(filter_from) data['from'] = filter_from;
             if(filter_to) data['to'] = filter_to;
             $.ajax({
@@ -138,6 +142,10 @@ $(document)
             filter_country = "";
             $('#filter-visibility').dropdown('clear');
             filter_visibility = "";
+            $('#filter-category').dropdown('clear');
+            filter_category = "";
+            $('#filter-active').dropdown('clear');
+            filter_active = "";
             $('#filter-search').val('');
             filter_search = "";
             filter();
@@ -194,6 +202,22 @@ $(document)
             .dropdown({
                 onChange: function(value, text, choice){
                     filter_country = value;
+                    filter();
+                },
+            });
+
+        $('#filter-category')
+            .dropdown({
+                onChange: function(value, text, choice){
+                    filter_category = value;
+                    filter();
+                },
+            });
+
+        $('#filter-active')
+            .dropdown({
+                onChange: function(value, text, choice){
+                    filter_active = value;
                     filter();
                 },
             });

@@ -8,12 +8,14 @@
         <div class="ui item"><a href="{% url 'idea' host.slug %}"><i class="lightbulb outline icon"></i> {% trans "Idea" %}</a></div>
         <div class="ui item"><a href="{% url 'history' host.slug %}"><i class="history icon"></i> {% trans "History" %}</a></div>
         <div class="ui item"><a href="{% url 'teams' host.slug %}"><i class="users icon"></i> {% trans "Team" %}</a></div>
+        <div class="ui item"><a href="{% url 'partners' host.slug %}"><i class="handshake icon"></i> {% trans "Partners" %}</a></div>
         <div class="ui item"><a href="{% url 'contact' host.slug %}"><i class="address book outline icon"></i> {% trans "Contact" %}</a></div>
     {% else %}
         <a class="ui item header" href="{% url 'about' %}">{% trans "About" %}</a>
         <div class="ui item"><a href="{% url 'idea' %}"><i class="lightbulb outline icon"></i> {% trans "Idea" %}</a></div>
         <div class="ui item"><a href="{% url 'history' %}"><i class="history icon"></i> {% trans "History" %}</a></div>
         <div class="ui item"><a href="{% url 'teams' %}"><i class="users icon"></i> {% trans "Team" %}</a></div>
+        <div class="ui item"><a href="{% url 'partners' %}"><i class="handshake icon"></i> {% trans "Partners" %}</a></div>
         <div class="ui item"><a href="{% url 'contact' %}"><i class="address book outline icon"></i> {% trans "Contact" %}</a></div>
     {% endif %}
 </div>
