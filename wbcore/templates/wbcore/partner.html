@@ -11,7 +11,9 @@
         </div>
         <p>{{ partner.description | safe_markdown }}</p>
     </div>
-    <div class="ui segment">
-        {% include 'wbcore/item_list.html' %}
-    </div>
+    {% if item_list %}
+        <div class="ui segment">
+            {% include 'wbcore/item_list.html' %}
+        </div>
+    {% endif %}
 {% endblock %}
