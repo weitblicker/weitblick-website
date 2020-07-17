@@ -311,10 +311,9 @@ def item_list_from_occ(occurrences, host_slug=None, text=True):
 def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='post_id', text=True):
     item_list = []
     for post in posts:
-        if not post.teaser:
+        if not post.teaser and post.text:
             post.teaser = post.text
-
-        if not text:
+        elif not post.teaser:
             post.teaser = ""
         current_host = Host.objects.get(slug=host_slug) if host_slug else None
         if current_host and post.host and current_host == post.host:
@@ -371,11 +370,13 @@ def item_list_from_proj(projects, host_slug=None, text=True, max_num_items=None)
 
 def item_list_from_teams(teams, host_slug=None):
     item_list = []
+    if not teams.exists():
+        return item_list
+
+    teams = teams.annotate(title=F('name'))
+
     for team in teams:
-        team.title = team.name
         team.teaser = team.teaser if team.teaser else team.description
-        team.image = team.image
-        team.country = None
         team.published = None
         team.hosts_list = [team.host]
         if host_slug:
