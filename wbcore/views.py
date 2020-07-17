@@ -811,7 +811,7 @@ def partner_view(request, host_slug=None, partner_slug=None):
 
     events = Event.objects.filter(projects__in=projects)
 
-    blogposts = BlogPost.objects.filter(project__in=projects)
+    blogposts = BlogPost.objects.filter(project__in=projects)[:3]
 
     template = loader.get_template('wbcore/partner.html')
     context = {
@@ -823,7 +823,7 @@ def partner_view(request, host_slug=None, partner_slug=None):
         'partner': partner,
         'item_list': item_list_from_proj(projects, host_slug=host_slug),
         'event_item_list': item_list_from_events(events, host_slug=host_slug, max_num_items=3),
-        'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False)[:3],
+        'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
     }
     return HttpResponse(template.render(context, request))
 
