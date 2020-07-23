@@ -8,7 +8,6 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth import get_permission_codename
 from django import forms
 from django.db import models
-from django.template import loader
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -17,10 +16,8 @@ from martor.widgets import AdminMartorWidget
 from django_google_maps import widgets as map_widgets
 from django_google_maps import fields as map_fields
 from schedule.models import Calendar
-from copy import copy
 from django_reverse_admin import ReverseModelAdmin
 from rules.contrib.admin import ObjectPermissionsModelAdmin
-from cairosvg import svg2png
 from wbcore.models import User
 
 from itertools import chain
@@ -575,75 +572,6 @@ class HostAdmin(MyAdmin, ReverseModelAdmin):
             return super().get_readonly_fields(request, obj)
 
         return readonly_field + ('slug', 'name', 'email')
-
-    def save_model(self, request, obj, form, change):
-        super(HostAdmin, self).save_model(request, obj, form, change)
-        from django.conf import settings
-        from zipfile import ZipFile
-        import os
-        import codecs
-
-        template = loader.get_template('wbcore/svgs/logo_standalone.svg')
-        path = "%(media_root)slogos/%(slug)s/%(name)s.%(ext)s"
-
-        logo_black = '#04090e'
-        logo_orange = '#f3971b'
-        logo_grey = '#969696'
-        logo_white = '#ffffff'
-
-        color_map = {
-            # text, weitblick, puzzle
-            'standard': (logo_grey, logo_black, logo_orange),
-            'grey': (logo_grey, logo_black, logo_grey),
-            'grey_negative': (logo_grey, logo_white, logo_grey),
-            'black': (logo_black, logo_black, logo_black),
-            'white': (logo_white, logo_white, logo_white)
-        }
-
-        dpi_list = [72, 150, 300]
-        width = 350  #386.76
-        height = 125  #141.55
-
-        zip_path = path % dict(media_root=settings.MEDIA_ROOT, slug=obj.slug, name="%s_%s" % ("logos", obj.slug), ext="zip")
-
-        if not os.path.exists(os.path.dirname(zip_path)):
-            try:
-                os.makedirs(os.path.dirname(zip_path))
-            except OSError as exc:  # Guard against race condition
-                if exc.errno != errno.EEXIST:
-                    raise
-
-        zip_obj = ZipFile(zip_path, "w")
-
-        for key, colors in color_map.items():
-            svg_name = "logo_%s_%s" % (obj.slug, key)
-            svg_path = path % dict(media_root=settings.MEDIA_ROOT, slug=obj.slug, name=svg_name, ext="svg")
-
-            svg_logo = template.render(
-                {'text': 'Bildungschancen weltweit!' if obj.slug == 'bundesverband' else obj.city.upper(),
-                 'title_text': obj.city,
-                 'color_text': colors[0],
-                 'color_weitblick': colors[1],
-                 'color_puzzle': colors[2]
-                 })
-
-            with codecs.open(svg_path, 'w', encoding='utf8') as file:
-                file.write(svg_logo)
-
-            zip_obj.write(svg_path, os.path.basename(svg_path))
-
-            for dpi in dpi_list:
-                try:
-                    name = "logo_%s_%s_%sdpi" % (obj.slug, key, dpi)
-                    png_path = path % dict(media_root=settings.MEDIA_ROOT, slug=obj.slug, name=name, ext="png")
-
-                    svg2png(bytestring=svg_logo, write_to=png_path, dpi=dpi, output_width=round(width*dpi/72), output_height=round(height*dpi/72))
-
-                    zip_obj.write(png_path, os.path.basename(png_path))
-                except OSError as exception:
-                    print("Could not convert logo file %s, Exception %s" % (svg_path, exception))
-
-        zip_obj.close()
 
 
 class PartnerAdmin(MyAdmin, ReverseModelAdmin):
