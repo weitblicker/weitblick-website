@@ -128,6 +128,19 @@ Now if everything worked, you can access the website on `http://localhost:8000`
 
 To enable the login via Microsoft OAuth2 with the official Weitblick intranet accounts visit [this site](http://localhost:8000/admin/sites/site/1/change/) and set the domain name to `localhost:8000`.
 
+## Django translations
+
+To update the translations do the following inside the `wbcore` directory
+
+    django-admin makemessages
+    django-admin makemessages -d djangojs
+
+For the first time you may have to run `django-admin makemessages -l de` or similar for each language.
+Fill the translation for newly added translated stings to `wbcore/locale/de/LC_MESSAGES/django.po` and `.../djangojs.po`.
+Finally compile the messeges
+
+    django-admin compilemessages
+
 ## FAE (Frequently Appearing Errors)
 
 - **no such table when database is empty**: Run Database Migration
