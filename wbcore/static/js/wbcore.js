@@ -88,7 +88,7 @@ $(document)
 
 
         let filter_union = "";
-        if(filter_union_preset) filter_union = filter_union_preset;
+        if(filter_union_preset) filter_union = filter_union_preset[0];
         let filter_search = "";
         let filter_country = "";
         let filter_visibility = "";
@@ -128,12 +128,13 @@ $(document)
         };
 
         $('#filter-clear').on('click', function() {
-            $('#filter-hosts').dropdown('clear');
-            filter_union = "";
             if(filter_union_preset) {
-                filter_union = filter_union_preset;
-                $('#filter-hosts').dropdown('set selected', filter_union_preset);
-            }
+                filter_union = filter_union_preset[0];
+                $('#filter-hosts').dropdown('set exactly', filter_union_preset);
+            } else {
+                $('#filter-hosts').dropdown('clear');
+                filter_union = ""
+            };
             $('#filter-from').calendar('clear');
             filter_from = "";
             $('#filter-to').calendar('clear');

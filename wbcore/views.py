@@ -1,7 +1,8 @@
 import csv
 
 from django.utils.translation import gettext as _
-from django.db.models import Count
+from django.db.models import Count, F, Value, Case, When, BooleanField, CharField
+from django.db.models.query import QuerySet
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader, RequestContext
 from django.template.defaultfilters import date as _date  # localized date https://stackoverflow.com/questions/6945251/localized-date-strftime-in-django-view
@@ -17,6 +18,8 @@ from django_countries import countries as countriesdict
 from collections import OrderedDict, Counter
 from datetime import date, datetime, timedelta
 from schedule.periods import Period
+from haystack.query import SearchQuerySet
+
 
 from wbcore.tokens import account_activation_token
 
@@ -28,7 +31,6 @@ from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
     UserRelation, Partner, JoinPage, SocialMediaLink, Content, Document, Donation, FAQ)
 
-from wbcore.filter import reorder_completed_projects, reorder_passed_events, reorder_inactive_partners
 
 main_host_slug = 'bundesverband' ## TODO configure this?
 
@@ -122,13 +124,13 @@ def get_dot_nav(host=None):
         host_slug = host.slug
         news = NewsPost.objects.filter(host=host).order_by('-published')[:3]
         blog = BlogPost.objects.filter(host=host).order_by('-published')[:3]
-        occurrences = Period(Event.objects.filter(host=host), datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()
+        events = Event.objects.filter(host=host)
     else:
         host_slug = None
         news = NewsPost.objects.all().order_by('-published')[:3]
         blog = BlogPost.objects.all().order_by('-published')[:3]
-        occurrences = Period(Event.objects.all(), datetime.now(), datetime.now() + timedelta(days=365)).get_occurrences()
-    occurrences = item_list_from_occ(occurrences, host_slug=host_slug, text=False, show_only_first_occ=True)[:3]
+        events = Event.objects.all()
+    occurrences = item_list_from_events(events, start=datetime.now(), host_slug=host_slug, text=False, show_only_first_occ=True, max_num_items=3)
     return {'news': news, 'blog': blog, 'occurrences': occurrences}
 
 
@@ -143,22 +145,128 @@ def get_host_slugs(request, host_slug):
     return host_slugs
 
 
-def sidebar_occurrences(events):
-    period = Period(events, datetime.now() - timedelta(365), datetime.now() + timedelta(365))
-    occurrences = period.get_occurrences()
-    return occurrences
+def item_list_from_events(events, host_slug=None, start=None, end=None, text=True, max_num_items=None,
+                          show_only_first_occ=True):
+    """
+    This function finds all relevant occurrences of a queryset of events, sorts them and gives the resulting list of
+    occurrences to item_list_from_occ().
+
+    :param events: a queryset/searchqueryset of events or a single event
+    :param host_slug: the host slug
+    :param start: the start date, defaults to a year ago
+    :param end: the end date, defaults to a year ahead
+    :param text: if text should be displayed
+    :param max_num_items: maximum number of items which should be in the item_list
+    :param show_only_first_occ: if True, only the first occurrence of reccurring events is in the list
+    :return: item_list of occurrences
+    """
+    if start is None:
+        start = datetime.now() - timedelta(days=365)
+    if end is None:
+        end = datetime.now() + timedelta(days=365)
+
+    if isinstance(events, QuerySet):
+        events_one_time = events.filter(rule__isnull=True)
+        events_recurring = events.filter(rule__isnull=False)
+    elif isinstance(events, SearchQuerySet):
+        events = [result.object for result in events]
+        events_one_time = [event for event in events if not event.rule]
+        events_recurring = [event for event in events if event.rule]
+    else:  # events is not a query but a single object
+        if events.rule:
+            events_one_time = []
+            events_recurring = [events]
+        else:
+            events_one_time = [events]
+            events_recurring = []
+
+    if end > datetime.now():
+        p_one_time_future = Period(events_one_time, max(start, datetime.now()), end)
+        occurrences_one_time_future = p_one_time_future.get_occurrences()
+
+        p_recurring = Period(events_recurring, max(start, datetime.now()), end)
+        all_occurrences_recurring = p_recurring.get_occurrences()
+        # restrict recurring occurrences to the next one
+        if show_only_first_occ:
+            events_recurring = set([item.event.slug for item in all_occurrences_recurring])
+            occurrences_recurring = []
+            for event_slug in events_recurring:
+                # look for all occurrences of the specific event
+                event_occurrences = [occ for occ in all_occurrences_recurring if occ.event.slug == event_slug]
+                # append the first occurrence of the event to the list
+                occurrences_recurring.append(event_occurrences[0])
+                # add dates of the following occurrences
+                occurrences_recurring[-1].following_dates = [occ.start for occ in event_occurrences[1:4]]
+                occurrences_recurring[-1].recurring = True
+        else:
+            occurrences_recurring = all_occurrences_recurring
+
+        occurrences = occurrences_one_time_future + occurrences_recurring
+        occurrences.sort(key=lambda x: x.start)
+        if max_num_items:
+            occurrences = occurrences[:max_num_items]
+
+        # add past events
+        if start < datetime.now() and (max_num_items is None or len(occurrences) < max_num_items):
+            p_one_time_past = Period(events_one_time, start, datetime.now())
+            occurrences_one_time_past = p_one_time_past.get_occurrences()
+            try:
+                occurrences_one_time_past[-1].first_passed_item = True
+                occurrences_one_time_past[-1].separator_text = _('Previous')
+            except IndexError:  # list might be empty
+                pass
+            occurrences_one_time_past = occurrences_one_time_past[::-1]
+            if max_num_items:
+                occurrences_one_time_past = occurrences_one_time_past[:max_num_items-len(occurrences)]
+
+            occurrences.extend(occurrences_one_time_past)
+
+    # all events are in the past
+    else:
+        p = Period(events_one_time, start, end)
+        occurrences = p.get_occurrences()
+        try:
+            occurrences = occurrences[::-1]
+            occurrences[0].first_passed_item = True
+            occurrences[0].separator_text = _('Previous')
+        except IndexError:
+            pass
+        if max_num_items:
+            occurrences = occurrences[:max_num_items]
+
+    return item_list_from_occ(occurrences, host_slug=host_slug, text=text)
 
 
-def item_list_from_occ(occurrences, host_slug=None, text=True, show_only_first_occ=True):
+def item_list_from_occ(occurrences, host_slug=None, text=True):
     # set attributes to fill list_item template
     item_list = []
     for occ in occurrences:
         # image
         occ.image = occ.event.image
-        if occ.start.day == occ.end.day:
-            occ.show_date = _date(occ.start, 'D, d. M Y')
-        else:
-            occ.show_date = _date(occ.start, 'd. M') + " - " + _date(occ.end, 'd. M Y')
+
+        # frequency
+        try:
+            if occ.event.rule.frequency == 'WEEKLY':
+                occ.frequency = _("every") + " " + _date(occ.start, 'l')
+                occ.frequency_short = _("every") + " " + _date(occ.start, 'D')  # for dot nav
+            else:
+                occ.frequency = None
+        except AttributeError:
+            occ.frequency = None
+
+        # date
+        try:
+            if occ.recurring:
+                occ.show_date = occ.frequency + ': ' + _date(occ.start, 'd. M Y') if occ.frequency else _date(occ.start, 'd. M Y')
+                for date in occ.following_dates[:2]:
+                    occ.show_date += ", " + _date(date, 'd. M')
+                if len(occ.following_dates) > 2:
+                    occ.show_date += ", ..."
+        except AttributeError:
+            if occ.start.day == occ.end.day:
+                occ.show_date = _date(occ.start, 'D, d. M Y')
+            else:
+                occ.show_date = _date(occ.start, 'd. M') + " - " + _date(occ.end, 'd. M Y')
 
         # host
         occ.host = occ.event.host
@@ -194,55 +302,18 @@ def item_list_from_occ(occurrences, host_slug=None, text=True, show_only_first_o
                     occ.location = None
         else:
             occ.location = None
+
         item_list.append(occ)
-    item_list = reorder_passed_events(item_list)
 
-    if show_only_first_occ:
-        # display only the next occurrence of all events
-        counter_dict = Counter([i.event.slug for i in item_list])  # {event slug: how often it occurs}
-        for slug, value in counter_dict.items():
-            if value > 1:
-                idx = []  # indexes of occurrences with same slug (= same event)
-                for i, item in enumerate(item_list):
-                    if item.event.slug == slug:
-                        idx.append(i)
-                        item.recurring = True
-                        if item.event.rule and item.event.rule.frequency == 'WEEKLY':
-                            item.frequency = _("every") + " " + _date(item.start, 'l')
-                            item.frequency_short = _("every") + " " + _date(item.start, 'D')  # for dot nav
-                        else:
-                            item.frequency = None
-
-                # modify show_date
-                first_occ = item_list[idx[0]]
-                first_occ.show_date = first_occ.frequency + ': ' + _date(first_occ.start, 'd. M Y') if first_occ.frequency else _date(first_occ.start, 'd. M Y')
-                following_dates = [item.start for item in [item_list[i] for i in idx[1:]]]
-                for date in following_dates[:2]:
-                    first_occ.show_date += ", " + _date(date, 'd. M')
-                if len(following_dates) > 2:
-                    first_occ.show_date += ", ..."
-
-                # find most recent passed occurrence
-                # add separator text
-                # remove all other occurrences from item_list
-                for i in idx[:0:-1]:
-                    try:
-                        if item_list[i].first_passed_item and len(item_list) > i + 1:
-                            item_list[i + 1].first_passed_item = True
-                            item_list[i + 1].separator_text = _('Previous')
-                    except AttributeError:
-                        pass
-                    del item_list[i]
     return item_list
 
 
 def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='post_id', text=True):
     item_list = []
     for post in posts:
-        if not post.teaser:
+        if not post.teaser and post.text:
             post.teaser = post.text
-
-        if not text:
+        elif not post.teaser:
             post.teaser = ""
         current_host = Host.objects.get(slug=host_slug) if host_slug else None
         if current_host and post.host and current_host == post.host:
@@ -257,35 +328,55 @@ def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='p
 
 
 def item_list_from_proj(projects, host_slug=None, text=True, max_num_items=None):
+    """
+    Creates a list of projects with the necessary information for the templates appended.
+    :param projects: This must be a queryset of Project objects
+    :param host_slug: host_slug or None
+    :param text: boolean, if text should be shown
+    :param max_num_items: integer or None
+    :return: a list of projects
+    """
     item_list = []
-    if projects is None:
+    if not projects.exists():
         return item_list
     if max_num_items:
         projects = projects[:max_num_items]
+    current_host = Host.objects.get(slug=host_slug) if host_slug else None
+
+    projects = projects.annotate(title=F('name'))
+    projects = projects.annotate(show_text=Value(text, output_field=BooleanField()))
+    projects = projects.annotate(teaser=Case(When(short_description__isnull=False, then=F('short_description')),
+                                             default=F('description')))
+
+    completed_projects = False
     for project in projects:
         project.image = project.get_title_image()
         project.country = project.location.country.name
         project.published = None  # do not show published date, but rather if active or not
         project.hosts_list = project.hosts.all()
-        current_host = Host.objects.get(slug=host_slug) if host_slug else None
+
         if current_host and current_host in project.hosts.all():
             project.link = reverse('project', kwargs={'project_slug': project.slug, 'host_slug': host_slug})
         else:
             project.link = reverse('project', args=[project.slug])
-        project.title = project.name
-        project.teaser = project.short_description if project.short_description else project.description
-        project.show_text = True if text else False
+
+        if project.completed and not completed_projects:
+            project.first_passed_item = True
+            project.separator_text = _('Completed')
+            completed_projects = True
         item_list.append(project)
-    item_list = reorder_completed_projects(item_list)
     return item_list
+
 
 def item_list_from_teams(teams, host_slug=None):
     item_list = []
+    if not teams.exists():
+        return item_list
+
+    teams = teams.annotate(title=F('name'))
+
     for team in teams:
-        team.title = team.name
         team.teaser = team.teaser if team.teaser else team.description
-        team.image = team.image
-        team.country = None
         team.published = None
         team.hosts_list = [team.host]
         if host_slug:
@@ -296,13 +387,28 @@ def item_list_from_teams(teams, host_slug=None):
     return item_list
 
 
-def item_list_from_partners(partners, host_slug=None, text=True):
+def item_list_from_partners(partners, host_slug=None, text=True, max_num_items=None):
     item_list = []
     categories = dict(Partner.CATEGORY_CHOICES)
     category_icons = dict(Partner.CATEGORY_ICONS)
+
+    # Expressions for annotating the category and its icon
+    whens_categories = [When(category=k, then=Value(v, output_field=CharField())) for k, v in categories.items()]
+    whens_icons = [When(category=k, then=Value(v, output_field=CharField())) for k, v in category_icons.items()]
+
+    if not partners.exists():
+        return item_list
+    if max_num_items:
+        partners = partners[:max_num_items]
+
+    partners = partners.annotate(title=F('name'))
+    partners = partners.annotate(show_text=Value(text, output_field=BooleanField()))
+    partners = partners.annotate(teaser=F('description'))
+    partners = partners.annotate(category_icon=Case(*whens_icons))
+    partners = partners.annotate(category_name=Case(*whens_categories))
+
+    inactive_partners = False
     for partner in partners:
-        partner.title = partner.name
-        partner.teaser = partner.description
         partner.fixed_image = partner.logo
         partner.hosts_list = [host for host in Host.objects.filter(partners=partner).order_by('name')]
         if not partner.hosts_list: continue  # do not show partners without host
@@ -310,21 +416,20 @@ def item_list_from_partners(partners, host_slug=None, text=True):
             partner.link = reverse('partner', kwargs={'partner_slug': partner.slug, 'host_slug': host_slug})
         else:
             partner.link = reverse('partner', kwargs={'partner_slug': partner.slug})
-        partner.show_text = True if text else False
-        partner.category_icon = category_icons[partner.category]
-        partner.category = categories[partner.category]
+        if not partner.active and not inactive_partners:
+            partner.first_passed_item = True
+            partner.separator_text = _('Former')
+            inactive_partners = True
         item_list.append(partner)
-    item_list = reorder_inactive_partners(item_list)
     return item_list
 
 
 def home_view(request):
-    projects = Project.objects.all()
+    projects = Project.objects.all()[:5]
     hosts = Host.objects.all()
     news = NewsPost.objects.all().order_by('-published')[:5]
     blog = BlogPost.objects.all().order_by('-published')[:3]
     events = Event.objects.all().order_by('-start')
-    occurrences = sidebar_occurrences(events)
 
 
     template = loader.get_template('wbcore/home.html')
@@ -335,12 +440,10 @@ def home_view(request):
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id', text=False),
         'item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
         'hosts': hosts,
-        'event_item_list': item_list_from_occ(occurrences, text=True)[:3],
+        'event_item_list': item_list_from_events(events, text=True, max_num_items=3),
         'breadcrumb': [(_('Home'), None)],
         'icon_links': icon_links
     }
-
-
 
     return HttpResponse(template.render(context, request))
 
@@ -514,9 +617,9 @@ def history_view(request, host_slug=None):
         history = None
 
     if host_slug:
-        projects = Project.objects.filter(hosts__slug=host_slug).order_by('-priority', '-updated')
+        projects = Project.objects.filter(hosts__slug=host_slug).order_by('completed', '-priority', '-updated')
     else:
-        projects = Project.objects.all().order_by('-updated')
+        projects = Project.objects.all().order_by('completed', '-updated')
 
     template = loader.get_template('wbcore/history.html')
     context = {
@@ -584,9 +687,9 @@ def teams_view(request, host_slug=None):
         teams = Team.objects.filter(host=Host.objects.get(slug='bundesverband'))
 
     if host_slug:
-        projects = Project.objects.filter(hosts__slug=host_slug).order_by('-priority', '-updated')
+        projects = Project.objects.filter(hosts__slug=host_slug).order_by('completed', '-priority', '-updated')
     else:
-        projects = Project.objects.all().order_by('-updated')
+        projects = Project.objects.all().order_by('completed', '-updated')
 
     template = loader.get_template('wbcore/teams.html')
     context = {
@@ -624,7 +727,10 @@ def team_view(request, host_slug=None, team_slug=None):
     relations = team.teamuserrelation_set.all().order_by('priority')
 
     teams = Team.objects.filter(host=host) if host else Team.objects.filter(host__slug=main_host_slug)
-    projects = Project.objects.filter(hosts=host) if host else Project.objects.all()
+    if host_slug:
+        projects = Project.objects.filter(hosts__slug=host_slug).order_by('completed', '-priority', '-updated')
+    else:
+        projects = Project.objects.all().order_by('completed', '-updated')
     teams, projects = teams[:3], projects[:3]
 
     template = loader.get_template('wbcore/team.html')
@@ -655,9 +761,9 @@ def partners_view(request, host_slug=None):
         breadcrumb = [(_('Home'), reverse('home')), (_('Partners'), None)]
 
     if host:
-        partners = host.partners.order_by('-priority')
+        partners = host.partners.order_by('-active', '-priority')
     else:
-        partners = Partner.objects.all().order_by('-updated')
+        partners = Partner.objects.all().order_by('-active', '-updated')
 
     # ajax needs a different template as 'more' calls this view and not the ajax_view
     if request.is_ajax():
@@ -679,6 +785,7 @@ def partners_view(request, host_slug=None):
     }
     return HttpResponse(template.render(context, request))
 
+
 def partner_view(request, host_slug=None, partner_slug=None):
     try:
         partner = Partner.objects.get(slug=partner_slug)
@@ -699,14 +806,13 @@ def partner_view(request, host_slug=None, partner_slug=None):
     categories = dict(Partner.CATEGORY_CHOICES)
     category_icons = dict(Partner.CATEGORY_ICONS)
     partner.category_icon = category_icons[partner.category]
-    partner.category = categories[partner.category]
+    partner.category_name = categories[partner.category]
 
     projects = Project.objects.filter(partners=partner)
 
     events = Event.objects.filter(projects__in=projects)
-    occurrences = sidebar_occurrences(events)
 
-    blogposts = BlogPost.objects.filter(project__in=projects)
+    blogposts = BlogPost.objects.filter(project__in=projects)[:3]
 
     template = loader.get_template('wbcore/partner.html')
     context = {
@@ -717,8 +823,8 @@ def partner_view(request, host_slug=None, partner_slug=None):
         'host': host,
         'partner': partner,
         'item_list': item_list_from_proj(projects, host_slug=host_slug),
-        'event_item_list': item_list_from_occ(occurrences, host_slug=host_slug)[:3],
-        'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False)[:3],
+        'event_item_list': item_list_from_events(events, host_slug=host_slug, max_num_items=3),
+        'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
     }
     return HttpResponse(template.render(context, request))
 
@@ -749,12 +855,10 @@ def about_view(request, host_slug=None):
         news = NewsPost.objects.filter(host=host).order_by('-published')[:3]
         blog = BlogPost.objects.filter(host=host).order_by('-published')[:3]
         events = Event.objects.filter(host=host).order_by('-start')
-        occurrences = sidebar_occurrences(events)
     else:
         news = NewsPost.objects.all().order_by('-published')[:3]
         blog = BlogPost.objects.all().order_by('-published')[:3]
-        events = Event.objects.filter(host__slug=host_slug if host else 'bundesverband').order_by('-start')
-        occurrences = sidebar_occurrences(events)
+        events = Event.objects.filter(host__slug='bundesverband').order_by('-start')
 
     template = loader.get_template('wbcore/about.html')
     context = {
@@ -767,7 +871,7 @@ def about_view(request, host_slug=None):
         'hosts': Host.objects.all(),
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id'),
         'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
-        'event_item_list': item_list_from_occ(occurrences, text=True)[:3],
+        'event_item_list': item_list_from_events(events, text=True, max_num_items=3),
     }
     return HttpResponse(template.render(context, request))
 
@@ -785,9 +889,9 @@ def idea_view(request, host_slug=None):
         breadcrumb = [(_('Home'), reverse('home')), (_('Idea'), None)]
 
     if host_slug:
-        projects = Project.objects.filter(hosts__slug=host_slug).order_by('-priority', '-updated')
+        projects = Project.objects.filter(hosts__slug=host_slug).order_by('completed', '-priority', '-updated')
     else:
-        projects = Project.objects.all().order_by('-updated')
+        projects = Project.objects.all().order_by('completed', '-updated')
 
     try:
         idea = Content.objects.get(host=Host.objects.get(slug='bundesverband'), type='idea')
@@ -826,18 +930,22 @@ def projects_view(request, host_slug=None):
 
     # sort projects
     if host_slug or len(host_slugs) == 1:  # only order by priority in host view to avoid competition between hosts
-        projects = projects.order_by('-priority', '-updated')
+        projects = projects.order_by('completed', '-priority', '-updated')
     else:
-        projects = projects.order_by('-updated')
+        projects = projects.order_by('completed', '-updated')
 
-    posts = BlogPost.objects.filter(project__in=projects)
+    blogposts = BlogPost.objects.filter(project__in=projects).order_by('-published')[:3]
 
-    countries = set([project.location.country for project in projects])
-
-    project_list = list(Location.objects.filter(project__in=projects).values(
+    all_countries_dict = dict(countriesdict)
+    # get a list of all countries for the filter
+    #countries = set([project.location.country for project in projects]) # is replaced by the following to reduce the loop length, distinct speed advantage
+    countries = [{'name': all_countries_dict[key], 'code':key} for key in set(projects.values_list('location__country', flat=True))]
+    # for chororpleth map
+    country_list_for_map = list(Location.objects.filter(project__in=projects).values(
             'country').annotate(number=Count('country')))
-    for country in project_list:
-        country['countryname'] = dict(countriesdict)[country['country']]
+    # add translated country names
+    for country in country_list_for_map:
+        country['countryname'] = all_countries_dict[country['country']]
 
     hosts = Host.objects.all()
 
@@ -850,11 +958,11 @@ def projects_view(request, host_slug=None):
         'dot_nav': get_dot_nav(host=host),
         'breadcrumb': breadcrumb,
         'item_list': item_list_from_proj(projects, host_slug),
-        'project_list': project_list,
+        'country_list_for_map': country_list_for_map,
         'host': host,
         'filter_preset': {'host': [host.slug] if host else None, },
         'hosts': hosts,
-        'blog_item_list': posts,
+        'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
         'countries': countries,
         'filter_visibility': True,
         'ajax_endpoint': reverse('ajax-filter-projects'),
@@ -940,7 +1048,7 @@ def join_view(request, host_slug=None):
         submit_url = reverse('join')
         breadcrumb = [(_('Home'), reverse('home')), (_('Participate'), None)]
         try:
-            host = Host.objects.get(slug=main_host_slug)
+            host = Host.objects.get(slug=main_host_slug) #  ??? Why do we need this? It changes host context to 'bundesverband' logo, links etc.
         except Host.DoesNotExist:
             host = None
 
@@ -999,9 +1107,9 @@ def join_view(request, host_slug=None):
         bank_form = BankForm()
 
     if host_slug:
-        projects = Project.objects.filter(hosts__slug=host_slug).order_by('-priority', '-updated')
+        projects = Project.objects.filter(hosts__slug=host_slug).order_by('completed', '-priority', '-updated')
     else:
-        projects = Project.objects.all().order_by('-updated')
+        projects = Project.objects.all().order_by('completed', '-updated')
 
     membership_declaration = Document.objects.filter(host=host, document_type='membership_declaration', public=True).order_by('-valid_from') if host else None
 
@@ -1058,7 +1166,7 @@ def project_view(request, host_slug=None, project_slug=None):
 
     project.image = project.get_title_image()
 
-    partners = project.partners.all()
+    partners = project.partners.all().order_by('-active')
 
     if Event.objects.filter(projects=project).exists():
         events = Event.objects.filter(projects=project)
@@ -1068,7 +1176,6 @@ def project_view(request, host_slug=None, project_slug=None):
         else:
             project_hosts = Host.objects.filter(projects=project)
             events = Event.objects.filter(host__in=project_hosts)
-    occurrences = sidebar_occurrences(events)
 
     news = NewsPost.objects.filter(project=project).order_by('-published')[:3]
     blogposts = BlogPost.objects.filter(project=project).order_by('-published')[:3]
@@ -1082,7 +1189,7 @@ def project_view(request, host_slug=None, project_slug=None):
         'project': project,
         'photos': project.photos.all(),
         'partner_item_list': item_list_from_partners(partners, host_slug=host_slug, text=False),
-        'event_item_list': item_list_from_occ(occurrences, text=False)[:3],
+        'event_item_list': item_list_from_events(events, text=True, max_num_items=3),
         'news_item_list': item_list_from_posts(news, host_slug=host_slug, post_type='news-post', id_key='post_id', text=False),
         'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
         'host': host,
@@ -1125,7 +1232,7 @@ def host_view(request, host_slug):
     blog = BlogPost.objects.filter(host=host_slug).order_by('-published')[:3]
 
     events = Event.objects.filter(host=host_slug).order_by('-start')
-    occurrences = sidebar_occurrences(events)
+
     try:
         welcome = Content.objects.get(host=host, type='welcome')
     except Content.DoesNotExist as e:
@@ -1144,7 +1251,7 @@ def host_view(request, host_slug):
         'dot_nav': get_dot_nav(host=host),
         'item_list': item_list_from_posts(posts, host_slug=host_slug),
         'hosts': hosts,
-        'event_item_list': item_list_from_occ(occurrences, host_slug=host_slug)[:3],
+        'event_item_list': item_list_from_events(events, host_slug=host_slug, max_num_items=3),
         'teams': teams,
         'welcome': welcome,
         'icon_links': icon_links,
@@ -1169,8 +1276,6 @@ def events_view(request, host_slug=None):
         events = Event.objects.all()
         breadcrumb = [(_('Home'), reverse('home')), (_('Events'), None)]
 
-    p = Period(events, datetime.now()- timedelta(days=365), datetime.now() + timedelta(days=365))
-    occurrences = p.get_occurrences()
     hosts = Host.objects.all()
 
     if request.is_ajax():
@@ -1185,7 +1290,7 @@ def events_view(request, host_slug=None):
         'hosts': hosts,
         'filter_preset': {'host': [host.slug] if host else None, },
         'filter_date': True,
-        'item_list': item_list_from_occ(occurrences, host_slug),
+        'item_list': item_list_from_events(events, host_slug),
         'ajax_endpoint': reverse('ajax-filter-events'),
         'icon_links': icon_links,
     }
@@ -1228,12 +1333,9 @@ def event_view(request, host_slug=None, event_slug=None):
     event.image = event.get_title_image()
 
     if event.projects.exists():
-        projects = event.projects.all().order_by('-priority', '-updated')
+        projects = event.projects.all().order_by('completed', '-priority', '-updated')
     else:
-        projects = []
-
-    p = Period([event], datetime(2008, 1, 1), datetime.now() + timedelta(days=365))
-    occurrences = p.get_occurrences()
+        projects = Project.objects.none()
 
     template = loader.get_template('wbcore/event.html')
     context = {
@@ -1245,7 +1347,7 @@ def event_view(request, host_slug=None, event_slug=None):
         'breadcrumb': breadcrumb,
         'host': host,
         'icon_links': icon_links,
-        'occurrences_item_list': item_list_from_occ(occurrences, show_only_first_occ=False)[:4]
+        'occurrences_item_list': item_list_from_events(event, start=datetime(2008, 1, 1), show_only_first_occ=False)[:4]
     }
     return HttpResponse(template.render(context, request))
 
@@ -1310,11 +1412,12 @@ def blog_post_view(request, host_slug=None, post_id=None):
         raise Http404()
 
     if post.project:
-        projects = [post.project]
+        # keep projects a queryset
+        projects = Project.objects.filter(blog=post)
     elif host:
-        projects = Project.objects.filter(hosts=host).order_by('-priority', '-updated')
+        projects = Project.objects.filter(hosts=host).order_by('completed', '-priority', '-updated')
     else:
-        projects = None
+        projects = Project.objects.none()
 
     post.type = "blog"
 
@@ -1395,11 +1498,11 @@ def news_post_view(request, host_slug=None, post_id=None):
         raise Http404()
 
     if post.project:
-        projects = [post.project]
+        projects = Project.objects.filter(news=post)
     elif host:
-        projects = Project.objects.filter(hosts=host).order_by('-priority', '-updated')
+        projects = Project.objects.filter(hosts=host).order_by('completed', '-priority', '-updated')
     else:
-        projects = None
+        projects = Project.objects.none()
 
     post.type = "news"
 
@@ -1412,42 +1515,6 @@ def news_post_view(request, host_slug=None, post_id=None):
         'photos': post.photos.all(),
         'project_item_list': item_list_from_proj(projects, host_slug=host_slug, max_num_items=3),
         'hosts': Host.objects.all(),
-        'icon_links': icon_links,
-    }
-    return HttpResponse(template.render(context, request))
-
-
-def host_projects_view(request, host_slug):
-    template = loader.get_template('wbcore/projects.html')
-    try:
-        host = Host.objects.get(slug=host_slug) if host_slug else None
-    except Host.DoesNotExist:
-        raise Http404()
-    projects = Project.objects.filter(hosts__slug=host_slug)
-    context = {
-        'main_nav': get_main_nav(host=host, active='projects'),
-        'dot_nav': get_dot_nav(host=host),
-        'projects': projects,
-        'host': host,
-        'breadcrumb': [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Projects'), None)],
-        'icon_links': icon_links,
-    }
-    return HttpResponse(template.render(context, request))
-
-
-def host_events_view(request, host_slug):
-    template = loader.get_template('wbcore/events.html')
-    try:
-        host = Host.objects.get(slug=host_slug) if host_slug else None
-    except Host.DoesNotExist:
-        raise Http404()
-    events = Event.objects.filter(hosts__slug=host_slug)
-    context = {
-        'main_nav': get_main_nav(host=host, active='events'),
-        'dot_nav': get_dot_nav(host=host),
-        'events': events,
-        'host': host,
-        'breadcrumb': [(_('Home'), reverse('home')), (host.name, reverse('host', host_slug)), (_('Events'), None)],
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
@@ -1511,7 +1578,10 @@ def donate_view(request, host_slug=None):
     except Content.DoesNotExist:
         donate = None
 
-    projects = Project.objects.filter(hosts=host) if host else Project.objects.all().order_by('-updated')
+    if host:
+        projects = Project.objects.filter(hosts=host).order_by('completed', '-priority', '-updated')
+    else:
+        projects = Project.objects.all().order_by('completed', '-updated')
 
     template = loader.get_template('wbcore/donate.html')
     context = {
@@ -1634,18 +1704,6 @@ def contact_view(request, host_slug=None):
 
     return HttpResponse(template.render(context, request))
 
-
-def sitemap_view(request):
-    template = loader.get_template('wbcore/sitemap.html')
-    hosts = Host.objects.all()
-    context = {
-        'main_nav': get_main_nav(),
-        'dot_nav': get_dot_nav(),
-        'hosts': hosts,
-        'breadcrumb': [(_('Home'), reverse('home')), (_('Sitemap'), None)],
-        'icon_links': icon_links,
-    }
-    return HttpResponse(template.render(context, request))
 
 
 def faq_view(request, host_slug=None):

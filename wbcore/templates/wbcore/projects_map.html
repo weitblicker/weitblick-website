@@ -16,7 +16,7 @@ Highcharts.setOptions({
     }
 });
 
-    var mydata = {{project_list|safe}};
+    var mydata = {{country_list_for_map|safe}};
 
     var data = Highcharts.geojson(Highcharts.maps['custom/world-robinson-lowres']),
         separators = Highcharts.geojson(Highcharts.maps['custom/world-robinson-lowres'], 'mapline'),
