@@ -226,6 +226,9 @@ MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
         'single_block_as_tab': False,
         'active_class': 'active',
         'template': 'default',
+    },
+    'martor.extensions.mdx_video': {
+        'youtube_nocookie': True
     }
 }
 
