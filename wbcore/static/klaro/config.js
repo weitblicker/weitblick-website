@@ -27,7 +27,7 @@ var klaroConfig = {
     //cookieDomain: '.github.com',
 
     // Put a link to your privacy policy here (relative or absolute).
-    privacyPolicy: '/#privacy',
+    privacyPolicy: '/privacy',
 
     // Defines the default state for applications (true=enabled by default).
     default: false,
@@ -42,7 +42,7 @@ var klaroConfig = {
     acceptAll: true,
 
     // replace "decline" with cookie manager modal
-    hideDeclineAll: false,
+    hideDeclineAll: true,
 
     // hide "learnMore" link
     hideLearnMore: false,
@@ -124,7 +124,7 @@ var klaroConfig = {
             // Overwrites global "default" setting.
             // We recommend leaving this to "false" for apps that collect
             // personal information.
-            default: true,
+            default: false,
 
             // The title of you app as listed in the consent modal.
             title: 'Example',
