@@ -6,7 +6,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from itertools import groupby
 from .filter import filter_news, filter_projects, filter_events, filter_blog, filter_partners
-from .views import item_list_from_occ, item_list_from_posts, item_list_from_proj, item_list_from_partners
+from .views import item_list_from_events, item_list_from_posts, item_list_from_proj, item_list_from_partners
 
 
 def remove_tags(text):
@@ -56,7 +56,7 @@ def search(request, query):
 @api_view(['GET', 'POST'])
 def filter_projects_view(request, host_slug=None):
     template = loader.get_template('wbcore/list_items.html')
-    projects = filter_projects(request)
+    projects = filter_projects(request, return_queryset=True)
     host = None  # TODO filter if on host specific news page
     context = {
         'host': host,
@@ -80,10 +80,10 @@ def filter_news_view(request):
 @api_view(['GET', 'POST'])
 def filter_events_view(request):
     template = loader.get_template('wbcore/list_items.html')
-    event_occurrences, events = filter_events(request)
-    host = None  # TODO filter if on host specific news page
+    events, start, end, limit = filter_events(request)
+    host = None  # TODO filter if on host specific events page
     context = {
-        'item_list': item_list_from_occ(event_occurrences),
+        'item_list': item_list_from_events(events, start=start, end=end, max_num_items=limit),
         'host': host,
     }
     return HttpResponse(template.render(context, request))
@@ -104,7 +104,7 @@ def filter_blog_view(request):
 @api_view(['GET', 'POST'])
 def filter_partners_view(request, host_slug=None):
     template = loader.get_template('wbcore/list_items.html')
-    partners = filter_partners(request)
+    partners = filter_partners(request, return_queryset=True)
     host = None  # TODO filter if on host specific partners page
     context = {
         'host': host,
