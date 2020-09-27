@@ -74,6 +74,9 @@ var klaroConfig = {
             example: {
                 description: 'Sammeln von Besucherstatistiken',
             },
+            googleAnalytics: {
+                description: 'Google Analytics blabla',
+            },
             googleFonts: {
                 description: 'Web-Schriftarten von Google gehostet',
             },
@@ -99,6 +102,9 @@ var klaroConfig = {
             example: {
                 description: 'Collecting of visitor statistics',
             },
+            googleAnalytics: {
+                description: 'Google Analytics blabla',
+            },
             googleFonts: {
                 description: 'Web fonts hosted by Google',
             },
@@ -108,6 +114,7 @@ var klaroConfig = {
                 livechat: 'Livechat',
                 advertising: 'Advertising',
                 styling: 'Styling',
+
             },
         },
     },
@@ -118,7 +125,7 @@ var klaroConfig = {
     apps: [
         {
             // Each app should have a unique (and short) name.
-            name: 'example',
+            name: 'googleAnalytics',
 
             // If "default" is set to true, the app will be enabled by default
             // Overwrites global "default" setting.
@@ -127,7 +134,7 @@ var klaroConfig = {
             default: false,
 
             // The title of you app as listed in the consent modal.
-            title: 'Example',
+            title: 'Google Analytics',
 
             // The purpose(s) of this app. Will be listed on the consent notice.
             // Do not forget to add translations for all purposes you list here.
@@ -181,6 +188,12 @@ var klaroConfig = {
             name: 'googleFonts',
             required: true,
             title: 'Google Fonts',
+            purposes: ['styling'],
+        },
+        {
+            name: 'klaro',
+            required: true,
+            title: 'Klaro!',
             purposes: ['styling'],
         },
     ],
