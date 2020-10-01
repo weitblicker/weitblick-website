@@ -71,13 +71,22 @@ var klaroConfig = {
                 description:
                     'Hier können Sie einsehen und anpassen, welche Information wir über Sie sammeln. Einträge die als "Beispiel" gekennzeichnet sind dienen lediglich zu Demonstrationszwecken und werden nicht wirklich verwendet.',
             },
-            example: {
+            klaro: {
+                description: '',
+            },
+            csrf_token: {
+                description: '',
+            },
+            session_id: {
+                description: '',
+            },
+            google_analytics: {
                 description: 'Sammeln von Besucherstatistiken',
             },
-            googleAnalytics: {
-                description: 'Google Analytics blabla',
+            google_ad: {
+                description: ''
             },
-            googleFonts: {
+            google_fonts: {
                 description: 'Web-Schriftarten von Google gehostet',
             },
             purposes: {
@@ -86,6 +95,7 @@ var klaroConfig = {
                 livechat: 'Live Chat',
                 advertising: 'Anzeigen von Werbung',
                 styling: 'Styling',
+                functionality: 'Funktionalität'
             },
         },
         en: {
@@ -99,13 +109,22 @@ var klaroConfig = {
                 description:
                     'Here you can see and customize the information that we collect about you. Entries marked as "Example" are just for demonstration purposes and are not really used on this website.',
             },
-            example: {
+            klaro: {
+                description: '',
+            },
+            csrf_token: {
+                description: '',
+            },
+            session_id: {
+                description: '',
+            },
+            google_analytics: {
                 description: 'Collecting of visitor statistics',
             },
-            googleAnalytics: {
-                description: 'Google Analytics blabla',
+            google_ad: {
+                description: '',
             },
-            googleFonts: {
+            google_fonts: {
                 description: 'Web fonts hosted by Google',
             },
             purposes: {
@@ -125,7 +144,7 @@ var klaroConfig = {
     apps: [
         {
             // Each app should have a unique (and short) name.
-            name: 'googleAnalytics',
+            name: 'klaro',
 
             // If "default" is set to true, the app will be enabled by default
             // Overwrites global "default" setting.
@@ -134,11 +153,11 @@ var klaroConfig = {
             default: false,
 
             // The title of you app as listed in the consent modal.
-            title: 'Google Analytics',
+            title: 'Klaro!',
 
             // The purpose(s) of this app. Will be listed on the consent notice.
             // Do not forget to add translations for all purposes you list here.
-            purposes: ['analytics'],
+            purposes: ['functionality'],
 
             // A list of regex expressions or strings giving the names of
             // cookies set by this app. If the user withdraws consent for a
@@ -171,7 +190,7 @@ var klaroConfig = {
 
             // If "required" is set to true, Klaro will not allow this app to
             // be disabled by the user.
-            required: false,
+            required: true,
 
             // If "optOut" is set to true, Klaro will load this app even before
             // the user gave explicit consent.
@@ -185,16 +204,54 @@ var klaroConfig = {
 
         // The apps will appear in the modal in the same order as defined here.
         {
-            name: 'googleFonts',
+            name: 'csrf_token',
+            title: 'CSRF Token',
+            purposes: ['functionality'],
             required: true,
-            title: 'Google Fonts',
-            purposes: ['styling'],
         },
         {
-            name: 'klaro',
+            name: 'session_id',
+            title: 'Session ID',
+            purposes: ['functionality'],
             required: true,
-            title: 'Klaro!',
+        },
+        {
+            name: 'google_tag_manager',
+            title: 'Google Analytics',
+            purposes: ['analytics'],
+            required: false,
+            cookies: [
+                [/^_dc_gtm_UA-.*$/, '/', 'weitblicker.org'],
+                [/^_dc_gtm_UA-.*$/, '/', 'localhost'],
+            ],
+        },
+        {
+            name: 'google_analytics',
+            title: 'Google Analytics',
+            purposes: ['analytics'],
+            required: false,
+            cookies: [
+                [/^_ga.*$/, '/', 'weitblicker.org'],
+                [/^_ga.*$/, '/', 'localhost'],
+                [/^_gid.*$/, '/', 'weitblicker.org'],
+                [/^_gid.*$/, '/', 'localhost'],
+            ],
+        },
+        {
+            name: 'google_ad',
+            title: 'Google Ad',
+            purposes: ['analytics'],
+            required: false,
+            cookies: [
+                [/^_gcl_au.*$/, '/', 'weitblicker.org'],
+                [/^_gcl_au.*$/, '/', 'localhost'],
+            ],
+        },
+        {
+            name: 'google_fonts',
+            title: 'Google Fonts',
             purposes: ['styling'],
+            required: true,
         },
     ],
 };
