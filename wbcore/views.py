@@ -759,7 +759,7 @@ def team_view(request, host_slug=None, team_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
-        'meta': get_meta(title=team.name, description=team.teaser),
+        'meta': get_meta(title=team.name, description=team.get_teaser()),
         'host': host,
         'breadcrumb': breadcrumb,
         'team': team,
@@ -842,7 +842,7 @@ def partner_view(request, host_slug=None, partner_slug=None):
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
-        'meta': get_meta(title=partner.name, description=partner.description),
+        'meta': get_meta(title=partner.name, description=partner.get_teaser()),
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'host': host,
@@ -1221,7 +1221,7 @@ def project_view(request, host_slug=None, project_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
-        'meta': get_meta(title=project.name, description=project.short_description),
+        'meta': get_meta(title=project.name, description=project.get_teaser()),
         'project': project,
         'photos': project.photos.all(),
         'partner_item_list': item_list_from_partners(partners, host_slug=host_slug, text=False),
@@ -1379,7 +1379,7 @@ def event_view(request, host_slug=None, event_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
-        'meta': get_meta(title=event.title, description=event.teaser if event else None),
+        'meta': get_meta(title=event.title, description=event.get_teaser()),
         'event': event,
         'project_item_list': item_list_from_proj(projects, host_slug=host_slug, text=False, max_num_items=3),
         'form': form,
@@ -1551,7 +1551,7 @@ def news_post_view(request, host_slug=None, post_id=None):
     context = {
         'main_nav': get_main_nav(host=host, active='news'),
         'dot_nav': get_dot_nav(host=host),
-        'meta': get_meta(title=post.title, description=post.teaser),
+        'meta': get_meta(title=post.title, description=post.get_teaser()),
         'host': host,
         'breadcrumb': breadcrumb,
         'post': post,
