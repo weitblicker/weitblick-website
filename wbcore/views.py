@@ -137,7 +137,7 @@ def get_dot_nav(host=None):
 def get_meta(title=None, description=None, robots=None):
     meta = {
         'title': None,
-        'description': 'Weitblick setzt sich für weltweit gerechte Bildungschancen ein.',
+        'description': 'Weitblick ist eine deutsche Studierendeninitiative, die sich für einen weltweit gerechteren Zugang zu Bildung einsetzt.',
         'robots': 'index, follow',
     }
     if title: meta['title'] = title
