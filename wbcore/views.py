@@ -134,6 +134,18 @@ def get_dot_nav(host=None):
     return {'news': news, 'blog': blog, 'occurrences': occurrences}
 
 
+def get_meta(title=None, description=None, robots=None):
+    meta = {
+        'title': None,
+        'description': 'Weitblick setzt sich für weltweit gerechte Bildungschancen ein.',
+        'robots': 'index, follow',
+    }
+    if title: meta['title'] = title
+    if description: meta['description'] = description[:155]
+    if robots: meta['robots'] = robots
+    return meta
+
+
 def get_host_slugs(request, host_slug):
     if host_slug:
         host_slugs = [host_slug]
@@ -436,6 +448,7 @@ def home_view(request):
     context = {
         'main_nav': get_main_nav(),
         'dot_nav': get_dot_nav(),
+        'meta': get_meta(),
         'projects': projects,
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id', text=False),
         'item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
@@ -473,6 +486,7 @@ def reports_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('Reports'), description=report.text if report else None),
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
@@ -507,6 +521,7 @@ def charter_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('Charter'), description=charter.text if charter else None),
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
@@ -553,6 +568,7 @@ def transparency_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('Transparency'), description=transparency.text if transparency else None),
         'host': host,
         'host_url_prefix': "/" + host.slug + "/" if host else "/",
         'breadcrumb': breadcrumb,
@@ -563,6 +579,8 @@ def transparency_view(request, host_slug=None):
         'financial_reports': financial_reports,
         'annual_reports': annual_reports,
     }
+    print('transparency')
+    print(context['meta'])
     return HttpResponse(template.render(context, request))
 
 
@@ -589,6 +607,7 @@ def facts_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('Facts'), description=facts.text if facts else None),
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
@@ -625,6 +644,7 @@ def history_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('History'), description=history.text if history else None),
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
@@ -658,6 +678,7 @@ def privacy_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('Privacy'), description=privacy.text if privacy else None),
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
@@ -695,6 +716,7 @@ def teams_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('Teams')),
         'host': host,
         'breadcrumb': breadcrumb,
         'item_list': item_list_from_teams(teams, host_slug),
@@ -737,6 +759,7 @@ def team_view(request, host_slug=None, team_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=team.name, description=team.teaser),
         'host': host,
         'breadcrumb': breadcrumb,
         'team': team,
@@ -773,6 +796,7 @@ def partners_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('Partners')),
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'ajax_endpoint': reverse('ajax-filter-partners'),
@@ -818,6 +842,7 @@ def partner_view(request, host_slug=None, partner_slug=None):
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=partner.name, description=partner.description),
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'host': host,
@@ -864,6 +889,7 @@ def about_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('About'), description=about.text if about else None),
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
@@ -902,6 +928,7 @@ def idea_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(active='idea', host=host),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('Idea'), description=idea.text if idea else None),
         'host': host,
         'idea': idea,
         'breadcrumb': breadcrumb,
@@ -956,6 +983,7 @@ def projects_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host, active='projects'),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('Projects')),
         'breadcrumb': breadcrumb,
         'item_list': item_list_from_proj(projects, host_slug),
         'country_list_for_map': country_list_for_map,
@@ -1026,7 +1054,8 @@ def activate_user(request, uidb64, token):
         'user': user,
         'pswd_form': pswd_form,
         'icon_links': icon_links,
-        'submit_url': reverse('activate', args=[uidb64, token])
+        'submit_url': reverse('activate', args=[uidb64, token]),
+        'meta': get_meta(robots='noindex'),
     }
 
     return HttpResponse(template.render(context, request))
@@ -1142,6 +1171,11 @@ def join_view(request, host_slug=None):
         except Content.DoesNotExist:
             pass
 
+    try:
+        context['meta'] = get_meta(title=_('Join'), description=context['text'])
+    except KeyError:
+        context['meta'] = get_meta(title=_('Join'))
+
     return HttpResponse(template.render(context, request))
 
 
@@ -1186,6 +1220,8 @@ def project_view(request, host_slug=None, project_slug=None):
     template = loader.get_template('wbcore/project.html')
     context = {
         'main_nav': get_main_nav(host=host),
+        'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=project.name, description=project.short_description),
         'project': project,
         'photos': project.photos.all(),
         'partner_item_list': item_list_from_partners(partners, host_slug=host_slug, text=False),
@@ -1195,7 +1231,6 @@ def project_view(request, host_slug=None, project_slug=None):
         'host': host,
         'hosts_list': hosts_list,
         'account': host.bank if host else None,
-        'dot_nav': get_dot_nav(host=host),
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'other_projects_country': item_list_from_proj(other_projects_country)
@@ -1210,6 +1245,7 @@ def hosts_view(request):
     context = {
         'hosts': hosts,
         'main_nav': get_main_nav(active='hosts'),
+        'meta': get_meta(title=_('Associations')),
         'dot_nav': get_dot_nav(),
         'breadcrumb': [(_('Home'), reverse('home')), (_('Associations'), None)],
         'icon_links': icon_links
@@ -1249,6 +1285,7 @@ def host_view(request, host_slug):
         'breadcrumb': [(_('Home'), reverse('home')), (host.name, None)],
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(description=welcome.text if welcome else None),
         'item_list': item_list_from_posts(posts, host_slug=host_slug),
         'hosts': hosts,
         'event_item_list': item_list_from_events(events, host_slug=host_slug, max_num_items=3),
@@ -1285,6 +1322,7 @@ def events_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host, active='events'),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('Events')),
         'host': host,
         'breadcrumb': breadcrumb,
         'hosts': hosts,
@@ -1341,6 +1379,7 @@ def event_view(request, host_slug=None, event_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=event.title, description=event.teaser if event else None),
         'event': event,
         'project_item_list': item_list_from_proj(projects, host_slug=host_slug, text=False, max_num_items=3),
         'form': form,
@@ -1379,6 +1418,7 @@ def blog_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host, active='blog'),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('Blog')),
         'breadcrumb': breadcrumb,
         'host': host,
         'hosts': hosts,
@@ -1424,6 +1464,7 @@ def blog_post_view(request, host_slug=None, post_id=None):
     context = {
         'main_nav': get_main_nav(host=host, active='blog'),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=post.title, description=post.teaser),
         'host': host,
         'breadcrumb': breadcrumb,
         'post': post,
@@ -1464,6 +1505,7 @@ def news_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host, active='news'),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('News')),
         'host': host,
         'breadcrumb': breadcrumb,
         'posts': posts,
@@ -1509,6 +1551,7 @@ def news_post_view(request, host_slug=None, post_id=None):
     context = {
         'main_nav': get_main_nav(host=host, active='news'),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=post.title, description=post.teaser),
         'host': host,
         'breadcrumb': breadcrumb,
         'post': post,
@@ -1525,6 +1568,7 @@ def search_view(request, query=None):
     context = {
         'main_nav': get_main_nav(),
         'dot_nav': get_dot_nav(),
+        'meta': get_meta(title=_('Search'), robots='noindex'),
         'breadcrumb': [(_('Home'), reverse('home')), (_('Search'), None)],
         'icon_links': icon_links,
     }
@@ -1550,6 +1594,7 @@ def sitemap_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(active='sitemap'),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('Sitemap'), robots='noindex'),
         'projects': projects,
         'host': host,
         'breadcrumb': breadcrumb,
@@ -1587,6 +1632,7 @@ def donate_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host, active='donate'),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('Donate'), description=donate.text if donate else None),
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
@@ -1617,6 +1663,7 @@ def imprint_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('Imprint')),
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
@@ -1661,6 +1708,7 @@ def contact_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('Contact'), description=contact.text if contact else None),
         'host': load_host,
         'breadcrumb': breadcrumb,
         'success': False,
@@ -1724,6 +1772,7 @@ def faq_view(request, host_slug=None):
     context = {
         'main_nav': get_main_nav(host=host),
         'dot_nav': get_dot_nav(host=host),
+        'meta': get_meta(title=_('FAQ')),
         'host': host,
         'faq': faq,
         'breadcrumb': breadcrumb,

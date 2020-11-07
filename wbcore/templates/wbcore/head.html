@@ -5,7 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
 <!-- Site Properties -->
-<title>{% block title %}Weitblick {{ host.city }}{% endblock %}</title>
+<title>{% block title %}{% if meta.title %}{{ meta.title }} | {% endif %}Weitblick {{ host.city }}{% endblock %}</title>
+
+{% block meta %}
+    <meta name="description" content="{{ meta.description }}" />
+    <meta name="robots" content="{{ meta.robots }}" />
+{% endblock %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'semantic/dist/semantic.min.css' %}">
 
