@@ -42,7 +42,7 @@ var klaroConfig = {
     acceptAll: true,
 
     // replace "decline" with cookie manager modal
-    hideDeclineAll: true,
+    hideDeclineAll: false,
 
     // hide "learnMore" link
     hideLearnMore: false,
@@ -95,7 +95,7 @@ var klaroConfig = {
                 livechat: 'Live Chat',
                 advertising: 'Anzeigen von Werbung',
                 styling: 'Styling',
-                functionality: 'Funktionalität'
+                essential: 'Essenziell',
             },
         },
         en: {
@@ -157,7 +157,7 @@ var klaroConfig = {
 
             // The purpose(s) of this app. Will be listed on the consent notice.
             // Do not forget to add translations for all purposes you list here.
-            purposes: ['functionality'],
+            purposes: ['essential'],
 
             // A list of regex expressions or strings giving the names of
             // cookies set by this app. If the user withdraws consent for a
@@ -206,18 +206,23 @@ var klaroConfig = {
         {
             name: 'csrf_token',
             title: 'CSRF Token',
-            purposes: ['functionality'],
+            purposes: ['essential'],
             required: true,
         },
         {
             name: 'session_id',
             title: 'Session ID',
-            purposes: ['functionality'],
+            purposes: ['essential'],
             required: true,
         },
         {
+            name: 'highmaps',
+            title: 'Highmaps',
+            purposes: ['essential'],
+        },
+        {
             name: 'google_tag_manager',
-            title: 'Google Analytics',
+            title: 'Google Tag Manger',
             purposes: ['analytics'],
             required: false,
             cookies: [
