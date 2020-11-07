@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'captcha',
     'honeypot',
+    'easy_thumbnails',
     'django_cleanup.apps.CleanupConfig',  # should be at the bottom
 ]
 
@@ -313,3 +314,11 @@ REST_AUTH_SERIALIZERS = {
 CAPTCHA_LENGTH = 6
 CAPTCHA_LETTER_ROTATION = (-50, 50)
 HONEYPOT_FIELD_NAME = "phone"
+
+THUMBNAIL_ALIASES = {
+    '': {
+        'profile_list_view': {'size': (24, 24), 'crop':'smart'},
+        'profile_post_view': {'size': (0, 26)},
+        'profile_team_members': {'size': (150, 0)},
+    },
+}
