@@ -16,6 +16,7 @@ from martor.widgets import AdminMartorWidget
 from django_google_maps import widgets as map_widgets
 from django_google_maps import fields as map_fields
 from schedule.models import Calendar
+from easy_thumbnails.files import get_thumbnailer
 from django_reverse_admin import ReverseModelAdmin
 from rules.contrib.admin import ObjectPermissionsModelAdmin
 from wbcore.models import User
@@ -530,6 +531,10 @@ class UserAdmin(BaseUserAdmin):
     def has_module_permission(self, request):
         return request.user.has_module_perms(self.opts.app_label)
 
+    def save_model(self, request, obj, form, change):
+        if obj.image != User.objects.get(pk=obj.pk).image:  # delete old thumbnails on profile picture change
+            get_thumbnailer(User.objects.get(pk=obj.pk).image).delete_thumbnails()
+        super(UserAdmin, self).save_model(request, obj, form, change)
 
 class TeamAdmin(MyAdmin):
     inlines = (TeamUserRelationInlineModel,)
