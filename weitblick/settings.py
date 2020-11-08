@@ -320,8 +320,8 @@ HONEYPOT_FIELD_NAME = "phone"
 
 THUMBNAIL_ALIASES = {
     '': {
-        'profile_list_view': {'size': (24, 24), 'crop':'smart'},
-        'profile_post_view': {'size': (0, 26)},
-        'profile_team_members': {'size': (150, 0)},
+        'profile_list_view': {'size': (24, 24), 'crop': ','},
+        'profile_post_view': {'size': (26, 26), 'crop': ','},
+        'profile_team_members': {'size': (150, 150), 'crop': ','},
     },
 }
