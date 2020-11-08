@@ -1,11 +1,13 @@
-<i class="label {{ icon }} icon"></i>
 {% if url_alias %}
     {% if host %}
+        <a href="{% url url_alias host_slug=host.slug%}"><i class="label {{ icon }} icon"></i></a>
         <a class="ui item title header" href="{% url url_alias host_slug=host.slug%}">{{ title }}</a>
     {% else %}
+        <a href="{% url url_alias %}"><i class="label {{ icon }} icon"></i></a>
         <a class="ui item title header" href="{% url url_alias %}">{{ title }}</a>
     {% endif %}
 {% else %}
+    <i class="label {{ icon }} icon"></i>
     <span class="ui item title header">{{ title }}</span>
 {% endif %}
 <div class="ui hidden divider"></div>

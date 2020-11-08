@@ -16,7 +16,7 @@ Pillow>=7.0.0
 libsass
 num2words
 markdown>=3.0
-martor
+martor>=1.5.1
 django-modeltranslation
 django-tinymce4-lite
 python-slugify
