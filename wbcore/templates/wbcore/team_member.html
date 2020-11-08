@@ -1,10 +1,11 @@
 {% load static %}
+{% load thumbnail %}
 <div class="item">
     <div class="ui circular small image">
         {% if not relation.user.image %}
             {% include 'wbcore/svgs/profile.svg' %}
         {% else %}
-            <img class="huhu" src="{{ relation.user.image.url }}">
+            <img class="huhu" src="{{ relation.user.image|thumbnail_url:'profile_team_members' }}">
         {% endif %}
     </div>
     <div class="middle aligned content">

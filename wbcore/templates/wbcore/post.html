@@ -4,6 +4,8 @@
 {% load static %}
 {% load martortags %}
 {% load wbcoretags %}
+{% load thumbnail %}
+
 
 {% block main %}
     {% if post.type == 'blog' %}
@@ -14,10 +16,9 @@
 
     <div class="ui segment">
         <div class="ui image label">
-            {% if post.author and post.author.image %}
-                <img class="ui avatar image" src='{{ post.author.image.url }}'>{{ post.author.name }}
-            {% elif post.author_name %}
-                <img class="ui avatar image" src='{% get_media_prefix %}kristy.png'>{{ post.author_name }}
+            {% if post.author_name %}
+                {% thumbnail post.author.image|default:'kristy.png' 'profile_post_view' as thumb %}
+                <img class="ui avatar image" src='{{ thumb.url }}'>{{ post.author_name }}
             {% endif %}
         </div>
         <span class="date">{{ post.published | date:"D, j. M Y" }}</span>
