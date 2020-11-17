@@ -720,7 +720,7 @@ def team_view(request, host_slug=None, team_slug=None):
         raise Http404()
 
     if host:
-        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Team'), reverse('teams')), (team.name, None)]
+        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Team'), reverse('teams', args=[host_slug])), (team.name, None)]
     else:
         breadcrumb = [(_('Home'), reverse('home')), (_('Team'), reverse('teams')), (team.name, None)]
 
@@ -830,9 +830,6 @@ def partner_view(request, host_slug=None, partner_slug=None):
 
 
 def about_view(request, host_slug=None):
-
-
-
     if host_slug:
         try:
             host = Host.objects.get(slug=host_slug)
@@ -855,10 +852,12 @@ def about_view(request, host_slug=None):
         news = NewsPost.objects.filter(host=host).order_by('-published')[:3]
         blog = BlogPost.objects.filter(host=host).order_by('-published')[:3]
         events = Event.objects.filter(host=host).order_by('-start')
+        account = host.bank
     else:
         news = NewsPost.objects.all().order_by('-published')[:3]
         blog = BlogPost.objects.all().order_by('-published')[:3]
         events = Event.objects.filter(host__slug='bundesverband').order_by('-start')
+        account = Host.objects.get(slug='bundesverband').bank
 
     template = loader.get_template('wbcore/about.html')
     context = {
@@ -869,6 +868,7 @@ def about_view(request, host_slug=None):
         'icon_links': icon_links,
         'about': about,
         'hosts': Host.objects.all(),
+        'account': account,
         'blog_item_list': item_list_from_posts(blog, post_type='blog-post', id_key='post_id'),
         'news_item_list': item_list_from_posts(news, post_type='news-post', id_key='news_id'),
         'event_item_list': item_list_from_events(events, text=True, max_num_items=3),
@@ -1153,7 +1153,7 @@ def project_view(request, host_slug=None, project_slug=None):
             host = Host.objects.get(slug=host_slug)
             breadcrumb = [(_('Home'), reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
-                          (_('Projects'), reverse('projects')),
+                          (_('Projects'), reverse('projects', args=[host_slug])),
                           (project.name, None)]
         else:
             project = Project.objects.get(slug=project_slug)
@@ -1645,7 +1645,6 @@ def contact_view(request, host_slug=None):
         contact = None
     teams = Team.objects.filter(host=load_host)
 
-
     if teams:
         if len(teams) > 3:
             teams = teams[:3]
@@ -1657,6 +1656,11 @@ def contact_view(request, host_slug=None):
         teams = False
         more_teams = False
 
+    if host:
+        account = host.bank
+    else:
+        account = Host.objects.get(slug='bundesverband').bank
+
     template = loader.get_template('wbcore/contact.html')
     context = {
         'main_nav': get_main_nav(host=host),
@@ -1666,6 +1670,7 @@ def contact_view(request, host_slug=None):
         'success': False,
         'icon_links': icon_links,
         'contact': contact,
+        'account': account,
         'teams': teams,
         'address': load_host.address,
         'more_teams': more_teams,
@@ -1717,6 +1722,11 @@ def faq_view(request, host_slug=None):
         host = None
         breadcrumb = [(_('Home'), reverse('home')), (_('FAQ'), None)]
 
+    if host:
+        account = host.bank
+    else:
+        account = Host.objects.get(slug='bundesverband').bank
+
     template = loader.get_template('wbcore/faq.html')
     faq = FAQ.objects.all()
     for f in faq:
@@ -1729,6 +1739,7 @@ def faq_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'hosts': Host.objects.all(),
+        'account': account,
     }
     return HttpResponse(template.render(context, request))
 

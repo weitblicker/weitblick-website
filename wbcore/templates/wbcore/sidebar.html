@@ -53,17 +53,17 @@
         </div>
     {% endif %}
 
+    {% if hosts %}
+    <div class="ui segment">
+        {% include 'wbcore/hosts_map.html' %}
+    </div>
+    {% endif %}
+
     {% if account %}
     <div class="ui segment">
         {% trans "Donate" as title %}
         {% include "wbcore/segment_header.html" with icon='donate' url_alias='donate' %}
         {% include 'wbcore/bank_account.html' with account=account %}
-    </div>
-    {% endif %}
-
-    {% if hosts %}
-    <div class="ui segment">
-        {% include 'wbcore/hosts_map.html' %}
     </div>
     {% endif %}
 

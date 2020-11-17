@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load thumbnail %}
 <div class="item" style="display: flex; align-items: center">
 
     {% if not no_image %}
@@ -103,11 +104,11 @@
         <div class="extra">
             {% if show_author|default_if_none:True %}
                 {% if item.author %}
-                    <img class="ui avatar image" src="{% get_media_prefix %}{% if item.author.image %}{{ item.author.image }}{% else %}kristy.png{% endif %}">
-                    {{ item.author.name }}
+                    {% thumbnail item.author.image|default:'kristy.png' 'profile_list_view' as thumb %}
+                    <img class="ui avatar image" src='{{ thumb.url }}'>{{ item.author_name }}
                 {% elif item.author_str %}
-                    <img class="ui avatar image" src="{% get_media_prefix %}kristy.png">
-                    {{ item.author_str }}
+                    {% thumbnail 'kristy.png' 'profile_list_view' as thumb %}
+                    <img class="ui avatar image" src='{{ thumb.url }}'>{{ item.author_str }}
                 {% endif %}
             {% endif %}
             {% if item.show_text and not no_read_more %}

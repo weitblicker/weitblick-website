@@ -6,21 +6,20 @@
     {% include 'wbcore/image-header.html' with default='/images/faq_header.jpg'%}
     {% if faq %}
     <div class="ui segment">
-        <div class="ui one column grid list">
-            {% for elem in faq %}
-            <h2>{{ elem.title }}</h2>
-            <div class="ui items">
-                {% for qa in elem.questionandanswer_set.all %}
-                <div class="item">
-                    <div class="content">
-                        <a class="header">{{ qa.question }}</a>
-                        <div class="description">{{ qa.answer | safe }}</div>
-                    </div>
+        {% for elem in faq %}
+        <h2>{{ elem.title }}</h2>
+        <div id="FAQ" class="ui styled fluid accordion">
+            {% for qa in elem.questionandanswer_set.all %}
+                <div class="title">
+                    <i class="dropdown icon"></i>
+                    {{ qa.question }}
                 </div>
-                {% endfor %}
-            </div>
+                <div class="content">
+                    <p>{{ qa.answer | safe }}</p>
+                </div>
             {% endfor %}
         </div>
+        {% endfor %}
     </div>
     {% endif %}
 {% endblock %}

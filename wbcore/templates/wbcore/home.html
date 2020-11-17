@@ -30,5 +30,6 @@
         {% trans "News" as title %}
         {% include "wbcore/segment_header.html" with icon='newspaper outline' url_alias='news' %}
         {% include 'wbcore/item_list.html' with item_list=item_list %}
+        <a href="{% url 'news' %}">{% trans "more" %}</a>
     </div>
 {% endblock %}

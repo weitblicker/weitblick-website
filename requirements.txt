@@ -39,3 +39,4 @@ sshtunnel
 django-instagram
 cairosvg
 django-cleanup
+easy-thumbnails
