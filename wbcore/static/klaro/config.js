@@ -74,9 +74,6 @@ var klaroConfig = {
             klaro: {
                 description: 'Verwaltung des Einverständnis',
             },
-            highmaps:{
-                description: 'Karten',
-            },
             google_fonts: {
                 description: 'Web-Schriftarten von Google gehostet',
             },
@@ -108,9 +105,6 @@ var klaroConfig = {
             },
             klaro: {
                 description: 'Consent management',
-            },
-            highmaps: {
-                description: 'Maps visualization',
             },
             google_fonts: {
                 description: 'Web fonts hosted by Google',
@@ -196,12 +190,6 @@ var klaroConfig = {
         },
 
         // The apps will appear in the modal in the same order as defined here.
-        {
-            name: 'highmaps',
-            title: 'Highmaps',
-            purposes: ['functionality'],
-            required: true,
-        },
         {
             name: 'google_fonts',
             title: 'Google Fonts',
