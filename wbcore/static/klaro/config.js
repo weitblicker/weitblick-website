@@ -144,7 +144,7 @@ var klaroConfig = {
 
             // The purpose(s) of this app. Will be listed on the consent notice.
             // Do not forget to add translations for all purposes you list here.
-            purposes: ['essential'],
+            purposes: ['functionality'],
 
             // A list of regex expressions or strings giving the names of
             // cookies set by this app. If the user withdraws consent for a
@@ -217,6 +217,12 @@ var klaroConfig = {
                 [/^_gid.*$/, '/', 'weitblicker.org'],
                 [/^_gid.*$/, '/', 'localhost'],
             ],
+            callback: function(consent, app) {
+                if (consent == true) {
+                    console.log('loadgtm-analytics');
+                    dataLayer.push({'event': 'loadgtm-analytics'});
+                }
+            },
         },
         {
             name: 'google_ad',
@@ -227,6 +233,12 @@ var klaroConfig = {
                 [/^_gcl_au.*$/, '/', 'weitblicker.org'],
                 [/^_gcl_au.*$/, '/', 'localhost'],
             ],
+            callback: function(consent, app) {
+                if (consent == true) {
+                    console.log('loadgtm-ad');
+                    dataLayer.push({'event': 'loadgtm-ad'});
+                }
+            },
         },
     ],
 };
