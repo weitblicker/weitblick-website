@@ -46,6 +46,7 @@ Highcharts.setOptions({
                     if (!e.seriesOptions) {
                         var chart = this,
                             mapKey = 'countries/' + e.point.drilldown.toLowerCase() +'/'+ e.point.drilldown.toLowerCase()  + '-all',
+                            mapfilename = 'highmaps/countries/' + e.point.drilldown.toLowerCase() + '.js',
                             // Handle error, the timeout is cleared on success
                             fail = setTimeout(function() {
                                 if (!Highcharts.maps[mapKey]) {
@@ -58,8 +59,9 @@ Highcharts.setOptions({
                         // Show the spinner
                         chart.showLoading('<i class="icon-spinner icon-spin icon-3x"></i>'); // Font Awesome spinner
 
-                        // Load the drilldown map
-                        $.getScript('https://code.highcharts.com/mapdata/' + mapKey + '.js', function() {
+                        // Load the drilldown map the old way on highcharts
+                        //$.getScript('https://code.highcharts.com/mapdata/' + mapKey + '.js', function() {
+                        $.getScript('{% get_static_prefix %}' + mapfilename , function() {
 
                             data = Highcharts.geojson(Highcharts.maps[mapKey]);
 
