@@ -720,7 +720,7 @@ def team_view(request, host_slug=None, team_slug=None):
         raise Http404()
 
     if host:
-        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Team'), reverse('teams')), (team.name, None)]
+        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Team'), reverse('teams', args=[host_slug])), (team.name, None)]
     else:
         breadcrumb = [(_('Home'), reverse('home')), (_('Team'), reverse('teams')), (team.name, None)]
 
@@ -1153,7 +1153,7 @@ def project_view(request, host_slug=None, project_slug=None):
             host = Host.objects.get(slug=host_slug)
             breadcrumb = [(_('Home'), reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
-                          (_('Projects'), reverse('projects')),
+                          (_('Projects'), reverse('projects', args=[host_slug])),
                           (project.name, None)]
         else:
             project = Project.objects.get(slug=project_slug)
