@@ -35,7 +35,7 @@ class Command(BaseCommand):
             try:
                 urllib.request.urlretrieve(url, str(path_highmaps_countries / country_code) + '.js')
                 count += 1
-            except:
+            except urllib.error.HTTPError:
                 print('country {} with code {} cannot be downloaded'.format(country['properties']['name'], country_code))
 
         print("created {} country files".format(count))
