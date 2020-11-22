@@ -320,9 +320,9 @@ HONEYPOT_FIELD_NAME = "phone"
 
 THUMBNAIL_ALIASES = {
     '': {
-        'profile_list_view': {'size': (24, 24), 'crop': ','},
-        'profile_post_view': {'size': (26, 26), 'crop': ','},
-        'profile_team_members': {'size': (150, 150), 'crop': ','},
-        'partner_logo_list_view': {'size': (175, 124), 'background': '#FFFFFF'}
+        'profile_list_view': {'size': (48, 48), 'crop': ','},
+        'profile_post_view': {'size': (52, 52), 'crop': ','},
+        'profile_team_members': {'size': (300, 300), 'crop': ','},
+        'partner_logo_list_view': {'size': (350, 248), 'background': '#FFFFFF'}
     },
 }
