@@ -170,9 +170,7 @@ var klaroConfig = {
             // the `app` config as the second parameter as well.
             callback: function(consent, app) {
                 // This is an example callback function.
-                console.log(
-                    'User consent for app ' + app.name + ': consent=' + consent
-                );
+                console.log('User consent for app ' + app.name + ': consent=' + consent);
             },
 
             // If "required" is set to true, Klaro will not allow this app to
@@ -195,6 +193,9 @@ var klaroConfig = {
             title: 'Google Fonts',
             purposes: ['functionality'],
             required: true,
+            callback: function(consent, app){
+                console.log('User consent for app ' + app.name + ': consent=' + consent);
+            }
         },
         {
             name: 'google_tag_manager',
@@ -205,6 +206,9 @@ var klaroConfig = {
                 [/^_dc_gtm_UA-.*$/, '/', 'weitblicker.org'],
                 [/^_dc_gtm_UA-.*$/, '/', 'localhost'],
             ],
+            callback: function(consent, app){
+                console.log('User consent for app ' + app.name + ': consent=' + consent);
+            }
         },
         {
             name: 'google_analytics',
@@ -218,10 +222,7 @@ var klaroConfig = {
                 [/^_gid.*$/, '/', 'localhost'],
             ],
             callback: function(consent, app) {
-                if (consent == true) {
-                    console.log('loadgtm-analytics');
-                    dataLayer.push({'event': 'loadgtm-analytics'});
-                }
+                console.log('User consent for app ' + app.name + ': consent=' + consent);
             },
         },
         {
@@ -234,10 +235,7 @@ var klaroConfig = {
                 [/^_gcl_au.*$/, '/', 'localhost'],
             ],
             callback: function(consent, app) {
-                if (consent == true) {
-                    console.log('loadgtm-ad');
-                    dataLayer.push({'event': 'loadgtm-ad'});
-                }
+                console.log('User consent for app ' + app.name + ': consent=' + consent);
             },
         },
     ],
@@ -245,3 +243,7 @@ var klaroConfig = {
 
 klaroConfig.translations.fr = klaroConfig.translations.en
 klaroConfig.translations.es = klaroConfig.translations.en
+
+
+
+klaro:"%7B%22klaro%22%3Atrue%2C%22google_fonts%22%3Atrue%2C%22google_tag_manager%22%3Atrue%2C%22google_analytics%22%3Atrue%2C%22google_ad%22%3Afalse%7D"
