@@ -661,6 +661,7 @@ def privacy_view(request, host_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'bundesverband': Host.objects.get(slug='bundesverband'),
         'privacy': privacy,
         'hosts': Host.objects.all(),
     }
