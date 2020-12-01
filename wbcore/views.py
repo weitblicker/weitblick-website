@@ -107,7 +107,7 @@ def get_main_nav(host=None, active=None):
             ('hosts',
                 {
                     'name': _('Associations'),
-                    'link': reverse('hosts'),
+                    'link': reverse('hosts', args=args),
                     'icon': 'wbcore/svgs/unions.svg',
                     'mobile': True,
                 }),
@@ -1238,16 +1238,22 @@ def project_view(request, host_slug=None, project_slug=None):
     return HttpResponse(template.render(context, request))
 
 
-def hosts_view(request):
-    hosts = Host.objects.all()
+def hosts_view(request, host_slug=None):
+    if host_slug:
+        host = Host.objects.get(slug=host_slug)
+        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Associations'), None)]
+    else:
+        host = None
+        breadcrumb = [(_('Home'), reverse('home')), (_('Associations'), None)]
 
     template = loader.get_template('wbcore/hosts.html')
     context = {
-        'hosts': hosts,
-        'main_nav': get_main_nav(active='hosts'),
+        'host': host,
+        'hosts': Host.objects.all(),
+        'main_nav': get_main_nav(host=host, active='hosts'),
         'meta': get_meta(title=_('Associations')),
-        'dot_nav': get_dot_nav(),
-        'breadcrumb': [(_('Home'), reverse('home')), (_('Associations'), None)],
+        'dot_nav': get_dot_nav(host=host),
+        'breadcrumb': breadcrumb,
         'icon_links': icon_links
     }
     return HttpResponse(template.render(context, request))
