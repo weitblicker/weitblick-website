@@ -516,6 +516,8 @@ class Partner(RulesModel):
         image = self.logo()
         return image.url if image else None
 
+    def get_teaser(self):
+        return self.description
 
 
 class Project(RulesModel):
@@ -584,6 +586,8 @@ class Project(RulesModel):
         image = self.get_title_image()
         return image.get_search_mini_url() if image else None
 
+    def get_teaser(self):
+        return self.short_description if self.short_description else self.description
 
 class Event(RulesModelMixin, ScheduleEvent, metaclass=RulesModelBase):
     class Meta:
@@ -633,6 +637,9 @@ class Event(RulesModelMixin, ScheduleEvent, metaclass=RulesModelBase):
 
     def get_hosts(self):
         return [self.host]
+
+    def get_teaser(self):
+        return self.teaser
 
 
 class UserRelation(RulesModel):
@@ -709,6 +716,9 @@ class NewsPost(RulesModel):
 
     def get_hosts(self):
         return [self.host]
+
+    def get_teaser(self):
+        return self.teaser if self.teaser else self.text
 
     def belongs_to_host(self, host):
         return self.host == host
@@ -824,6 +834,9 @@ class BlogPost(RulesModel):
     def get_hosts(self):
         return [self.host]
 
+    def get_teaser(self):
+        return self.teaser if self.teaser else self.text
+
 def replace_umlaute(string):
     string_utf8 = string.replace('ä', 'ae').replace('ü', 'ue').replace('ö', 'oe').replace('ß', 'ss')
     # get rid of other utf8 symbols
@@ -930,6 +943,9 @@ class Team(RulesModel):
 
     def get_hosts(self):
         return [self.host]
+
+    def get_teaser(self):
+        return self.teaser if self.teaser else self.description
 
 
 class TeamUserRelation(RulesModel):
