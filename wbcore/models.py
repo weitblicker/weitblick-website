@@ -513,7 +513,7 @@ class Partner(RulesModel):
         return reverse('partner', args=[self.slug])
 
     def search_image(self):
-        image = self.logo()
+        image = self.logo
         return image.url if image else None
 
     def get_teaser(self):
