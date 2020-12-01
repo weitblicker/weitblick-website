@@ -252,6 +252,7 @@ def item_list_from_events(events, host_slug=None, start=None, end=None, text=Tru
 def item_list_from_occ(occurrences, host_slug=None, text=True):
     # set attributes to fill list_item template
     item_list = []
+    current_host = Host.objects.get(slug=host_slug) if host_slug else None
     for occ in occurrences:
         # image
         occ.image = occ.event.image
@@ -284,7 +285,6 @@ def item_list_from_occ(occurrences, host_slug=None, text=True):
         occ.host = occ.event.host
 
         # link
-        current_host = Host.objects.get(slug=host_slug) if host_slug else None
         if current_host and current_host == occ.event.host:
             occ.link = reverse('event', kwargs={'event_slug': occ.event.slug, 'host_slug': host_slug})
         else:
@@ -322,15 +322,14 @@ def item_list_from_occ(occurrences, host_slug=None, text=True):
 
 def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='post_id', text=True):
     item_list = []
+    current_host = Host.objects.get(slug=host_slug) if host_slug else None
     for post in posts:
         if not post.teaser and post.text:
             post.teaser = post.text
         elif not post.teaser:
             post.teaser = ""
-        current_host = Host.objects.get(slug=host_slug) if host_slug else None
         if current_host and post.host and current_host == post.host:
             post.link = reverse(post_type, kwargs={id_key: post.id, 'host_slug': host_slug})
-
         else:
             post.link = reverse(post_type, args=[post.id])
         post.show_text = text
@@ -401,6 +400,7 @@ def item_list_from_teams(teams, host_slug=None):
 
 def item_list_from_partners(partners, host_slug=None, text=True, max_num_items=None):
     item_list = []
+    current_host = Host.objects.get(slug=host_slug) if host_slug else None
     categories = dict(Partner.CATEGORY_CHOICES)
     category_icons = dict(Partner.CATEGORY_ICONS)
 
@@ -424,7 +424,7 @@ def item_list_from_partners(partners, host_slug=None, text=True, max_num_items=N
         partner.fixed_image = partner.logo
         partner.hosts_list = [host for host in Host.objects.filter(partners=partner).order_by('name')]
         if not partner.hosts_list: continue  # do not show partners without host
-        if host_slug:
+        if current_host and partner.belongs_to_host(current_host):
             partner.link = reverse('partner', kwargs={'partner_slug': partner.slug, 'host_slug': host_slug})
         else:
             partner.link = reverse('partner', kwargs={'partner_slug': partner.slug})
@@ -799,7 +799,7 @@ def partners_view(request, host_slug=None):
         'meta': get_meta(title=_('Partners')),
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
-        'ajax_endpoint': reverse('ajax-filter-partners'),
+        'ajax_endpoint': reverse('ajax-filter-partners', args=[host_slug] if host_slug else None),
         'filter_preset': {'host': [host.slug] if host else None, },
         'filter_active': True,
         'categories': Partner.CATEGORY_CHOICES,
@@ -993,7 +993,7 @@ def projects_view(request, host_slug=None):
         'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
         'countries': countries,
         'filter_visibility': True,
-        'ajax_endpoint': reverse('ajax-filter-projects'),
+        'ajax_endpoint': reverse('ajax-filter-projects', args=[host_slug] if host_slug else None),
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
@@ -1329,7 +1329,7 @@ def events_view(request, host_slug=None):
         'filter_preset': {'host': [host.slug] if host else None, },
         'filter_date': True,
         'item_list': item_list_from_events(events, host_slug),
-        'ajax_endpoint': reverse('ajax-filter-events'),
+        'ajax_endpoint': reverse('ajax-filter-events', args=[host_slug] if host_slug else None),
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
@@ -1425,7 +1425,7 @@ def blog_view(request, host_slug=None):
         'filter_preset': {'host': [host.slug] if host else None, },
         'filter_date': True,
         'item_list': item_list_from_posts(posts, host_slug, post_type="blog-post", id_key='post_id'),
-        'ajax_endpoint': reverse('ajax-filter-blog'),
+        'ajax_endpoint': reverse('ajax-filter-blog', args=[host_slug] if host_slug else None),
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
@@ -1514,7 +1514,7 @@ def news_view(request, host_slug=None):
         'filter_date': True,
         'item_list': posts,
         'icon_links': icon_links,
-        'ajax_endpoint': reverse('ajax-filter-news'),
+        'ajax_endpoint': reverse('ajax-filter-news', args=[host_slug] if host_slug else None),
     }
     return HttpResponse(template.render(context, request))
 
