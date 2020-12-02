@@ -17,7 +17,7 @@ libsass
 num2words
 markdown>=3.0
 martor>=1.5.1
-django-modeltranslation
+django-modeltranslation>=0.16.1
 django-tinymce4-lite
 python-slugify
 django-microsoft-auth
@@ -40,3 +40,4 @@ django-instagram
 cairosvg
 django-cleanup
 easy-thumbnails
+django-location-field

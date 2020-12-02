@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'captcha',
     'honeypot',
     'easy_thumbnails',
+    'location_field.apps.DefaultConfig',
     'django_cleanup.apps.CleanupConfig',  # should be at the bottom
 ]
 
@@ -325,4 +326,16 @@ THUMBNAIL_ALIASES = {
         'profile_team_members': {'size': (300, 300), 'crop': ','},
         'partner_logo_list_view': {'size': (350, 248), 'background': '#FFFFFF'}
     },
+}
+
+LOCATION_FIELD = {
+    'map.provider': 'openstreetmap',
+    'map.zoom': 5,
+    'provider.openstreetmap.max_zoom': 18,
+    'search.provider': 'nominatim',
+    'resources.root_path': '/static/location_field',
+    'resources.media': {
+        'js': [
+            'custom_map_widget/form.js'
+        ]}
 }
