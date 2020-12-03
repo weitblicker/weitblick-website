@@ -122,17 +122,105 @@ def get_main_nav(host=None, active=None):
 def get_dot_nav(host=None):
     if host:
         host_slug = host.slug
+        link_args = [host.slug]
         news = NewsPost.objects.filter(host=host).order_by('-published')[:3]
         blog = BlogPost.objects.filter(host=host).order_by('-published')[:3]
         events = Event.objects.filter(host=host)
     else:
         host_slug = None
+        link_args = []
         news = NewsPost.objects.all().order_by('-published')[:3]
         blog = BlogPost.objects.all().order_by('-published')[:3]
         events = Event.objects.all()
+    news = item_list_from_posts(news, host_slug=host_slug, post_type='news-post')
+    blog = item_list_from_posts(blog, host_slug=host_slug, post_type='blog-post')
     occurrences = item_list_from_events(events, start=datetime.now(), host_slug=host_slug, text=False, show_only_first_occ=True, max_num_items=3)
-    return {'news': news, 'blog': blog, 'occurrences': occurrences}
 
+    about_entries = OrderedDict([
+        ('idea', {
+            'name': _('Idea'),
+            'link': reverse('idea', args=link_args),
+            'icon': 'lightbulb outline icon',
+        }),
+        ('history', {
+            'name': _('History'),
+            'link': reverse('history', args=link_args),
+            'icon': 'history icon',
+        }),
+        ('teams', {
+            'name': _('Team'),
+            'link': reverse('teams', args=link_args),
+            'icon': 'users icon',
+        }),
+        ('partners', {
+            'name': _('Partners'),
+            'link': reverse('partners', args=link_args),
+            'icon': 'handshake icon',
+        }),
+        ('donate', {
+            'name': _('Donate'),
+            'link': reverse('donate', args=link_args),
+            'icon': 'donate icon',
+        }),
+        ('contact', {
+            'name': _('Contact'),
+            'link': reverse('contact', args=link_args),
+            'icon': 'address book outline icon',
+        }),
+    ])
+
+    facts_entries = OrderedDict([
+        ('transparency', {
+            'name': _('Transparency'),
+            'link': reverse('transparency', args=link_args),
+            'icon': 'eye outline icon',
+        }),
+        ('charter', {
+            'name': _('Charter'),
+            'link': reverse('charter', args=link_args),
+            'icon': 'file alternate outline icon',
+        }),
+        ('reports', {
+            'name': _('Reports'),
+            'link': reverse('reports', args=link_args),
+            'icon': 'chart line icon',
+        }),
+        ('faq', {
+            'name': _('FAQ'),
+            'link': reverse('faq', args=link_args),
+            'icon': 'question icon',
+        }),
+    ])
+
+    dot_nav = OrderedDict([
+        ('about', {
+            'name': _('About'),
+            'link': reverse('about', args=link_args),
+            'entries': about_entries,
+        }),
+        ('news', {
+            'name': _('News'),
+            'link': reverse('news', args=link_args),
+            'items': news,
+        }),
+        ('blog', {
+            'name': _('Blog'),
+            'link': reverse('blog', args=link_args),
+            'items': blog,
+        }),
+        ('facts', {
+            'name': _('Facts'),
+            'link': reverse('facts', args=link_args),
+            'entries': facts_entries,
+        }),
+        ('events', {
+            'name': _('Events'),
+            'link': reverse('events', args=link_args),
+            'items': occurrences,
+        }),
+    ])
+
+    return dot_nav
 
 def get_meta(title=None, description=None, robots=None):
     meta = {
@@ -330,7 +418,6 @@ def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='p
         current_host = Host.objects.get(slug=host_slug) if host_slug else None
         if current_host and post.host and current_host == post.host:
             post.link = reverse(post_type, kwargs={id_key: post.id, 'host_slug': host_slug})
-
         else:
             post.link = reverse(post_type, args=[post.id])
         post.show_text = text
