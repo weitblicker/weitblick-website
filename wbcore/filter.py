@@ -39,7 +39,7 @@ def parse_limit(request, default=20):
         except ValueError:
             pass
 
-    if limit is -1:
+    if limit == -1:
         return None
 
     return limit
