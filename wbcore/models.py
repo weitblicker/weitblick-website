@@ -360,7 +360,7 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
         if self.is_super_admin:
             return True
 
-        if app_label is 'wbcore':
+        if app_label == 'wbcore':
             return True
 
         return False
@@ -513,7 +513,7 @@ class Partner(RulesModel):
         return reverse('partner', args=[self.slug])
 
     def search_image(self):
-        image = self.logo()
+        image = self.logo
         return image.url if image else None
 
     def get_teaser(self):
