@@ -29,7 +29,6 @@ django-el-pagination
 markdown-fenced-code-tabs
 rules
 django_reverse_admin
-django-cookie-law
 django-simple-captcha
 django-honeypot
 # load blog posts
