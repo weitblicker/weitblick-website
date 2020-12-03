@@ -65,11 +65,11 @@ var klaroConfig = {
         // bundled translations.
         de: {
             consentNotice: {
-                // extraHTML: "<p>test</p>",
+                extraHTML: "Mehr Informationen zu allen Verarbeitungen deiner personenbezogenen Daten findest Du in unserer <a href='/privacy'>Datenschutzerklärung</a> und in der folgenden Cookie-Übersicht:",
             },
             consentModal: {
                 description:
-                    'Hier können Sie einsehen und anpassen, welche Information wir über Sie sammeln. Einträge die als "Beispiel" gekennzeichnet sind dienen lediglich zu Demonstrationszwecken und werden nicht wirklich verwendet.',
+                    'Wir möchten gerne einige externe Inhalte nutzen, um unseren Web-Auftritt zu optimieren. Die Drittanbieter erhalten insbesondere Zugriff auf Anfrage-Daten und Nutzungs-Daten wie deine IP-Adresse und die aufgerufene Weitblick-URL. Für diese Verarbeitungen – d.h. insbesondere Übermittlungen in Länder außerhalb der EU – bitten wir um deine Einwilligung, die du jederzeit über den Link in unserer Datenschutzerklärung widerrufen kannst.',
             },
             klaro: {
                 description: 'Verwaltung des Einverständnis',
@@ -78,7 +78,7 @@ var klaroConfig = {
                 description: 'Web-Schriftarten von Google gehostet',
             },
             google_tag_manager: {
-                description: 'Einbinden von Website-Inhalten wie Statistik-Tools, Performanceoptimierung',
+                description: 'Die Google-Konzernunternehmen wie Google LLC und Google Ireland Limited verarbeiten die übermittelten Anfrage-Daten (z.B. IP-Adresse), Nutzungs- (z.B. aufgerufene Seiten) und Werbekampagnen-Daten darüber hinaus zu eigenen Zwecken und verknüpfen diese womöglich mit weiteren Daten wie deinen Account-Daten. Die Verarbeitungen erfolgen teilweise in den USA, wo kein mit der EU vergleichbares Datenschutzniveau garantiert ist und insbesondere staatliche Behörden Zugriff auf die verarbeiteten Daten haben können. Zur Google-Datenschutzerklärung: https://policies.google.com/privacy?hl=de',
             },
             google_analytics: {
                 description: 'Reichweitenmessung und Inhalteoptimierung',
@@ -101,7 +101,7 @@ var klaroConfig = {
                 // uncomment and edit this to add extra HTML to the consent modal below the main text
                 // extraHTML: "<p>This is additional HTML that can be freely defined.</p>",
                 description:
-                    'Here you can see and customize the information that we collect about you. Entries marked as "Example" are just for demonstration purposes and are not really used on this website.',
+                    'We want to use some third party content to optimize our website. The third parties gain access to access and usage data like your IP address and the weitblick-url you accessed. For this processing - i.e. the transmission into countries outside of the EU - we ask you for your consent. You can revoke this consent at any time on our privacy page.',
             },
             klaro: {
                 description: 'Consent management',
