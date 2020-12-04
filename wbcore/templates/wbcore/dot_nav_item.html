@@ -27,7 +27,7 @@
 {% else %}
 
     <div class="item">
-        {% if image %}
+        {% if item.image %}
             <a href="{{ item.link }}" class="ui top aligned image">
                 <img src="{{ item.image.get_menusize_url }}" class="thumbnail" alt="{{ item.image.title }}">
             </a>
@@ -35,7 +35,7 @@
 
         <div class="content">
             <a href="{{ item.link }}">{{ item.title }}</a>
-            {% if type == 'blog-post' %}
+            {% if not item.image %}
                 <p>{{ item.teaser | truncatewords:7 }}</p>
             {% endif %}
         </div>
