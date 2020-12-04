@@ -25,7 +25,9 @@
         <div class="ui fluid vertical menu">
             <a class="item" href="{{dot_nav.about.link}}">{{dot_nav.about.name}}</a>
             {% for key, entry in dot_nav.about.entries.items %}
-                <a class="item" href="{{ entry.link }}">{{ entry.name }}</a>
+                {% if key != 'idea' %}
+                    <a class="item" href="{{ entry.link }}">{{ entry.name }}</a>
+                {% endif %}
             {% endfor %}
         </div>
     </div>
