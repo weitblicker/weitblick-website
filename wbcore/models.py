@@ -885,6 +885,43 @@ class Document(RulesModel):
     def get_hosts(self):
         return [self.host]
 
+    def get_url(self):
+        return self.file.url
+
+class ExternalDocument(RulesModel):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "view": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "delete": pred.is_super_admin | pred.is_admin | pred.is_editor,
+        }
+        get_latest_by = 'valid_from'
+
+    title = models.CharField(max_length=50)
+    description = models.TextField(null=True, blank=True)
+    url = models.URLField()
+    host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True)
+    published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    TYPE_CHOICES = Document.TYPE_CHOICES
+    document_type = models.CharField(max_length=40, choices=TYPE_CHOICES, default='annual_report', null=True)
+    updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+    valid_from = models.DateField(blank=False, default=datetime.date.today)
+    public = models.BooleanField(default=True)
+
+    def belongs_to_host(self, host):
+        return self.host == host
+
+    def __str__(self):
+        city = ("(" + self.host.city + ")") if self.host else ''
+        return self.title + " " + city
+
+    def get_hosts(self):
+        return [self.host]
+
+    def get_url(self):
+        return self.url
+
 
 class Team(RulesModel):
     class Meta:

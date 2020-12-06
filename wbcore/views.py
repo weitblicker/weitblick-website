@@ -29,7 +29,7 @@ from honeypot.decorators import check_honeypot
 
 from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
-    UserRelation, Partner, JoinPage, SocialMediaLink, Content, Document, Donation, FAQ)
+    UserRelation, Partner, JoinPage, SocialMediaLink, Content, Document, ExternalDocument, Donation, FAQ)
 
 
 main_host_slug = 'bundesverband' ## TODO configure this?
@@ -436,6 +436,13 @@ def item_list_from_partners(partners, host_slug=None, text=True, max_num_items=N
     return item_list
 
 
+def join_documents_external(documents, external_documents):
+    documents = [d for d in documents]
+    external_documents = [d for d in external_documents]
+    documents = documents + external_documents
+    return sorted(documents, key=lambda x: x.valid_from, reverse=True)
+
+
 def home_view(request):
     projects = Project.objects.all()[:5]
     hosts = Host.objects.all()
@@ -479,8 +486,10 @@ def reports_view(request, host_slug=None):
         report = None
     financial_reports = Document.objects.filter(host=load_host, document_type='financial_report', public=True)
     financial_reports = financial_reports.order_by('-valid_from') if financial_reports else financial_reports
+
     annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
-    annual_reports = annual_reports.order_by('-valid_from') if annual_reports else annual_reports
+    annual_reports_ext = ExternalDocument.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports = join_documents_external(annual_reports, annual_reports_ext)
 
     template = loader.get_template('wbcore/reports.html')
     context = {

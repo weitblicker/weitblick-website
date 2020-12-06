@@ -6,7 +6,7 @@ Necessary for the modeltranslation package
 
 from modeltranslation.translator import register, TranslationOptions
 from .models import (
-    Project, Location, Address, Host, Partner, NewsPost, BlogPost, Document, Team, Content, Event, Milestone,
+    Project, Location, Address, Host, Partner, NewsPost, BlogPost, Document, ExternalDocument, Team, Content, Event, Milestone,
     Donation, BankAccount, ContactMessage, CycleDonation, FAQ, QuestionAndAnswer, UserRelation, JoinPage,
     SocialMediaLink, TeamUserRelation, CycleDonationRelation, Photo)
 from schedule.models.events import Event as ScheduleEvent
@@ -59,6 +59,11 @@ class BlogPostTranslationOptions(TranslationOptions):
 
 @register(Document)
 class DocumentTranslationOptions(TranslationOptions):
+    fields = ('title','description')
+
+
+@register(ExternalDocument)
+class ExternalDocumentTranslationOptions(TranslationOptions):
     fields = ('title','description')
 
 
