@@ -360,7 +360,7 @@ class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesM
         if self.is_super_admin:
             return True
 
-        if app_label is 'wbcore':
+        if app_label == 'wbcore':
             return True
 
         return False
