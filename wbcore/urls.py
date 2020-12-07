@@ -52,6 +52,7 @@ urlpatterns = [
     path('', views.home_view, name='home'),
     path('rest/', include(rest_urls.rest_patterns)),
     path('ajax/', include(ajax_urls.ajax_patterns)),
+    path('ajax/<str:host_slug>/', include(ajax_urls.ajax_patterns)),
     path('search/', views.search_view, name='search'),
     path('sitemap/', views.sitemap_view, name='sitemap'),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
