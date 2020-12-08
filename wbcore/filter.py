@@ -194,7 +194,6 @@ def filter_events(request, default_limit=None):
 
 def filter_partners(request, default_limit=None, return_queryset=False):
     host_slugs = parse_union(request)
-    print(host_slugs)
     contains = request.GET.get("search")
     active = request.GET.get("active")
     categories = parse_categories(request)
