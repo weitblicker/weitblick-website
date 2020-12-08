@@ -776,7 +776,6 @@ class LocationAdmin(MyAdmin):
     def get_occurrences(self, location):
         occurrences = []
 
-        print(location)
         for event in location.event_set.all():
             occurrences.append(self.link('Event', event.pk, event.title))
 
