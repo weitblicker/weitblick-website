@@ -29,7 +29,7 @@ from honeypot.decorators import check_honeypot
 
 from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
-    UserRelation, Partner, JoinPage, SocialMediaLink, Content, Document, ExternalDocument, Donation, FAQ)
+    UserRelation, Partner, JoinPage, SocialMediaLink, Content, Document, UrlDocument, Donation, FAQ)
 
 
 main_host_slug = 'bundesverband' ## TODO configure this?
@@ -436,11 +436,17 @@ def item_list_from_partners(partners, host_slug=None, text=True, max_num_items=N
     return item_list
 
 
-def join_documents_external(documents, external_documents):
+def join_documents_urldocuments(documents, url_documents, sort_key='valid_from'):
     documents = [d for d in documents]
-    external_documents = [d for d in external_documents]
-    documents = documents + external_documents
-    return sorted(documents, key=lambda x: x.valid_from, reverse=True)
+    url_documents = [d for d in url_documents]
+    documents = documents + url_documents
+    if sort_key[0] == '-':
+        sort_reverse = True
+        sort_key = sort_key[1:]
+    else:
+        sort_reverse = False
+    documents = sorted(documents, key=lambda x: getattr(x, sort_key), reverse=sort_reverse)
+    return documents
 
 
 def home_view(request):
@@ -484,12 +490,14 @@ def reports_view(request, host_slug=None):
         report = Content.objects.get(host=load_host, type='reports')
     except Content.DoesNotExist:
         report = None
+
     financial_reports = Document.objects.filter(host=load_host, document_type='financial_report', public=True)
-    financial_reports = financial_reports.order_by('-valid_from') if financial_reports else financial_reports
+    financial_reports_url = UrlDocument.objects.filter(host=load_host, document_type='financial_report', public=True)
+    financial_reports = join_documents_urldocuments(financial_reports, financial_reports_url, sort_key="-valid_from")
 
     annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
-    annual_reports_ext = ExternalDocument.objects.filter(host=load_host, document_type='annual_report', public=True)
-    annual_reports = join_documents_external(annual_reports, annual_reports_ext)
+    annual_reports_url = UrlDocument.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports = join_documents_urldocuments(annual_reports, annual_reports_url, sort_key="-valid_from")
 
     template = loader.get_template('wbcore/reports.html')
     context = {
@@ -524,7 +532,8 @@ def charter_view(request, host_slug=None):
         charter = None
 
     charter_files = Document.objects.filter(host=load_host, document_type='charter', public=True)
-    charter_files = charter_files.order_by('valid_from') if charter_files else charter_files
+    charter_files_url = UrlDocument.objects.filter(host=load_host, document_type='charter', public=True)
+    charter_files = join_documents_urldocuments(charter_files, charter_files_url, sort_key='-valid_from')
 
     template = loader.get_template('wbcore/charter.html')
     context = {
@@ -568,9 +577,13 @@ def transparency_view(request, host_slug=None):
     }
 
     financial_reports = Document.objects.filter(host=load_host, document_type='financial_report', public=True)
-    financial_reports = financial_reports.order_by('-valid_from') if financial_reports else financial_reports
+    financial_reports_url = UrlDocument.objects.filter(host=load_host, document_type='financial_report', public=True)
+    financial_reports = join_documents_urldocuments(financial_reports, financial_reports_url, sort_key="-valid_from")
+
     annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
-    annual_reports = annual_reports.order_by('-valid_from') if annual_reports else annual_reports
+    annual_reports_url = UrlDocument.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports = join_documents_urldocuments(annual_reports, annual_reports_url, sort_key="-valid_from")
+
 
 
     template = loader.get_template('wbcore/transparency.html')
@@ -1149,7 +1162,12 @@ def join_view(request, host_slug=None):
     else:
         projects = Project.objects.all().order_by('completed', '-updated')
 
-    membership_declaration = Document.objects.filter(host=host, document_type='membership_declaration', public=True).order_by('-valid_from') if host else None
+    if host:
+        membership_declaration = Document.objects.filter(host=host, document_type='membership_declaration', public=True)
+        membership_declaration_url = UrlDocument.objects.filter(host=host, document_type='membership_declaration', public=True)
+        membership_declaration = join_documents_urldocuments(membership_declaration, membership_declaration_url, sort_key='-valid_from')
+    else:
+        membership_declaration = None
 
     context = {
         'main_nav': get_main_nav(host=host, active='join'),

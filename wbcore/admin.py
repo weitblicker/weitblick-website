@@ -25,7 +25,7 @@ from itertools import chain
 
 from .models import (
     Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, ContactMessage, UserRelation,
-    Document, ExternalDocument, Team, Milestone, Donation, BankAccount, TeamUserRelation, Content, User, JoinPage,
+    Document, UrlDocument, Team, Milestone, Donation, BankAccount, TeamUserRelation, Content, User, JoinPage,
     SocialMediaLink, CycleDonation, QuestionAndAnswer, FAQ, Photo)
 
 
@@ -730,13 +730,18 @@ class CycleDonationAdmin(MyAdmin):
     get_projects.short_description = 'Projects'
 
 
-class DocumentAdmin(MyAdmin):
+class BaseDocumentAdmin(MyAdmin):
 
     list_display = ('title', 'host', 'document_type', 'published', 'public', 'valid_from')
 
-class ExternalDocumentAdmin(MyAdmin):
 
-    list_display = ('title', 'host', 'document_type', 'published', 'public', 'valid_from')
+class DocumentAdmin(BaseDocumentAdmin):
+    fields = ('title', 'description', 'host', 'file', 'valid_from', 'document_type', 'public')
+
+
+class UrlDocumentAdmin(BaseDocumentAdmin):
+    fields = ('title', 'description', 'host', 'url', 'valid_from', 'document_type', 'public')
+
 
 class DonationAdmin(MyAdmin):
 
@@ -841,7 +846,7 @@ admin.site.register(ContactMessage, ContactMessageAdmin)
 admin.site.register(Content, ContentAdmin)
 admin.site.register(CycleDonation, CycleDonationAdmin)
 admin.site.register(Document, DocumentAdmin)
-admin.site.register(ExternalDocument, ExternalDocumentAdmin)
+admin.site.register(UrlDocument, UrlDocumentAdmin)
 admin.site.register(Donation, DonationAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(FAQ, FAQAdmin)
