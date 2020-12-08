@@ -63,7 +63,7 @@ class DocumentTranslationOptions(TranslationOptions):
 
 
 @register(UrlDocument)
-class ExternalDocumentTranslationOptions(TranslationOptions):
+class UrlDocumentTranslationOptions(TranslationOptions):
     fields = ('title','description')
 
 
