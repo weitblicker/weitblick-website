@@ -894,7 +894,7 @@ class Document(BaseDocument):
         return self.file.url
 
 
-class UrlDocument(BaseDocument):
+class LinkedDocument(BaseDocument):
     url = models.URLField()
     icon = 'linkify'
 

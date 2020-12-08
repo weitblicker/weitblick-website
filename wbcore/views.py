@@ -29,7 +29,7 @@ from honeypot.decorators import check_honeypot
 
 from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
-    UserRelation, Partner, JoinPage, SocialMediaLink, Content, Document, UrlDocument, Donation, FAQ)
+    UserRelation, Partner, JoinPage, SocialMediaLink, Content, Document, LinkedDocument, Donation, FAQ)
 
 
 main_host_slug = 'bundesverband' ## TODO configure this?
@@ -436,10 +436,10 @@ def item_list_from_partners(partners, host_slug=None, text=True, max_num_items=N
     return item_list
 
 
-def join_documents_urldocuments(documents, url_documents, sort_key='-valid_from'):
+def join_documents_linked(documents, linked_documents, sort_key='-valid_from'):
     documents = [d for d in documents]
-    url_documents = [d for d in url_documents]
-    documents = documents + url_documents
+    linked_documents = [d for d in linked_documents]
+    documents = documents + linked_documents
     if sort_key[0] == '-':
         sort_reverse = True
         sort_key = sort_key[1:]
@@ -491,12 +491,12 @@ def reports_view(request, host_slug=None):
         report = None
 
     financial_reports = Document.objects.filter(host=load_host, document_type='financial_report', public=True)
-    financial_reports_url = UrlDocument.objects.filter(host=load_host, document_type='financial_report', public=True)
-    financial_reports = join_documents_urldocuments(financial_reports, financial_reports_url, sort_key="-valid_from")
+    financial_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='financial_report', public=True)
+    financial_reports = join_documents_linked(financial_reports, financial_reports_linked, sort_key="-valid_from")
 
     annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
-    annual_reports_url = UrlDocument.objects.filter(host=load_host, document_type='annual_report', public=True)
-    annual_reports = join_documents_urldocuments(annual_reports, annual_reports_url, sort_key="-valid_from")
+    annual_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports = join_documents_linked(annual_reports, annual_reports_linked, sort_key="-valid_from")
 
     template = loader.get_template('wbcore/reports.html')
     context = {
@@ -531,8 +531,8 @@ def charter_view(request, host_slug=None):
         charter = None
 
     charter_files = Document.objects.filter(host=load_host, document_type='charter', public=True)
-    charter_files_url = UrlDocument.objects.filter(host=load_host, document_type='charter', public=True)
-    charter_files = join_documents_urldocuments(charter_files, charter_files_url, sort_key='-valid_from')
+    charter_linked = LinkedDocument.objects.filter(host=load_host, document_type='charter', public=True)
+    charter_files = join_documents_linked(charter_files, charter_linked, sort_key='-valid_from')
 
     template = loader.get_template('wbcore/charter.html')
     context = {
@@ -576,14 +576,12 @@ def transparency_view(request, host_slug=None):
     }
 
     financial_reports = Document.objects.filter(host=load_host, document_type='financial_report', public=True)
-    financial_reports_url = UrlDocument.objects.filter(host=load_host, document_type='financial_report', public=True)
-    financial_reports = join_documents_urldocuments(financial_reports, financial_reports_url, sort_key="-valid_from")
+    financial_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='financial_report', public=True)
+    financial_reports = join_documents_linked(financial_reports, financial_reports_linked, sort_key="-valid_from")
 
     annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
-    annual_reports_url = UrlDocument.objects.filter(host=load_host, document_type='annual_report', public=True)
-    annual_reports = join_documents_urldocuments(annual_reports, annual_reports_url, sort_key="-valid_from")
-
-
+    annual_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports = join_documents_linked(annual_reports, annual_reports_linked, sort_key="-valid_from")
 
     template = loader.get_template('wbcore/transparency.html')
     context = {
@@ -1163,8 +1161,8 @@ def join_view(request, host_slug=None):
 
     if host:
         membership_declaration = Document.objects.filter(host=host, document_type='membership_declaration', public=True)
-        membership_declaration_url = UrlDocument.objects.filter(host=host, document_type='membership_declaration', public=True)
-        membership_declaration = join_documents_urldocuments(membership_declaration, membership_declaration_url, sort_key='-valid_from')
+        membership_declaration_linked = LinkedDocument.objects.filter(host=host, document_type='membership_declaration', public=True)
+        membership_declaration = join_documents_linked(membership_declaration, membership_declaration_linked, sort_key='-valid_from')
     else:
         membership_declaration = None
 
