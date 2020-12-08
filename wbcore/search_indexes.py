@@ -64,6 +64,10 @@ class BlogPostIndex(indexes.SearchIndex, indexes.Indexable):
     def index_queryset(self, using=None):
         return self.get_model().objects.all()
 
+    def prepare_host_slug(self, blog_post):
+        return blog_post.host.slug if blog_post.host else None
+
+
 
 class EventsIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
