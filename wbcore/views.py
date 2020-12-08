@@ -579,8 +579,6 @@ def transparency_view(request, host_slug=None):
         'financial_reports': financial_reports,
         'annual_reports': annual_reports,
     }
-    print('transparency')
-    print(context['meta'])
     return HttpResponse(template.render(context, request))
 
 
