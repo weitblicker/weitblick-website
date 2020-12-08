@@ -6,7 +6,7 @@
             <tr>
                 {% if show_year %}<td class="one wide">{{ document.valid_from.year }}</td>{% endif %}
                 <td class="selectable">
-                    <a target="_blank" href="{{ document.get_url }}" > <i class="file pdf outline icon"></i>{{ document.title }} </a>
+                    <a target="_blank" href="{{ document.get_url }}" > <i class="{{ document.icon }} icon"></i>{{ document.title }} </a>
                 </td>
             </tr>
         {% endfor %}

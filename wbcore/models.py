@@ -888,6 +888,7 @@ class BaseDocument(RulesModel):
 
 class Document(BaseDocument):
     file = models.FileField(upload_to=save_document)
+    icon = 'file pdf outline'
 
     def get_url(self):
         return self.file.url
@@ -895,6 +896,7 @@ class Document(BaseDocument):
 
 class UrlDocument(BaseDocument):
     url = models.URLField()
+    icon = 'linkify'
 
     def get_url(self):
         return self.url
