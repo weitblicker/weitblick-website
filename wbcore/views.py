@@ -436,7 +436,7 @@ def item_list_from_partners(partners, host_slug=None, text=True, max_num_items=N
     return item_list
 
 
-def join_documents_urldocuments(documents, url_documents, sort_key='valid_from'):
+def join_documents_urldocuments(documents, url_documents, sort_key='-valid_from'):
     documents = [d for d in documents]
     url_documents = [d for d in url_documents]
     documents = documents + url_documents
@@ -455,7 +455,6 @@ def home_view(request):
     news = NewsPost.objects.all().order_by('-published')[:5]
     blog = BlogPost.objects.all().order_by('-published')[:3]
     events = Event.objects.all().order_by('-start')
-
 
     template = loader.get_template('wbcore/home.html')
     context = {
