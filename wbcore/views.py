@@ -620,6 +620,14 @@ def facts_view(request, host_slug=None):
     except Content.DoesNotExist:
         facts = None
 
+    financial_reports = Document.objects.filter(host=load_host, document_type='financial_report', public=True)
+    financial_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='financial_report', public=True)
+    financial_reports = join_documents_linked(financial_reports, financial_reports_linked, sort_key="-valid_from")
+
+    annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports = join_documents_linked(annual_reports, annual_reports_linked, sort_key="-valid_from")
+
     template = loader.get_template('wbcore/facts.html')
     context = {
         'main_nav': get_main_nav(host=host),
@@ -629,6 +637,8 @@ def facts_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'facts': facts,
+        'financial_reports': financial_reports,
+        'annual_reports': annual_reports,
     }
     return HttpResponse(template.render(context, request))
 
