@@ -564,6 +564,8 @@ class HostAdmin(MyAdmin, ReverseModelAdmin):
     inline_type = 'stacked'
     inline_reverse = ['address', 'bank']
 
+    search_fields = ['name']
+
     list_display = ('name', 'slug', 'email', 'founding_date', 'address')
 
     def get_readonly_fields(self, request, obj=None):
@@ -670,6 +672,7 @@ class ProjectAdmin(MyAdmin, ReverseModelAdmin):
     #inlines = (MilestoneInlineModel, )
     list_display = ('name', 'get_hosts', 'get_country', 'start_date', 'end_date', 'completed', 'published')
     prepopulated_fields = {'slug': ('name',)}
+    autocomplete_fields = ['hosts']
 
     def get_hosts(self, project):
         return ", ".join([host.name.replace("Weitblick ", "") for host in project.hosts.all()])
@@ -793,7 +796,7 @@ class LocationAdmin(MyAdmin):
 
 class PhotoAdmin(MyAdmin):
 
-    list_display = ('title', 'slug', 'type', 'uploader', 'host',)
+    list_display = ('title', 'slug', 'type', 'uploader', 'host', 'admin_thumbnail')
     exclude = ('uploader', 'sites',)
 
     def save_model(self, request, obj, form, change):
