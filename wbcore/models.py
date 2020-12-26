@@ -26,9 +26,9 @@ import rules, datetime
 class Photo(RulesModelMixin, PhotologuePhoto, metaclass=RulesModelBase):
     class Meta:
         rules_permissions = {
-            "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "add": pred.is_super_admin | pred.is_admin | pred.is_editor | pred.is_author,
             "view": rules.always_allow,
-            "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_editor | pred.is_author,
             "delete": pred.is_super_admin | pred.is_admin,
         }
 

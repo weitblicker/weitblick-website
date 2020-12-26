@@ -191,6 +191,11 @@ class MyAdmin(TabbedTranslationAdmin):
                 # making the field readonly
                 kwargs['disabled'] = True
             kwargs["queryset"] = request.user.hosts
+
+        elif db_field.name == 'photos':
+            hosts = request.user.get_hosts_for_role(['admin', 'editor', 'author'])
+            kwargs["queryset"] = Photo.objects.filter(host__in=hosts).all()
+
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
     def get_exclude(self, request, obj=None):
@@ -249,6 +254,10 @@ class MyAdmin(TabbedTranslationAdmin):
                 hosts = request.user.hosts.all()
                 kwargs["queryset"] = Project.objects.filter(hosts__in=hosts).all()
 
+        elif db_field.name == 'image':
+                hosts = request.user.get_hosts_for_role(['admin', 'editor', 'author'])
+                kwargs["queryset"] = Photo.objects.filter(host__in=hosts).all()
+
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_queryset(self, request):
@@ -262,6 +271,7 @@ class MyAdmin(TabbedTranslationAdmin):
             return request.user.hosts.all()
 
         # if many to many field hosts exists filter using it
+        print(request.user.hosts.all())
         try:
             return queryset.filter(hosts__in=request.user.hosts.all())
         except:
@@ -532,8 +542,11 @@ class UserAdmin(BaseUserAdmin):
         return request.user.has_module_perms(self.opts.app_label)
 
     def save_model(self, request, obj, form, change):
-        if obj.image != User.objects.get(pk=obj.pk).image:  # delete old thumbnails on profile picture change
-            get_thumbnailer(User.objects.get(pk=obj.pk).image).delete_thumbnails()
+        try:
+            if obj.image != User.objects.get(pk=obj.pk).image:  # delete old thumbnails on profile picture change
+                get_thumbnailer(User.objects.get(pk=obj.pk).image).delete_thumbnails()
+        except User.DoesNotExist:
+            pass #User is created
         super(UserAdmin, self).save_model(request, obj, form, change)
 
 class TeamAdmin(MyAdmin):

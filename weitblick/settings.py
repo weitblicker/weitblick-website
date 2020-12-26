@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 from django.utils.translation import gettext_lazy as _
 import os
+import time
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -87,9 +88,13 @@ PHOTOLOGUE_DIR = 'images'
 
 def get_storage_path(instance, filename):
     fn = filename.lower()
+    replacements = {' ': '-', 'ä': 'ae', 'ö': 'oe', 'ü': 'ue'}
+    for k, i in replacements.items():
+        fn = fn.replace(k, i)
+    fn = '{}-{}'.format(time.strftime("%Y-%m-%d"), fn)
     if hasattr(instance, 'type'):
-        dir = instance.type
-        return os.path.join(PHOTOLOGUE_DIR, dir, fn)
+        mydir = instance.type
+        return os.path.join(PHOTOLOGUE_DIR, mydir, fn)
 
     return os.path.join(PHOTOLOGUE_DIR, 'photos', fn)
 
@@ -233,8 +238,6 @@ MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
     }
 }
 
-import time
-MARTOR_UPLOAD_PATH = 'images/uploads/{}'.format(time.strftime("%Y/%m/%d/"))
 MARTOR_UPLOAD_URL = '/rest/upload/'  # change to local uploader
 
 # Internationalization
