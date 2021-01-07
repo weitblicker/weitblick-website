@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'captcha',
     'honeypot',
     'easy_thumbnails',
+    'fixture_magic',
     'django_cleanup.apps.CleanupConfig',  # should be at the bottom
 ]
 
