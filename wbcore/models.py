@@ -590,6 +590,7 @@ class Project(RulesModel):
     def get_teaser(self):
         return self.short_description if self.short_description else self.description
 
+
 class Event(RulesModelMixin, ScheduleEvent, metaclass=RulesModelBase):
     class Meta:
         rules_permissions = {

@@ -1,9 +1,12 @@
 from django.core.management.base import BaseCommand
-from wbcore.models import Host
+from django.conf import settings
+from wbcore.models import Host, Document, Photo, UserRelation
 from fixture_magic.management.commands.dump_object import Command as DumpObjectCommand
+from fixture_magic.management.commands.merge_fixtures import Command as MergeFixturesCommand
 import io
 import sys
 import os
+import shutil
 import json
 
 class Command(BaseCommand):
@@ -28,8 +31,20 @@ class Command(BaseCommand):
             ('wbcore.newspost', {"host__slug": host.slug}),
             ('wbcore.blogpost', {"host__slug": host.slug}),
             ('wbcore.project', {"hosts__slug": host.slug}),
-            #('wbcore.event', {"hosts__slug": host.slug}),
+            ('wbcore.event', {"host__slug": host.slug}),
+            ('wbcore.document', {"host__slug": host.slug}),
+            # ('wbcore.external_document', {}),  # TODO not yet merged in master
+            ('wbcore.content', {"host__slug": host.slug}),
+            ('wbcore.team', {"host__slug": host.slug}),
+            ('wbcore.donation', {"host__slug": host.slug}),
+            ('wbcore.contactmessage', {"host__slug": host.slug}),
+            ('wbcore.userrelation', {"host__slug": host.slug}),  # includes users
+            ('wbcore.teamuserrelation', {'team__host__slug': host.slug}),
+            ('wbcore.photo', {"host__slug": host.slug}),
         ]
+
+        def get_model_filename(model_name, folder=''):
+            return dump_folder + model_name.split('.')[-1] + '.json'
 
         # backup
 
@@ -38,16 +53,40 @@ class Command(BaseCommand):
             os.makedirs(dump_folder)
 
         for model, query in models:
-            print(model, query)
             temp_stdout = io.StringIO()
             sys.stdout = temp_stdout
             DumpObjectCommand().handle(model=model, ids=None, query=json.dumps(query))
-            with open(dump_folder + model.split('.')[-1] + '.json', 'w') as f:
+            with open(get_model_filename(model, folder=dump_folder), 'w') as f:
                 f.write(temp_stdout.getvalue())
             sys.stdout = sys.__stdout__
-            print(temp_stdout.getvalue())
 
-        # save documents and files
+        # merge fixtures
+
+        temp_stdout = io.StringIO()
+        sys.stdout = temp_stdout
+        files = [get_model_filename(model[0], folder=dump_folder) for model in models]
+        MergeFixturesCommand().handle(*files)
+        with open(dump_folder + f'{host.slug}.json', 'w') as f:
+            f.write(temp_stdout.getvalue())
+        sys.stdout = sys.__stdout__
+
+        # save documents and photos
+
+        for document in Document.objects.filter(host__slug=host.slug):
+            os.makedirs(os.path.dirname(dump_folder + document.file.url.strip('/')), exist_ok=True)
+            shutil.copyfile(document.file.path, dump_folder + document.file.url.strip('/'))
+
+        for photo in Photo.objects.filter(host__slug=host.slug):
+            os.makedirs(os.path.dirname(dump_folder + photo.image.url.strip('/')), exist_ok=True)
+            shutil.copyfile(photo.image.path, dump_folder + photo.image.url.strip('/'))
+
+        for user_relation in UserRelation.objects.filter(host__slug=host.slug):
+            user = user_relation.user
+            try:
+                os.makedirs(os.path.dirname(dump_folder + user.image.url.strip('/')), exist_ok=True)
+                shutil.copyfile(user.image.path, dump_folder + user.image.url.strip('/'))
+            except ValueError:
+                pass
 
         # delete
 
