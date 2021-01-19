@@ -321,7 +321,7 @@ var SequentialLoader = function() {
                             // map providers
                              this.path + '/leaflet.js',
                             // search providers
-                             this.path + 'l.control.geosearch.js',
+                             this.path + '/l.control.geosearch.js',
                         ],
                         css = [
                             // map providers
