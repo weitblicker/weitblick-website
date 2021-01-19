@@ -59,8 +59,6 @@ Highcharts.setOptions({
                         // Show the spinner
                         chart.showLoading('<i class="icon-spinner icon-spin icon-3x"></i>'); // Font Awesome spinner
 
-                        // Load the drilldown map the old way on highcharts
-                        //$.getScript('https://code.highcharts.com/mapdata/' + mapKey + '.js', function() {
                         $.getScript('{% get_static_prefix %}' + mapfilename , function() {
 
                             data = Highcharts.geojson(Highcharts.maps[mapKey]);
