@@ -15,7 +15,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         env_path = Path(settings.ENV_PATH)
         local_static_path = env_path.parent / 'wbcore' / 'static'
-        static_location = local_static_path if settings.DEBUG else settings.SERVER_STATIC_ROOT
+        static_location = local_static_path if settings.DEBUG else Path(settings.SERVER_STATIC_ROOT)
 
         path_highmaps_countries = static_location / 'highmaps' / 'countries'
         print('Save files in ' + str(path_highmaps_countries))
