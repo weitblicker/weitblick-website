@@ -55,7 +55,6 @@ def markdown_uploader(request):
     Makdown image upload for locale storage
     and represent as json to markdown editor.
     """
-    print(request.user)
     if request.method == 'POST' and request.is_ajax():
         if 'markdown-image-upload' in request.FILES:
             image = request.FILES['markdown-image-upload']
@@ -82,7 +81,6 @@ def markdown_uploader(request):
             name = '{} Texteditor Upload {}'.format(time.strftime("%Y-%m-%d"), image.name)
 
             types = ('project', 'blog', 'event', 'news')
-            print(request.META)
             search_string = request.META['HTTP_REFERER']
             # create a generator to find the first match in the url string
             positions = ((search_string.find(sub), sub) for sub in types)

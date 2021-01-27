@@ -44,7 +44,7 @@ class Photo(RulesModelMixin, PhotologuePhoto, metaclass=RulesModelBase):
     host = models.ForeignKey('Host', on_delete=models.SET_NULL, null=True)
 
     def get_hosts(self):
-        return self.host
+        return [self.host]
 
 
 class Address(models.Model):
