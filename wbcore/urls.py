@@ -1,5 +1,8 @@
 from django.urls import path, re_path
+from django.conf import settings
 from django.conf.urls import include
+from django.conf.urls.i18n import i18n_patterns
+from django.views.i18n import JavaScriptCatalog
 from django.contrib.sitemaps.views import sitemap
 from .sitemaps import NewsPostSitemap, ProjectSitemap, BlogPostSitemap, EventSitemap, TeamSitemap, HostSitemap
 from .sitemaps import AboutSitemap, HistorySitemap, ContactSitemap, JoinSitemap
@@ -60,6 +63,7 @@ urlpatterns = [
     re_path(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
             views.activate_user, name='activate'),
     # path('search/', include('haystack.urls')),
+    path(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 ]
 
 urlpatterns = urlpatterns + main_patterns
