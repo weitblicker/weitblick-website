@@ -13,6 +13,8 @@ from django.db import transaction
 
 class Command(BaseCommand):
     """
+    This is necessary to update the location and type of photos updated previously by the text Editor
+    to our new standard.
     Crawl all news models (except imported news and posts) for uploaded photos in the TextFields.
     Create a photologue photo object for each upload and change the corresponding url in the TextField.
     """
@@ -101,5 +103,3 @@ class Command(BaseCommand):
             return Photo.objects.get(title=myname).image.url
         return photo_obj.image.url
 
-    def converturltofilepath(self):
-        raise NotImplementedError
