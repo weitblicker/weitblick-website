@@ -532,8 +532,11 @@ class UserAdmin(BaseUserAdmin):
         return request.user.has_module_perms(self.opts.app_label)
 
     def save_model(self, request, obj, form, change):
-        if obj.image != User.objects.get(pk=obj.pk).image:  # delete old thumbnails on profile picture change
-            get_thumbnailer(User.objects.get(pk=obj.pk).image).delete_thumbnails()
+        try:
+            if obj.image != User.objects.get(pk=obj.pk).image:  # delete old thumbnails on profile picture change
+                get_thumbnailer(User.objects.get(pk=obj.pk).image).delete_thumbnails()
+        except User.DoesNotExist:
+            pass
         super(UserAdmin, self).save_model(request, obj, form, change)
 
 class TeamAdmin(MyAdmin):
