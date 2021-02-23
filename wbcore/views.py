@@ -1697,8 +1697,8 @@ def contact_view(request, host_slug=None):
         contact = None
     teams = Team.objects.filter(host=load_host)
 
-    if teams:
-        if len(teams) > 3:
+    if teams.exists():
+        if teams.count() > 3:
             teams = teams[:3]
             more_teams = reverse('teams', args=[host_slug]) if host_slug else reverse('teams')
         else:
