@@ -1,9 +1,7 @@
 from django.core.management.base import BaseCommand
-from django.db.utils import IntegrityError
 from django.core.files import File
 from wbcore.models import NewsPost, BlogPost, Content, Document, Event, Partner, Project, Team, Photo
 import datetime
-import time
 import re
 import os
 from weitblick import settings
@@ -20,13 +18,13 @@ class Command(BaseCommand):
     """
     def handle(self, *args, **options):
         modelfields = [
-                       #(NewsPost, ["text", "teaser"]),
-                       #(BlogPost, ["text", "teaser"]),
-                       #(Content, ["text"]),
-                       #(Document, ["description"]),
-                       #(Event, ["description", "teaser"]),
-                       #(Partner, ["description"]),
-                       #(Project, ["description", "short_description"]),
+                       (NewsPost, ["text", "teaser"]),
+                       (BlogPost, ["text", "teaser"]),
+                       (Content, ["text"]),
+                       (Document, ["description"]),
+                       (Event, ["description", "teaser"]),
+                       (Partner, ["description"]),
+                       (Project, ["description", "short_description"]),
                        (Team, ["description", "teaser"])
         ]
 
@@ -40,12 +38,16 @@ class Command(BaseCommand):
         elif Model == BlogPost:
             objs = objs.filter(published__date__gte=datetime.date(2019, 12, 11))
 
-        for obj in objs:
-            self.convertphotosofentry(obj, fields, Model)
+        try:
+            with transaction.atomic():
+                for obj in objs:
+                    self.convertphotosofentry(obj, fields, Model)
+        except Exception as e:
+            print(e)
 
     def convertphotosofentry(self, obj, fields, Model):
         for field in fields:
-            try:
+            try: # if field is translated, pictures can be uploaded for all languages
                 for lang in ['_de', '_en', '_es', '_fr']:
                     langfield = field + lang
                     self.updatetext(langfield, Model, obj)
@@ -54,17 +56,15 @@ class Command(BaseCommand):
 
     def updatetext(self, fieldname, Model, obj):
         text = getattr(obj, fieldname)
-        links = self.findurlintext(text)
-        if links:
-            for link in links:
-                print(self.createphotologuepic(link[1], link[0], Model, obj))
+        p = re.compile(r"(!\[([^\]]*)\]\()/(media/images/uploads/[^\)\'\"\s]*)([^\)]*\))")
+        new_text = p.sub(lambda x: self.createphotologuepic(x, Model, obj), text)
+        if not new_text == text:
+            setattr(obj, fieldname, new_text)
+            obj.save()
 
-    def findurlintext(self, text):
-        #p = re.compile(r'!\[[^\]]*\]\(/media/images/uploads/[^)]*\)')
-        p = re.compile(r"!\[([^\]]*)\]\(/(media/images/uploads/[^\)\'\"\s]*)([^\)]*)\)")
-        return p.findall(text)
-
-    def createphotologuepic(self, url, name, Model, obj):
+    def createphotologuepic(self, match, Model, obj):
+        url = match.group(3)
+        name = match.group(2)
         if Model == NewsPost:
             mytype = 'news'
         elif Model == BlogPost:
@@ -96,10 +96,11 @@ class Command(BaseCommand):
             host = hosts[0]
         else:
             host = None
-        try:
+        if Photo.objects.filter(title=myname).exists():
+            new_url = Photo.objects.get(title=myname).image.url
+        else:
             photo_obj = Photo(type=mytype, uploader=user, image=imageobj, title=myname, slug=slugify(myname), host=host)
             photo_obj.save()
-        except IntegrityError:
-            return Photo.objects.get(title=myname).image.url
-        return photo_obj.image.url
+            new_url = photo_obj.image.url
+        return match.group(1) + new_url + match.group(4)
 
