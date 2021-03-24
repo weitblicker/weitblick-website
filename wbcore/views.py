@@ -252,7 +252,7 @@ def item_list_from_events(events, host_slug=None, start=None, end=None, text=Tru
 def item_list_from_occ(occurrences, host_slug=None, text=True):
     # set attributes to fill list_item template
     item_list = []
-    current_host = Host.objects.get(slug=host_slug) if host_slug else None
+    current_host = Host.all_objects.get(slug=host_slug) if host_slug else None
     for occ in occurrences:
         # image
         occ.image = occ.event.image
@@ -322,7 +322,7 @@ def item_list_from_occ(occurrences, host_slug=None, text=True):
 
 def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='post_id', text=True):
     item_list = []
-    current_host = Host.objects.get(slug=host_slug) if host_slug else None
+    current_host = Host.all_objects.get(slug=host_slug) if host_slug else None
     for post in posts:
         if not post.teaser and post.text:
             post.teaser = post.text
@@ -400,7 +400,7 @@ def item_list_from_teams(teams, host_slug=None):
 
 def item_list_from_partners(partners, host_slug=None, text=True, max_num_items=None):
     item_list = []
-    current_host = Host.objects.get(slug=host_slug) if host_slug else None
+    current_host = Host.all_objects.get(slug=host_slug) if host_slug else None
     categories = dict(Partner.CATEGORY_CHOICES)
     category_icons = dict(Partner.CATEGORY_ICONS)
 
@@ -1260,7 +1260,7 @@ def hosts_view(request, host_slug=None):
 
 def host_view(request, host_slug):
     try:
-        host = Host.objects.get(slug=host_slug) if host_slug else None
+        host = Host.all_objects.get(slug=host_slug) if host_slug else None
 
         # replacing the link with the social media link # TODO no hardcoded links in general!
         for social_link in host.socialmedialink_set.all():
@@ -1289,7 +1289,7 @@ def host_view(request, host_slug):
         'host': host,
         'breadcrumb': [(_('Home'), reverse('home')), (host.name, None)],
         'main_nav': get_main_nav(host=host),
-        'dot_nav': get_dot_nav(host=host),
+        'dot_nav': get_dot_nav(host=host) if not host.dissolved else None,
         'meta': get_meta(description=welcome.text if welcome else None),
         'item_list': item_list_from_posts(posts, host_slug=host_slug),
         'hosts': hosts,

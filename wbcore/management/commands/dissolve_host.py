@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from wbcore.models import Host, Document, Photo, UserRelation
+from wbcore.models import SocialMediaLink, JoinPage, Content, Event, NewsPost, BlogPost, Document, Team, Donation, ContactMessage
 from fixture_magic.management.commands.dump_object import Command as DumpObjectCommand
 from fixture_magic.management.commands.merge_fixtures import Command as MergeFixturesCommand
 import io
@@ -90,11 +91,24 @@ class Command(BaseCommand):
 
         # delete
 
-        for model, query in models:
-            if model == 'wbcore.host':  # do not delete host, but set as dissolved
-                host.dissolved = True
-                #host.save()
-            else:
-                pass
+        # keep host itself, delete related objects
+        # TODO check if this is everything
+        SocialMediaLink.objects.filter(host=host).delete()
+        JoinPage.objects.filter(host=host).delete()
+        Content.objects.filter(host=host).exclude(type='welcome').delete()
+        Event.objects.filter(host=host).delete()
+        UserRelation.objects.filter(host=host).delete()
+        NewsPost.objects.filter(host=host).delete()
+        BlogPost.objects.filter(host=host).delete()
+        Document.objects.filter(host=host).delete()
+        Team.objects.filter(host=host).delete()
+        Donation.objects.filter(host=host).delete()
+        ContactMessage.objects.filter(host=host).delete()
+        # keep projects
+        Photo.objects.filter(host=host).exclude(type='project')
+        # User? many to many -> only delete if
+
+        host.dissolved = True
+        host.save()
 
         print(host.name + ' dissolved')
