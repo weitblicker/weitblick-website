@@ -47,6 +47,7 @@ class EventTranslationOptions(ScheduleEventTranslationOptions):
     fields = ('title', 'description', 'teaser')
 
 
+
 @register(NewsPost)
 class NewsPostTranslationOptions(TranslationOptions):
     fields = ('title','text', 'teaser')
@@ -64,7 +65,8 @@ class DocumentTranslationOptions(TranslationOptions):
 
 @register(Team)
 class TeamTranslationOptions(TranslationOptions):
-    fields = ('name','description', 'teaser')
+    fields = ('name', 'description', 'teaser')
+
 
 
 @register(Milestone)

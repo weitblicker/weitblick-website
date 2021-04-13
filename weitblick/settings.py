@@ -89,7 +89,7 @@ PHOTOLOGUE_DIR = 'images'
 
 def get_storage_path(instance, filename):
     fn = filename.lower()
-    replacements = {' ': '-', 'ä': 'ae', 'ö': 'oe', 'ü': 'ue'}
+    replacements = {' ': '-', 'ä': 'ae', 'ö': 'oe', 'ü': 'ue', '(': '-', ')': '-'}
     for k, i in replacements.items():
         fn = fn.replace(k, i)
     p = re.compile(r'20\d{2}-[01]\d-[0123]\d-')
