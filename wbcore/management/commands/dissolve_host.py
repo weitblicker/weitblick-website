@@ -13,7 +13,6 @@ import json
 class Command(BaseCommand):
     """Delete a city permanently"""
 
-
     def add_arguments(self, parser):
         parser.add_argument('host_slug', type=str)
 
@@ -74,8 +73,10 @@ class Command(BaseCommand):
         # save documents and photos
 
         for document in Document.objects.filter(host__slug=host.slug):
-            os.makedirs(os.path.dirname(dump_folder + document.file.url.strip('/')), exist_ok=True)
-            shutil.copyfile(document.file.path, dump_folder + document.file.url.strip('/'))
+            source = document.file.path
+            target = f'{dump_folder}{os.path.dirname(document.file.url).strip("/")}/{os.path.basename(document.file.path)}'
+            os.makedirs(os.path.dirname(target), exist_ok=True)
+            shutil.copyfile(source, target)
 
         for photo in Photo.objects.filter(host__slug=host.slug):
             os.makedirs(os.path.dirname(dump_folder + photo.image.url.strip('/')), exist_ok=True)
