@@ -1,2 +1,2 @@
 {% load static %}
-<a href="{% url 'host' host_slug=host.slug %}" class="wb-link"><span class="wb-icon">{% include 'wbcore/svgs/puzzle-icon.svg' %}</span><span class="wb-name">{{ host.name|cut:"Weitblick " }}</span></a>
+<a href="{% url 'host' host_slug=host.slug %}" class="wb-link">{% if host.dissolved %}<span class="wb-icon">{% include 'wbcore/svgs/puzzle-icon.svg' with color="#979797" %}</span>{% else %}<span class="wb-icon">{% include 'wbcore/svgs/puzzle-icon.svg' %}</span>{% endif %}<span class="wb-name">{{ host.name|cut:"Weitblick " }}</span></a>

@@ -1249,6 +1249,7 @@ def hosts_view(request, host_slug=None):
     context = {
         'host': host,
         'hosts': Host.objects.all(),
+        'dissolved_hosts': Host.all_objects.filter(dissolved=True),
         'main_nav': get_main_nav(host=host, active='hosts'),
         'meta': get_meta(title=_('Associations')),
         'dot_nav': get_dot_nav(host=host),
