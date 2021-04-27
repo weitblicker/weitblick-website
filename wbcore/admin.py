@@ -247,7 +247,7 @@ class MyAdmin(TabbedTranslationAdmin):
                 # making the field readonly
                 kwargs['disabled'] = True
             else:
-                hosts = request.user.get_hosts_for_admin()
+                hosts = request.user.get_hosts_for_role(['admin', 'editor', 'author'])
                 kwargs["queryset"] = Host.objects.filter(pk__in=[host.pk for host in hosts])
 
         elif db_field.name == 'project':
