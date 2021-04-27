@@ -67,7 +67,7 @@ icon_links = OrderedDict([
 
 
 def get_main_nav(host=None, active=None):
-    args = [host.slug] if host else []
+    args = [host.slug] if host and not host.dissolved else []
     nav = OrderedDict([
             ('home',
                 {
@@ -113,6 +113,10 @@ def get_main_nav(host=None, active=None):
                 }),
     ])
 
+    if host and host.dissolved:
+        nav['projects']['link'] = reverse('projects', args=[host.slug])
+
+
     if active in nav:
         nav[active]['link'] = None
 
@@ -120,7 +124,9 @@ def get_main_nav(host=None, active=None):
 
 
 def get_dot_nav(host=None):
-    if host:
+    if host and host.dissolved:
+        return None
+    elif host:
         host_slug = host.slug
         news = NewsPost.objects.filter(host=host).order_by('-published')[:3]
         blog = BlogPost.objects.filter(host=host).order_by('-published')[:3]
@@ -352,7 +358,7 @@ def item_list_from_proj(projects, host_slug=None, text=True, max_num_items=None)
         return item_list
     if max_num_items:
         projects = projects[:max_num_items]
-    current_host = Host.objects.get(slug=host_slug) if host_slug else None
+    current_host = Host.all_objects.get(slug=host_slug) if host_slug else None
 
     projects = projects.annotate(title=F('name'))
     projects = projects.annotate(show_text=Value(text, output_field=BooleanField()))
@@ -942,7 +948,7 @@ def projects_view(request, host_slug=None):
 
     if host_slugs:
         try:
-            host = Host.objects.get(slug=host_slug) if host_slug else None
+            host = Host.all_objects.get(slug=host_slug) if host_slug else None
             projects = Project.objects.filter(hosts__slug__in=host_slugs).distinct()
             breadcrumb = [(_('Home'), reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
@@ -1183,7 +1189,7 @@ def project_view(request, host_slug=None, project_slug=None):
     try:
         if host_slug:
             project = Project.objects.get(slug=project_slug, hosts__slug=host_slug)
-            host = Host.objects.get(slug=host_slug)
+            host = Host.all_objects.get(slug=host_slug)
             breadcrumb = [(_('Home'), reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
                           (_('Projects'), reverse('projects', args=[host_slug])),
@@ -1290,7 +1296,7 @@ def host_view(request, host_slug):
         'host': host,
         'breadcrumb': [(_('Home'), reverse('home')), (host.name, None)],
         'main_nav': get_main_nav(host=host),
-        'dot_nav': get_dot_nav(host=host) if not host.dissolved else None,
+        'dot_nav': get_dot_nav(host=host),
         'meta': get_meta(description=welcome.text if welcome else None),
         'item_list': item_list_from_posts(posts, host_slug=host_slug),
         'hosts': hosts,
