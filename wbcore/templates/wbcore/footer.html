@@ -2,7 +2,7 @@
 <div class="ui inverted vertical footer segment">
     <div class="ui container">
         <div class="ui stackable inverted divided equal height stackable grid">
-            {% if host %}
+            {% if host and not host.dissolved%}
                 <div class="two wide column">
                     <h4 class="ui inverted header">About</h4>
                     <div class="ui inverted link list">
@@ -44,7 +44,7 @@
                     </div>
                 </div>
             {% endif %}
-            <div class="five wide column">
+            <div class="{% if host and not host.dissolved %}five{% else %}eight{% endif %} wide column">
                 <h4 class="ui inverted header">{% trans "Internal" %}</h4>
                 <div class="ui inverted link list">
                     <a href="/admin/login/" class="item">Login</a>
@@ -54,8 +54,8 @@
                     <a href="https://cloud.weitblicker.org" class="item">Cloud</a>
                 </div>
             </div>
-            <div class="three wide column">
-                {% if host %}
+            {% if host and not host.dissolved %}
+                <div class="three wide column">
                     <h4 class="ui inverted header">{{ host.name }}</h4>
                     <p class="ui inverted list">
                         {{ host.address.street }}
@@ -69,8 +69,8 @@
                         IBAN: {{ host.bank.iban }}
                         <br>BIC: {{ host.bank.bic }}
                     </p>
-                {% endif %}
-            </div>
+                </div>
+            {% endif %}
             <div class="three wide column">
                 {% include 'wbcore/logo.html' with inverse=True %}
             </div>
