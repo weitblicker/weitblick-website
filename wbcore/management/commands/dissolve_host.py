@@ -110,6 +110,8 @@ class Command(BaseCommand):
         # User? many to many -> only delete if
 
         host.dissolved = True
+        host.address = None
+        host.bank = None
         host.save()
 
         print(host.name + ' dissolved')
