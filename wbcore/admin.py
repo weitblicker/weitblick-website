@@ -194,7 +194,7 @@ class MyAdmin(TabbedTranslationAdmin):
 
         elif db_field.name == 'photos':
             hosts = request.user.get_hosts_for_role(['admin', 'editor', 'author'])
-            kwargs["queryset"] = Photo.objects.filter(host__in=hosts).all()
+            kwargs["queryset"] = Photo.objects.filter(host__in=hosts).all().order_by('-date_added')[:100]
 
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
@@ -256,7 +256,7 @@ class MyAdmin(TabbedTranslationAdmin):
 
         elif db_field.name == 'image':
                 hosts = request.user.get_hosts_for_role(['admin', 'editor', 'author'])
-                kwargs["queryset"] = Photo.objects.filter(host__in=hosts).all()
+                kwargs["queryset"] = Photo.objects.filter(host__in=hosts).all().order_by('-date_added')[:100]
 
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
@@ -406,7 +406,8 @@ class UserAdmin(BaseUserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ('username', 'name', 'email', 'date_of_birth', 'get_hosts', 'get_roles',)
+    list_display = ('admin_thumb', 'username', 'name', 'email', 'date_of_birth', 'get_hosts', 'get_roles',)
+    list_display_links = ('name', 'username')
     list_filter = (HostListFilter, RoleListFilter,)
     fieldsets = (
         ('Account', {'fields': ('username', 'email', 'password')}),
@@ -552,7 +553,8 @@ class UserAdmin(BaseUserAdmin):
 class TeamAdmin(MyAdmin):
     inlines = (TeamUserRelationInlineModel,)
 
-    list_display = ('name', 'slug', 'host', 'get_member', 'rank')
+    list_display = ('admin_thumb', 'name', 'slug', 'host', 'get_member', 'rank')
+    list_display_links = ('name', 'admin_thumb')
     prepopulated_fields = {'slug': ('name', 'host', )}
 
     def get_member(self, team):
@@ -607,6 +609,7 @@ class PostAdmin(MyAdmin):
 
     ordering = ('-published', 'title',)
     search_fields = ('title', 'text')
+    list_display_links = ('title', 'admin_thumb')
 
     prepopulated_fields = {'slug': ('title',)}
 
@@ -641,9 +644,9 @@ class PostAdmin(MyAdmin):
 
     def get_list_display(self, request):
         if request.user.is_super_admin or request.user.is_superuser:
-            return 'title', 'get_author', 'host', 'published',
+            return 'admin_thumb', 'title', 'get_author', 'host', 'published',
         else:
-            return 'title', 'get_author', 'published',
+            return 'admin_thumb', 'title', 'get_author', 'published',
 
 
 class ContactMessageAdmin(MyAdmin):
@@ -681,7 +684,8 @@ class ProjectAdmin(MyAdmin, ReverseModelAdmin):
     inline_type = 'stacked'
     inline_reverse = ['donation_account', 'milestones']
     #inlines = (MilestoneInlineModel, )
-    list_display = ('name', 'get_hosts', 'get_country', 'start_date', 'end_date', 'completed', 'published')
+    list_display = ('admin_thumb','name', 'get_hosts', 'get_country', 'start_date', 'end_date', 'completed', 'published')
+    list_display_links = ('name', 'admin_thumb')
     prepopulated_fields = {'slug': ('name',)}
 
     def get_hosts(self, project):
@@ -700,7 +704,8 @@ class ProjectAdmin(MyAdmin, ReverseModelAdmin):
 
 class EventAdmin(MyAdmin):
 
-    list_display = ('title', 'start', 'end', 'host')
+    list_display = ('admin_thumb', 'title', 'start', 'end', 'host')
+    list_display_links = ('title', 'admin_thumb')
     prepopulated_fields = {'slug': ('title', 'host', )}
 
     ordering = ('-start',)
@@ -806,8 +811,10 @@ class LocationAdmin(MyAdmin):
 
 class PhotoAdmin(MyAdmin):
 
-    list_display = ('title', 'slug', 'type', 'uploader', 'host',)
+    list_display = ('admin_thumb', 'title', 'slug', 'type', 'uploader', 'host', 'date_added')
+    list_display_links = ('title', 'admin_thumb')
     exclude = ('uploader', 'sites',)
+    ordering = ('-date_added',)
 
     def save_model(self, request, obj, form, change):
         if not obj.uploader:
