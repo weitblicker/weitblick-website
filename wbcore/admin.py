@@ -194,7 +194,8 @@ class MyAdmin(TabbedTranslationAdmin):
 
         elif db_field.name == 'photos':
             hosts = request.user.get_hosts_for_role(['admin', 'editor', 'author'])
-            kwargs["queryset"] = Photo.objects.filter(host__in=hosts).all().order_by('-date_added')[:100]
+            recent_photos = Photo.objects.filter(host__in=hosts).all().order_by('-date_added')[:100]
+            kwargs["queryset"] = Photo.objects.filter(id__in=recent_photos).order_by('-date_added')
 
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
@@ -256,7 +257,8 @@ class MyAdmin(TabbedTranslationAdmin):
 
         elif db_field.name == 'image':
                 hosts = request.user.get_hosts_for_role(['admin', 'editor', 'author'])
-                kwargs["queryset"] = Photo.objects.filter(host__in=hosts).all().order_by('-date_added')[:100]
+                recent_photos = Photo.objects.filter(host__in=hosts).all().order_by('-date_added')[:100]
+                kwargs["queryset"] = Photo.objects.filter(id__in=recent_photos).order_by('-date_added')
 
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
@@ -271,7 +273,6 @@ class MyAdmin(TabbedTranslationAdmin):
             return request.user.hosts.all()
 
         # if many to many field hosts exists filter using it
-        print(request.user.hosts.all())
         try:
             return queryset.filter(hosts__in=request.user.hosts.all())
         except:
