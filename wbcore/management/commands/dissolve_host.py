@@ -18,13 +18,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         host = Host.objects.get(slug=options["host_slug"])
-        host.dissolved = False
 
-        #confirm = input('Are you sure you want to dissolve the host "' + host.name + '"? This will delete a lot of data permanently! (yes/NO) ')
-        #if confirm != 'yes':
-        #    print('abort')
-        #    return None
-
+        confirm = input('Are you sure you want to dissolve the host "' + host.name + '"? This will delete a lot of data permanently! (yes/NO) ')
+        if confirm != 'yes':
+            print('abort')
+            return None
 
         models = [
             ('wbcore.host', {"pk__in": [host.slug]}),
@@ -93,7 +91,7 @@ class Command(BaseCommand):
         # delete
 
         # keep host itself, delete related objects
-        # TODO check if this is everything
+        # keep projects
         SocialMediaLink.objects.filter(host=host).delete()
         JoinPage.objects.filter(host=host).delete()
         Content.objects.filter(host=host).exclude(type='welcome').delete()
@@ -105,9 +103,10 @@ class Command(BaseCommand):
         Team.objects.filter(host=host).delete()
         Donation.objects.filter(host=host).delete()
         ContactMessage.objects.filter(host=host).delete()
-        # keep projects
         Photo.objects.filter(host=host).exclude(type='project')
-        # User? many to many -> only delete if
+        for partner in host.partners.all():
+            if len(partner.hosts.all()) == 1 and len(partner.projects.all()) == 0:
+                partner.delete()
 
         host.dissolved = True
         host.address = None

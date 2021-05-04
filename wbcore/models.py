@@ -513,7 +513,7 @@ class Partner(RulesModel):
         return self.name
 
     def get_hosts(self):
-        return Host.objects.all()
+        return self.hosts.all()
 
     def search_title(self):
         return self.name
