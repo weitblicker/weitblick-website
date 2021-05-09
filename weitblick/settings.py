@@ -198,7 +198,7 @@ MARTOR_ENABLE_CONFIGS = {
     'mention': 'false',  # to enable/disable mention
     'jquery': 'true',    # to include/revoke jquery (require for admin default django)
     'living': 'true',   # to enable/disable live updates in preview
-    'spellcheck': 'true',  # to enable/disable spellcheck in form textareas
+    'spellcheck': 'false',  # to enable/disable spellcheck in form textareas
 }
 
 MARTOR_MARKDOWN_EXTENSIONS = [

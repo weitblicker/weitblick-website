@@ -25,7 +25,7 @@ from itertools import chain
 
 from .models import (
     Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, ContactMessage, UserRelation,
-    Document, Team, Milestone, Donation, BankAccount, TeamUserRelation, Content, User, JoinPage,
+    Document, LinkedDocument, Team, Milestone, Donation, BankAccount, TeamUserRelation, Content, User, JoinPage,
     SocialMediaLink, CycleDonation, QuestionAndAnswer, FAQ, Photo)
 
 
@@ -532,8 +532,11 @@ class UserAdmin(BaseUserAdmin):
         return request.user.has_module_perms(self.opts.app_label)
 
     def save_model(self, request, obj, form, change):
-        if obj.image != User.objects.get(pk=obj.pk).image:  # delete old thumbnails on profile picture change
-            get_thumbnailer(User.objects.get(pk=obj.pk).image).delete_thumbnails()
+        try:
+            if obj.image != User.objects.get(pk=obj.pk).image:  # delete old thumbnails on profile picture change
+                get_thumbnailer(User.objects.get(pk=obj.pk).image).delete_thumbnails()
+        except User.DoesNotExist:
+            pass
         super(UserAdmin, self).save_model(request, obj, form, change)
 
 class TeamAdmin(MyAdmin):
@@ -563,6 +566,8 @@ class HostAdmin(MyAdmin, ReverseModelAdmin):
     inlines = (JoinPageInlineModel, SocialMediaLinkInlineModel)
     inline_type = 'stacked'
     inline_reverse = ['address', 'bank']
+
+    search_fields = ['name']
 
     list_display = ('name', 'slug', 'email', 'founding_date', 'address')
 
@@ -670,6 +675,7 @@ class ProjectAdmin(MyAdmin, ReverseModelAdmin):
     #inlines = (MilestoneInlineModel, )
     list_display = ('name', 'get_hosts', 'get_country', 'start_date', 'end_date', 'completed', 'published')
     prepopulated_fields = {'slug': ('name',)}
+    autocomplete_fields = ['hosts']
 
     def get_hosts(self, project):
         return ", ".join([host.name.replace("Weitblick ", "") for host in project.hosts.all()])
@@ -730,9 +736,17 @@ class CycleDonationAdmin(MyAdmin):
     get_projects.short_description = 'Projects'
 
 
-class DocumentAdmin(MyAdmin):
+class BaseDocumentAdmin(MyAdmin):
 
     list_display = ('title', 'host', 'document_type', 'published', 'public', 'valid_from')
+
+
+class DocumentAdmin(BaseDocumentAdmin):
+    fields = ('title', 'description', 'host', 'file', 'valid_from', 'document_type', 'public')
+
+
+class LinkedDocumentAdmin(BaseDocumentAdmin):
+    fields = ('title', 'description', 'host', 'url', 'valid_from', 'document_type', 'public')
 
 
 class DonationAdmin(MyAdmin):
@@ -768,7 +782,6 @@ class LocationAdmin(MyAdmin):
     def get_occurrences(self, location):
         occurrences = []
 
-        print(location)
         for event in location.event_set.all():
             occurrences.append(self.link('Event', event.pk, event.title))
 
@@ -794,7 +807,7 @@ class LocationAdmin(MyAdmin):
 
 class PhotoAdmin(MyAdmin):
 
-    list_display = ('title', 'slug', 'type', 'uploader', 'host',)
+    list_display = ('title', 'slug', 'type', 'uploader', 'host', 'admin_thumbnail')
     exclude = ('uploader', 'sites',)
 
     def save_model(self, request, obj, form, change):
@@ -838,6 +851,7 @@ admin.site.register(ContactMessage, ContactMessageAdmin)
 admin.site.register(Content, ContentAdmin)
 admin.site.register(CycleDonation, CycleDonationAdmin)
 admin.site.register(Document, DocumentAdmin)
+admin.site.register(LinkedDocument, LinkedDocumentAdmin)
 admin.site.register(Donation, DonationAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(FAQ, FAQAdmin)

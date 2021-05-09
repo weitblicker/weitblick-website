@@ -1,5 +1,6 @@
 {% load static %}
 {% load humanize %}
+{% load martortags %}
 
 {% if type == 'event' %}
 
@@ -36,7 +37,7 @@
         <div class="content">
             <a href="{{ item.link }}">{{ item.title }}</a>
             {% if not item.image %}
-                <p>{{ item.teaser | truncatewords:7 }}</p>
+                <p>{{ item.teaser | safe_markdown | striptags | truncatewords:7 }}</p>
             {% endif %}
         </div>
     </div>

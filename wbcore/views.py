@@ -29,7 +29,7 @@ from honeypot.decorators import check_honeypot
 
 from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
-    UserRelation, Partner, JoinPage, SocialMediaLink, Content, Document, Donation, FAQ)
+    UserRelation, Partner, JoinPage, SocialMediaLink, Content, Document, LinkedDocument, Donation, FAQ)
 
 
 main_host_slug = 'bundesverband' ## TODO configure this?
@@ -107,7 +107,7 @@ def get_main_nav(host=None, active=None):
             ('hosts',
                 {
                     'name': _('Associations'),
-                    'link': reverse('hosts'),
+                    'link': reverse('hosts', args=args),
                     'icon': 'wbcore/svgs/unions.svg',
                     'mobile': True,
                 }),
@@ -132,8 +132,10 @@ def get_dot_nav(host=None):
         news = NewsPost.objects.all().order_by('-published')[:3]
         blog = BlogPost.objects.all().order_by('-published')[:3]
         events = Event.objects.all()
+
     news = item_list_from_posts(news, host_slug=host_slug, post_type='news-post')
     blog = item_list_from_posts(blog, host_slug=host_slug, post_type='blog-post')
+
     occurrences = item_list_from_events(events, start=datetime.now(), host_slug=host_slug, text=False, show_only_first_occ=True, max_num_items=3)
 
     about_entries = OrderedDict([
@@ -340,6 +342,7 @@ def item_list_from_events(events, host_slug=None, start=None, end=None, text=Tru
 def item_list_from_occ(occurrences, host_slug=None, text=True):
     # set attributes to fill list_item template
     item_list = []
+    current_host = Host.objects.get(slug=host_slug) if host_slug else None
     for occ in occurrences:
         # image
         occ.image = occ.event.image
@@ -372,7 +375,6 @@ def item_list_from_occ(occurrences, host_slug=None, text=True):
         occ.host = occ.event.host
 
         # link
-        current_host = Host.objects.get(slug=host_slug) if host_slug else None
         if current_host and current_host == occ.event.host:
             occ.link = reverse('event', kwargs={'event_slug': occ.event.slug, 'host_slug': host_slug})
         else:
@@ -410,12 +412,12 @@ def item_list_from_occ(occurrences, host_slug=None, text=True):
 
 def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='post_id', text=True):
     item_list = []
+    current_host = Host.objects.get(slug=host_slug) if host_slug else None
     for post in posts:
         if not post.teaser and post.text:
             post.teaser = post.text
         elif not post.teaser:
             post.teaser = ""
-        current_host = Host.objects.get(slug=host_slug) if host_slug else None
         if current_host and post.host and current_host == post.host:
             post.link = reverse(post_type, kwargs={id_key: post.id, 'host_slug': host_slug})
         else:
@@ -488,6 +490,7 @@ def item_list_from_teams(teams, host_slug=None):
 
 def item_list_from_partners(partners, host_slug=None, text=True, max_num_items=None):
     item_list = []
+    current_host = Host.objects.get(slug=host_slug) if host_slug else None
     categories = dict(Partner.CATEGORY_CHOICES)
     category_icons = dict(Partner.CATEGORY_ICONS)
 
@@ -511,7 +514,7 @@ def item_list_from_partners(partners, host_slug=None, text=True, max_num_items=N
         partner.fixed_image = partner.logo
         partner.hosts_list = [host for host in Host.objects.filter(partners=partner).order_by('name')]
         if not partner.hosts_list: continue  # do not show partners without host
-        if host_slug:
+        if current_host and partner.belongs_to_host(current_host):
             partner.link = reverse('partner', kwargs={'partner_slug': partner.slug, 'host_slug': host_slug})
         else:
             partner.link = reverse('partner', kwargs={'partner_slug': partner.slug})
@@ -523,13 +526,25 @@ def item_list_from_partners(partners, host_slug=None, text=True, max_num_items=N
     return item_list
 
 
+def join_documents_linked(documents, linked_documents, sort_key='-valid_from'):
+    documents = [d for d in documents]
+    linked_documents = [d for d in linked_documents]
+    documents = documents + linked_documents
+    if sort_key[0] == '-':
+        sort_reverse = True
+        sort_key = sort_key[1:]
+    else:
+        sort_reverse = False
+    documents = sorted(documents, key=lambda x: getattr(x, sort_key), reverse=sort_reverse)
+    return documents
+
+
 def home_view(request):
     projects = Project.objects.all()[:5]
     hosts = Host.objects.all()
     news = NewsPost.objects.all().order_by('-published')[:5]
     blog = BlogPost.objects.all().order_by('-published')[:3]
     events = Event.objects.all().order_by('-start')
-
 
     template = loader.get_template('wbcore/home.html')
     context = {
@@ -564,10 +579,14 @@ def reports_view(request, host_slug=None):
         report = Content.objects.get(host=load_host, type='reports')
     except Content.DoesNotExist:
         report = None
+
     financial_reports = Document.objects.filter(host=load_host, document_type='financial_report', public=True)
-    financial_reports = financial_reports.order_by('-valid_from') if financial_reports else financial_reports
+    financial_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='financial_report', public=True)
+    financial_reports = join_documents_linked(financial_reports, financial_reports_linked, sort_key="-valid_from")
+
     annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
-    annual_reports = annual_reports.order_by('-valid_from') if annual_reports else annual_reports
+    annual_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports = join_documents_linked(annual_reports, annual_reports_linked, sort_key="-valid_from")
 
     template = loader.get_template('wbcore/reports.html')
     context = {
@@ -602,7 +621,8 @@ def charter_view(request, host_slug=None):
         charter = None
 
     charter_files = Document.objects.filter(host=load_host, document_type='charter', public=True)
-    charter_files = charter_files.order_by('valid_from') if charter_files else charter_files
+    charter_linked = LinkedDocument.objects.filter(host=load_host, document_type='charter', public=True)
+    charter_files = join_documents_linked(charter_files, charter_linked, sort_key='-valid_from')
 
     template = loader.get_template('wbcore/charter.html')
     context = {
@@ -646,10 +666,12 @@ def transparency_view(request, host_slug=None):
     }
 
     financial_reports = Document.objects.filter(host=load_host, document_type='financial_report', public=True)
-    financial_reports = financial_reports.order_by('-valid_from') if financial_reports else financial_reports
-    annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
-    annual_reports = annual_reports.order_by('-valid_from') if annual_reports else annual_reports
+    financial_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='financial_report', public=True)
+    financial_reports = join_documents_linked(financial_reports, financial_reports_linked, sort_key="-valid_from")
 
+    annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports = join_documents_linked(annual_reports, annual_reports_linked, sort_key="-valid_from")
 
     template = loader.get_template('wbcore/transparency.html')
     context = {
@@ -666,8 +688,6 @@ def transparency_view(request, host_slug=None):
         'financial_reports': financial_reports,
         'annual_reports': annual_reports,
     }
-    print('transparency')
-    print(context['meta'])
     return HttpResponse(template.render(context, request))
 
 
@@ -690,6 +710,14 @@ def facts_view(request, host_slug=None):
     except Content.DoesNotExist:
         facts = None
 
+    financial_reports = Document.objects.filter(host=load_host, document_type='financial_report', public=True)
+    financial_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='financial_report', public=True)
+    financial_reports = join_documents_linked(financial_reports, financial_reports_linked, sort_key="-valid_from")
+
+    annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports = join_documents_linked(annual_reports, annual_reports_linked, sort_key="-valid_from")
+
     template = loader.get_template('wbcore/facts.html')
     context = {
         'main_nav': get_main_nav(host=host),
@@ -699,6 +727,8 @@ def facts_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'facts': facts,
+        'financial_reports': financial_reports,
+        'annual_reports': annual_reports,
     }
     return HttpResponse(template.render(context, request))
 
@@ -887,7 +917,7 @@ def partners_view(request, host_slug=None):
         'meta': get_meta(title=_('Partners')),
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
-        'ajax_endpoint': reverse('ajax-filter-partners'),
+        'ajax_endpoint': reverse('ajax-filter-partners', args=[host_slug] if host_slug else None),
         'filter_preset': {'host': [host.slug] if host else None, },
         'filter_active': True,
         'categories': Partner.CATEGORY_CHOICES,
@@ -1081,7 +1111,7 @@ def projects_view(request, host_slug=None):
         'blog_item_list': item_list_from_posts(blogposts, host_slug=host_slug, post_type='blog-post', id_key='post_id', text=False),
         'countries': countries,
         'filter_visibility': True,
-        'ajax_endpoint': reverse('ajax-filter-projects'),
+        'ajax_endpoint': reverse('ajax-filter-projects', args=[host_slug] if host_slug else None),
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
@@ -1228,7 +1258,12 @@ def join_view(request, host_slug=None):
     else:
         projects = Project.objects.all().order_by('completed', '-updated')
 
-    membership_declaration = Document.objects.filter(host=host, document_type='membership_declaration', public=True).order_by('-valid_from') if host else None
+    if host:
+        membership_declaration = Document.objects.filter(host=host, document_type='membership_declaration', public=True)
+        membership_declaration_linked = LinkedDocument.objects.filter(host=host, document_type='membership_declaration', public=True)
+        membership_declaration = join_documents_linked(membership_declaration, membership_declaration_linked, sort_key='-valid_from')
+    else:
+        membership_declaration = None
 
     context = {
         'main_nav': get_main_nav(host=host, active='join'),
@@ -1326,16 +1361,22 @@ def project_view(request, host_slug=None, project_slug=None):
     return HttpResponse(template.render(context, request))
 
 
-def hosts_view(request):
-    hosts = Host.objects.all()
+def hosts_view(request, host_slug=None):
+    if host_slug:
+        host = Host.objects.get(slug=host_slug)
+        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Associations'), None)]
+    else:
+        host = None
+        breadcrumb = [(_('Home'), reverse('home')), (_('Associations'), None)]
 
     template = loader.get_template('wbcore/hosts.html')
     context = {
-        'hosts': hosts,
-        'main_nav': get_main_nav(active='hosts'),
+        'host': host,
+        'hosts': Host.objects.all(),
+        'main_nav': get_main_nav(host=host, active='hosts'),
         'meta': get_meta(title=_('Associations')),
-        'dot_nav': get_dot_nav(),
-        'breadcrumb': [(_('Home'), reverse('home')), (_('Associations'), None)],
+        'dot_nav': get_dot_nav(host=host),
+        'breadcrumb': breadcrumb,
         'icon_links': icon_links
     }
     return HttpResponse(template.render(context, request))
@@ -1417,7 +1458,7 @@ def events_view(request, host_slug=None):
         'filter_preset': {'host': [host.slug] if host else None, },
         'filter_date': True,
         'item_list': item_list_from_events(events, host_slug),
-        'ajax_endpoint': reverse('ajax-filter-events'),
+        'ajax_endpoint': reverse('ajax-filter-events', args=[host_slug] if host_slug else None),
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
@@ -1513,7 +1554,7 @@ def blog_view(request, host_slug=None):
         'filter_preset': {'host': [host.slug] if host else None, },
         'filter_date': True,
         'item_list': item_list_from_posts(posts, host_slug, post_type="blog-post", id_key='post_id'),
-        'ajax_endpoint': reverse('ajax-filter-blog'),
+        'ajax_endpoint': reverse('ajax-filter-blog', args=[host_slug] if host_slug else None),
         'icon_links': icon_links,
     }
     return HttpResponse(template.render(context, request))
@@ -1602,7 +1643,7 @@ def news_view(request, host_slug=None):
         'filter_date': True,
         'item_list': posts,
         'icon_links': icon_links,
-        'ajax_endpoint': reverse('ajax-filter-news'),
+        'ajax_endpoint': reverse('ajax-filter-news', args=[host_slug] if host_slug else None),
     }
     return HttpResponse(template.render(context, request))
 
@@ -1780,8 +1821,8 @@ def contact_view(request, host_slug=None):
         contact = None
     teams = Team.objects.filter(host=load_host)
 
-    if teams:
-        if len(teams) > 3:
+    if teams.exists():
+        if teams.count() > 3:
             teams = teams[:3]
             more_teams = reverse('teams', args=[host_slug]) if host_slug else reverse('teams')
         else:

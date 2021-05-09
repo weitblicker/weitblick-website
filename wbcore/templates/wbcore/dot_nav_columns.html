@@ -12,7 +12,7 @@
 <div class="ui {% language 'en' %}{{ news_width | apnumber }}{% endlanguage %} wide column unstackable items">
     <a class="ui item header" href="{{ dot_nav.news.link }}">{{ dot_nav.news.name }}</a>
     {% for item in dot_nav.news.items %}
-        {% include 'wbcore/dot_nav_item.html' with type='news-post' %}
+        {% include 'wbcore/dot_nav_item.html' with item=item type='news-post' %}
     {% endfor %}
 </div>
 
