@@ -130,6 +130,15 @@ def get_dot_nav(host=None):
         news = NewsPost.objects.all().order_by('-published')[:3]
         blog = BlogPost.objects.all().order_by('-published')[:3]
         events = Event.objects.all()
+
+    for post in news:
+        if not post.teaser and post.text:
+            post.teaser = post.text
+            
+    for post in blog:
+        if not post.teaser and post.text:
+            post.teaser = post.text
+
     occurrences = item_list_from_events(events, start=datetime.now(), host_slug=host_slug, text=False, show_only_first_occ=True, max_num_items=3)
     return {'news': news, 'blog': blog, 'occurrences': occurrences}
 

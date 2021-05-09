@@ -1,4 +1,5 @@
 {% load static %}
+{% load martortags %}
 <div class="item">
     {% if image %}
         {% if host %}
@@ -28,7 +29,7 @@
             {% else %}
                 <a href="{% url type post_id=id %}">{{ title }}</a>
             {% endif %}
-            <p>{{ desc }}</p>
+            <p>{{ desc | safe_markdown | striptags }}</p>
         {% endif %}
     </div>
 </div>
