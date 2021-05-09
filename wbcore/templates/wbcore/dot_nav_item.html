@@ -1,35 +1,45 @@
 {% load static %}
+{% load humanize %}
 {% load martortags %}
-<div class="item">
-    {% if image %}
-        {% if host %}
-            <a href="{% url type post_id=id host_slug=host.slug %}" class="ui top aligned image">
-                <img src="{{ image.get_menusize_url }}" class="thumbnail" alt="{{ image.title }}">
-            </a>
-        {% else %}
-            <a href="{% url type post_id=id %}" class="ui top aligned image">
-                <img src="{{ image.get_menusize_url }}" class="thumbnail" alt="{{ image.title }}">
-            </a>
-        {% endif %}
-    {% elif type == 'event' %}
-        <i class="clock outline icon"></i>
-    {% endif %}
 
-    <div class="content">
-        {% if type == 'event'%}
-            {% if host %}
-                <a href="{% url type event_slug=slug host_slug=host.slug %}">{{ title }}</a>
-            {% else %}
-                <a href="{% url type event_slug=slug %}">{{ title }}</a>
+{% if type == 'event' %}
+
+    <div class="item">
+        <div class="content">
+            <div class="date">
+                <i class="clock outline icon"></i>
+                {{ item.start | naturalday:"d. M" }} {{ item.start | time:"H:i" }}
+                {% if item.recurring %}
+                    <i class="redo alternate icon"></i>
+                    {% if item.frequency_short %} {{ item.frequency_short }} {% endif %}
+                {% endif %}
+            </div>
+            <div class="title">
+                <a href="{{ item.link }}">{{ item.title | truncatechars:20 }}</a>
+            </div>
+            {% if item.location %}
+                <div class="location">
+                    <i class="map marker alternate icon"></i>{{ item.location }}
+                </div>
             {% endif %}
-            <p>{{ show_date | safe }}</p>
-        {% else %}
-            {% if host %}
-                <a href="{% url type post_id=id host_slug=host.slug %}">{{ title }}</a>
-            {% else %}
-                <a href="{% url type post_id=id %}">{{ title }}</a>
-            {% endif %}
-            <p>{{ desc | safe_markdown | striptags }}</p>
-        {% endif %}
+        </div>
     </div>
-</div>
+
+{% else %}
+
+    <div class="item">
+        {% if item.image %}
+            <a href="{{ item.link }}" class="ui top aligned image">
+                <img src="{{ item.image.get_menusize_url }}" class="thumbnail" alt="{{ item.image.title }}">
+            </a>
+        {% endif %}
+
+        <div class="content">
+            <a href="{{ item.link }}">{{ item.title }}</a>
+            {% if not item.image %}
+                <p>{{ item.teaser | safe_markdown | striptags | truncatewords:7 }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+{% endif %}
