@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
-from django.conf import settings
-from wbcore.models import Host, Document, Photo, UserRelation
-from wbcore.models import SocialMediaLink, JoinPage, Content, Event, NewsPost, BlogPost, Document, Team, Donation, ContactMessage
+from wbcore.models import Host, Photo, UserRelation
+from wbcore.models import SocialMediaLink, JoinPage, Content, Event, NewsPost, BlogPost, Document, LinkedDocument, Team, Donation, ContactMessage
 from fixture_magic.management.commands.dump_object import Command as DumpObjectCommand
 from fixture_magic.management.commands.merge_fixtures import Command as MergeFixturesCommand
 import io
@@ -31,7 +30,7 @@ class Command(BaseCommand):
             ('wbcore.project', {"hosts__slug": host.slug}),
             ('wbcore.event', {"host__slug": host.slug}),
             ('wbcore.document', {"host__slug": host.slug}),
-            # ('wbcore.external_document', {}),  # TODO not yet merged in master
+            ('wbcore.linkeddocument', {"host__slug": host.slug}),
             ('wbcore.content', {"host__slug": host.slug}),
             ('wbcore.team', {"host__slug": host.slug}),
             ('wbcore.donation', {"host__slug": host.slug}),
@@ -100,6 +99,7 @@ class Command(BaseCommand):
         NewsPost.objects.filter(host=host).delete()
         BlogPost.objects.filter(host=host).delete()
         Document.objects.filter(host=host).delete()
+        LinkedDocument.objects.filter(host=host).delete()
         Team.objects.filter(host=host).delete()
         Donation.objects.filter(host=host).delete()
         ContactMessage.objects.filter(host=host).delete()
