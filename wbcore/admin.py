@@ -25,7 +25,7 @@ from itertools import chain
 
 from .models import (
     Address, Location, Host, Partner, Project, Event, NewsPost, BlogPost, ContactMessage, UserRelation,
-    Document, Team, Milestone, Donation, BankAccount, TeamUserRelation, Content, User, JoinPage,
+    Document, LinkedDocument, Team, Milestone, Donation, BankAccount, TeamUserRelation, Content, User, JoinPage,
     SocialMediaLink, CycleDonation, QuestionAndAnswer, FAQ, Photo)
 
 
@@ -532,8 +532,11 @@ class UserAdmin(BaseUserAdmin):
         return request.user.has_module_perms(self.opts.app_label)
 
     def save_model(self, request, obj, form, change):
-        if obj.image != User.objects.get(pk=obj.pk).image:  # delete old thumbnails on profile picture change
-            get_thumbnailer(User.objects.get(pk=obj.pk).image).delete_thumbnails()
+        try:
+            if obj.image != User.objects.get(pk=obj.pk).image:  # delete old thumbnails on profile picture change
+                get_thumbnailer(User.objects.get(pk=obj.pk).image).delete_thumbnails()
+        except User.DoesNotExist:
+            pass
         super(UserAdmin, self).save_model(request, obj, form, change)
 
 class TeamAdmin(MyAdmin):
@@ -733,9 +736,17 @@ class CycleDonationAdmin(MyAdmin):
     get_projects.short_description = 'Projects'
 
 
-class DocumentAdmin(MyAdmin):
+class BaseDocumentAdmin(MyAdmin):
 
     list_display = ('title', 'host', 'document_type', 'published', 'public', 'valid_from')
+
+
+class DocumentAdmin(BaseDocumentAdmin):
+    fields = ('title', 'description', 'host', 'file', 'valid_from', 'document_type', 'public')
+
+
+class LinkedDocumentAdmin(BaseDocumentAdmin):
+    fields = ('title', 'description', 'host', 'url', 'valid_from', 'document_type', 'public')
 
 
 class DonationAdmin(MyAdmin):
@@ -840,6 +851,7 @@ admin.site.register(ContactMessage, ContactMessageAdmin)
 admin.site.register(Content, ContentAdmin)
 admin.site.register(CycleDonation, CycleDonationAdmin)
 admin.site.register(Document, DocumentAdmin)
+admin.site.register(LinkedDocument, LinkedDocumentAdmin)
 admin.site.register(Donation, DonationAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(FAQ, FAQAdmin)

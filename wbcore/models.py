@@ -858,7 +858,7 @@ def save_document(instance, filename):
     return replace_umlaute(path)
 
 
-class Document(RulesModel):
+class BaseDocument(RulesModel):
     class Meta:
         rules_permissions = {
             "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
@@ -867,10 +867,10 @@ class Document(RulesModel):
             "delete": pred.is_super_admin | pred.is_admin | pred.is_editor,
         }
         get_latest_by = 'valid_from'
+        abstract = True
 
     title = models.CharField(max_length=50)
     description = models.TextField(null=True, blank=True)
-    file = models.FileField(upload_to=save_document)
     host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     TYPE_CHOICES = (
@@ -894,6 +894,22 @@ class Document(RulesModel):
 
     def get_hosts(self):
         return [self.host]
+
+
+class Document(BaseDocument):
+    file = models.FileField(upload_to=save_document)
+    icon = 'file pdf outline'
+
+    def get_url(self):
+        return self.file.url
+
+
+class LinkedDocument(BaseDocument):
+    url = models.URLField()
+    icon = 'linkify'
+
+    def get_url(self):
+        return self.url
 
 
 class Team(RulesModel):
