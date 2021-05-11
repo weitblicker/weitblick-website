@@ -21,14 +21,36 @@ from sortedm2m.fields import SortedManyToManyField
 from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
 import rules, datetime
+from django.utils.safestring import mark_safe
+from easy_thumbnails.files import get_thumbnailer
+from weitblick import settings
+
+class AdminThumbnailMixin(models.Model):
+    class Meta:
+        abstract = True
+
+    def admin_thumb(self):
+        try:
+            return self.admin_thumbnail()
+        except AttributeError:  # if class is not Photo
+            if self.image:
+                if type(self.image) == Photo:
+                    return self.image.admin_thumbnail()
+                else:
+                    thumbnailer = get_thumbnailer(self.image)
+                    return mark_safe('<img src="%s%s" />' % (settings.MEDIA_URL, thumbnailer['profile_list_view']))
+            else:
+                return None
+
+    admin_thumb.short_description = _('Photo')
 
 
-class Photo(RulesModelMixin, PhotologuePhoto, metaclass=RulesModelBase):
+class Photo(RulesModelMixin, AdminThumbnailMixin, PhotologuePhoto, metaclass=RulesModelBase):
     class Meta:
         rules_permissions = {
-            "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "add": pred.is_super_admin | pred.is_admin | pred.is_editor | pred.is_author,
             "view": rules.always_allow,
-            "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_editor | pred.is_author,
             "delete": pred.is_super_admin | pred.is_admin,
         }
 
@@ -44,8 +66,7 @@ class Photo(RulesModelMixin, PhotologuePhoto, metaclass=RulesModelBase):
     host = models.ForeignKey('Host', on_delete=models.SET_NULL, null=True)
 
     def get_hosts(self):
-        return self.host
-
+        return [self.host]
 
 class Address(models.Model):
     name = models.CharField(max_length=200)
@@ -261,7 +282,7 @@ def user_image_path(user, filename):
     return 'images/users/%s%s' % (user.pk, extension)
 
 
-class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, metaclass=RulesModelBase):
+class User(AbstractBaseUser, PermissionsMixin, RulesModelMixin, AdminThumbnailMixin, metaclass=RulesModelBase):
     class Meta:
         rules_permissions = {
             "add": pred.is_super_admin,
@@ -520,7 +541,7 @@ class Partner(RulesModel):
         return self.description
 
 
-class Project(RulesModel):
+class Project(AdminThumbnailMixin, RulesModel):
     class Meta:
         rules_permissions = {
             "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
@@ -589,7 +610,7 @@ class Project(RulesModel):
     def get_teaser(self):
         return self.short_description if self.short_description else self.description
 
-class Event(RulesModelMixin, ScheduleEvent, metaclass=RulesModelBase):
+class Event(RulesModelMixin, AdminThumbnailMixin, ScheduleEvent, metaclass=RulesModelBase):
     class Meta:
         rules_permissions = {
             "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
@@ -675,7 +696,7 @@ class UserRelation(RulesModel):
         return [self.host]
 
 
-class NewsPost(RulesModel):
+class NewsPost(RulesModel, AdminThumbnailMixin):
     class Meta:
         rules_permissions = {
             "add": pred.is_super_admin | pred.is_admin | pred.is_editor | pred.is_author,
@@ -759,7 +780,7 @@ class NewsPost(RulesModel):
         return self.title + city
 
 
-class BlogPost(RulesModel):
+class BlogPost(RulesModel, AdminThumbnailMixin):
     class Meta:
         rules_permissions = {
             "add": pred.is_super_admin | pred.is_admin | pred.is_editor | pred.is_author,
@@ -902,7 +923,7 @@ class LinkedDocument(BaseDocument):
         return self.url
 
 
-class Team(RulesModel):
+class Team(RulesModel, AdminThumbnailMixin):
     class Meta:
         rules_permissions = {
             "add": pred.is_super_admin | pred.is_admin,

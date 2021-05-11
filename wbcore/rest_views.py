@@ -1,5 +1,6 @@
 import json
 import os
+import time
 import uuid
 
 from allauth.account.models import EmailConfirmation, EmailConfirmationHMAC
@@ -74,20 +75,40 @@ def markdown_uploader(request):
                 return HttpResponse(
                     data, content_type='application/json', status=405)
 
-            name = image.name.lower()
-            for k, i in replacements.items():
-                name = name.replace(k, i)
+            user = request.user
+            possible_hosts = user.get_hosts_for_role(['author', 'editor', 'admin'])
+            host = possible_hosts[0] if possible_hosts else None
+            name = '{} Texteditor Upload {}'.format(time.strftime("%Y-%m-%d"), image.name)
 
-            img_uuid = "{0}-{1}".format(uuid.uuid4().hex[:10], name)
-            tmp_file = os.path.join(settings.MARTOR_UPLOAD_PATH, img_uuid)
-            def_path = default_storage.save(tmp_file, ContentFile(image.read()))
-            img_url = os.path.join(settings.MEDIA_URL, def_path)
+            types = ('project', 'blog', 'event', 'news')
+            search_string = request.META['HTTP_REFERER']
+            # create a generator to find the first match in the url string
+            positions = ((search_string.find(sub), sub) for sub in types)
+            try:
+                mytype = min((pos, sub) for pos, sub in positions if pos > -1)[1]
+            except ValueError:
+                mytype = None
 
-            data = json.dumps({
-                'status': 200,
-                'link': img_url,
-                'name': name
-            })
+            # check if title name is already used
+            existing_photo = Photo.objects.filter(title=name)
+            if existing_photo:
+                existing_photo = existing_photo[0]
+                if existing_photo.uploader == user and existing_photo.type == mytype:
+                    existing_photo.image = image
+                    existing_photo.save()
+                    photo_url = existing_photo.image.url
+                    data = json.dumps({'status': 200, 'link': photo_url, 'name': image.name})
+                    return HttpResponse(data, content_type='application/json')
+                else:
+                    name = "{0}-{1}".format(name, uuid.uuid4().hex[:5])
+
+            photo_obj = Photo(type=mytype, uploader=user, image=image, title=name, slug=slugify(name), host=host)
+            filename = settings.PHOTOLOGUE_PATH(photo_obj, image.name)
+            photo_url = os.path.join(settings.MEDIA_URL, filename)
+            photo_obj.save()
+
+            data = json.dumps({'status': 200, 'link': photo_url, 'name': image.name})
+
             return HttpResponse(data, content_type='application/json')
         return HttpResponse(_('Invalid request!'))
     return HttpResponse(_('Invalid request!'))
