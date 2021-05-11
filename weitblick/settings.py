@@ -66,7 +66,6 @@ INSTALLED_APPS = [
     'el_pagination',
     'rules',
     'django_instagram',
-    'cookielaw',
     'django.contrib.humanize',
     'captcha',
     'honeypot',

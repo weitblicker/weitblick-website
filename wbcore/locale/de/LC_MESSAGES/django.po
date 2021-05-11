@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-26 01:44+0200\n"
+"POT-Creation-Date: 2020-12-03 18:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,47 +18,35 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: filter.py:222 templates/wbcore/list_filter.html:96
-msgid "Completed"
-msgstr "Abgeschlossen"
-
-#: filter.py:231 views.py:231
-msgid "Previous"
-msgstr "Vergangen"
-
-#: filter.py:239 templates/wbcore/list_filter.html:129
-msgid "Former"
-msgstr "Ehemalige"
-
-#: models.py:476
+#: models.py:477
 msgid "Project Partner"
 msgstr "Projekt Partner"
 
-#: models.py:477
+#: models.py:478
 msgid "Sponsor"
 msgstr "Förderer"
 
-#: models.py:478
+#: models.py:479
 msgid "Patron"
 msgstr "Schirmherr*in"
 
-#: models.py:479
+#: models.py:480
 msgid "Network"
 msgstr "Netzwerk"
 
-#: models.py:542 models.py:603 models.py:699 models.py:779
+#: models.py:546 models.py:610 models.py:710 models.py:794
 msgid "photos"
 msgstr "Bilder"
 
-#: models.py:1059
+#: models.py:1080
 msgid "Donation"
 msgstr "Spende"
 
-#: models.py:1060
+#: models.py:1081
 msgid "Membership"
 msgstr "Mitgliedschaft"
 
-#: models.py:1061
+#: models.py:1082
 msgid "Other"
 msgstr "Anderer"
 
@@ -74,21 +62,10 @@ msgstr ""
 msgid "Invalid request!"
 msgstr ""
 
-#: templates/cookielaw/banner.html:6
-msgid "COOKIE_INFO_HEADER"
-msgstr ""
-
-#: templates/cookielaw/banner.html:9
-msgid "COOKIE_INFO_PARA"
-msgstr ""
-
-#: templates/cookielaw/banner.html:13
-msgid "COOKIE_INFO_OK"
-msgstr ""
-
 #: templates/wbcore/about.html:6 templates/wbcore/dot_nav.html:32
-#: templates/wbcore/dot_nav.html:40 templates/wbcore/dot_nav_columns.html:7
-#: templates/wbcore/dot_nav_columns.html:14 views.py:730 views.py:733
+#: templates/wbcore/dot_nav.html:41 templates/wbcore/dot_nav_columns.html:7
+#: templates/wbcore/dot_nav_columns.html:15 views.py:864 views.py:867
+#: views.py:892
 msgid "About"
 msgstr "Über uns"
 
@@ -97,9 +74,9 @@ msgid "Address"
 msgstr "Adresse"
 
 #: templates/wbcore/blog.html:5 templates/wbcore/dot_nav.html:22
-#: templates/wbcore/dot_nav.html:25 templates/wbcore/dot_nav_columns.html:33
-#: templates/wbcore/dot_nav_columns.html:34 views.py:1264 views.py:1266
-#: views.py:1295 views.py:1300
+#: templates/wbcore/dot_nav.html:25 templates/wbcore/dot_nav_columns.html:35
+#: templates/wbcore/dot_nav_columns.html:36 views.py:1411 views.py:1413
+#: views.py:1422 views.py:1443 views.py:1448
 msgid "Blog"
 msgstr "Blog"
 
@@ -107,109 +84,112 @@ msgstr "Blog"
 msgid "No posts available."
 msgstr "Keine Beiträge vorhanden."
 
-#: templates/wbcore/charter.html:6 templates/wbcore/dot_nav.html:56
-#: templates/wbcore/dot_nav.html:64 templates/wbcore/dot_nav_columns.html:45
-#: templates/wbcore/dot_nav_columns.html:51 templates/wbcore/sidebar.html:90
-#: views.py:386 views.py:391
+#: templates/wbcore/charter.html:6 templates/wbcore/dot_nav.html:58
+#: templates/wbcore/dot_nav.html:66 templates/wbcore/dot_nav_columns.html:47
+#: templates/wbcore/dot_nav_columns.html:53 templates/wbcore/sidebar.html:95
+#: views.py:504 views.py:509 views.py:524
 msgid "Charter"
 msgstr "Satzung"
 
-#: templates/wbcore/contact.html:5 templates/wbcore/dot_nav.html:37
-#: templates/wbcore/dot_nav.html:45 templates/wbcore/dot_nav_columns.html:12
-#: templates/wbcore/dot_nav_columns.html:19 templates/wbcore/footer.html:10
-#: templates/wbcore/footer.html:31 views.py:1561 views.py:1563
+#: templates/wbcore/contact.html:5 templates/wbcore/dot_nav.html:38
+#: templates/wbcore/dot_nav.html:47 templates/wbcore/dot_nav_columns.html:13
+#: templates/wbcore/dot_nav_columns.html:21 templates/wbcore/footer.html:10
+#: templates/wbcore/footer.html:31 views.py:1685 views.py:1687 views.py:1716
 msgid "Contact"
 msgstr "Kontakt"
 
-#: templates/wbcore/contact_form.html:3
+#: templates/wbcore/contact_form.html:4
 msgid "Write us!"
 msgstr "Schreib uns!"
 
-#: templates/wbcore/contact_form.html:10
+#: templates/wbcore/contact_form.html:11
 msgid "Your message has been delivered. Thank you."
 msgstr "Deine Nachricht wurde zugestellt. Danke dir!"
 
-#: templates/wbcore/contact_form.html:54
+#: templates/wbcore/contact_form.html:56
 msgid "Submit"
 msgstr "Abschicken"
 
-#: templates/wbcore/donate.html:6 templates/wbcore/footer.html:20
-#: templates/wbcore/footer.html:41 templates/wbcore/sidebar.html:54
-#: views.py:1495 views.py:1500
+#: templates/wbcore/donate.html:6 templates/wbcore/dot_nav.html:37
+#: templates/wbcore/dot_nav.html:46 templates/wbcore/dot_nav_columns.html:12
+#: templates/wbcore/dot_nav_columns.html:20 templates/wbcore/footer.html:20
+#: templates/wbcore/footer.html:41 templates/wbcore/sidebar.html:65
+#: views.py:1613 views.py:1618 views.py:1636
 msgid "Donate"
 msgstr "Spenden"
 
 #: templates/wbcore/dot_nav.html:21 templates/wbcore/dot_nav.html:24
-#: templates/wbcore/dot_nav_columns.html:24
-#: templates/wbcore/dot_nav_columns.html:25 templates/wbcore/home.html:30
+#: templates/wbcore/dot_nav_columns.html:26
+#: templates/wbcore/dot_nav_columns.html:27 templates/wbcore/home.html:30
 #: templates/wbcore/host.html:12 templates/wbcore/news.html:4
-#: templates/wbcore/sidebar.html:150 views.py:1346 views.py:1350 views.py:1380
-#: views.py:1385
+#: templates/wbcore/sidebar.html:155 views.py:1496 views.py:1500 views.py:1509
+#: views.py:1531 views.py:1536
 msgid "News"
 msgstr "News"
 
-#: templates/wbcore/dot_nav.html:34 templates/wbcore/dot_nav.html:42
+#: templates/wbcore/dot_nav.html:34 templates/wbcore/dot_nav.html:43
 #: templates/wbcore/dot_nav_columns.html:9
-#: templates/wbcore/dot_nav_columns.html:16 templates/wbcore/history.html:6
-#: views.py:502 views.py:507
+#: templates/wbcore/dot_nav_columns.html:17 templates/wbcore/history.html:6
+#: views.py:625 views.py:630 views.py:647
 msgid "History"
 msgstr "Geschichte"
 
-#: templates/wbcore/dot_nav.html:35 templates/wbcore/dot_nav.html:43
+#: templates/wbcore/dot_nav.html:35 templates/wbcore/dot_nav.html:44
 #: templates/wbcore/dot_nav_columns.html:10
-#: templates/wbcore/dot_nav_columns.html:17 templates/wbcore/team_list.html:7
-#: views.py:576 views.py:582 views.py:619 views.py:621
+#: templates/wbcore/dot_nav_columns.html:18 templates/wbcore/team_list.html:7
+#: views.py:702 views.py:708 views.py:746 views.py:748
 msgid "Team"
 msgstr "Team"
 
-#: templates/wbcore/dot_nav.html:36 templates/wbcore/dot_nav.html:44
+#: templates/wbcore/dot_nav.html:36 templates/wbcore/dot_nav.html:45
 #: templates/wbcore/dot_nav_columns.html:11
-#: templates/wbcore/dot_nav_columns.html:18 templates/wbcore/partners.html:5
-#: templates/wbcore/sidebar.html:106 views.py:651 views.py:654 views.py:689
-#: views.py:692
+#: templates/wbcore/dot_nav_columns.html:19 templates/wbcore/partners.html:5
+#: templates/wbcore/sidebar.html:111 views.py:782 views.py:785 views.py:800
+#: views.py:826 views.py:829
 msgid "Partners"
 msgstr "Partner"
 
-#: templates/wbcore/dot_nav.html:53 templates/wbcore/dot_nav.html:61
-#: templates/wbcore/dot_nav_columns.html:43
-#: templates/wbcore/dot_nav_columns.html:49 templates/wbcore/facts.html:6
-#: views.py:471 views.py:476
+#: templates/wbcore/dot_nav.html:55 templates/wbcore/dot_nav.html:63
+#: templates/wbcore/dot_nav_columns.html:45
+#: templates/wbcore/dot_nav_columns.html:51 templates/wbcore/facts.html:6
+#: views.py:593 views.py:598 views.py:610
 msgid "Facts"
 msgstr "Fakten"
 
-#: templates/wbcore/dot_nav.html:55 templates/wbcore/dot_nav.html:63
-#: templates/wbcore/dot_nav_columns.html:44
-#: templates/wbcore/dot_nav_columns.html:50 templates/wbcore/footer.html:9
+#: templates/wbcore/dot_nav.html:57 templates/wbcore/dot_nav.html:65
+#: templates/wbcore/dot_nav_columns.html:46
+#: templates/wbcore/dot_nav_columns.html:52 templates/wbcore/footer.html:9
 #: templates/wbcore/footer.html:30 templates/wbcore/transparency.html:7
-#: views.py:422 views.py:427
+#: views.py:541 views.py:546 views.py:571
 msgid "Transparency"
 msgstr "Transparenz"
 
-#: templates/wbcore/dot_nav.html:57 templates/wbcore/dot_nav.html:65
-#: templates/wbcore/dot_nav_columns.html:46
-#: templates/wbcore/dot_nav_columns.html:52 templates/wbcore/reports.html:7
-#: views.py:351 views.py:356
+#: templates/wbcore/dot_nav.html:59 templates/wbcore/dot_nav.html:67
+#: templates/wbcore/dot_nav_columns.html:48
+#: templates/wbcore/dot_nav_columns.html:54 templates/wbcore/reports.html:7
+#: views.py:468 views.py:473 views.py:489
 msgid "Reports"
 msgstr "Berichte"
 
-#: templates/wbcore/dot_nav.html:58 templates/wbcore/dot_nav.html:66
-#: templates/wbcore/dot_nav_columns.html:47
-#: templates/wbcore/dot_nav_columns.html:53 templates/wbcore/faq.html:5
-#: views.py:1649 views.py:1654
+#: templates/wbcore/dot_nav.html:60 templates/wbcore/dot_nav.html:68
+#: templates/wbcore/dot_nav_columns.html:49
+#: templates/wbcore/dot_nav_columns.html:55 templates/wbcore/faq.html:5
+#: views.py:1767 views.py:1772 views.py:1786
 msgid "FAQ"
 msgstr "FAQ"
 
 #: templates/wbcore/dot_nav_columns.html:8
-#: templates/wbcore/dot_nav_columns.html:15 templates/wbcore/footer.html:21
+#: templates/wbcore/dot_nav_columns.html:16 templates/wbcore/footer.html:21
 #: templates/wbcore/footer.html:42 templates/wbcore/home.html:9
-#: templates/wbcore/idea.html:5 views.py:78 views.py:775 views.py:780
+#: templates/wbcore/idea.html:5 views.py:81 views.py:911 views.py:916
+#: views.py:932
 msgid "Idea"
 msgstr "Idee"
 
-#: templates/wbcore/dot_nav_columns.html:57
-#: templates/wbcore/dot_nav_columns.html:58 templates/wbcore/events.html:5
-#: templates/wbcore/home.html:17 templates/wbcore/sidebar.html:114 views.py:92
-#: views.py:1159 views.py:1165 views.py:1197 views.py:1202 views.py:1445
+#: templates/wbcore/dot_nav_columns.html:59
+#: templates/wbcore/dot_nav_columns.html:60 templates/wbcore/events.html:5
+#: templates/wbcore/home.html:17 templates/wbcore/sidebar.html:119 views.py:95
+#: views.py:1309 views.py:1315 views.py:1326 views.py:1346 views.py:1351
 msgid "Events"
 msgstr "Events"
 
@@ -230,7 +210,7 @@ msgid "Register"
 msgstr "Anmelden"
 
 #: templates/wbcore/footer.html:11 templates/wbcore/footer.html:32
-#: templates/wbcore/imprint.html:6 views.py:1532 views.py:1537
+#: templates/wbcore/imprint.html:6 views.py:1654 views.py:1659 views.py:1667
 msgid "Imprint"
 msgstr "Impressum"
 
@@ -239,7 +219,7 @@ msgid "Data Protection"
 msgstr "Datenschutz"
 
 #: templates/wbcore/footer.html:13 templates/wbcore/footer.html:34
-#: views.py:1468 views.py:1473 views.py:1639
+#: views.py:1585 views.py:1590 views.py:1598
 msgid "Sitemap"
 msgstr "Sitemap"
 
@@ -249,7 +229,8 @@ msgstr "Mitglied werden"
 
 #: templates/wbcore/footer.html:22 templates/wbcore/footer.html:43
 #: templates/wbcore/hosts.html:5 templates/wbcore/hosts_map.html:10
-#: templates/wbcore/list_filter.html:11 views.py:106 views.py:1102
+#: templates/wbcore/list_filter.html:11 views.py:109 views.py:1249
+#: views.py:1251
 msgid "Associations"
 msgstr "Vereine"
 
@@ -261,8 +242,8 @@ msgstr "Intern"
 msgid "What is Weitblick?"
 msgstr "Was ist Weitblick?"
 
-#: templates/wbcore/home.html:13 templates/wbcore/sidebar.html:122 views.py:85
-#: views.py:814 views.py:820 views.py:1043 views.py:1048 views.py:1427
+#: templates/wbcore/home.html:13 templates/wbcore/sidebar.html:127 views.py:88
+#: views.py:951 views.py:957 views.py:987 views.py:1191 views.py:1196
 msgid "Projects"
 msgstr "Projekte"
 
@@ -274,13 +255,19 @@ msgstr "Wen unterstützen wir?"
 msgid "What do we do?"
 msgstr "Was machen wir?"
 
-#: templates/wbcore/home.html:21 views.py:99 views.py:932 views.py:936
+#: templates/wbcore/home.html:21 views.py:102 views.py:1075 views.py:1079
 msgid "Participate"
 msgstr "Mitmachen"
 
 #: templates/wbcore/home.html:22
 msgid "Come over!"
 msgstr "Komm vorbei!"
+
+#: templates/wbcore/home.html:33 templates/wbcore/host.html:15
+#, fuzzy
+#| msgid "Read more"
+msgid "more"
+msgstr "weiterlesen"
 
 #: templates/wbcore/join.html:16
 msgid "Registration Form"
@@ -343,17 +330,25 @@ msgstr "Alle"
 msgid "Current"
 msgstr "Aktuelle"
 
+#: templates/wbcore/list_filter.html:96 views.py:377
+msgid "Completed"
+msgstr "Abgeschlossen"
+
 #: templates/wbcore/list_filter.html:106 templates/wbcore/list_filter.html:110
 msgid "Category"
 msgstr "Kategorie"
 
+#: templates/wbcore/list_filter.html:129 views.py:433
+msgid "Former"
+msgstr "Ehemalige"
+
 #: templates/wbcore/list_filter.html:137 templates/wbcore/list_filter.html:138
 #: templates/wbcore/main_nav.html:13 templates/wbcore/main_nav.html:62
-#: templates/wbcore/main_nav.html:108 views.py:1456
+#: templates/wbcore/main_nav.html:108 views.py:1572 views.py:1573
 msgid "Search"
 msgstr "Suche"
 
-#: templates/wbcore/list_item.html:114
+#: templates/wbcore/list_item.html:115
 msgid "Read more"
 msgstr "weiterlesen"
 
@@ -429,31 +424,31 @@ msgstr "Karte"
 msgid "Project Map"
 msgstr "Projekt Karte"
 
-#: templates/wbcore/projects_map.html:15
+#: templates/wbcore/projects_map.html:14
 msgid "Back to the world map"
 msgstr "Zurück zur Weltkarte"
 
-#: templates/wbcore/sidebar.html:46
+#: templates/wbcore/sidebar.html:51
 msgid "Gallery"
 msgstr "Galerie"
 
-#: templates/wbcore/sidebar.html:74
+#: templates/wbcore/sidebar.html:79
 msgid "Annual Reports"
 msgstr "Jahresberichte"
 
-#: templates/wbcore/sidebar.html:82
+#: templates/wbcore/sidebar.html:87
 msgid "Financial Reports"
 msgstr "Finanzberichte"
 
-#: templates/wbcore/sidebar.html:98
+#: templates/wbcore/sidebar.html:103
 msgid "Membership Declaration"
 msgstr "Beitrittserklärung"
 
-#: templates/wbcore/sidebar.html:130 templates/wbcore/teams.html:5
+#: templates/wbcore/sidebar.html:135 templates/wbcore/teams.html:5 views.py:720
 msgid "Teams"
 msgstr "Teams"
 
-#: templates/wbcore/sidebar.html:142
+#: templates/wbcore/sidebar.html:147
 msgid "Blog Posts"
 msgstr ""
 
@@ -461,28 +456,36 @@ msgstr ""
 msgid "Details"
 msgstr "Details"
 
-#: views.py:71 views.py:338 views.py:351 views.py:356 views.py:386 views.py:391
-#: views.py:422 views.py:427 views.py:471 views.py:476 views.py:502
-#: views.py:507 views.py:540 views.py:545 views.py:576 views.py:582
-#: views.py:619 views.py:621 views.py:651 views.py:654 views.py:688
-#: views.py:692 views.py:730 views.py:733 views.py:775 views.py:780
-#: views.py:812 views.py:820 views.py:932 views.py:936 views.py:1041
-#: views.py:1048 views.py:1102 views.py:1137 views.py:1157 views.py:1165
-#: views.py:1195 views.py:1202 views.py:1264 views.py:1266 views.py:1293
-#: views.py:1300 views.py:1346 views.py:1350 views.py:1378 views.py:1385
-#: views.py:1427 views.py:1445 views.py:1456 views.py:1468 views.py:1473
-#: views.py:1495 views.py:1500 views.py:1532 views.py:1537 views.py:1561
-#: views.py:1563 views.py:1639 views.py:1649 views.py:1654
+#: views.py:74 views.py:457 views.py:468 views.py:473 views.py:504 views.py:509
+#: views.py:541 views.py:546 views.py:593 views.py:598 views.py:625
+#: views.py:630 views.py:664 views.py:669 views.py:702 views.py:708
+#: views.py:746 views.py:748 views.py:782 views.py:785 views.py:825
+#: views.py:829 views.py:864 views.py:867 views.py:911 views.py:916
+#: views.py:949 views.py:957 views.py:1075 views.py:1079 views.py:1189
+#: views.py:1196 views.py:1251 views.py:1286 views.py:1307 views.py:1315
+#: views.py:1344 views.py:1351 views.py:1411 views.py:1413 views.py:1441
+#: views.py:1448 views.py:1496 views.py:1500 views.py:1529 views.py:1536
+#: views.py:1573 views.py:1585 views.py:1590 views.py:1613 views.py:1618
+#: views.py:1654 views.py:1659 views.py:1685 views.py:1687 views.py:1767
+#: views.py:1772
 msgid "Home"
 msgstr "Home"
 
-#: views.py:210 views.py:211
+#: views.py:227 views.py:243
+msgid "Previous"
+msgstr "Vergangen"
+
+#: views.py:262 views.py:263
 msgid "every"
 msgstr "jeden"
 
-#: views.py:540 views.py:545
+#: views.py:664 views.py:669 views.py:681
 msgid "Privacy"
 msgstr "Datenschutz"
+
+#: views.py:1176 views.py:1178
+msgid "Join"
+msgstr ""
 
 #~ msgid "Archive"
 #~ msgstr "Archiv"

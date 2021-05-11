@@ -29,7 +29,7 @@ from honeypot.decorators import check_honeypot
 
 from wbcore.models import (
     Host, Project, Event, NewsPost, Location, BlogPost, Team, TeamUserRelation,
-    UserRelation, Partner, JoinPage, SocialMediaLink, Content, Document, Donation, FAQ)
+    UserRelation, Partner, JoinPage, SocialMediaLink, Content, Document, LinkedDocument, Donation, FAQ)
 
 
 main_host_slug = 'bundesverband' ## TODO configure this?
@@ -130,6 +130,15 @@ def get_dot_nav(host=None):
         news = NewsPost.objects.all().order_by('-published')[:3]
         blog = BlogPost.objects.all().order_by('-published')[:3]
         events = Event.objects.all()
+
+    for post in news:
+        if not post.teaser and post.text:
+            post.teaser = post.text
+            
+    for post in blog:
+        if not post.teaser and post.text:
+            post.teaser = post.text
+
     occurrences = item_list_from_events(events, start=datetime.now(), host_slug=host_slug, text=False, show_only_first_occ=True, max_num_items=3)
     return {'news': news, 'blog': blog, 'occurrences': occurrences}
 
@@ -436,13 +445,25 @@ def item_list_from_partners(partners, host_slug=None, text=True, max_num_items=N
     return item_list
 
 
+def join_documents_linked(documents, linked_documents, sort_key='-valid_from'):
+    documents = [d for d in documents]
+    linked_documents = [d for d in linked_documents]
+    documents = documents + linked_documents
+    if sort_key[0] == '-':
+        sort_reverse = True
+        sort_key = sort_key[1:]
+    else:
+        sort_reverse = False
+    documents = sorted(documents, key=lambda x: getattr(x, sort_key), reverse=sort_reverse)
+    return documents
+
+
 def home_view(request):
     projects = Project.objects.all()[:5]
     hosts = Host.objects.all()
     news = NewsPost.objects.all().order_by('-published')[:5]
     blog = BlogPost.objects.all().order_by('-published')[:3]
     events = Event.objects.all().order_by('-start')
-
 
     template = loader.get_template('wbcore/home.html')
     context = {
@@ -477,10 +498,14 @@ def reports_view(request, host_slug=None):
         report = Content.objects.get(host=load_host, type='reports')
     except Content.DoesNotExist:
         report = None
+
     financial_reports = Document.objects.filter(host=load_host, document_type='financial_report', public=True)
-    financial_reports = financial_reports.order_by('-valid_from') if financial_reports else financial_reports
+    financial_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='financial_report', public=True)
+    financial_reports = join_documents_linked(financial_reports, financial_reports_linked, sort_key="-valid_from")
+
     annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
-    annual_reports = annual_reports.order_by('-valid_from') if annual_reports else annual_reports
+    annual_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports = join_documents_linked(annual_reports, annual_reports_linked, sort_key="-valid_from")
 
     template = loader.get_template('wbcore/reports.html')
     context = {
@@ -515,7 +540,8 @@ def charter_view(request, host_slug=None):
         charter = None
 
     charter_files = Document.objects.filter(host=load_host, document_type='charter', public=True)
-    charter_files = charter_files.order_by('valid_from') if charter_files else charter_files
+    charter_linked = LinkedDocument.objects.filter(host=load_host, document_type='charter', public=True)
+    charter_files = join_documents_linked(charter_files, charter_linked, sort_key='-valid_from')
 
     template = loader.get_template('wbcore/charter.html')
     context = {
@@ -559,10 +585,12 @@ def transparency_view(request, host_slug=None):
     }
 
     financial_reports = Document.objects.filter(host=load_host, document_type='financial_report', public=True)
-    financial_reports = financial_reports.order_by('-valid_from') if financial_reports else financial_reports
-    annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
-    annual_reports = annual_reports.order_by('-valid_from') if annual_reports else annual_reports
+    financial_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='financial_report', public=True)
+    financial_reports = join_documents_linked(financial_reports, financial_reports_linked, sort_key="-valid_from")
 
+    annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports = join_documents_linked(annual_reports, annual_reports_linked, sort_key="-valid_from")
 
     template = loader.get_template('wbcore/transparency.html')
     context = {
@@ -601,6 +629,14 @@ def facts_view(request, host_slug=None):
     except Content.DoesNotExist:
         facts = None
 
+    financial_reports = Document.objects.filter(host=load_host, document_type='financial_report', public=True)
+    financial_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='financial_report', public=True)
+    financial_reports = join_documents_linked(financial_reports, financial_reports_linked, sort_key="-valid_from")
+
+    annual_reports = Document.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports_linked = LinkedDocument.objects.filter(host=load_host, document_type='annual_report', public=True)
+    annual_reports = join_documents_linked(annual_reports, annual_reports_linked, sort_key="-valid_from")
+
     template = loader.get_template('wbcore/facts.html')
     context = {
         'main_nav': get_main_nav(host=host),
@@ -610,6 +646,8 @@ def facts_view(request, host_slug=None):
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
         'facts': facts,
+        'financial_reports': financial_reports,
+        'annual_reports': annual_reports,
     }
     return HttpResponse(template.render(context, request))
 
@@ -680,6 +718,7 @@ def privacy_view(request, host_slug=None):
         'host': host,
         'breadcrumb': breadcrumb,
         'icon_links': icon_links,
+        'bundesverband': Host.objects.get(slug='bundesverband'),
         'privacy': privacy,
         'hosts': Host.objects.all(),
     }
@@ -1138,7 +1177,12 @@ def join_view(request, host_slug=None):
     else:
         projects = Project.objects.all().order_by('completed', '-updated')
 
-    membership_declaration = Document.objects.filter(host=host, document_type='membership_declaration', public=True).order_by('-valid_from') if host else None
+    if host:
+        membership_declaration = Document.objects.filter(host=host, document_type='membership_declaration', public=True)
+        membership_declaration_linked = LinkedDocument.objects.filter(host=host, document_type='membership_declaration', public=True)
+        membership_declaration = join_documents_linked(membership_declaration, membership_declaration_linked, sort_key='-valid_from')
+    else:
+        membership_declaration = None
 
     context = {
         'main_nav': get_main_nav(host=host, active='join'),
@@ -1696,8 +1740,8 @@ def contact_view(request, host_slug=None):
         contact = None
     teams = Team.objects.filter(host=load_host)
 
-    if teams:
-        if len(teams) > 3:
+    if teams.exists():
+        if teams.count() > 3:
             teams = teams[:3]
             more_teams = reverse('teams', args=[host_slug]) if host_slug else reverse('teams')
         else:

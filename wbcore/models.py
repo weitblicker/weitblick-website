@@ -31,18 +31,18 @@ class AdminThumbnailMixin(models.Model):
 
     def admin_thumb(self):
         try:
-            return mark_safe('<img src="%s" />' % self.get_admin_thumbnail_url())
+            return self.admin_thumbnail()
         except AttributeError:  # if class is not Photo
             if self.image:
                 if type(self.image) == Photo:
-                    return mark_safe('<img src="%s" />' % self.image.get_admin_thumbnail_url())
+                    return self.image.admin_thumbnail()
                 else:
                     thumbnailer = get_thumbnailer(self.image)
                     return mark_safe('<img src="%s%s" />' % (settings.MEDIA_URL, thumbnailer['profile_list_view']))
             else:
                 return None
 
-    admin_thumb.short_description = 'Photo'
+    admin_thumb.short_description = _('Photo')
 
 
 class Photo(RulesModelMixin, AdminThumbnailMixin, PhotologuePhoto, metaclass=RulesModelBase):
@@ -869,7 +869,7 @@ def save_document(instance, filename):
     return replace_umlaute(path)
 
 
-class Document(RulesModel):
+class BaseDocument(RulesModel):
     class Meta:
         rules_permissions = {
             "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
@@ -878,10 +878,10 @@ class Document(RulesModel):
             "delete": pred.is_super_admin | pred.is_admin | pred.is_editor,
         }
         get_latest_by = 'valid_from'
+        abstract = True
 
     title = models.CharField(max_length=50)
     description = models.TextField(null=True, blank=True)
-    file = models.FileField(upload_to=save_document)
     host = models.ForeignKey(Host, on_delete=models.SET_NULL, null=True)
     published = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     TYPE_CHOICES = (
@@ -905,6 +905,22 @@ class Document(RulesModel):
 
     def get_hosts(self):
         return [self.host]
+
+
+class Document(BaseDocument):
+    file = models.FileField(upload_to=save_document)
+    icon = 'file pdf outline'
+
+    def get_url(self):
+        return self.file.url
+
+
+class LinkedDocument(BaseDocument):
+    url = models.URLField()
+    icon = 'linkify'
+
+    def get_url(self):
+        return self.url
 
 
 class Team(RulesModel, AdminThumbnailMixin):
