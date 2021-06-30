@@ -1287,12 +1287,15 @@ def project_view(request, host_slug=None, project_slug=None):
 
 
 def hosts_view(request, host_slug=None):
-    if host_slug:
-        host = Host.objects.get(slug=host_slug)
-        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Associations'), None)]
-    else:
-        host = None
-        breadcrumb = [(_('Home'), reverse('home')), (_('Associations'), None)]
+    try:
+        if host_slug:
+            host = Host.objects.get(slug=host_slug)
+            breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Associations'), None)]
+        else:
+            host = None
+            breadcrumb = [(_('Home'), reverse('home')), (_('Associations'), None)]
+    except Host.DoesNotExist:
+        raise Http404()
 
     template = loader.get_template('wbcore/hosts.html')
     context = {
