@@ -35,9 +35,11 @@
                                     </a>
                                 {% endif %}
                             {% endfor %}
-                            <a class="popup-menu-btn item">
-                                <i class="fitted large chevron down icon"></i>
-                            </a>
+                            {% if dot_nav %}
+                                <a class="popup-menu-btn item">
+                                    <i class="fitted large chevron down icon"></i>
+                                </a>
+                            {% endif %}
                         </div>
                         <br>
                         <div class="ui compact secondary menu">
@@ -91,9 +93,11 @@
                                     </a>
                                 {% endif %}
                             {% endfor %}
-                            <a class="popup-menu-btn item">
-                                <i class="fitted large chevron down icon"></i>
-                            </a>
+                            {% if dot_nav %}
+                                <a class="popup-menu-btn item">
+                                    <i class="fitted large chevron down icon"></i>
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -149,16 +153,20 @@
                                 {% endif %}
                             {% endif %}
                         {% endfor %}
-                        <a class="popup-menu-btn item">
-                            <i class="fitted large chevron down icon"></i>
-                            More
-                        </a>
+                        {% if dot_nav %}
+                            <a class="popup-menu-btn item">
+                                <i class="fitted large chevron down icon"></i>
+                                More
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-            <div id="popup-menu">
-                {% include 'wbcore/dot_nav.html' %}
-            </div>
+            {% if dot_nav %}
+                <div id="popup-menu">
+                    {% include 'wbcore/dot_nav.html' %}
+                </div>
+            {% endif %}
         </div>
 
     </div>

@@ -25,4 +25,5 @@ semantic/dist/themes/*
 !semantic/dist/*.css
 !semantic/dist/themes/default/
 wbcore/static/semantic/dist/components/
+wbcore/locale/*/LC_MESSAGES/*.mo
 .vscode

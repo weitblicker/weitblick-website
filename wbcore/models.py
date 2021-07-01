@@ -94,6 +94,9 @@ class Location(RulesModel):
     def __str__(self):
         return self.name + " (" + self.country.name + ")"
 
+class HostManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(dissolved=False)
 
 class Host(RulesModel):
     class Meta:
@@ -116,6 +119,12 @@ class Host(RulesModel):
     location = models.OneToOneField(Location, on_delete=models.SET_NULL, null=True)
     partners = SortedManyToManyField('Partner', blank=True, related_name='hosts')
     bank = models.OneToOneField('BankAccount', on_delete=models.SET_NULL, null=True)
+    dissolved = models.BooleanField(default=False, null=False, blank=False)
+    dissolution_date = models.DateField(null=True, blank=True, help_text="Datum der Auflösung des Vereins")
+
+    # Manager https://docs.djangoproject.com/en/3.1/topics/db/managers/
+    all_objects = models.Manager()  # first manager is used as default manager
+    objects = HostManager()  # when calling Host.objects only return non-dissolved
 
     def belongs_to_host(self, host):
         return host == self
@@ -504,7 +513,7 @@ class Partner(RulesModel):
         return self.name
 
     def get_hosts(self):
-        return Host.objects.all()
+        return self.hosts.all()
 
     def search_title(self):
         return self.name
@@ -588,6 +597,7 @@ class Project(RulesModel):
 
     def get_teaser(self):
         return self.short_description if self.short_description else self.description
+
 
 class Event(RulesModelMixin, ScheduleEvent, metaclass=RulesModelBase):
     class Meta:
