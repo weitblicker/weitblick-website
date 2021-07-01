@@ -15,6 +15,7 @@ from modeltranslation.admin import TabbedTranslationAdmin, TranslationTabularInl
 from martor.widgets import AdminMartorWidget
 from django_google_maps import widgets as map_widgets
 from django_google_maps import fields as map_fields
+from wbcore.widgets import CustomLocationWidget
 from schedule.models import Calendar
 from easy_thumbnails.files import get_thumbnailer
 from django_reverse_admin import ReverseModelAdmin
@@ -150,8 +151,7 @@ class JoinPageInlineModel(PermissionInlineModel):
     model = JoinPage
 
     formfield_overrides = {
-        models.TextField: {'widget': AdminMartorWidget},
-        map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget(attrs={'data-map-type': 'roadmap'})},
+        models.TextField: {'widget': AdminMartorWidget}
     }
 
 
@@ -177,8 +177,7 @@ class MyAdmin(TabbedTranslationAdmin):
         
     formfield_overrides = {
         models.TextField: {'widget': AdminMartorWidget},
-        map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget(attrs={'data-map-type': 'roadmap'})},
-    }
+        }
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if request.user.is_super_admin:
@@ -762,6 +761,8 @@ class ContentAdmin(MyAdmin):
 class LocationAdmin(MyAdmin):
 
     def get_queryset(self, request):
+        if request.user.is_superuser or request.user.is_super_admin:
+            return super().get_queryset(request)
         event_locations = Location.objects.filter(event__host__in=request.user.hosts.all())
         host_locations = Location.objects.filter(host__in=request.user.hosts.all())
         project_locations = Location.objects.filter(project__hosts__in=request.user.hosts.all())
@@ -770,6 +771,11 @@ class LocationAdmin(MyAdmin):
 
     list_display = ('name', 'street', 'postal_code', 'city', 'get_country', 'geolocation', 'get_occurrences')
     readonly_fields = ('get_occurrences',)
+
+    formfield_overrides = {
+        map_fields.GeoLocationField: {'widget': CustomLocationWidget(based_fields=['address'])}
+    }
+
 
     def get_country(self, address):
         return address.country.name

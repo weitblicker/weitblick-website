@@ -13,7 +13,7 @@
             {% if item.image %} <!-- Photologue image -->
                 <img src="{{ item.image.get_listsize_url }}" alt="{{ item.image.title }}">
             {% elif item.fixed_image %} <!-- ImageField -->
-                <img src="{{ item.fixed_image.url }}" style="max-width: 100%; max-height: 70.58%">
+                <img src="{{ item.fixed_image|thumbnail_url:'partner_logo_list_view'  }}" style="max-width: 100%; max-height: 70.58%">
             {% else %}
                 <div class="ui image {{ image_size }}">{% include 'wbcore/svgs/placeholder.svg' with text=item.get_model_name %}</div>
             {% endif %}
