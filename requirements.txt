@@ -39,3 +39,4 @@ django-instagram
 cairosvg
 django-cleanup
 easy-thumbnails
+django-fixture-magic
