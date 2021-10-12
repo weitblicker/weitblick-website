@@ -106,6 +106,11 @@ class Command(BaseCommand):
         Photo.objects.filter(host=host).exclude(type='project')
         for partner in host.partners.all():
             if len(partner.hosts.all()) == 1 and len(partner.projects.all()) == 0:
+                try:
+                    os.makedirs(os.path.dirname(dump_folder + partner.logo.url.strip('/')), exist_ok=True)
+                    shutil.copyfile(partner.logo.path, dump_folder + partner.logo.url.strip('/'))
+                except (FileNotFoundError, ValueError) as e:
+                    pass
                 partner.delete()
 
         host.dissolved = True
