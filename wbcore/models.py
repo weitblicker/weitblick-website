@@ -887,6 +887,15 @@ class BaseDocument(RulesModel):
 
 
 class Document(BaseDocument):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "view": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "delete": pred.is_super_admin | pred.is_admin | pred.is_editor,
+        }
+        get_latest_by = 'valid_from'
+
     file = models.FileField(upload_to=save_document)
     icon = 'file pdf outline'
 
@@ -895,6 +904,15 @@ class Document(BaseDocument):
 
 
 class LinkedDocument(BaseDocument):
+    class Meta:
+        rules_permissions = {
+            "add": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "view": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "change": pred.is_super_admin | pred.is_admin | pred.is_editor,
+            "delete": pred.is_super_admin | pred.is_admin | pred.is_editor,
+        }
+        get_latest_by = 'valid_from'
+
     url = models.URLField()
     icon = 'linkify'
 
