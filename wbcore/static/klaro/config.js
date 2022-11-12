@@ -74,9 +74,6 @@ var klaroConfig = {
             klaro: {
                 description: 'Verwaltung des Einverständnis',
             },
-            google_fonts: {
-                description: 'Web-Schriftarten von Google gehostet',
-            },
             google_tag_manager: {
                 description: 'Die Google-Konzernunternehmen wie Google LLC und Google Ireland Limited verarbeiten die übermittelten Anfrage-Daten (z.B. IP-Adresse), Nutzungs- (z.B. aufgerufene Seiten) und Werbekampagnen-Daten darüber hinaus zu eigenen Zwecken und verknüpfen diese womöglich mit weiteren Daten wie deinen Account-Daten. Die Verarbeitungen erfolgen teilweise in den USA, wo kein mit der EU vergleichbares Datenschutzniveau garantiert ist und insbesondere staatliche Behörden Zugriff auf die verarbeiteten Daten haben können. Zur Google-Datenschutzerklärung: https://policies.google.com/privacy?hl=de',
             },
@@ -105,9 +102,6 @@ var klaroConfig = {
             },
             klaro: {
                 description: 'Consent management',
-            },
-            google_fonts: {
-                description: 'Web fonts hosted by Google',
             },
             google_tag_manager: {
                 description: 'Simplified integration of website content like statistic tools and performance optimization',
@@ -189,15 +183,6 @@ var klaroConfig = {
 
         // The apps will appear in the modal in the same order as defined here.
         {
-            name: 'google_fonts',
-            title: 'Google Fonts',
-            purposes: ['functionality'],
-            required: true,
-            callback: function(consent, app){
-                console.log('User consent for app ' + app.name + ': consent=' + consent);
-            }
-        },
-        {
             name: 'google_tag_manager',
             title: 'Google Tag Manger',
             purposes: ['statistics'],
@@ -246,4 +231,4 @@ klaroConfig.translations.es = klaroConfig.translations.en
 
 
 
-klaro:"%7B%22klaro%22%3Atrue%2C%22google_fonts%22%3Atrue%2C%22google_tag_manager%22%3Atrue%2C%22google_analytics%22%3Atrue%2C%22google_ad%22%3Afalse%7D"
+klaro:"%7B%22klaro%22%3Atrue%2C%2C%22google_tag_manager%22%3Atrue%2C%22google_analytics%22%3Atrue%2C%22google_ad%22%3Afalse%7D"
