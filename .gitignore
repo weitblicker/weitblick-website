@@ -2,7 +2,6 @@
 Pipfile
 Pipfile.lock
 __pycache__
-migrations
 djangoenv
 .idea
 deploy.sh
@@ -26,3 +25,4 @@ semantic/dist/themes/*
 !semantic/dist/themes/default/
 wbcore/static/semantic/dist/components/
 .vscode
+*.code-workspace
