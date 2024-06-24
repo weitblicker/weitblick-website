@@ -17,58 +17,26 @@
 
     <div class="six wide column">
         <div class="ui fluid vertical menu">
-          {% if host %}
-            <a class="item" href="{% url 'news' host.slug %}">{% trans "News" %}</a>
-            <a class="item" href="{% url 'blog' host.slug %}">{% trans "Blog" %}</a>
-          {% else %}
-            <a class="item" href="{% url 'news' %}">{% trans "News" %}</a>
-            <a class="item" href="{% url 'blog' %}">{% trans "Blog" %}</a>
-          {% endif %}
+            <a class="item" href="{{ dot_nav.news.link }}">{{ dot_nav.news.name }}</a>
+            <a class="item" href="{{ dot_nav.blog.link }}">{{ dot_nav.blog.name }}</a>
         </div>
     </div>
     <div class="six wide column">
         <div class="ui fluid vertical menu">
-            {% if host %}
-                <a class="item" href="{% url 'about' host.slug %}">{% trans "About" %}</a>
-                <div class="ui vertical fluid menu">
-                    <a class="item" href="{% url 'history' host.slug %}">{% trans "History" %}</a>
-                    <a class="item" href="{% url 'teams' host.slug %}">{% trans "Team" %}</a>
-                    <a class="item" href="{% url 'partners' host.slug %}">{% trans "Partners" %}</a>
-                    <a class="item" href="{% url 'donate' host.slug %}">{% trans "Donate" %}</a>
-                    <a class="item" href="{% url 'contact' host.slug %}">{% trans "Contact" %}</a>
-                </div>
-            {% else %}
-                <a class="item" href="{% url 'about' %}">{% trans "About" %}</a>
-                <div class="ui vertical fluid menu">
-                    <a class="item" href="{% url 'history' %}">{% trans "History" %}</a>
-                    <a class="item" href="{% url 'teams' %}">{% trans "Team" %}</a>
-                    <a class="item" href="{% url 'partners' %}">{% trans "Partners" %}</a>
-                    <a class="item" href="{% url 'donate' %}">{% trans "Donate" %}</a>
-                    <a class="item" href="{% url 'contact' %}">{% trans "Contact" %}</a>
-                </div>
-            {% endif %}
+            <a class="item" href="{{dot_nav.about.link}}">{{dot_nav.about.name}}</a>
+            {% for key, entry in dot_nav.about.entries.items %}
+                {% if key != 'idea' %}
+                    <a class="item" href="{{ entry.link }}">{{ entry.name }}</a>
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
     <div class="six wide column">
         <div class="ui fluid vertical menu">
-            {% if host %}
-                <a class="item" href="{% url 'facts' host.slug %}">{% trans "Facts" %}</a>
-                <div class="ui vertical fluid menu">
-                    <a class="item" href="{% url 'transparency' host.slug %}">{% trans "Transparency" %}</a>
-                    <a class="item" href="{% url 'charter' host.slug %}">{% trans "Charter" %}</a>
-                    <a class="item" href="{% url 'reports' host.slug %}">{% trans "Reports" %}</a>
-                    <a class="item" href="{% url 'faq' host.slug %}">{% trans "FAQ" %}</a>
-                </div>
-            {% else %}
-                <a class="item" href="{% url 'facts' %}">{% trans "Facts" %}</a>
-                <div class="ui vertical fluid menu">
-                    <a class="item" href="{% url 'transparency' %}">{% trans "Transparency" %}</a>
-                    <a class="item" href="{% url 'charter' %}">{% trans "Charter" %}</a>
-                    <a class="item" href="{% url 'reports' %}">{% trans "Reports" %}</a>
-                    <a class="item" href="{% url 'faq' %}">{% trans "FAQ" %}</a>
-                </div>
-            {% endif %}
-
+            <a class="item" href="{{dot_nav.facts.link}}">{{dot_nav.facts.name}}</a>
+            {% for key, entry in dot_nav.facts.entries.items %}
+                <a class="item" href="{{ entry.link }}">{{ entry.name }}</a>
+            {% endfor %}
         </div>
     </div>
 
