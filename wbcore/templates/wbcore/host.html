@@ -8,10 +8,12 @@
             {{ welcome.text | safe_markdown }}
         </div>
     {% endif %}
-    <div id="news-list" class="ui segment">
-        {% trans "News" as title %}
-        {% include 'wbcore/segment_header.html' with icon='newspaper outline' url_alias='news' %}
-        {% include 'wbcore/item_list.html' with item_list=item_list %}
-        <a href="{% url 'news' host_slug=host.slug %}">{% trans "more" %}</a>
-    </div>
+    {% if not host.dissolved %}
+        <div id="news-list" class="ui segment">
+            {% trans "News" as title %}
+            {% include 'wbcore/segment_header.html' with icon='newspaper outline' url_alias='news' %}
+            {% include 'wbcore/item_list.html' with item_list=item_list %}
+            <a href="{% url 'news' host_slug=host.slug %}">{% trans "more" %}</a>
+        </div>
+    {% endif %}
 {% endblock %}

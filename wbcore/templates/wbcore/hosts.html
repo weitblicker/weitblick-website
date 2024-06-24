@@ -27,4 +27,29 @@
             </div>
         {% endif %}
     </div>
+
+    {% if dissolved_hosts %}
+        <div class="    ui segment">
+            <h2>{% trans "Dissolved Associations" %}</h2>
+            <div class="ui two column grid list">
+                {% for host in dissolved_hosts %}
+                    <div class="column">
+                        <a class="ui item" href="{% url 'host' host.slug %}">
+                            <div class="ui avatar" style="width: 25px; height: 25px; margin-right: 1rem; float: left">
+                                {% include 'wbcore/svgs/puzzle-icon.svg' with color='#979797'%}
+                            </div>
+                            <div class="content">
+                                <div class="header">
+                                    {{ host.name }}
+                                </div>
+                                <div class="description">
+                                    {{ host.email }}
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

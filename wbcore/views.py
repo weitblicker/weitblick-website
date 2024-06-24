@@ -67,7 +67,7 @@ icon_links = OrderedDict([
 
 
 def get_main_nav(host=None, active=None):
-    args = [host.slug] if host else []
+    args = [host.slug] if host and not host.dissolved else []
     nav = OrderedDict([
             ('home',
                 {
@@ -113,6 +113,10 @@ def get_main_nav(host=None, active=None):
                 }),
     ])
 
+    if host and host.dissolved:
+        nav['projects']['link'] = reverse('projects', args=[host.slug])
+
+
     if active in nav:
         nav[active]['link'] = None
 
@@ -120,7 +124,9 @@ def get_main_nav(host=None, active=None):
 
 
 def get_dot_nav(host=None):
-    if host:
+    if host and host.dissolved:
+        return None
+    elif host:
         host_slug = host.slug
         news = NewsPost.objects.filter(host=host).order_by('-published')[:3]
         blog = BlogPost.objects.filter(host=host).order_by('-published')[:3]
@@ -261,7 +267,7 @@ def item_list_from_events(events, host_slug=None, start=None, end=None, text=Tru
 def item_list_from_occ(occurrences, host_slug=None, text=True):
     # set attributes to fill list_item template
     item_list = []
-    current_host = Host.objects.get(slug=host_slug) if host_slug else None
+    current_host = Host.all_objects.get(slug=host_slug) if host_slug else None
     for occ in occurrences:
         # image
         occ.image = occ.event.image
@@ -331,7 +337,7 @@ def item_list_from_occ(occurrences, host_slug=None, text=True):
 
 def item_list_from_posts(posts, host_slug=None, post_type='news-post', id_key='post_id', text=True):
     item_list = []
-    current_host = Host.objects.get(slug=host_slug) if host_slug else None
+    current_host = Host.all_objects.get(slug=host_slug) if host_slug else None
     for post in posts:
         if not post.teaser and post.text:
             post.teaser = post.text
@@ -361,7 +367,7 @@ def item_list_from_proj(projects, host_slug=None, text=True, max_num_items=None)
         return item_list
     if max_num_items:
         projects = projects[:max_num_items]
-    current_host = Host.objects.get(slug=host_slug) if host_slug else None
+    current_host = Host.all_objects.get(slug=host_slug) if host_slug else None
 
     projects = projects.annotate(title=F('name'))
     projects = projects.annotate(show_text=Value(text, output_field=BooleanField()))
@@ -409,7 +415,7 @@ def item_list_from_teams(teams, host_slug=None):
 
 def item_list_from_partners(partners, host_slug=None, text=True, max_num_items=None):
     item_list = []
-    current_host = Host.objects.get(slug=host_slug) if host_slug else None
+    current_host = Host.all_objects.get(slug=host_slug) if host_slug else None
     categories = dict(Partner.CATEGORY_CHOICES)
     category_icons = dict(Partner.CATEGORY_ICONS)
 
@@ -980,7 +986,7 @@ def projects_view(request, host_slug=None):
 
     if host_slugs:
         try:
-            host = Host.objects.get(slug=host_slug) if host_slug else None
+            host = Host.all_objects.get(slug=host_slug) if host_slug else None
             projects = Project.objects.filter(hosts__slug__in=host_slugs).distinct()
             breadcrumb = [(_('Home'), reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
@@ -1226,7 +1232,7 @@ def project_view(request, host_slug=None, project_slug=None):
     try:
         if host_slug:
             project = Project.objects.get(slug=project_slug, hosts__slug=host_slug)
-            host = Host.objects.get(slug=host_slug)
+            host = Host.all_objects.get(slug=host_slug)
             breadcrumb = [(_('Home'), reverse('home')),
                           (host.name, reverse('host', args=[host_slug])),
                           (_('Projects'), reverse('projects', args=[host_slug])),
@@ -1281,17 +1287,21 @@ def project_view(request, host_slug=None, project_slug=None):
 
 
 def hosts_view(request, host_slug=None):
-    if host_slug:
-        host = Host.objects.get(slug=host_slug)
-        breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Associations'), None)]
-    else:
-        host = None
-        breadcrumb = [(_('Home'), reverse('home')), (_('Associations'), None)]
+    try:
+        if host_slug:
+            host = Host.objects.get(slug=host_slug)
+            breadcrumb = [(_('Home'), reverse('home')), (host.name, reverse('host', args=[host_slug])), (_('Associations'), None)]
+        else:
+            host = None
+            breadcrumb = [(_('Home'), reverse('home')), (_('Associations'), None)]
+    except Host.DoesNotExist:
+        raise Http404()
 
     template = loader.get_template('wbcore/hosts.html')
     context = {
         'host': host,
         'hosts': Host.objects.all(),
+        'dissolved_hosts': Host.all_objects.filter(dissolved=True),
         'main_nav': get_main_nav(host=host, active='hosts'),
         'meta': get_meta(title=_('Associations')),
         'dot_nav': get_dot_nav(host=host),
@@ -1303,7 +1313,7 @@ def hosts_view(request, host_slug=None):
 
 def host_view(request, host_slug):
     try:
-        host = Host.objects.get(slug=host_slug) if host_slug else None
+        host = Host.all_objects.get(slug=host_slug) if host_slug else None
 
         # replacing the link with the social media link # TODO no hardcoded links in general!
         for social_link in host.socialmedialink_set.all():

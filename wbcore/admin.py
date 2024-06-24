@@ -569,7 +569,7 @@ class HostAdmin(MyAdmin, ReverseModelAdmin):
 
     search_fields = ['name']
 
-    list_display = ('name', 'slug', 'email', 'founding_date', 'address')
+    list_display = ('name', 'slug', 'email', 'founding_date', 'address', 'dissolved')
 
     def get_readonly_fields(self, request, obj=None):
         readonly_field = super().get_readonly_fields(request, obj)
